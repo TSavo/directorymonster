@@ -47,3 +47,12 @@ next-env.d.ts
 # Redis data files
 *.rdb
 dump.rdb
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SEO data logs and raw data
+/seo_data/logs/
+/seo_data/raw/

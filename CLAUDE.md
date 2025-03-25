@@ -138,3 +138,9 @@ The test suite is designed to run in CI environments:
 2. **Working with Redis**
    - If Redis is not available, the app can use an in-memory fallback (configured in `src/lib/redis-client.ts`)
    - For production, always use a proper Redis instance
+
+3. **URL Construction**
+   - Always use the URL utility functions in `src/lib/site-utils.ts` to construct URLs
+   - For components, use the Link wrapper components in `src/components/LinkUtilities.tsx`
+   - See `docs/url-utilities.md` for detailed documentation and examples
+   - Follow these patterns to ensure consistent URL construction across the application

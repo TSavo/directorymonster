@@ -16,20 +16,47 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
     );
   }
   
-  // Get all categories for this site
-  const categoryKeys = await kv.keys(`category:site:${site.id}:*`);
-  const categories = await Promise.all(
-    categoryKeys.map(async (key) => await kv.get<Category>(key))
-  );
-  
-  return NextResponse.json(categories);
+  try {
+    // Get all categories for this site
+    const categoryKeys = await kv.keys(`category:site:${site.id}:*`);
+    const categoriesPromises = categoryKeys.map(async (key) => await kv.get<Category>(key));
+    
+    // Handle each promise individually to prevent one failure from breaking everything
+    const categories: Category[] = [];
+    for (let i = 0; i < categoriesPromises.length; i++) {
+      try {
+        const category = await categoriesPromises[i];
+        if (category) {
+          categories.push(category);
+        }
+      } catch (error) {
+        console.error(`Error fetching category at index ${i}:`, error);
+        // Continue with other categories
+      }
+    }
+    
+    return NextResponse.json(categories);
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch categories' },
+      { status: 500 }
+    );
+  }
 });
 
 export const POST = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string } }) => {
   const siteSlug = params.siteSlug;
   
+  console.log(`Looking for site with slug: ${siteSlug}`);
+  
+  // Debugging - list all site keys
+  const siteKeys = await kv.keys('site:*');
+  console.log('Available site keys:', siteKeys);
+  
   // Get site by slug
   const site = await kv.get<SiteConfig>(`site:slug:${siteSlug}`);
+  console.log('Found site:', site);
   
   if (!site) {
     return NextResponse.json(
@@ -92,10 +119,28 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
     multi.set(`category:id:${category.id}`, JSON.stringify(category));
     multi.set(`category:site:${site.id}:${category.slug}`, JSON.stringify(category));
     
-    // Execute all commands as a transaction
-    await multi.exec();
-    
-    return NextResponse.json(category, { status: 201 });
+    try {
+      // Execute all commands as a transaction
+      const results = await multi.exec();
+      
+      // Check for errors in the transaction
+      const errors = results.filter(([err]) => err !== null);
+      if (errors.length > 0) {
+        console.error('Transaction errors:', errors);
+        return NextResponse.json(
+          { error: 'Failed to save category data' },
+          { status: 500 }
+        );
+      }
+      
+      return NextResponse.json(category, { status: 201 });
+    } catch (error) {
+      console.error('Error executing Redis transaction:', error);
+      return NextResponse.json(
+        { error: 'Failed to save category data' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('Error creating category:', error);
     return NextResponse.json(

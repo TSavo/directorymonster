@@ -28,6 +28,7 @@ export interface Listing {
   id: string;
   siteId: string;
   categoryId: string;
+  categorySlug?: string; // Added optional categorySlug for better URL construction
   title: string;
   slug: string;
   metaDescription: string;

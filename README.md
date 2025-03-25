@@ -112,14 +112,14 @@ For development without Redis, the application includes an in-memory fallback:
 
 ##### Important Notes About In-Memory Redis:
 
-1. The in-memory store is empty on startup - you must seed data for proper functionality:
+1. The in-memory store is empty on startup - you must seed data via the API for proper functionality:
    ```bash
    npm run seed
    ```
 
 2. Data is lost when the application restarts
 
-3. For testing, use the convenience scripts that automatically handle seeding:
+3. For testing, use the convenience scripts that automatically handle API seeding:
    ```bash
    # Run tests with auto-seeding
    npm run test:with-seed
@@ -134,6 +134,8 @@ For development without Redis, the application includes an in-memory fallback:
    - `keys` - Pattern-based key searching
    - `sadd` - Set operations for search indexing
    - `del` - Key deletion
+
+5. All data seeding is done through the API to ensure proper validation and consistency.
 
 ## Directory Architecture
 
@@ -162,11 +164,14 @@ DirectoryMonster has comprehensive testing strategies to ensure proper functioni
 
 ### Data Seeding for Tests
 
-**Important:** Many tests require seeded data to pass. The in-memory Redis implementation will be empty when you first start, causing test failures. Always seed data before testing:
+**Important:** Many tests require seeded data to pass. The in-memory Redis implementation will be empty when you first start, causing test failures. Always seed data through the API before testing:
 
 ```bash
-# Seed sample data for testing
+# Seed sample data for testing via API
 npm run seed
+
+# For Docker environments
+npm run seed:docker
 
 # Run tests with auto-seeding
 npm run test:with-seed
@@ -175,6 +180,8 @@ npm run test:all-with-seed
 # Run tests with server and auto-seeding (single command)
 npm run test:with-server  
 ```
+
+See [docs/seeding.md](docs/seeding.md) for more details on the API-based seeding process.
 
 ### Unit and Integration Tests
 

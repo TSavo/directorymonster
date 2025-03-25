@@ -10,47 +10,72 @@ export const searchIndexer = {
    * Index a listing for search
    */
   async indexListing(listing: Listing): Promise<void> {
-    const multi = redis.multi();
-    
-    // Extract search terms
-    const searchTerms = extractSearchTerms(listing);
-    
-    // Add listing ID to each search term set
-    for (const term of searchTerms) {
-      // Store site-specific search term
-      multi.sadd(`search:${listing.siteId}:term:${term.toLowerCase()}`, listing.id);
+    try {
+      const multi = redis.multi();
       
-      // Store global search term
-      multi.sadd(`search:global:term:${term.toLowerCase()}`, listing.id);
+      // Extract search terms
+      const searchTerms = extractSearchTerms(listing);
+      
+      // Add listing ID to each search term set
+      for (const term of searchTerms) {
+        // Store site-specific search term
+        multi.sadd(`search:${listing.siteId}:term:${term.toLowerCase()}`, listing.id);
+        
+        // Store global search term
+        multi.sadd(`search:global:term:${term.toLowerCase()}`, listing.id);
+      }
+      
+      // Store a list of all search terms for this listing (for removal later)
+      multi.sadd(`search:listing:${listing.id}:terms`, ...searchTerms.map(t => t.toLowerCase()));
+      
+      // Execute all commands
+      const results = await multi.exec();
+      
+      // Check for errors in the results
+      if (results.some(([err]) => err !== null)) {
+        const errors = results.filter(([err]) => err !== null).map(([err]) => err?.message);
+        console.error(`Errors occurred during search indexing: ${errors.join(', ')}`);
+        // We don't throw here to prevent breaking the main transaction flow
+        // but we log the errors for debugging
+      }
+    } catch (error) {
+      console.error('Error indexing listing for search:', error);
+      // We don't throw here to prevent breaking the main functionality
+      // since search indexing is not critical for the core API operation
     }
-    
-    // Store a list of all search terms for this listing (for removal later)
-    multi.sadd(`search:listing:${listing.id}:terms`, ...searchTerms.map(t => t.toLowerCase()));
-    
-    // Execute all commands
-    await multi.exec();
   },
   
   /**
    * Remove a listing from search index
    */
   async removeListing(listingId: string, siteId: string): Promise<void> {
-    // Get all search terms for this listing
-    const terms = await redis.smembers(`search:listing:${listingId}:terms`);
-    
-    const multi = redis.multi();
-    
-    // Remove listing ID from each search term set
-    for (const term of terms) {
-      multi.srem(`search:${siteId}:term:${term}`, listingId);
-      multi.srem(`search:global:term:${term}`, listingId);
+    try {
+      // Get all search terms for this listing
+      const terms = await redis.smembers(`search:listing:${listingId}:terms`);
+      
+      const multi = redis.multi();
+      
+      // Remove listing ID from each search term set
+      for (const term of terms) {
+        multi.srem(`search:${siteId}:term:${term}`, listingId);
+        multi.srem(`search:global:term:${term}`, listingId);
+      }
+      
+      // Remove the listing's terms set
+      multi.del(`search:listing:${listingId}:terms`);
+      
+      // Execute all commands
+      const results = await multi.exec();
+      
+      // Check for errors in the results
+      if (results.some(([err]) => err !== null)) {
+        const errors = results.filter(([err]) => err !== null).map(([err]) => err?.message);
+        console.error(`Errors occurred during search index removal: ${errors.join(', ')}`);
+      }
+    } catch (error) {
+      console.error('Error removing listing from search index:', error);
+      // We don't throw here to prevent breaking the main functionality
     }
-    
-    // Remove the listing's terms set
-    multi.del(`search:listing:${listingId}:terms`);
-    
-    // Execute all commands
-    await multi.exec();
   },
   
   /**

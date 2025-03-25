@@ -17,13 +17,33 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
     );
   }
   
-  // Get all listings for this site
-  const listingKeys = await kv.keys(`listing:site:${site.id}:*`);
-  const listings = await Promise.all(
-    listingKeys.map(async (key) => await kv.get<Listing>(key))
-  );
-  
-  return NextResponse.json(listings);
+  try {
+    // Get all listings for this site
+    const listingKeys = await kv.keys(`listing:site:${site.id}:*`);
+    const listingsPromises = listingKeys.map(async (key) => await kv.get<Listing>(key));
+    
+    // Handle each promise individually to prevent one failure from breaking everything
+    const listings: Listing[] = [];
+    for (let i = 0; i < listingsPromises.length; i++) {
+      try {
+        const listing = await listingsPromises[i];
+        if (listing) {
+          listings.push(listing);
+        }
+      } catch (error) {
+        console.error(`Error fetching listing at index ${i}:`, error);
+        // Continue with other listings
+      }
+    }
+    
+    return NextResponse.json(listings);
+  } catch (error) {
+    console.error('Error fetching listings:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch listings' },
+      { status: 500 }
+    );
+  }
 });
 
 export const POST = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string } }) => {
@@ -101,21 +121,44 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
     multi.set(`listing:site:${site.id}:${listing.slug}`, JSON.stringify(listing));
     multi.set(`listing:category:${listing.categoryId}:${listing.slug}`, JSON.stringify(listing));
     
-    // Execute all commands as a transaction
-    await multi.exec();
-    
-    // Index the listing for search
-    await searchIndexer.indexListing(listing);
-    
-    // Return the listing with URLs
-    const baseUrl = site.domain
-      ? `https://${site.domain}`
-      : `http://localhost:3000`; // For local testing
+    try {
+      // Execute all commands as a transaction
+      const results = await multi.exec();
       
-    return NextResponse.json({
-      ...listing,
-      url: `${baseUrl}/${category.slug}/${listing.slug}`,
-    }, { status: 201 });
+      // Check for errors in the transaction
+      const errors = results.filter(([err]) => err !== null);
+      if (errors.length > 0) {
+        console.error('Transaction errors:', errors);
+        return NextResponse.json(
+          { error: 'Failed to save listing data' },
+          { status: 500 }
+        );
+      }
+      
+      // Index the listing for search (this is isolated from the transaction with error handling)
+      try {
+        await searchIndexer.indexListing(listing);
+      } catch (error) {
+        // Log but don't fail the request if indexing fails
+        console.error('Error indexing listing:', error);
+      }
+      
+      // Return the listing with URLs
+      const baseUrl = site.domain
+        ? `https://${site.domain}`
+        : `http://localhost:3000`; // For local testing
+        
+      return NextResponse.json({
+        ...listing,
+        url: `${baseUrl}/${category.slug}/${listing.slug}`,
+      }, { status: 201 });
+    } catch (error) {
+      console.error('Error executing Redis transaction:', error);
+      return NextResponse.json(
+        { error: 'Failed to save listing data' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('Error creating listing:', error);
     return NextResponse.json(

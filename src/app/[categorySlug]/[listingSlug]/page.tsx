@@ -4,7 +4,8 @@ import Image from 'next/image';
 import { kv } from '@/lib/redis-client';
 import { SiteConfig, Category, Listing } from '@/types';
 import SiteHeader from '@/components/SiteHeader';
-import { getSiteByHostname } from '@/lib/site-utils';
+import { getSiteByHostname, generateSiteBaseUrl, generateCategoryHref, generateListingUrl } from '@/lib/site-utils';
+import { CategoryLink } from '@/components/LinkUtilities';
 
 interface ListingPageProps {
   params: {
@@ -154,10 +155,8 @@ export default async function ListingPage({ params, searchParams }: ListingPageP
   }
   
   // Build the canonical URL for this listing
-  const baseUrl = site.domain 
-    ? `https://${site.domain}` 
-    : `https://${site.slug}.mydirectory.com`;
-  const canonicalUrl = `${baseUrl}/${category.slug}/${listing.slug}`;
+  const baseUrl = generateSiteBaseUrl(site);
+  const canonicalUrl = generateListingUrl(site, category.slug, listing.slug);
   
   // Extract rating from custom fields if available
   const ratingValue = listing.customFields?.rating ? Number(listing.customFields.rating) : undefined;
@@ -199,7 +198,7 @@ export default async function ListingPage({ params, searchParams }: ListingPageP
   const structuredDataStr = JSON.stringify(productData);
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <SiteHeader 
         site={site} 
         categories={categories.filter(cat => cat !== null).map(cat => ({
@@ -215,31 +214,36 @@ export default async function ListingPage({ params, searchParams }: ListingPageP
         dangerouslySetInnerHTML={{ __html: structuredDataStr }}
       />
       
-      {/* Breadcrumbs for better SEO and navigation */}
-      <nav aria-label="Breadcrumb" className="container mx-auto px-4 pt-4">
-        <ol className="flex text-sm text-gray-500">
-          <li className="flex items-center">
-            <a href={baseUrl} className="hover:text-gray-700">Home</a>
-            <svg className="h-4 w-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-            </svg>
-          </li>
-          <li className="flex items-center">
-            <a href={`${baseUrl}/${category.slug}`} className="hover:text-gray-700">{category.name}</a>
-            <svg className="h-4 w-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-            </svg>
-          </li>
-          <li className="text-gray-800 font-medium">{listing.title}</li>
-        </ol>
-      </nav>
+      {/* Page header with breadcrumb */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          {/* Breadcrumbs for better SEO and navigation */}
+          <nav aria-label="Breadcrumb">
+            <ol className="flex text-sm text-gray-500">
+              <li className="flex items-center">
+                <a href={baseUrl} className="hover:text-blue-600 transition-colors">Home</a>
+                <svg className="h-4 w-4 mx-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
+                </svg>
+              </li>
+              <li className="flex items-center">
+                <CategoryLink category={category} className="hover:text-blue-600 transition-colors">
+                  {category.name}
+                </CategoryLink>
+                <svg className="h-4 w-4 mx-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
+                </svg>
+              </li>
+              <li className="text-gray-900 font-medium">{listing.title}</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
       
-      <main className="container mx-auto px-4 py-8">
-        <article className="max-w-4xl mx-auto" itemScope itemType="https://schema.org/Product">
+      <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <article className="bg-white shadow-sm rounded-lg overflow-hidden" itemScope itemType="https://schema.org/Product">
           {/* Hidden canonical URL for SEO */}
           <link rel="canonical" href={canonicalUrl} />
-          
-          <h1 className="text-4xl font-bold mb-4" itemProp="name">{listing.title}</h1>
           
           {/* Meta data for social sharing */}
           <meta property="og:title" content={`${listing.title} - ${site.name}`} />
@@ -248,111 +252,132 @@ export default async function ListingPage({ params, searchParams }: ListingPageP
           <meta property="og:type" content="product" />
           <meta property="og:url" content={canonicalUrl} />
           
-          {listing.imageUrl && (
-            <div className="relative h-96 w-full mb-6 rounded-lg overflow-hidden">
-              <Image
-                src={listing.imageUrl}
-                alt={listing.title}
-                fill
-                className="object-cover"
-                itemProp="image"
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-            </div>
-          )}
-          
-          {/* Display rating if available */}
-          {ratingValue && (
-            <div className="flex items-center mb-4">
-              <div className="flex text-yellow-400" itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} className={`h-5 w-5 ${star <= ratingValue ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-                <span className="ml-2 text-gray-600" itemProp="ratingValue">{ratingValue.toFixed(1)}</span>
-                <meta itemProp="reviewCount" content={String(reviewCount || 1)} />
-                <meta itemProp="bestRating" content="5" />
-                <meta itemProp="worstRating" content="1" />
+          <div className="md:flex">
+            {listing.imageUrl && (
+              <div className="md:w-1/2 relative">
+                <div className="relative aspect-[4/3] w-full h-full">
+                  <Image
+                    src={listing.imageUrl}
+                    alt={listing.title}
+                    fill
+                    className="object-cover"
+                    itemProp="image"
+                    priority
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
               </div>
-              {reviewCount && <span className="ml-2 text-gray-600">({reviewCount} reviews)</span>}
+            )}
+            
+            <div className={`p-8 ${listing.imageUrl ? 'md:w-1/2' : 'w-full'}`}>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4" itemProp="name">{listing.title}</h1>
+              
+              {/* Display rating if available */}
+              {ratingValue && (
+                <div className="flex items-center mb-6">
+                  <div className="flex" itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <svg key={star} className={`h-5 w-5 ${star <= ratingValue ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                    <span className="ml-2 text-gray-600" itemProp="ratingValue">{ratingValue.toFixed(1)}</span>
+                    <meta itemProp="reviewCount" content={String(reviewCount || 1)} />
+                    <meta itemProp="bestRating" content="5" />
+                    <meta itemProp="worstRating" content="1" />
+                  </div>
+                  {reviewCount && <span className="ml-2 text-gray-600">({reviewCount} reviews)</span>}
+                </div>
+              )}
+              
+              <p className="text-gray-700 mb-6" itemProp="description">
+                {listing.metaDescription}
+              </p>
+              
+              {/* Price display if available */}
+              {listing.customFields?.price && (
+                <div className="mb-6">
+                  <span className="text-2xl font-bold text-green-700">${listing.customFields.price}</span>
+                </div>
+              )}
+              
+              {/* Prominent backlink styled as a button */}
+              {listing.backlinkPosition === 'prominent' && (
+                <div className="mb-8">
+                  <a 
+                    href={listing.backlinkUrl}
+                    target="_blank"
+                    rel={listing.backlinkType === 'nofollow' ? 'nofollow' : ''}
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                    itemProp="url"
+                  >
+                    {listing.backlinkAnchorText}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="px-8 py-10 border-t border-gray-200">
+            <div className="prose prose-lg max-w-none" itemProp="description">
+              {listing.content}
+              
+              {/* Body backlink */}
+              {listing.backlinkPosition === 'body' && (
+                <div className="my-8 p-4 bg-gray-50 border-l-4 border-blue-500 rounded">
+                  <p className="mb-2 font-medium">For more information:</p>
+                  <a 
+                    href={listing.backlinkUrl}
+                    target="_blank"
+                    rel={listing.backlinkType === 'nofollow' ? 'nofollow' : ''}
+                    className="text-blue-600 font-medium hover:text-blue-800 transition-colors"
+                  >
+                    {listing.backlinkAnchorText}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Custom fields display with a more modern look */}
+          {listing.customFields && Object.keys(listing.customFields).length > 0 && (
+            <div className="px-8 py-10 bg-gray-50 border-t border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Product Details</h2>
+              <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                {Object.entries(listing.customFields)
+                  .filter(([key]) => !['rating', 'review_count'].includes(key)) // Skip rating fields as they're shown elsewhere
+                  .map(([key, value]) => (
+                    <div key={key} className="bg-white p-4 rounded shadow-sm">
+                      <dt className="font-medium text-gray-500 text-sm uppercase tracking-wider mb-1">
+                        {key.replace(/_/g, ' ')}
+                      </dt>
+                      <dd className="text-gray-900 font-medium">{String(value)}</dd>
+                      {/* Add structured data properties */}
+                      {key === 'brand' && <meta itemProp="brand" content={String(value)} />}
+                      {key === 'sku' && <meta itemProp="sku" content={String(value)} />}
+                      {key === 'price' && <meta itemProp="offers" content={String(value)} />}
+                    </div>
+                  ))}
+              </dl>
             </div>
           )}
           
-          {/* Prominent backlink */}
-          {listing.backlinkPosition === 'prominent' && (
-            <div className="bg-gray-100 p-4 my-6 rounded-lg">
-              <p className="font-medium">Learn more about this product:</p>
+          {/* Footer backlink in a footer section */}
+          {listing.backlinkPosition === 'footer' && (
+            <div className="px-8 py-6 bg-gray-50 border-t border-gray-200">
               <a 
                 href={listing.backlinkUrl}
                 target="_blank"
                 rel={listing.backlinkType === 'nofollow' ? 'nofollow' : ''}
-                className="text-blue-600 font-bold hover:underline"
-                itemProp="url"
+                className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
               >
                 {listing.backlinkAnchorText}
               </a>
             </div>
           )}
           
-          <div className="prose prose-lg max-w-none mt-8" itemProp="description">
-            {listing.content}
-            
-            {/* Body backlink */}
-            {listing.backlinkPosition === 'body' && (
-              <p className="my-6">
-                For more information, check out the{' '}
-                <a 
-                  href={listing.backlinkUrl}
-                  target="_blank"
-                  rel={listing.backlinkType === 'nofollow' ? 'nofollow' : ''}
-                  className="text-blue-600 font-medium hover:underline"
-                >
-                  {listing.backlinkAnchorText}
-                </a>
-                .
-              </p>
-            )}
-          </div>
-          
-          {/* Custom fields display */}
-          {listing.customFields && Object.keys(listing.customFields).length > 0 && (
-            <div className="mt-10 border-t pt-6">
-              <h2 className="text-2xl font-bold mb-4">Product Details</h2>
-              <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
-                {Object.entries(listing.customFields).map(([key, value]) => (
-                  <div key={key} className="py-2">
-                    <dt className="font-medium text-gray-500 capitalize">{key.replace(/_/g, ' ')}</dt>
-                    <dd>{String(value)}</dd>
-                    {/* Add structured data properties */}
-                    {key === 'brand' && <meta itemProp="brand" content={String(value)} />}
-                    {key === 'sku' && <meta itemProp="sku" content={String(value)} />}
-                    {key === 'price' && <meta itemProp="offers" content={String(value)} />}
-                  </div>
-                ))}
-              </dl>
-            </div>
-          )}
-          
-          {/* Footer backlink */}
-          {listing.backlinkPosition === 'footer' && (
-            <div className="mt-10 pt-6 border-t">
-              <p>
-                <a 
-                  href={listing.backlinkUrl}
-                  target="_blank"
-                  rel={listing.backlinkType === 'nofollow' ? 'nofollow' : ''}
-                  className="text-blue-600 hover:underline"
-                >
-                  {listing.backlinkAnchorText}
-                </a>
-              </p>
-            </div>
-          )}
-          
           {/* Last updated date (good for SEO freshness) */}
-          <div className="mt-8 text-sm text-gray-500">
+          <div className="px-8 py-4 bg-gray-100 border-t border-gray-200 text-sm text-gray-500">
             <p>Last updated: {new Date(listing.updatedAt).toLocaleDateString()}</p>
           </div>
         </article>

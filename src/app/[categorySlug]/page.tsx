@@ -4,7 +4,7 @@ import { kv } from '@/lib/redis-client';
 import { SiteConfig, Category, Listing } from '@/types';
 import ListingCard from '@/components/ListingCard';
 import SiteHeader from '@/components/SiteHeader';
-import { getSiteByHostname } from '@/lib/site-utils';
+import { getSiteByHostname, generateSiteBaseUrl, generateCategoryUrl } from '@/lib/site-utils';
 
 interface CategoryPageProps {
   params: {
@@ -128,15 +128,19 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   
   // Get listings for this category
   const listingKeys = await kv.keys(`listing:category:${category.id}:*`);
-  const listings = await Promise.all(
-    listingKeys.map(async (key) => await kv.get<Listing>(key))
-  );
+  const listingsPromises = listingKeys.map(async (key) => {
+    const listing = await kv.get<Listing>(key);
+    // Add categorySlug to each listing for proper URL construction
+    if (listing) {
+      listing.categorySlug = category.slug;
+    }
+    return listing;
+  });
+  const listings = await Promise.all(listingsPromises);
   
   // Build the canonical URL for this category
-  const baseUrl = site.domain 
-    ? `https://${site.domain}` 
-    : `https://${site.slug}.mydirectory.com`;
-  const canonicalUrl = `${baseUrl}/${category.slug}`;
+  const baseUrl = generateSiteBaseUrl(site);
+  const canonicalUrl = generateCategoryUrl(site, category.slug);
   
   // Format structured data for category page
   const listingItems = listings.filter(listing => listing !== null).map(listing => ({
@@ -189,7 +193,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const collectionDataStr = JSON.stringify(collectionData);
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <SiteHeader 
         site={site} 
         categories={categories.filter(cat => cat !== null).map(cat => ({
@@ -209,28 +213,33 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         dangerouslySetInnerHTML={{ __html: collectionDataStr }}
       />
       
-      {/* Breadcrumb navigation */}
-      <nav aria-label="Breadcrumb" className="container mx-auto px-4 pt-4">
-        <ol className="flex text-sm text-gray-500">
-          <li className="flex items-center">
-            <a href={baseUrl} className="hover:text-gray-700">Home</a>
-            <svg className="h-4 w-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-            </svg>
-          </li>
-          <li className="text-gray-800 font-medium">{category.name}</li>
-        </ol>
-      </nav>
+      {/* Page header with breadcrumb */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          {/* Breadcrumb navigation */}
+          <nav aria-label="Breadcrumb" className="mb-4">
+            <ol className="flex text-sm text-gray-500">
+              <li className="flex items-center">
+                <a href={baseUrl} className="hover:text-blue-600 transition-colors">Home</a>
+                <svg className="h-4 w-4 mx-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
+                </svg>
+              </li>
+              <li className="text-gray-900 font-medium">{category.name}</li>
+            </ol>
+          </nav>
+          
+          {/* Category heading with semantic HTML */}
+          <header>
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">{category.name}</h1>
+            <p className="text-gray-600 max-w-3xl">{category.metaDescription}</p>
+          </header>
+        </div>
+      </div>
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Canonical link for SEO */}
         <link rel="canonical" href={canonicalUrl} />
-        
-        {/* Category heading with semantic HTML */}
-        <header>
-          <h1 className="text-3xl font-bold mb-3">{category.name}</h1>
-          <p className="text-gray-600 mb-8 max-w-3xl">{category.metaDescription}</p>
-        </header>
         
         {/* Meta tags for social sharing */}
         <meta property="og:title" content={`${category.name} - ${site.name}`} />
@@ -239,7 +248,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         <meta property="og:url" content={canonicalUrl} />
         
         {/* Listings grid with structured data attributes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" itemScope itemType="https://schema.org/ItemList">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" itemScope itemType="https://schema.org/ItemList">
           {listings.filter(listing => listing !== null).map((listing, index) => (
             <div key={listing.id} itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
               <meta itemProp="position" content={String(index + 1)} />
@@ -253,17 +262,25 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           ))}
           
           {listings.filter(listing => listing !== null).length === 0 && (
-            <p className="col-span-full text-center text-gray-500 py-8">
-              No listings found in this category.
-            </p>
+            <div className="col-span-full bg-white p-12 rounded-lg shadow-sm text-center">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <h3 className="mt-2 text-lg font-medium text-gray-900">No listings yet</h3>
+              <p className="mt-1 text-gray-500">
+                No listings found in this category.
+              </p>
+            </div>
           )}
         </div>
-        
-        {/* Category footer with last updated info */}
-        <footer className="mt-12 text-sm text-gray-500">
-          <p>Last updated: {new Date(category.updatedAt).toLocaleDateString()}</p>
-        </footer>
       </main>
+      
+      {/* Category footer with last updated info */}
+      <footer className="bg-white border-t">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <p className="text-sm text-gray-500">Last updated: {new Date(category.updatedAt).toLocaleDateString()}</p>
+        </div>
+      </footer>
     </div>
   );
 }

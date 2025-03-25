@@ -63,10 +63,28 @@ export const POST = withRedis(async (request: NextRequest) => {
       multi.set(`site:domain:${site.domain}`, JSON.stringify(site));
     }
     
-    // Execute all commands as a transaction
-    await multi.exec();
-    
-    return NextResponse.json(site, { status: 201 });
+    try {
+      // Execute all commands as a transaction
+      const results = await multi.exec();
+      
+      // Check for errors in the transaction
+      const errors = results.filter(([err]) => err !== null);
+      if (errors.length > 0) {
+        console.error('Transaction errors:', errors);
+        return NextResponse.json(
+          { error: 'Failed to save site data' },
+          { status: 500 }
+        );
+      }
+      
+      return NextResponse.json(site, { status: 201 });
+    } catch (error) {
+      console.error('Error executing Redis transaction:', error);
+      return NextResponse.json(
+        { error: 'Failed to save site data' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('Error creating site:', error);
     return NextResponse.json(

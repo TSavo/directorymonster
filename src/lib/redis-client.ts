@@ -3,98 +3,189 @@ import { Redis } from 'ioredis';
 // Enable in-memory fallback for development without Redis
 const USE_MEMORY_FALLBACK = true;
 
-// Create a Redis client using REDIS_URL environment variable
-// Use environment variable, with fallbacks for different scenarios
-const redisUrl = process.env.REDIS_URL || 'redis://redis:6379';
+// Declare global memory store for persistence across API routes
+declare global {
+  var inMemoryRedisStore: Map<string, any>;
+  var redisClient: any;
+}
 
-console.log(`Connecting to Redis at ${redisUrl}`);
+// Initialize global memory store if needed
+if (!global.inMemoryRedisStore) {
+  global.inMemoryRedisStore = new Map<string, any>();
+  console.log('Created global in-memory Redis store');
+}
 
-// Create Redis client with fallback to in-memory store
+// In-memory Redis implementation
+class MemoryRedis {
+  store: Map<string, any>;
+  
+  constructor() {
+    this.store = global.inMemoryRedisStore;
+    console.log(`Using in-memory Redis with ${this.store.size} keys`);
+  }
+  
+  // Basic Redis operations
+  async get(key: string): Promise<any> {
+    return this.store.get(key);
+  }
+  
+  async set(key: string, value: string, ...args: any[]): Promise<'OK'> {
+    this.store.set(key, value);
+    return 'OK';
+  }
+  
+  async del(...keys: string[]): Promise<number> {
+    let count = 0;
+    for (const key of keys) {
+      if (this.store.delete(key)) count++;
+    }
+    return count;
+  }
+  
+  async keys(pattern: string): Promise<string[]> {
+    const wildcard = pattern.includes('*');
+    const prefix = pattern.replace('*', '');
+    return Array.from(this.store.keys()).filter(k => 
+      wildcard ? k.startsWith(prefix) : k === pattern
+    );
+  }
+  
+  // Set operations
+  async sadd(key: string, ...values: any[]): Promise<number> {
+    if (!this.store.has(key)) {
+      this.store.set(key, new Set());
+    }
+    const set = this.store.get(key);
+    let added = 0;
+    for (const value of values) {
+      const size = set.size;
+      set.add(value);
+      if (set.size > size) added++;
+    }
+    return added;
+  }
+  
+  async smembers(key: string): Promise<string[]> {
+    if (!this.store.has(key)) return [];
+    return Array.from(this.store.get(key));
+  }
+  
+  async srem(key: string, ...members: string[]): Promise<number> {
+    if (!this.store.has(key)) return 0;
+    const set = this.store.get(key);
+    let removed = 0;
+    for (const member of members) {
+      if (set.delete(member)) removed++;
+    }
+    return removed;
+  }
+  
+  async sinter(...keys: string[]): Promise<string[]> {
+    if (keys.length === 0) return [];
+    
+    const sets: Set<string>[] = [];
+    for (const key of keys) {
+      if (!this.store.has(key)) return []; // Empty intersection
+      sets.push(new Set(this.store.get(key)));
+    }
+    
+    if (sets.length === 0) return [];
+    
+    const [firstSet, ...restSets] = sets;
+    const result = new Set(firstSet);
+    
+    for (const item of result) {
+      if (!restSets.every(set => set.has(item))) {
+        result.delete(item);
+      }
+    }
+    
+    return Array.from(result);
+  }
+  
+  // Transaction support
+  multi(): any {
+    const commands: { cmd: string; args: any[] }[] = [];
+    
+    const exec = async (): Promise<Array<[Error | null, any]>> => {
+      const results: Array<[Error | null, any]> = [];
+      
+      for (const { cmd, args } of commands) {
+        try {
+          // @ts-ignore - We know these methods exist
+          const result = await this[cmd](...args);
+          results.push([null, result]);
+        } catch (error) {
+          results.push([error as Error, null]);
+        }
+      }
+      
+      return results;
+    };
+    
+    // Helper to add commands to the transaction
+    const addCommand = (cmd: string) => {
+      return (...args: any[]) => {
+        commands.push({ cmd, args });
+        return multi;
+      };
+    };
+    
+    // Build multi object with methods
+    const multi = {
+      exec,
+      get: addCommand('get'),
+      set: addCommand('set'),
+      del: addCommand('del'),
+      keys: addCommand('keys'),
+      sadd: addCommand('sadd'),
+      srem: addCommand('srem'),
+      smembers: addCommand('smembers'),
+      sinter: addCommand('sinter'),
+    };
+    
+    return multi;
+  }
+  
+  // Utility
+  async ping(): Promise<string> {
+    return 'PONG';
+  }
+}
+
+// Setup Redis client (real or in-memory)
+console.log('Setting up Redis client...');
 let redis;
 
-// Type definition for mock Redis
-type MockRedis = {
-  get: (key: string) => Promise<any>;
-  set: (key: string, value: string, ...args: any[]) => Promise<string>;
-  del: (...keys: string[]) => Promise<number>;
-  keys: (pattern: string) => Promise<string[]>;
-  ping: () => Promise<string>;
-  sadd: (key: string, ...values: any[]) => Promise<number>;
-};
-
-// In-memory mock Redis implementation
-const createMemoryRedis = (): MockRedis => {
-  console.log('Using in-memory fallback for Redis');
-  
-  // Try to import pre-seeded data if available
-  try {
-    // Use pre-seeded data if available (from our seed script)
-    const seedData = require('../../scripts/seed-data');
-    console.log('Using pre-seeded data from seed-data.js');
-    
-    // Run the seed function to populate the memory store if needed
-    seedData.seedData().catch((error: Error) => {
-      console.error('Error seeding data:', error);
-    });
-    
-    return seedData.redis as MockRedis;
-  } catch (error) {
-    console.log('Could not load pre-seeded data, using empty memory store');
-    
-    // Create a fresh memory store
-    const memoryStore = new Map<string, any>();
-    
-    return {
-      get: async (key: string) => memoryStore.get(key),
-      set: async (key: string, value: string, ...args: any[]) => {
-        memoryStore.set(key, value);
-        return 'OK';
-      },
-      del: async (...keys: string[]) => {
-        let count = 0;
-        for (const key of keys) {
-          if (memoryStore.delete(key)) count++;
-        }
-        return count;
-      },
-      keys: async (pattern: string) => {
-        const wildcard = pattern.includes('*');
-        const prefix = pattern.replace('*', '');
-        return Array.from(memoryStore.keys()).filter(k => 
-          wildcard ? k.startsWith(prefix) : k === pattern
-        );
-      },
-      ping: async () => 'PONG',
-      sadd: async (key: string, ...values: any[]) => {
-        if (!memoryStore.has(key)) {
-          memoryStore.set(key, new Set());
-        }
-        const set = memoryStore.get(key);
-        values.forEach((v: any) => set.add(v));
-        return values.length;
-      },
-    };
-  }
-};
-
 if (USE_MEMORY_FALLBACK) {
-  redis = createMemoryRedis();
+  // Use singleton pattern for memory redis
+  if (!global.redisClient) {
+    global.redisClient = new MemoryRedis();
+  }
+  redis = global.redisClient;
 } else {
+  // Create Redis client with retry options
+  const redisUrl = process.env.REDIS_URL || 'redis://redis:6379';
+  console.log(`Connecting to Redis at ${redisUrl}`);
+  
   try {
-    // Create Redis client with retry options
-    redis = new Redis(redisUrl, {
-      retryStrategy: (times) => {
-        console.log(`Redis connection attempt ${times}`);
-        if (times > 3) {
-          console.log('Max Redis connection attempts reached, using memory fallback');
-          return null; // Stop retrying
-        }
-        return Math.min(times * 100, 30000);
-      },
-    });
+    if (!global.redisClient) {
+      global.redisClient = new Redis(redisUrl, {
+        retryStrategy: (times) => {
+          console.log(`Redis connection attempt ${times}`);
+          if (times > 3) {
+            console.log('Max Redis connection attempts reached, using memory fallback');
+            global.redisClient = new MemoryRedis();
+            return null; // Stop retrying
+          }
+          return Math.min(times * 100, 30000);
+        },
+      });
+    }
+    redis = global.redisClient;
   } catch (error) {
     console.error('Redis connection error:', error);
-    redis = createMemoryRedis();
+    redis = new MemoryRedis();
   }
 }
 

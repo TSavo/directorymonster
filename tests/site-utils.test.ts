@@ -1,4 +1,4 @@
-import { getSiteByHostname, generateListingUrl } from '@/lib/site-utils';
+import { getSiteByHostname, generateListingUrl, generateSiteBaseUrl, generateCategoryUrl, generateCategoryHref, generateListingHref } from '@/lib/site-utils';
 import { SiteConfig } from '@/types';
 import { kv, redis } from '@/lib/redis-client';
 import { headers } from 'next/headers';
@@ -136,42 +136,80 @@ describe('Site Utilities', () => {
     });
   });
 
-  describe('generateListingUrl', () => {
-    it('should generate URL with custom domain when available', () => {
-      const site: SiteConfig = {
-        id: 'site_123',
-        name: 'Test Site',
-        slug: 'test-site',
-        domain: 'test-site.com',
-        primaryKeyword: 'test',
-        metaDescription: 'A test site',
-        headerText: 'Test Site Header',
-        defaultLinkAttributes: 'dofollow',
-        createdAt: 1234567890,
-        updatedAt: 1234567890,
-      };
-      
-      const url = generateListingUrl(site, 'category-slug', 'listing-slug');
-      
-      expect(url).toBe('https://test-site.com/category-slug/listing-slug');
-    });
+  describe('URL generation utilities', () => {
+    const siteWithDomain: SiteConfig = {
+      id: 'site_123',
+      name: 'Test Site',
+      slug: 'test-site',
+      domain: 'test-site.com',
+      primaryKeyword: 'test',
+      metaDescription: 'A test site',
+      headerText: 'Test Site Header',
+      defaultLinkAttributes: 'dofollow',
+      createdAt: 1234567890,
+      updatedAt: 1234567890,
+    };
     
-    it('should generate URL with platform subdomain when no custom domain', () => {
-      const site: SiteConfig = {
-        id: 'site_123',
-        name: 'Test Site',
-        slug: 'test-site',
-        primaryKeyword: 'test',
-        metaDescription: 'A test site',
-        headerText: 'Test Site Header',
-        defaultLinkAttributes: 'dofollow',
-        createdAt: 1234567890,
-        updatedAt: 1234567890,
-      };
+    const siteWithoutDomain: SiteConfig = {
+      id: 'site_123',
+      name: 'Test Site',
+      slug: 'test-site',
+      primaryKeyword: 'test',
+      metaDescription: 'A test site',
+      headerText: 'Test Site Header',
+      defaultLinkAttributes: 'dofollow',
+      createdAt: 1234567890,
+      updatedAt: 1234567890,
+    };
+
+    describe('generateSiteBaseUrl', () => {
+      it('should generate base URL with custom domain when available', () => {
+        const url = generateSiteBaseUrl(siteWithDomain);
+        expect(url).toBe('https://test-site.com');
+      });
       
-      const url = generateListingUrl(site, 'category-slug', 'listing-slug');
+      it('should generate base URL with platform subdomain when no custom domain', () => {
+        const url = generateSiteBaseUrl(siteWithoutDomain);
+        expect(url).toBe('https://test-site.mydirectory.com');
+      });
+    });
+
+    describe('generateCategoryUrl', () => {
+      it('should generate category URL with custom domain when available', () => {
+        const url = generateCategoryUrl(siteWithDomain, 'category-slug');
+        expect(url).toBe('https://test-site.com/category-slug');
+      });
       
-      expect(url).toBe('https://test-site.mydirectory.com/category-slug/listing-slug');
+      it('should generate category URL with platform subdomain when no custom domain', () => {
+        const url = generateCategoryUrl(siteWithoutDomain, 'category-slug');
+        expect(url).toBe('https://test-site.mydirectory.com/category-slug');
+      });
+    });
+
+    describe('generateListingUrl', () => {
+      it('should generate listing URL with custom domain when available', () => {
+        const url = generateListingUrl(siteWithDomain, 'category-slug', 'listing-slug');
+        expect(url).toBe('https://test-site.com/category-slug/listing-slug');
+      });
+      
+      it('should generate listing URL with platform subdomain when no custom domain', () => {
+        const url = generateListingUrl(siteWithoutDomain, 'category-slug', 'listing-slug');
+        expect(url).toBe('https://test-site.mydirectory.com/category-slug/listing-slug');
+      });
+    });
+
+    describe('generateCategoryHref', () => {
+      it('should generate category href for use in Link components', () => {
+        const href = generateCategoryHref('category-slug');
+        expect(href).toBe('/category-slug');
+      });
+    });
+
+    describe('generateListingHref', () => {
+      it('should generate listing href for use in Link components', () => {
+        const href = generateListingHref('category-slug', 'listing-slug');
+        expect(href).toBe('/category-slug/listing-slug');
+      });
     });
   });
 });

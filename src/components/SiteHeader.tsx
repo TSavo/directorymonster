@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { SiteConfig } from '@/types';
+import { CategoryLink } from './LinkUtilities';
 
 interface SiteHeaderProps {
   site: SiteConfig;
@@ -10,11 +11,11 @@ interface SiteHeaderProps {
 export default function SiteHeader({ site, categories }: SiteHeaderProps) {
   return (
     <header className="bg-white shadow-sm">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center space-x-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6">
+          <div className="flex items-center">
             {site.logoUrl && (
-              <div className="relative h-10 w-10">
+              <div className="relative h-10 w-10 mr-3">
                 <Image
                   src={site.logoUrl}
                   alt={site.name}
@@ -23,7 +24,7 @@ export default function SiteHeader({ site, categories }: SiteHeaderProps) {
                 />
               </div>
             )}
-            <Link href="/" className="text-2xl font-bold">
+            <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
               {site.name}
             </Link>
           </div>
@@ -33,21 +34,24 @@ export default function SiteHeader({ site, categories }: SiteHeaderProps) {
         </div>
         
         {/* Navigation */}
-        <nav className="mt-4">
-          <ul className="flex flex-wrap gap-6">
+        <nav className="py-4 border-t border-gray-100">
+          <ul className="flex flex-wrap gap-8">
             <li>
-              <Link href="/" className="hover:text-blue-600 hover:underline">
+              <Link 
+                href="/" 
+                className="text-base font-medium text-gray-600 hover:text-blue-600 transition-colors"
+              >
                 Home
               </Link>
             </li>
             {categories.map(category => (
               <li key={category.id}>
-                <Link 
-                  href={`/${category.slug}`} 
-                  className="hover:text-blue-600 hover:underline"
+                <CategoryLink 
+                  category={category}
+                  className="text-base font-medium text-gray-600 hover:text-blue-600 transition-colors"
                 >
                   {category.name}
-                </Link>
+                </CategoryLink>
               </li>
             ))}
           </ul>

@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { kv } from '@/lib/redis-client';
 import { SiteConfig, Listing, Category } from '@/types';
+import { generateSiteBaseUrl, generateCategoryUrl, generateListingUrl } from '@/lib/site-utils';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
@@ -12,9 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
   
   for (const site of sites) {
-    const baseUrl = site.domain 
-      ? `https://${site.domain}` 
-      : `https://${site.slug}.mydirectory.com`;
+    const baseUrl = generateSiteBaseUrl(site);
     
     // Add site homepage
     entries.push({
@@ -33,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Add category pages
     for (const category of categories) {
       entries.push({
-        url: `${baseUrl}/${category.slug}`,
+        url: generateCategoryUrl(site, category.slug),
         lastModified: new Date(category.updatedAt),
         changeFrequency: 'daily',
         priority: 0.8,
@@ -48,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       // Add listing pages
       for (const listing of listings) {
         entries.push({
-          url: `${baseUrl}/${category.slug}/${listing.slug}`,
+          url: generateListingUrl(site, category.slug, listing.slug),
           lastModified: new Date(listing.updatedAt),
           changeFrequency: 'weekly',
           priority: 0.6,

@@ -57,11 +57,38 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
 }
 
 /**
+ * Generate base URL for a site (without path)
+ */
+export function generateSiteBaseUrl(site: SiteConfig): string {
+  return site.domain ? `https://${site.domain}` : `https://${site.slug}.mydirectory.com`;
+}
+
+/**
+ * Generate SEO-friendly URL for a category
+ */
+export function generateCategoryUrl(site: SiteConfig, categorySlug: string): string {
+  return `${generateSiteBaseUrl(site)}/${categorySlug}`;
+}
+
+/**
  * Generate SEO-friendly URL for a listing
  */
 export function generateListingUrl(site: SiteConfig, categorySlug: string, listingSlug: string): string {
-  const baseUrl = site.domain ? `https://${site.domain}` : `https://${site.slug}.mydirectory.com`;
-  return `${baseUrl}/${categorySlug}/${listingSlug}`;
+  return `${generateSiteBaseUrl(site)}/${categorySlug}/${listingSlug}`;
+}
+
+/**
+ * Generate relative href path for a category (without domain)
+ */
+export function generateCategoryHref(categorySlug: string): string {
+  return `/${categorySlug}`;
+}
+
+/**
+ * Generate relative href path for a listing (without domain)
+ */
+export function generateListingHref(categorySlug: string, listingSlug: string): string {
+  return `/${categorySlug}/${listingSlug}`;
 }
 
 /**

@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { kv } from '@/lib/redis-client';
 import { SiteConfig, Category } from '@/types';
-import { getSiteByHostname } from '@/lib/site-utils';
+import { getSiteByHostname, generateSiteBaseUrl, generateCategoryHref } from '@/lib/site-utils';
+import { CategoryLink } from '@/components/LinkUtilities';
 
 // Types for Next.js App Router page props
 type PageProps = {
@@ -60,9 +61,7 @@ export default async function Home({ searchParams }: PageProps) {
     );
     
     // Build base URL for site
-    const baseUrl = site.domain 
-      ? `https://${site.domain}` 
-      : `https://${site.slug}.mydirectory.com`;
+    const baseUrl = generateSiteBaseUrl(site);
     
     // Create structured data for WebSite
     const websiteData = {
@@ -93,7 +92,7 @@ export default async function Home({ searchParams }: PageProps) {
     const organizationDataStr = JSON.stringify(organizationData);
     
     return (
-      <main className="flex min-h-screen flex-col p-8">
+      <main className="min-h-screen bg-gray-50">
         {/* Add structured data */}
         <script 
           type="application/ld+json"
@@ -114,81 +113,143 @@ export default async function Home({ searchParams }: PageProps) {
         <meta property="og:url" content={baseUrl} />
         {site.logoUrl && <meta property="og:image" content={site.logoUrl} />}
         
-        {/* Main content with semantic HTML */}
-        <div className="max-w-5xl mx-auto w-full">
-          <header>
-            <h1 className="text-4xl font-bold mb-4">{site.name}</h1>
-            <p className="text-xl mb-8">{site.metaDescription}</p>
+        {/* Hero section with site name and description */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+                {site.name}
+              </h1>
+              <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500">
+                {site.metaDescription}
+              </p>
+            </div>
             
             {/* SEO-friendly markup for primary keyword */}
             <div className="hidden">
               <h2>Best {site.primaryKeyword} Reviews and Guides</h2>
               <p>Comprehensive {site.primaryKeyword} reviews, comparisons, and buyer guides.</p>
             </div>
-          </header>
-          
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Categories</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8" itemScope itemType="https://schema.org/ItemList">
-              {categories.filter(category => category !== null).map((category, index) => (
-                <Link 
-                  key={category.id}
-                  href={`/${category.slug}`}
-                  className="border p-4 rounded-lg hover:bg-gray-50 transition-colors"
-                  itemProp="itemListElement"
-                  itemScope
-                  itemType="https://schema.org/ListItem"
-                >
-                  <meta itemProp="position" content={String(index + 1)} />
-                  <h3 className="text-lg font-medium mb-2" itemProp="name">{category.name}</h3>
-                  <p className="text-gray-600 text-sm" itemProp="description">{category.metaDescription}</p>
-                  <meta itemProp="url" content={`${baseUrl}/${category.slug}`} />
-                </Link>
-              ))}
-              
-              {categories.filter(category => category !== null).length === 0 && (
-                <p className="col-span-full text-gray-500">No categories found. Try seeding data first.</p>
-              )}
-            </div>
-          </section>
-          
-          <section>
-            <div className="mt-12 mb-8 border-t pt-8">
-              <h2 className="text-2xl font-semibold mb-4">Platform Administration</h2>
-              <Link href="/admin" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
-                Admin Dashboard
-              </Link>
-            </div>
-          </section>
-
-          <footer className="text-sm text-gray-500 mt-12">
-            <p>To seed sample data, run: <code className="bg-gray-100 p-1 rounded">npm run seed</code></p>
-            <p className="mt-2">Last updated: {new Date(site.updatedAt).toLocaleDateString()}</p>
-          </footer>
+          </div>
         </div>
+        
+        {/* Categories section */}
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse Categories</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" itemScope itemType="https://schema.org/ItemList">
+            {categories.filter(category => category !== null).map((category, index) => (
+              <div 
+                key={category.id}
+                itemProp="itemListElement"
+                itemScope
+                itemType="https://schema.org/ListItem"
+              >
+                <CategoryLink 
+                  category={category}
+                  className="group"
+                >
+                  <div className="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition duration-300 h-full flex flex-col">
+                    <div className="p-6 flex-grow">
+                      <meta itemProp="position" content={String(index + 1)} />
+                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition duration-300" itemProp="name">
+                        {category.name}
+                      </h3>
+                      <p className="mt-3 text-base text-gray-500" itemProp="description">
+                        {category.metaDescription}
+                      </p>
+                      <meta itemProp="url" content={`${baseUrl}/${category.slug}`} />
+                    </div>
+                    <div className="bg-gray-50 px-6 py-4">
+                      <div className="text-sm font-medium text-blue-600 group-hover:text-blue-800">
+                        View listings →
+                      </div>
+                    </div>
+                  </div>
+                </CategoryLink>
+              </div>
+            ))}
+            
+            {categories.filter(category => category !== null).length === 0 && (
+              <div className="col-span-full bg-white p-6 rounded-lg shadow text-center">
+                <p className="text-gray-500">No categories found. Try seeding data first.</p>
+                <p className="mt-2 text-sm text-gray-400">Run: <code className="bg-gray-100 p-1 rounded">npm run seed</code></p>
+              </div>
+            )}
+          </div>
+        </div>
+          
+        {/* Admin section with lighter visual weight */}
+        <div className="bg-white border-t">
+          <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-medium text-gray-900">Platform Administration</h2>
+                <p className="mt-1 text-sm text-gray-500">Access the admin dashboard to manage your directory.</p>
+              </div>
+              <div className="mt-4 sm:mt-0">
+                <Link 
+                  href="/admin" 
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Admin Dashboard
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer className="bg-gray-50 border-t">
+          <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <p className="text-sm text-gray-500">Last updated: {new Date(site.updatedAt).toLocaleDateString()}</p>
+          </div>
+        </footer>
       </main>
     );
   }
   
   // If no site exists, this is a fresh installation
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-4xl font-bold mb-8">Directory Monster</h1>
-      <p className="text-xl mb-6">SEO-Focused Multitenancy Directory Platform</p>
-      
-      <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg mb-8 max-w-lg">
-        <h2 className="text-lg font-medium text-amber-800 mb-2">Getting Started</h2>
-        <p className="text-amber-700 mb-2">
-          No directory sites found. To seed sample data, run:
-        </p>
-        <pre className="bg-amber-100 p-2 rounded text-amber-800 overflow-x-auto">
-          npm run seed
-        </pre>
+    <main className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex flex-col items-center justify-center">
+          <div className="text-center mb-12">
+            <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight sm:text-6xl md:text-7xl">
+              Directory<span className="text-blue-600">Monster</span>
+            </h1>
+            <p className="mt-6 text-xl text-gray-500 max-w-2xl mx-auto">
+              SEO-Focused Multitenancy Directory Platform
+            </p>
+          </div>
+          
+          <div className="bg-white shadow-md overflow-hidden rounded-lg max-w-lg w-full mb-12">
+            <div className="bg-blue-600 px-6 py-4">
+              <h2 className="text-lg font-semibold text-white">Getting Started</h2>
+            </div>
+            <div className="px-6 py-6">
+              <p className="text-gray-600 mb-4">
+                No directory sites found. To seed sample data, run:
+              </p>
+              <div className="bg-gray-50 rounded-md p-4 border border-gray-200">
+                <code className="text-sm text-gray-800">npm run seed</code>
+              </div>
+              
+              <div className="mt-8">
+                <Link 
+                  href="/admin" 
+                  className="w-full flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Admin Dashboard
+                </Link>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center text-sm text-gray-500">
+            <p>A modern directory platform for creating SEO-optimized listing sites</p>
+          </div>
+        </div>
       </div>
-      
-      <Link href="/admin" className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-        Admin Dashboard
-      </Link>
     </main>
   );
 }
