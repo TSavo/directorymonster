@@ -1,0 +1,22 @@
+{
+  "products": [
+    {
+      "title": "Product title",
+      "slug": "product-slug",
+      "metaDescription": "SEO-friendly description of the product",
+      "content": "Detailed content about the product",
+      "imageUrl": "https://example.com/image.jpg",
+      "backlinkUrl": "https://original-product-site.com/product",
+      "backlinkAnchorText": "Product Name",
+      "backlinkPosition": "prominent",
+      "backlinkType": "dofollow",
+      "customFields": {
+        "product_name": "Full product name",
+        "brand": "Brand name",
+        "rating": 4.5,
+        "category": "Product category",
+        "price": "Price with currency"
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "products": [
+    {
+      "id": "product1",
+      "url": "https://www.ebay.com/itm/365481009447?hash=item55185da127:g:H8YAAeSw~E1n4gHB",
+      "title": "Vintage Barbie Doll Lot 15 90s Dolls Of The World Collection 1992-1995 In Box",
+      "description": "A Vintage Barbie Doll Lot of 15 from the Dolls Of The World Collection, manufactured between 1992-1995. The dolls are in their original unopened packaging.",
+      "price": "$369.88",
+      "brand": "Mattel",
+      "images": {
+        "main": "https://i.ebayimg.com/images/g/H8YAAeSw~E1n4gHB/s-l500.webp"
+      },
+      "specs": {
+        "condition": "Used",
+        "unit_of_sale": "Lot",
+        "antique": "No",
+        "year_manufactured": "1992",
+        "vintage": "Yes"
+      },
+      "seo_data": {
+        "meta_tags": {
+          "EBay_item_number": "365481009447",
+          "Last_updated": "Mar 24, 2025 18:23:33 PDT"
+        }
+      },
+      "blog_commentary": "\"Vintage Barbie fans, gather around! You won't believe this treasure trove of 90s Dolls Of The World Collection all in their original packaging. It's like stepping into a time machine of nostalgia! \ud83c\udf0d\ud83d\udcab #BarbieMagic\""
+    },
+    {
+      "id": "product2",
+      "url": "https://www.ebay.com/itm/387833650187",
+      "title": "Barbie & Ken Pink Label Collectible Doll Lot (5) The Twilight Saga-Brand New",
+      "description": "A brand-new, unused, unopened, undamaged item (including handmade items). See the seller's listing for full details.",
+      "price": "$399.00",
+      "brand": "Barbie",
+      "images": {
+        "main": "https://i.ebayimg.com/images/g/kLIAAOSwZ3Vninl4/s-l500.webp"
+      },
+      "specs": {
+        "Condition": "New",
+        "Year Manufactured": "2009",
+        "Vintage": "Yes",
+        "Doll Size": "12 in"
+      },
+      "seo_data": {
+        "meta_tags": {
+          "title": "Barbie & Ken Pink Label Collectible Doll Lot (5) The Twilight Saga-Brand New | eBay",
+          "keywords": "Barbie, Ken, Pink Label"
+        }
+      },
+      "blog_commentary": "\"Can you believe this Barbie & Ken Twilight Saga doll set from 2009? It's vintage, brand new, and oh-so-collectible! Check it out for a trip down memory lane or a new addition to your collection! \ud83c\udf19\ud83c\udf80\""
+    }
+  ]
+}
