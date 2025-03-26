@@ -1,0 +1,134 @@
+
+        You are an AI shopping assistant analyzing an e-commerce webpage.
+        Analyze this page and provide a structured response in JSON format.
+        
+        SEARCH CONTEXT:
+        Search term: "nes game raygar walmart"
+        Base category: "nes"
+        
+        PAGE INFORMATION:
+        URL: https://www.walmart.com/blocked?url=L2lwL1J5Z2FyLU5FUy1SZXRyby1TdHlsZS05MC1zLVZpZGVvLUdhbWUtOC1CaXQtUGl4ZWwtQXJ0LVVuaXNleC1ULVNoaXJ0LzEyMTI5NzA4ODI4&uuid=1dd78475-09f6-11f0-b35b-cc998b7b63e6&vid=1bfc966b-09f6-11f0-a5b0-44b2348f1550&g=b
+        Title: Robot or human?
+        Content sample: Robot or human?
+Activate and hold the button to confirm that you’re human. Thank You!
+Terms of Use Privacy Policy Do Not Sell My Personal Information Request My Personal Information
+©2025 Walmart Stores, Inc.
+        Element counts: {"product_elements": 0, "grid_elements": 0, "cart_buttons": 0}
+        
+        AVAILABLE LINKS ON THE PAGE:
+        []
+        
+        PAGE TYPE DEFINITIONS:
+        - PRODUCT page: A page focused on a single product with details, price, and purchase options
+        - CATEGORY page: A page showing multiple products in a list or grid with limited details per item
+        - NEITHER: Not related to products (homepage, blog, error page, captcha, etc.)
+        
+        JSON SCHEMA:
+        {
+          "page_type": string,         // Must be exactly "PRODUCT", "CATEGORY", or "NEITHER"
+          "confidence": number,        // Integer from 0-100 indicating confidence level
+          "reason": string,            // Brief explanation of classification
+          "recommended_links": [       // ONLY include for CATEGORY pages, omit for others
+            {
+              "url": string,           // Full URL of recommended product link
+              "reason": string         // Why this link was selected (e.g., "Matches nes")
+            }
+          ]
+        }
+        
+        INSTRUCTIONS FOR LINK RECOMMENDATIONS:
+        IF page_type is "CATEGORY":
+            - Include 1-3 links that are most likely to be PRODUCT pages (not subcategories)
+            - Prioritize links that match the search term "nes game raygar walmart" or category "nes"
+            - Select links that appear to be specific products with price information
+            - Avoid links to search results, filters, or "view all" type pages
+            - If page has > 10 products, try to select popular or featured ones
+        ELSE:
+            - Do NOT include the "recommended_links" field at all
+        
+        EXAMPLES:
+        For a PRODUCT page:
+        {
+          "page_type": "PRODUCT",
+          "confidence": 95,
+          "reason": "Page focuses on a single nes product with price, description, and add to cart button"
+        }
+        
+        For a CATEGORY page:
+        {
+          "page_type": "CATEGORY",
+          "confidence": 85,
+          "reason": "Page displays multiple nes products in a grid format with thumbnails and brief descriptions",
+          "recommended_links": [
+            {
+              "url": "https://example.com/product/123",
+              "reason": "This appears to be a specific nes product with clear pricing information"
+            },
+            {
+              "url": "https://example.com/product/456",
+              "reason": "Featured nes item that closely matches search term"
+            }
+          ]
+        }
+        
+        For a NEITHER page:
+        {
+          "page_type": "NEITHER",
+          "confidence": 70,
+          "reason": "This is a blog post about nes products but doesn't sell them directly"
+        }
+        
+        RETURN ONLY VALID JSON WITH NO ADDITIONAL TEXT OR EXPLANATION.
+        
+
+
+            Your response should be a JSON object conforming to this schema:
+            {
+  "description": "Schema for page analysis results.",
+  "properties": {
+    "page_type": {
+      "description": "Must be exactly 'PRODUCT', 'CATEGORY', or 'NEITHER'",
+      "title": "Page Type",
+      "type": "string"
+    },
+    "confidence": {
+      "description": "Integer from 0-100 indicating confidence level",
+      "title": "Confidence",
+      "type": "integer"
+    },
+    "reason": {
+      "description": "Brief explanation of classification",
+      "title": "Reason",
+      "type": "string"
+    },
+    "recommended_links": {
+      "anyOf": [
+        {
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Only for CATEGORY pages, list of recommended product links",
+      "title": "Recommended Links"
+    }
+  },
+  "required": [
+    "page_type",
+    "confidence",
+    "reason"
+  ],
+  "title": "PageAnalysisResult",
+  "type": "object"
+}
+            
+            Return only valid JSON with no additional text.
+            

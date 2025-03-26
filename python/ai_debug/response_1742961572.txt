@@ -1,0 +1,5 @@
+{
+"is_product": true,
+"product_name": "Arcade Archives RYGAR",
+"price": "$7.99"
+}

@@ -1,0 +1,89 @@
+
+        You are an expert product information extractor for an e-commerce directory.
+        Your task is to analyze this webpage and extract COMPREHENSIVE product information.
+        
+        EXTREMELY IMPORTANT:
+        1. Include ALL available fields, not just the minimum required ones
+        2. Your response quality will be rated based on completeness (how many fields you accurately fill)
+        
+        WEBPAGE TO ANALYZE:
+        URL: https://www.thevideogamecompany.com/products/rygar-nintendo-nes
+        Domain: thevideogamecompany.com
+        
+        Page content excerpt:
+        Skip to content
+Open navigation menu
+The Video Game Company
+United States (USD $)
+Open search
+Open account page
+Open cart
+0
+Zoom
+Certified Tested
+Rygar - Nintendo NES
+Sale price
+$108.99
+Sold out
+No reviews
+Sold out
+NOTIFY ME WHEN AVAILABLE
+NOTIFY ME WHEN AVAILABLE
+Why Us?
+60 day warranty
+Free shipping over $100
+Each purchase prevents e-waste from ending up in landfills
+Professional Cleaned & Tested
+Region Code
+Customer Reviews
+Write a review
+Sort by:
+Most Recent
+empty list icon
+Be the first to write a review
+Write a review
+You may also like
+Company
+About Us
+Sell Your Games
+Shop Now
+Contact Us
+Support
+Shipping
+Returns, Refunds & Warranty
+Terms of Service
+Privacy Policy
+How We Grade
+Sign up to our newsletter
+E-mail
+Subscribe
+United States (USD $)
+© 2025, The Video Game Company. Powered by Shopify
+1
+        
+        For image extraction, here are some HTML snippets that might contain product images:
+        http://www.thevideogamecompany.com/cdn/shop/products/rygar-nintendo-nes-018946110011-cartridge.jpg?v=1656101278&amp;width=2048
+//www.thevideogamecompany.com/cdn/shop/products/rygar-nintendo-nes-018946110011-cartridge.jpg?v=1656101278&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/rygar-nintendo-nes-018946110011-cover-art.jpg?v=1656101278&amp;width=497
+//www.thevideogamecompany.com/cdn/shop/products/dragon-warrior-nintendo-nes-045496630379-cartridge.jpg?v=1656100232&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/world-games-nintendo-nes-032244048838-cartridge.jpg?v=1656101952&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/renegade-nintendo-nes-020588010048-cartridge.jpg?v=1656101190&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/wizards-and-warriors-nintendo-nes-021481102045-cartridge.jpg?v=1656101933&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/the-last-ninja-nintendo-nes-032264900154-cartridge.jpg?v=1656101637&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/the-guardian-legend-nintendo-nes-047956145409-cartridge.jpg?v=1656101627&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/nightshade-nintendo-nes-083717120162-cartridge.jpg?v=1656100967&amp;width=543
+        
+        Additional metadata:
+        {
+  "meta_description": "Find Rygar for Nintendo NES. Each Game is Authentic, Cleaned, Tested and Refurbished. Shop and browse our huge selection of Video Games, Consoles and Accessories.",
+  "og_title": "Rygar - Nintendo NES",
+  "og_description": "Find Rygar for Nintendo NES. Each Game is Authentic, Cleaned, Tested and Refurbished. Shop and browse our huge selection of Video Games, Consoles and Accessories.",
+  "canonical_url": "https://www.thevideogamecompany.com/products/rygar-nintendo-nes",
+  "page_title": "Rygar for Nintendo NES | TVGC"
+}
+        
+        IF NOT A PRODUCT PAGE, set is_product to false with an error message.
+        IF THIS IS A PRODUCT PAGE, extract as many details as possible.
+        
+        REMEMBER: A COMPLETE and COMPREHENSIVE response with ALL fields filled will be rated higher than a minimal response.
+        

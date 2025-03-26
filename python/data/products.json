@@ -1,0 +1,27 @@
+[
+  {
+    "is_product": true,
+    "product_name": null,
+    "price": null,
+    "description": null,
+    "seo_listing_title": null,
+    "original_commentary": null,
+    "primary_category": null,
+    "secondary_categories": [],
+    "brand": null,
+    "main_image_url": null,
+    "additional_image_urls": [],
+    "specifications": [],
+    "related_search_terms": [],
+    "target_audience": null,
+    "use_cases": [],
+    "benefits": [],
+    "unique_selling_points": null,
+    "backlink_suggestions": [],
+    "source_url": null,
+    "source_domain": null,
+    "error": null,
+    "scraped_at": "2025-03-25T21:16:00.756498",
+    "slug": "unknown-product"
+  }
+]

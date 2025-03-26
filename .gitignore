@@ -48,11 +48,22 @@ next-env.d.ts
 *.rdb
 dump.rdb
 
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+/python/venv/
+**/debug_page_*.png
+**/debug_response_*.txt
+**/extraction_prompt_*.txt
+**/raw_extraction_*.txt
+**/pre_extraction_debug_*.json
+**/json_error_*.json
+**/page_depth_*.png
+python/scraper.log
+python/ai_debug/
 
 # SEO data logs and raw data
 /seo_data/logs/
 /seo_data/raw/
+/seo_data/screenshots/

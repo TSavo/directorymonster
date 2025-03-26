@@ -1,0 +1,2 @@
+DECISION: YES
+REASON: The webpage is focused on a single product (Rygar for Nintendo NES), has product details such as price, description, and images, and contains "Notify me when available" functionality, which are typical characteristics of a product page.

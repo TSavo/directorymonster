@@ -1,0 +1,33 @@
+
+        Analyze these links from search results for "nes game raygar walmart" and determine which ONE is most likely 
+        to be a direct product page (not a category page or search results).
+        
+        Prioritize links from well-known e-commerce companies like Amazon, Target, Walmart, eBay, Etsy, etc.
+        
+        Links:
+        1. https://www.walmart.com/ip/RYGAR-T-SHIRT-nintendo-nes-video-game-cover-SMALL-MEDIUM-LARGE-XL/12468760802
+2. https://www.walmart.com/ip/RYGAR-T-SHIRT-nintendo-nes-video-game-cover-SMALL-MEDIUM-LARGE-XL/12468760802
+3. https://strategywiki.org/wiki/Rygar_(NES)
+4. https://strategywiki.org/wiki/Rygar_(NES)
+5. https://gamefaqs.gamespot.com/nes/587594-rygar/faqs/52944
+6. https://gamefaqs.gamespot.com/nes/587594-rygar/faqs/52944
+7. http://www.hardcoregaming101.net/rygar-arcade/
+8. http://www.hardcoregaming101.net/rygar-arcade/
+9. https://strategywiki.org/wiki/Rygar
+10. https://strategywiki.org/wiki/Rygar
+11. https://ragegames.neocities.org/rygar
+12. https://ragegames.neocities.org/rygar
+13. https://www.nintendolife.com/games/nes/rygar
+14. https://www.nintendolife.com/games/nes/rygar
+15. https://videogamegeek.com/videogame/79789/rygar-nes
+16. https://videogamegeek.com/videogame/79789/rygar-nes
+17. https://www.imdb.com/title/tt0186509
+18. https://apps.apple.com/app/duckduckgo-private-browser/id663592361?platform=iphone&pt=866401&mt=8&ct=serp-atb-serp
+19. https://duck.ai/
+        
+        Your task:
+        1. Choose the number of the single best link that seems to be a product page
+        2. If none are product pages, choose one that is a category page from a major retailer
+
+        RESPOND WITH ONLY A SINGLE NUMBER (1-19) and nothing else.
+        

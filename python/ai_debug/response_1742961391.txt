@@ -1,0 +1,2 @@
+DECISION: NO
+REASON: This webpage does not contain product details like price, description, images, or "add to cart" functionality. It appears to be a game information page on Nintendo Life, providing an overview, reviews, screenshots, and other related content about the game Rygar for NES.

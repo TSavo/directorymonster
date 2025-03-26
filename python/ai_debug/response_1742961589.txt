@@ -1,0 +1,5 @@
+{
+  "page_type": "NEITHER",
+  "confidence": 70,
+  "reason": "This page is not related to products (contains a captcha)"
+}

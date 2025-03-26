@@ -1,0 +1,172 @@
+
+        Analyze this webpage and determine if it's a product page or not.
+        
+        Previous page analyses:
+        - URL: https://www.amazon.com/Rygar-Nes/dp/B000EA40UC, Decision: PRODUCT, Reason: The webpage is focused on a single product, Rygar for Nintendo NES, and contains detailed information about the game, including price, description, and images. It also has "add to cart" functionality, which suggests that it's a product page.
+- URL: https://www.nintendolife.com/games/nes/rygar, Decision: NOT PRODUCT, Reason: This webpage does not contain product details like price, description, images, or "add to cart" functionality. It appears to be a game information page on Nintendo Life, providing an overview, reviews, screenshots, and other related content about the game Rygar for NES.
+- URL: https://www.amazon.com/Rygar-Nes/dp/B000EA40UC, Decision: PRODUCT, Reason: This webpage meets the typical criteria of a product page, as it is focused on a single product (Rygar for Nintendo NES), contains detailed information about the game, including price ($46.06 or $31.92 for the Renewed version), description, images, and "add to cart" functionality.
+        
+        Current URL: https://www.amazon.com/Rygar-Nes/dp/B000EA40UC
+        Current Title: Amazon.com: Rygar : Video Games
+        
+        Page content excerpt:
+        Delivering to Los Angeles 90029
+Update location
+Video Games
+All Departments
+Alexa Skills
+Amazon Autos
+Amazon Devices
+Amazon Fresh
+Amazon Global Store
+Amazon One Medical
+Amazon Pharmacy
+Amazon Resale
+Appliances
+Apps & Games
+Arts, Crafts & Sewing
+Audible Books & Originals
+Automotive Parts & Accessories
+Baby
+Beauty & Personal Care
+Books
+Bristol Farms
+CDs & Vinyl
+Cell Phones & Accessories
+Clothing, Shoes & Jewelry
+Women's Clothing, Shoes & Jewelry
+Men's Clothing, Shoes & Jewelry
+Girl's Clothing, Shoes & Jewelry
+Boy's Clothing, Shoes & Jewelry
+Baby Clothing, Shoes & Jewelry
+Collectibles & Fine Art
+Computers
+Credit and Payment Cards
+Digital Music
+Electronics
+Garden & Outdoor
+Gift Cards
+Grocery & Gourmet Food
+Handmade
+Health, Household & Baby Care
+Home & Business Services
+Home & Kitchen
+Industrial & Scientific
+Just for Prime
+Kindle Store
+Luggage & Travel Gear
+Luxury Stores
+Magazine Subscriptions
+Mission Wine & Spirits
+Movies & TV
+Musical Instruments
+Office Products
+Pet Supplies
+Premium Beauty
+Prime Video
+Rite Aid
+Smart Home
+Software
+Sports & Outdoors
+Subscribe & Save
+Subscription Boxes
+Tools & Home Improvement
+Toys & Games
+Under $10
+Video Games
+Whole Foods Market
+EN
+Hello, sign in
+Account & Lists
+Returns
+& Orders
+0
+Cart
+All
+Big Spring Sale
+Medical Care
+Alexa+
+Best Sellers
+Music
+Amazon Basics
+New Releases
+Prime
+  Big Spring Sale: Outlet deals
+Video Games
+PS5
+Xbox Series X|S
+Switch
+PS4
+Xbox One
+PC
+Wii U
+Arcade Gaming
+PS3
+Xbox 360
+Accessories
+VR
+Sign in
+New customer? Start here.
+Video Games
+›
+Legacy Systems
+›
+Nintendo Systems
+›
+Nintendo NES
+›
+Games
+Buy used: $46.06
+FREE delivery Monday, March 31
+Or Prime members get FREE delivery Friday, March 28. Order within 3 hrs 2 mins. Join Prime
+Delivering to Los Angeles 90029 - Update location
+Used: Very Good | Details
+Sold by Discovergoods1
+Fulfilled by Amazon
+Add to cart
+Add to List
+Other sellers on Amazon
+Used (16) from
+$13
+30   + $3.99 shipping
+
+Roll over image to zoom in
+Rygar
+Brand: Tecmo
+Platform : Nintendo NES
+|
+Rated: Everyone
+4.1
+65 ratings
+$46
+06
+FREE Returns
+Apply now and get a $80 Amazon Gift Card upon approval of the Amazon Store Card, or see if you pre-qualify with no impact to your credit bureau score.
+Only 4 left in stock - order soon.
+About this item
+You and Rygar, the legendary warrior of Argool, must defeat the evil king and his army of dangerous beasts. With powers and weapons from the Indora war gods, you go into battle with Rygar. It's up to you! The enemies are strong, the terrain treacherous, and the challenges difficult. The sun is setting and Rygar is depending on you. Rygar's exploits were once confined to arcades, but now he is battling the forces of evil everywhere. Join forces with Rygar!
+  Report an issue with this product or seller
+This product is available as Renewed.
+Rygar (Renewed)
+$31.92 FREE Shipping
+on orders over $35.00 shipped by Amazon or get Fast, Free Shipping with Amazon Prime
+(4)
+Works and looks like new and backed by the Amazon Renewed Guarantee
+Sponsored
+Customers who 
+        
+        A product page typically:
+        1. Is focused on a single product (not a list of products)
+        2. Has product details like price, description, images
+        3. Often has "add to cart" or "buy now" functionality
+        4. Contains product specifications or features
+        
+        Answer with a simple "YES" if this is a product page, or "NO" if it's not (e.g., if it's a search results page, 
+        category page, homepage, etc.).
+        
+        Then, provide a brief explanation for your decision (1-2 sentences).
+        
+        Format your response exactly like this:
+        DECISION: YES or NO
+        REASON: Your explanation here
+        

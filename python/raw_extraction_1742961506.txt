@@ -1,0 +1,8 @@
+{
+  "is_product": true,
+  "product_name": "Rygar",
+  "price": "$46.06",
+  "description": "You and Rygar, the legendary warrior of Argool, must defeat the evil king and his army of dangerous beasts.",
+  "source_url": "https://www.amazon.com/Rygar-Nes/dp/B000EA40UC",
+  "source_domain": "amazon.com"
+}

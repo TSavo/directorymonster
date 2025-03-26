@@ -1,0 +1,284 @@
+
+        You are an AI shopping assistant analyzing an e-commerce webpage.
+        Analyze this page and provide a structured response in JSON format.
+        
+        SEARCH CONTEXT:
+        Search term: "nes game raygar amazon"
+        Base category: "nes"
+        
+        PAGE INFORMATION:
+        URL: https://www.amazon.com/Rygar-Nes/dp/B000EA40UC
+        Title: Amazon.com: Rygar : Video Games
+        Content sample: Delivering to Los Angeles 90029
+Update location
+Video Games
+All Departments
+Alexa Skills
+Amazon Autos
+Amazon Devices
+Amazon Fresh
+Amazon Global Store
+Amazon One Medical
+Amazon Pharmacy
+Amazon Resale
+Appliances
+Apps & Games
+Arts, Crafts & Sewing
+Audible Books & Originals
+Automotive Parts & Accessories
+Baby
+Beauty & Personal Care
+Books
+Bristol Farms
+CDs & Vinyl
+Cell Phones & Accessories
+Clothing, Shoes & Jewelry
+Women's Clothing, Shoes & Jewelry
+Men's Clothing, Shoes & Jewelry
+Girl's Clothing, Shoes & Jewelry
+Boy's Clothing, Shoes & Jewelry
+Baby Clothing, Shoes & Jewelry
+Collectibles & Fine Art
+Computers
+Credit and Payment Cards
+Digital Music
+Electronics
+Garden & Outdoor
+Gift Cards
+Grocery & Gourmet Food
+Handmade
+Health, Household & Baby Care
+Home & Business Services
+Home & Kitchen
+Industrial & Scientific
+Just for Prime
+Kindle Store
+Luggage & Travel Gear
+Luxury Stores
+Magazine Subscriptions
+Mission Wine & Spirits
+Movies & TV
+Musical Instruments
+Office Products
+Pet Supplies
+Premium Beauty
+Prime Video
+Rite Aid
+Smart Home
+Software
+Sports & Outdoors
+Subscribe & Save
+Subscription Boxes
+Tools & Home Improvement
+Toys & Games
+Under $10
+Video Games
+Whole Foods Market
+EN
+Hello, sign in
+Account & Lists
+Returns
+& Orders
+0
+Cart
+All
+Big Spring Sale
+Medical Care
+Alexa+
+Best Sellers
+Music
+Amazon Basics
+New Releases
+Prime
+  Big Spring Sale: Outlet deals
+Video Games
+PS5
+Xbox Series X|S
+Switch
+PS4
+Xbox One
+PC
+Wii U
+Arcade Gaming
+PS3
+Xbox 360
+Accessories
+VR
+Sign in
+New customer? Start here.
+Video 
+        Element counts: {"product_elements": 10, "grid_elements": 48, "cart_buttons": 0}
+        
+        AVAILABLE LINKS ON THE PAGE:
+        [
+  {
+    "index": 1,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/Rygar-Nes/dp/B000EA40UC#skippedLink"
+  },
+  {
+    "index": 2,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/Rygar-Nes/dp/B000EA40UC#featurebullets_feature_div"
+  },
+  {
+    "index": 3,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/Rygar-Nes/dp/B000EA40UC#nic-po-expander-heading"
+  },
+  {
+    "index": 4,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/Rygar-Nes/dp/B000EA40UC#buybox"
+  },
+  {
+    "index": 5,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/Rygar-Nes/dp/B000EA40UC#product-comparison_feature_div"
+  },
+  {
+    "index": 6,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/Rygar-Nes/dp/B000EA40UC#va-related-videos-widget_feature_div"
+  },
+  {
+    "index": 7,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/Rygar-Nes/dp/B000EA40UC#customerReviews"
+  },
+  {
+    "index": 12,
+    "text": "Alexa+",
+    "url": "https://www.amazon.com/dp/B0DCCNHWV5?ref_=nav_cs_xaa"
+  },
+  {
+    "index": 13,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/hz/wishlist/ls?triggerElementID=createList&ref_=nav_ListFlyout_navFlyout_createList_lv_redirect"
+  },
+  {
+    "index": 14,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/registries?ref_=nav_ListFlyout_find"
+  },
+  {
+    "index": 15,
+    "text": "Unnamed link",
+    "url": "https://www.amazon.com/gp/css/homepage.html?ref_=nav_AccountFlyout_ya"
+  }
+]
+        
+        PAGE TYPE DEFINITIONS:
+        - PRODUCT page: A page focused on a single product with details, price, and purchase options
+        - CATEGORY page: A page showing multiple products in a list or grid with limited details per item
+        - NEITHER: Not related to products (homepage, blog, error page, captcha, etc.)
+        
+        JSON SCHEMA:
+        {
+          "page_type": string,         // Must be exactly "PRODUCT", "CATEGORY", or "NEITHER"
+          "confidence": number,        // Integer from 0-100 indicating confidence level
+          "reason": string,            // Brief explanation of classification
+          "recommended_links": [       // ONLY include for CATEGORY pages, omit for others
+            {
+              "url": string,           // Full URL of recommended product link
+              "reason": string         // Why this link was selected (e.g., "Matches nes")
+            }
+          ]
+        }
+        
+        INSTRUCTIONS FOR LINK RECOMMENDATIONS:
+        IF page_type is "CATEGORY":
+            - Include 1-3 links that are most likely to be PRODUCT pages (not subcategories)
+            - Prioritize links that match the search term "nes game raygar amazon" or category "nes"
+            - Select links that appear to be specific products with price information
+            - Avoid links to search results, filters, or "view all" type pages
+            - If page has > 10 products, try to select popular or featured ones
+        ELSE:
+            - Do NOT include the "recommended_links" field at all
+        
+        EXAMPLES:
+        For a PRODUCT page:
+        {
+          "page_type": "PRODUCT",
+          "confidence": 95,
+          "reason": "Page focuses on a single nes product with price, description, and add to cart button"
+        }
+        
+        For a CATEGORY page:
+        {
+          "page_type": "CATEGORY",
+          "confidence": 85,
+          "reason": "Page displays multiple nes products in a grid format with thumbnails and brief descriptions",
+          "recommended_links": [
+            {
+              "url": "https://example.com/product/123",
+              "reason": "This appears to be a specific nes product with clear pricing information"
+            },
+            {
+              "url": "https://example.com/product/456",
+              "reason": "Featured nes item that closely matches search term"
+            }
+          ]
+        }
+        
+        For a NEITHER page:
+        {
+          "page_type": "NEITHER",
+          "confidence": 70,
+          "reason": "This is a blog post about nes products but doesn't sell them directly"
+        }
+        
+        RETURN ONLY VALID JSON WITH NO ADDITIONAL TEXT OR EXPLANATION.
+        
+
+
+            Your response should be a JSON object conforming to this schema:
+            {
+  "description": "Schema for page analysis results.",
+  "properties": {
+    "page_type": {
+      "description": "Must be exactly 'PRODUCT', 'CATEGORY', or 'NEITHER'",
+      "title": "Page Type",
+      "type": "string"
+    },
+    "confidence": {
+      "description": "Integer from 0-100 indicating confidence level",
+      "title": "Confidence",
+      "type": "integer"
+    },
+    "reason": {
+      "description": "Brief explanation of classification",
+      "title": "Reason",
+      "type": "string"
+    },
+    "recommended_links": {
+      "anyOf": [
+        {
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Only for CATEGORY pages, list of recommended product links",
+      "title": "Recommended Links"
+    }
+  },
+  "required": [
+    "page_type",
+    "confidence",
+    "reason"
+  ],
+  "title": "PageAnalysisResult",
+  "type": "object"
+}
+            
+            Return only valid JSON with no additional text.
+            

@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  # Separate service for Ollama to maintain models
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-server
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ollama-models:/root/.ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - NVIDIA_VISIBLE_DEVICES=all
+      - CUDA_VISIBLE_DEVICES=0
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f http://localhost:11434/api/tags || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    # Run Ollama in detached mode so it keeps running
+    restart: unless-stopped
+  
+  # Scraper service that depends on Ollama
+  product-scraper:
+    build: 
+      context: .
+      dockerfile: Dockerfile.scraper
+    container_name: product-scraper
+    shm_size: 2gb
+    depends_on:
+      ollama:
+        condition: service_healthy
+    volumes:
+      - ./data:/data
+      # Mount code directory for development
+      - ./:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OLLAMA_MODEL=llama3:latest
+    command: >
+      --count 5
+      --output /data/products.json
+      --search-engine "https://www.google.com/"
+      --categories "outdoor gear"
+      --ollama-host ollama
+
+volumes:
+  ollama-models:
+    name: ollama-models

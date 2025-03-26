@@ -1,0 +1,247 @@
+PROMPT:
+
+        You are an AI shopping assistant analyzing an e-commerce webpage.
+        Analyze this page and provide a structured response in JSON format.
+        
+        SEARCH CONTEXT:
+        Search term: "nes game raygar top rated"
+        Base category: "nes"
+        
+        PAGE INFORMATION:
+        URL: https://www.nintendolife.com/games/nes/rygar
+        Title: Rygar (1987) | NES Game | Nintendo Life
+        Content sample: Guest
+Guest
+Login | Sign Up
+Nintendo Life
+Retro News Reviews Features Games Guides Videos Forums Better eShop
+RygarNES 1987
+System NES Developer Tecmo
+6.5
+Game Rating
+User Ratings: 138
+Our Review: N/A
+Add to Games Collection
+OverviewReviewsScreenshotsGuidesNewsDiscussions
+Overview
+Also Known As
+Warrior of Argus: Extreme Great Charge
+Genre
+ActionAdventurePlatformer
+Release Date
+NES
+Jul 1987
+30th Mar 1990
+17th Apr 1987
+30th Mar 1990
+Nintendo Switch Online (Subscription)
+Available Now
+Also Available On
+VC ArcadeArcade
+Series
+Nintendo Switch Online
+Tags
+Nintendo Switch Online
+Reviews
+Sorry, no Rygar review yet.
+Screenshots
+Sorry, no Rygar screenshots yet.
+Share:
+Comments 0
+Leave A Comment
+Hold on there, you need to login to post a comment...
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+TopAboutStaffHow We WorkSupport UsContactPrivacy PolicyTerms of UseAds PolicyArchiveCookie Settings
+Popular Right Now
+Best Nintendo Switch Open World Games
+Mon, 6pm
+The Best Nintendo Switch Games (2025)
+Fri 14th Mar 2025
+Rumour: Nintendo Switch 2 To Launch In June With 3-Phase Software Plan
+Yesterday, 4:15pm
+Select Pokémon Card Pre-Orders Cancelled After New Expansion's Disastrous Launch
+Yesterday, 5:45pm
+PSA: Gold Points For Nintendo Switch Purchases Are Now Discontinued
+Yesterday, 10:35am
+After Copying Smash's Homework, MultiVersus Publisher Was Apparently Turning To Mario Kart Next
+Yesterday, 5pm
+Feature: "If The Game Does Not Sell Well, We May Be Done" - It's Do Or Die For Too Kyo Games & 'The Hundred Line'
+Yest
+        Element counts: {"product_elements": 24, "grid_elements": 0, "cart_buttons": 0}
+        
+        AVAILABLE LINKS ON THE PAGE:
+        [
+  {
+    "index": 1,
+    "text": "Home",
+    "url": "https://www.nintendolife.com/"
+  },
+  {
+    "index": 2,
+    "text": "Retro",
+    "url": "https://www.nintendolife.com/retro"
+  },
+  {
+    "index": 3,
+    "text": "News",
+    "url": "https://www.nintendolife.com/news"
+  },
+  {
+    "index": 4,
+    "text": "Reviews",
+    "url": "https://www.nintendolife.com/reviews"
+  },
+  {
+    "index": 5,
+    "text": "Features",
+    "url": "https://www.nintendolife.com/features"
+  },
+  {
+    "index": 6,
+    "text": "Games",
+    "url": "https://www.nintendolife.com/games/browse"
+  },
+  {
+    "index": 7,
+    "text": "Guides",
+    "url": "https://www.nintendolife.com/guides"
+  },
+  {
+    "index": 8,
+    "text": "Videos",
+    "url": "https://www.youtube.com/nintendolife"
+  },
+  {
+    "index": 9,
+    "text": "Forums",
+    "url": "https://www.nintendolife.com/forums"
+  },
+  {
+    "index": 10,
+    "text": "Better eShop",
+    "url": "https://www.nintendolife.com/eshop"
+  }
+]
+        
+        PAGE TYPE DEFINITIONS:
+        - PRODUCT page: A page focused on a single product with details, price, and purchase options
+        - CATEGORY page: A page showing multiple products in a list or grid with limited details per item
+        - NEITHER: Not related to products (homepage, blog, error page, captcha, etc.)
+        
+        JSON SCHEMA:
+        {
+          "page_type": string,         // Must be exactly "PRODUCT", "CATEGORY", or "NEITHER"
+          "confidence": number,        // Integer from 0-100 indicating confidence level
+          "reason": string,            // Brief explanation of classification
+          "recommended_links": [       // ONLY include for CATEGORY pages, omit for others
+            {
+              "url": string,           // Full URL of recommended product link
+              "reason": string         // Why this link was selected (e.g., "Matches nes")
+            }
+          ]
+        }
+        
+        INSTRUCTIONS FOR LINK RECOMMENDATIONS:
+        IF page_type is "CATEGORY":
+            - Include 1-3 links that are most likely to be PRODUCT pages (not subcategories)
+            - Prioritize links that match the search term "nes game raygar top rated" or category "nes"
+            - Select links that appear to be specific products with price information
+            - Avoid links to search results, filters, or "view all" type pages
+            - If page has > 10 products, try to select popular or featured ones
+        ELSE:
+            - Do NOT include the "recommended_links" field at all
+        
+        EXAMPLES:
+        For a PRODUCT page:
+        {
+          "page_type": "PRODUCT",
+          "confidence": 95,
+          "reason": "Page focuses on a single nes product with price, description, and add to cart button"
+        }
+        
+        For a CATEGORY page:
+        {
+          "page_type": "CATEGORY",
+          "confidence": 85,
+          "reason": "Page displays multiple nes products in a grid format with thumbnails and brief descriptions",
+          "recommended_links": [
+            {
+              "url": "https://example.com/product/123",
+              "reason": "This appears to be a specific nes product with clear pricing information"
+            },
+            {
+              "url": "https://example.com/product/456",
+              "reason": "Featured nes item that closely matches search term"
+            }
+          ]
+        }
+        
+        For a NEITHER page:
+        {
+          "page_type": "NEITHER",
+          "confidence": 70,
+          "reason": "This is a blog post about nes products but doesn't sell them directly"
+        }
+        
+        RETURN ONLY VALID JSON WITH NO ADDITIONAL TEXT OR EXPLANATION.
+        
+
+
+            Your response should be a JSON object conforming to this schema:
+            {
+  "description": "Schema for page analysis results.",
+  "properties": {
+    "page_type": {
+      "description": "Must be exactly 'PRODUCT', 'CATEGORY', or 'NEITHER'",
+      "title": "Page Type",
+      "type": "string"
+    },
+    "confidence": {
+      "description": "Integer from 0-100 indicating confidence level",
+      "title": "Confidence",
+      "type": "integer"
+    },
+    "reason": {
+      "description": "Brief explanation of classification",
+      "title": "Reason",
+      "type": "string"
+    },
+    "recommended_links": {
+      "anyOf": [
+        {
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Only for CATEGORY pages, list of recommended product links",
+      "title": "Recommended Links"
+    }
+  },
+  "required": [
+    "page_type",
+    "confidence",
+    "reason"
+  ],
+  "title": "PageAnalysisResult",
+  "type": "object"
+}
+            
+            Return only valid JSON with no additional text.
+            
+
+RESPONSE:
+{
+  "page_type": "PRODUCT",
+  "confidence": 95,
+  "reason": "Page focuses on a single NES product, Rygar, with detailed information and game ratings.",
+  "recommended_links": null
+}

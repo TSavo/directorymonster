@@ -1,0 +1,34 @@
+
+        Analyze these links from search results for "nes game raygar buy online" and determine which ONE is most likely 
+        to be a direct product page (not a category page or search results).
+        
+        Prioritize links from well-known e-commerce companies like Amazon, Target, Walmart, eBay, Etsy, etc.
+        
+        Links:
+        1. https://www.ebay.com/b/Nintendo-NES-Rygar-Video-Games/139973/bn_80351528
+2. https://www.ebay.com/b/Nintendo-NES-Rygar-Video-Games/139973/bn_80351528
+3. https://www.retrogames.cz/play_677-NES.php
+4. https://www.retrogames.cz/play_677-NES.php
+5. https://www.ebay.com/sch/i.html?_nkw=rygar+nes&_sop=12
+6. https://www.ebay.com/sch/i.html?_nkw=rygar+nes&_sop=12
+7. https://www.ebay.com/p/56252979
+8. https://www.ebay.com/p/56252979
+9. https://www.amazon.com/Rygar-Nes/dp/B000EA40UC
+10. https://www.amazon.com/Rygar-Nes/dp/B000EA40UC
+11. https://www.lukiegames.com/rygar-nes-nintendo-game.html
+12. https://www.lukiegames.com/rygar-nes-nintendo-game.html
+13. https://www.dkoldies.com/rygar-nes-game/
+14. https://www.dkoldies.com/rygar-nes-game/
+15. https://pnpgamesonline.com/product/rygar-2/
+16. https://pnpgamesonline.com/product/rygar-2/
+17. https://retrovgames.com/rygar-nes-game-1/
+18. https://retrovgames.com/rygar-nes-game-1/
+19. https://www.playnesonline.com/play-rygar-online/
+20. https://www.playnesonline.com/play-rygar-online/
+        
+        Your task:
+        1. Choose the number of the single best link that seems to be a product page
+        2. If none are product pages, choose one that is a category page from a major retailer
+
+        RESPOND WITH ONLY A SINGLE NUMBER (1-20) and nothing else.
+        

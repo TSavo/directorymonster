@@ -1,0 +1,34 @@
+
+        Analyze these links from search results for "nes game raygar product page" and determine which ONE is most likely 
+        to be a direct product page (not a category page or search results).
+        
+        Prioritize links from well-known e-commerce companies like Amazon, Target, Walmart, eBay, Etsy, etc.
+        
+        Links:
+        1. https://strategywiki.org/wiki/Rygar_(NES)
+2. https://strategywiki.org/wiki/Rygar_(NES)
+3. https://strategywiki.org/wiki/Rygar_(NES)/Walkthrough
+4. https://strategywiki.org/wiki/Rygar_(NES)/Bosses
+5. https://strategywiki.org/wiki/Rygar_(NES)/Garloz
+6. https://strategywiki.org/wiki/Rygar_(NES)/Enemies
+7. https://strategywiki.org/wiki/Rygar_(NES)/Valley_of_Rolsa
+8. https://strategywiki.org/wiki/Rygar_(NES)/Dorago%27s_Palace
+9. https://www.nintendolife.com/games/nes/rygar
+10. https://www.nintendolife.com/games/nes/rygar
+11. https://www.thevideogamecompany.com/products/rygar-nintendo-nes
+12. https://www.thevideogamecompany.com/products/rygar-nintendo-nes
+13. https://gamefaqs.gamespot.com/nes/587594-rygar
+14. https://gamefaqs.gamespot.com/nes/587594-rygar
+15. https://www.mobygames.com/game/8609/rygar/
+16. https://www.mobygames.com/game/8609/rygar/
+17. https://videogamegeek.com/videogame/79789/rygar-nes
+18. https://videogamegeek.com/videogame/79789/rygar-nes
+19. https://www.retrogames.me/nes-games/rygar-usa.html
+20. https://www.retrogames.me/nes-games/rygar-usa.html
+        
+        Your task:
+        1. Choose the number of the single best link that seems to be a product page
+        2. If none are product pages, choose one that is a category page from a major retailer
+
+        RESPOND WITH ONLY A SINGLE NUMBER (1-20) and nothing else.
+        

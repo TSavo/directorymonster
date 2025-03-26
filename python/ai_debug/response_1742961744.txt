@@ -1,0 +1,5 @@
+{
+  "page_type": "NEITHER",
+  "confidence": 70,
+  "reason": "This page does not focus on a single product or category, and the content is unrelated to the search term 'nes game raygar walmart'."
+}

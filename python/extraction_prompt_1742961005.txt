@@ -1,0 +1,101 @@
+
+        Analyze this webpage and extract comprehensive product information for an SEO-optimized product directory.
+        
+        CRITICAL: Your response MUST be valid JSON with all required fields. 
+        
+        REQUIRED FIELDS:
+        - "is_product": boolean (true/false) - MUST be included
+        - If is_product is true:
+          - "product_name": string - MUST be included
+          - "price": string - MUST be included
+        
+        If this page contains a product, extract the following information:
+
+        1. Product name (REQUIRED)
+        2. Price (REQUIRED, with currency)
+        3. Comprehensive description (3-4 sentences)
+        4. Primary category
+        5. Secondary categories/tags (5-8 relevant tags)
+        6. Brand name
+        7. Main image URL
+        8. Additional image URLs (up to 3)
+        9. Product specifications/features (list of 5-10 key specs)
+        10. Related search terms
+        11. Target audience/who would use this
+        12. Possible use cases
+        13. Key benefits
+        14. Unique selling points
+        
+        Also generate:
+        - A catchy title for a directory listing
+        - Original commentary about the product
+        - 3 high-quality backlink anchor text suggestions
+        
+        If this is NOT a product page, ONLY return: { "is_product": false, "error": "reason why" }
+        
+        URL: https://www.thevideogamecompany.com/products/rygar-nintendo-nes
+        Domain: thevideogamecompany.com
+        
+        Page content excerpt:
+        Skip to content
+Open navigation menu
+The Video Game Company
+United States (USD $)
+Open search
+Open account page
+Open cart
+0
+Zoom
+Certified Tested
+Rygar - Nintendo NES
+Sale price
+$108.99
+Sold out
+No reviews
+Sold out
+NOTIFY ME WHEN AVAILABLE
+NOTIFY ME WHEN AVAILABLE
+Why Us?
+60 day warranty
+Free shipping over $100
+Each purchase prevents e-waste from ending up in landfills
+Professional Cleaned & Tested
+Region Code
+Customer Reviews
+Write a review
+Sort by:
+Most Recent
+empty list icon
+Be the first to write a review
+Write a review
+You may also like
+Company
+About Us
+Sell Your Games
+Shop Now
+Contact Us
+Support
+Shipping
+Returns, Refunds & Warranty
+Terms of Service
+Privacy Policy
+How We Grade
+Sign up to our newsletter
+E-mail
+Subscribe
+United States (USD $)
+© 2025, The Video Game Company. Powered by Shopify
+1
+        
+        For image extraction, here are some HTML snippets that might contain product images:
+        http://www.thevideogamecompany.com/cdn/shop/products/rygar-nintendo-nes-018946110011-cartridge.jpg?v=1656101278&amp;width=2048
+//www.thevideogamecompany.com/cdn/shop/products/rygar-nintendo-nes-018946110011-cartridge.jpg?v=1656101278&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/rygar-nintendo-nes-018946110011-cover-art.jpg?v=1656101278&amp;width=497
+//www.thevideogamecompany.com/cdn/shop/products/dragon-warrior-nintendo-nes-045496630379-cartridge.jpg?v=1656100232&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/world-games-nintendo-nes-032244048838-cartridge.jpg?v=1656101952&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/renegade-nintendo-nes-020588010048-cartridge.jpg?v=1656101190&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/wizards-and-warriors-nintendo-nes-021481102045-cartridge.jpg?v=1656101933&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/the-last-ninja-nintendo-nes-032264900154-cartridge.jpg?v=1656101637&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/the-guardian-legend-nintendo-nes-047956145409-cartridge.jpg?v=1656101627&amp;width=543
+//www.thevideogamecompany.com/cdn/shop/products/nightshade-nintendo-nes-083717120162-cartridge.jpg?v=1656100967&amp;width=543
+        
