@@ -1,5 +1,0 @@
-{
-  "is_product": true,
-  "product_name": "Rygar",
-  "price": "$46.06"
-}

@@ -1,2 +1,0 @@
-DECISION: YES
-REASON: The webpage is focused on a single product, Rygar for Nintendo NES, and provides detailed information about the product, including price, sale status, and description. It also has images and customer review functionality, which are typical features of a product page.

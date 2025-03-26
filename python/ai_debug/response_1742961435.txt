@@ -1,5 +1,0 @@
-{
-  "page_type": "PRODUCT",
-  "confidence": 95,
-  "reason": "Page focuses on a single Nes product with price, description, and add to cart button"
-}

@@ -1,3 +1,0 @@
-DECISION: YES
-
-REASON: This webpage meets the typical criteria of a product page, as it is focused on a single product (Rygar for Nintendo NES), contains detailed information about the game, including price ($46.06 or $31.92 for the Renewed version), description, images, and "add to cart" functionality.

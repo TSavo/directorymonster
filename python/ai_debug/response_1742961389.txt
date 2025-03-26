@@ -1,6 +1,0 @@
-{
-  "page_type": "PRODUCT",
-  "confidence": 95,
-  "reason": "Page focuses on a single NES product, Rygar, with detailed information and game ratings.",
-  "recommended_links": null
-}

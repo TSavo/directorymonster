@@ -1,5 +1,0 @@
-{
-  "page_type": "NEITHER",
-  "confidence": 70,
-  "reason": "This page is not a product or category page, it's an FAQ page for the seller."
-}

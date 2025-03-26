@@ -112,7 +112,7 @@ class JsonOutputParser(OutputParser):
         start_idx = text.find("{")
         end_idx = text.rfind("}")
         
-        if start_idx != -1 and end_idx != -1 and start_idx < end_idx:
+        if (start_idx != -1 and end_idx != -1 and start_idx < end_idx):
             return text[start_idx:end_idx + 1]
         
         # Failed to extract JSON
@@ -121,10 +121,11 @@ class JsonOutputParser(OutputParser):
     def get_format_instructions(self) -> str:
         """Get instructions for the expected JSON format."""
         if self.pydantic_model:
-            schema = self.pydantic_model.schema()
+            # Generate a cleaner schema without anyOf patterns
+            clean_schema = self._generate_clean_schema()
             return f"""
-            Your response should be a JSON object conforming to this schema:
-            {json.dumps(schema, indent=2)}
+            Your response should be a JSON object with these fields:
+            {json.dumps(clean_schema, indent=2)}
             
             Return only valid JSON with no additional text.
             """
@@ -133,6 +134,86 @@ class JsonOutputParser(OutputParser):
             Your response should be a valid JSON object.
             Return only valid JSON with no additional text.
             """
+    
+    def _generate_clean_schema(self) -> Dict[str, Any]:
+        """
+        Generate a simplified schema based on the Pydantic model.
+        Removes verbose anyOf patterns in favor of more concise field descriptions.
+        """
+        if not self.pydantic_model:
+            return {}
+            
+        # Get the full schema
+        full_schema = self.pydantic_model.schema()
+        
+        # Extract only the properties section which has the field info
+        properties = full_schema.get("properties", {})
+        required = full_schema.get("required", [])
+        
+        # Create a simplified schema structure
+        simplified = {}
+        
+        # Process each property
+        for field_name, field_schema in properties.items():
+            # Check if field is required
+            is_required = field_name in required
+            
+            # Get field type and description
+            field_type = self._get_simplified_type(field_schema)
+            field_desc = field_schema.get("description", "")
+            
+            # Create simplified entry
+            simplified[field_name] = {
+                "type": field_type,
+                "required": is_required,
+                "description": field_desc
+            }
+            
+            # Add example values for common types
+            if field_type == "string":
+                simplified[field_name]["example"] = "example text"
+            elif field_type == "integer" or field_type == "number":
+                simplified[field_name]["example"] = 100
+            elif field_type == "boolean":
+                simplified[field_name]["example"] = True
+            elif field_type == "array":
+                simplified[field_name]["example"] = ["item1", "item2"]
+            elif field_type == "object":
+                simplified[field_name]["example"] = {"key": "value"}
+        
+        return simplified
+    
+    def _get_simplified_type(self, field_schema: Dict[str, Any]) -> str:
+        """Extract simplified type from a potentially complex field schema."""
+        # Handle arrays
+        if field_schema.get("type") == "array":
+            return "array"
+            
+        # Handle objects
+        if field_schema.get("type") == "object":
+            return "object"
+            
+        # Handle simple types
+        if "type" in field_schema:
+            return field_schema["type"]
+            
+        # Handle anyOf patterns
+        if "anyOf" in field_schema:
+            for option in field_schema["anyOf"]:
+                # Skip null type
+                if option.get("type") == "null":
+                    continue
+                    
+                # Return first non-null type
+                if "type" in option:
+                    return option["type"]
+                    
+                # Handle nested anyOf
+                if "anyOf" in option:
+                    return self._get_simplified_type(option)
+        
+        # Default to string if can't determine
+        return "string"
 
 
 # Define common schema models

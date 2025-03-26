@@ -1,6 +1,0 @@
-{
-  "page_type": "PRODUCT",
-  "confidence": 95,
-  "reason": "Page focuses on a single Sega Ages Shinobi Switch product with price, description, and purchase options",
-  "recommended_links": null
-}
