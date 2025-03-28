@@ -7,6 +7,23 @@ jest.mock('jsonwebtoken', () => ({
   decode: jest.fn()
 }));
 
+// Mock the Next.js router
+const mockPush = jest.fn();
+const mockRouter = {
+  push: mockPush,
+  replace: jest.fn(),
+  prefetch: jest.fn(),
+  back: jest.fn(),
+  forward: jest.fn(),
+  refresh: jest.fn(),
+  pathname: '/admin',
+};
+
+// Add the router mock before the tests run
+jest.mock('next/navigation', () => ({
+  useRouter: () => mockRouter
+}));
+
 describe('Token Refresh Functionality', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -37,6 +54,7 @@ describe('Token Refresh Functionality', () => {
     jest.requireMock('jsonwebtoken').decode.mockReturnValue({ 
       username: 'testuser', 
       role: 'admin',
+      userId: 'user123',
       exp: Math.floor(Date.now() / 1000) + 300 // 5 minutes from now
     });
     
@@ -45,8 +63,13 @@ describe('Token Refresh Functionality', () => {
     
     // Test component that shows when refresh happens
     const RefreshTestComponent = () => {
-      const { isRefreshing } = useAuth();
-      return <div data-testid="refreshing">{isRefreshing ? 'Refreshing' : 'Not Refreshing'}</div>;
+      const { isRefreshing, isAuthenticated } = useAuth();
+      return (
+        <div>
+          <div data-testid="refreshing">{isRefreshing ? 'Refreshing' : 'Not Refreshing'}</div>
+          <div data-testid="auth-status">{isAuthenticated ? 'Authenticated' : 'Not Authenticated'}</div>
+        </div>
+      );
     };
     
     render(
@@ -58,11 +81,21 @@ describe('Token Refresh Functionality', () => {
     // Wait for token refresh to occur
     await waitFor(() => {
       // Should call the refresh endpoint
-      expect(global.fetch).toHaveBeenCalledWith('/api/auth/refresh', expect.any(Object));
-      
-      // Should update the token in localStorage
+      expect(global.fetch).toHaveBeenCalledWith('/api/auth/refresh', expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          'Authorization': 'Bearer almost-expired-token'
+        })
+      }));
+    });
+    
+    // Should update the token in localStorage
+    await waitFor(() => {
       expect(window.localStorage.setItem).toHaveBeenCalledWith('authToken', 'new-valid-token');
     });
+    
+    // Should be authenticated
+    expect(screen.getByTestId('auth-status')).toHaveTextContent('Authenticated');
   });
   
   it('handles failed token refresh', async () => {
@@ -79,23 +112,21 @@ describe('Token Refresh Functionality', () => {
     jest.requireMock('jsonwebtoken').decode.mockReturnValue({ 
       username: 'testuser', 
       role: 'admin',
+      userId: 'user123',
       exp: Math.floor(Date.now() / 1000) + 300 // 5 minutes from now
     });
     
     // Mock localStorage to return the almost expired token
     (window.localStorage.getItem as jest.Mock).mockReturnValue('almost-expired-token');
     
-    // Mock router for redirect check
-    const mockPush = jest.fn();
-    jest.mock('next/navigation', () => ({
-      useRouter: () => ({
-        push: mockPush,
-      }),
-    }));
+    const AuthStatusComponent = () => {
+      const { isAuthenticated } = useAuth();
+      return <div data-testid="auth-status">{isAuthenticated ? 'Authenticated' : 'Not Authenticated'}</div>;
+    };
     
     render(
       <SessionManager redirectToLogin={true}>
-        <div>Test Content</div>
+        <AuthStatusComponent />
       </SessionManager>
     );
     
@@ -104,6 +135,12 @@ describe('Token Refresh Functionality', () => {
       // Should remove the token
       expect(window.localStorage.removeItem).toHaveBeenCalledWith('authToken');
     });
+    
+    // Should redirect to login
+    expect(mockPush).toHaveBeenCalledWith('/login');
+    
+    // Should show as not authenticated
+    expect(screen.getByTestId('auth-status')).toHaveTextContent('Not Authenticated');
   });
   
   it('does not attempt refresh for valid tokens', async () => {
@@ -111,20 +148,28 @@ describe('Token Refresh Functionality', () => {
     jest.requireMock('jsonwebtoken').decode.mockReturnValue({ 
       username: 'testuser', 
       role: 'admin',
+      userId: 'user123',
       exp: Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
     });
     
     // Mock localStorage to return the valid token
     (window.localStorage.getItem as jest.Mock).mockReturnValue('valid-token');
     
+    const AuthStatusComponent = () => {
+      const { isAuthenticated } = useAuth();
+      return <div data-testid="auth-status">{isAuthenticated ? 'Authenticated' : 'Not Authenticated'}</div>;
+    };
+    
     render(
       <SessionManager>
-        <div>Test Content</div>
+        <AuthStatusComponent />
       </SessionManager>
     );
     
-    // Wait some time for any potential refresh
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Wait for authentication to complete
+    await waitFor(() => {
+      expect(screen.getByTestId('auth-status')).toHaveTextContent('Authenticated');
+    });
     
     // No fetch calls should have been made
     expect(global.fetch).not.toHaveBeenCalled();
