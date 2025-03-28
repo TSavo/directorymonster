@@ -16,7 +16,7 @@ jest.mock('../Utils/FileSystem', () => {
       directoryExists: jest.fn().mockReturnValue(true),
       readFile: jest.fn().mockReturnValue('test content'),
       writeFile: jest.fn().mockReturnValue(true),
-      getBasename: jest.fn((filePath, ext) => {
+      getBasename: jest.fn((filePath: string, ext?: string) => {
         const baseName = path.basename(filePath);
         if (ext && baseName.endsWith(ext)) {
           return baseName.slice(0, -ext.length);

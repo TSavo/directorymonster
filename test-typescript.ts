@@ -168,12 +168,12 @@ async function runTests() {
     const loadedTemplate = loadTestManager.getTemplate('load-test');
     const templateContent = loadedTemplate?.content || '';
     console.log(`loadTemplate content: ${loadedTemplate && templateContent === 'Test template for loadTemplate method' ? 'PASS' : 'FAIL'}`);
-    allTestsPassed = allTestsPassed && loadedTemplate && templateContent === 'Test template for loadTemplate method';
+    allTestsPassed = allTestsPassed && Boolean(loadedTemplate && templateContent === 'Test template for loadTemplate method');
     
     // Verify metadata was added
     const metadataPath = loadedTemplate?.metadata?.path || '';
     console.log(`loadTemplate metadata: ${loadedTemplate && metadataPath === newTestTemplatePath ? 'PASS' : 'FAIL'}`);
-    allTestsPassed = allTestsPassed && loadedTemplate && metadataPath === newTestTemplatePath;
+    allTestsPassed = allTestsPassed && Boolean(loadedTemplate && metadataPath === newTestTemplatePath);
     
     // Test loadTemplate with non-existent file
     const nonExistentPath = path.join(TEMPLATES_DIR, 'nonexistent.hbs');
