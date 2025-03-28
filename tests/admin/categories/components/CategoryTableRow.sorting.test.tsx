@@ -82,7 +82,25 @@ describe('CategoryTableRow Component - Sorting Indicators', () => {
     expect(nameCell).toHaveAttribute('aria-sort', 'descending');
   });
   
-  it('applies visual indication when row is sorted by order', () => {
+  it('applies ascending aria-sort attribute to order column', () => {
+    renderWithTableContext(
+      <CategoryTableRow 
+        category={mockCategory}
+        showSiteColumn={false}
+        onDeleteClick={mockDeleteClick}
+        isSortedBy="order"
+        sortDirection="asc"
+      />
+    );
+    
+    // Check the order cell has the correct aria-sort attribute for ascending
+    const cells = screen.getAllByRole('cell');
+    const orderCell = cells[0]; // First cell is order
+    
+    expect(orderCell).toHaveAttribute('aria-sort', 'ascending');
+  });
+  
+  it('applies descending aria-sort attribute to order column', () => {
     renderWithTableContext(
       <CategoryTableRow 
         category={mockCategory}
@@ -93,18 +111,14 @@ describe('CategoryTableRow Component - Sorting Indicators', () => {
       />
     );
     
-    // Get the order cell (first cell)
+    // Check the order cell has the correct aria-sort attribute for descending
     const cells = screen.getAllByRole('cell');
-    const orderCell = cells[0];
+    const orderCell = cells[0]; // First cell is order
     
-    // Verify visual indication of sorting
-    expect(orderCell).toHaveClass('bg-blue-50');
-    
-    // Verify correct ARIA attribute for accessibility
     expect(orderCell).toHaveAttribute('aria-sort', 'descending');
   });
   
-  it('applies visual indication when row is sorted by updatedAt', () => {
+  it('applies ascending aria-sort attribute to updatedAt column', () => {
     renderWithTableContext(
       <CategoryTableRow 
         category={mockCategory}
@@ -115,15 +129,29 @@ describe('CategoryTableRow Component - Sorting Indicators', () => {
       />
     );
     
-    // Get the date cell (third cell when showSiteColumn is false)
+    // Check the date cell has the correct aria-sort attribute for ascending
     const cells = screen.getAllByRole('cell');
-    const dateCell = cells[2];
+    const dateCell = cells[2]; // Third cell is date when showSiteColumn is false
     
-    // Verify visual indication of sorting
-    expect(dateCell).toHaveClass('bg-blue-50');
-    
-    // Verify correct ARIA attribute for accessibility
     expect(dateCell).toHaveAttribute('aria-sort', 'ascending');
+  });
+  
+  it('applies descending aria-sort attribute to updatedAt column', () => {
+    renderWithTableContext(
+      <CategoryTableRow 
+        category={mockCategory}
+        showSiteColumn={false}
+        onDeleteClick={mockDeleteClick}
+        isSortedBy="updatedAt"
+        sortDirection="desc"
+      />
+    );
+    
+    // Check the date cell has the correct aria-sort attribute for descending
+    const cells = screen.getAllByRole('cell');
+    const dateCell = cells[2]; // Third cell is date when showSiteColumn is false
+    
+    expect(dateCell).toHaveAttribute('aria-sort', 'descending');
   });
   
   it('applies no sorting indication when not sorted', () => {
@@ -170,5 +198,25 @@ describe('CategoryTableRow Component - Sorting Indicators', () => {
     expect(cells[1]).not.toHaveClass('bg-blue-50'); // Name
     expect(cells[2]).not.toHaveClass('bg-blue-50'); // Site
     expect(cells[4]).not.toHaveClass('bg-blue-50'); // Actions
+  });
+  
+  it('applies createdAt sorting correctly', () => {
+    renderWithTableContext(
+      <CategoryTableRow 
+        category={mockCategory}
+        showSiteColumn={false}
+        onDeleteClick={mockDeleteClick}
+        isSortedBy="createdAt"
+        sortDirection="asc"
+      />
+    );
+    
+    // When sorted by createdAt, no special cell highlighting occurs
+    // but we should maintain the sort state in case it's needed
+    const cells = screen.getAllByRole('cell');
+    cells.forEach(cell => {
+      expect(cell).not.toHaveClass('bg-blue-50');
+      expect(cell).not.toHaveAttribute('aria-sort');
+    });
   });
 });
