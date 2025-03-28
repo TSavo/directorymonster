@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 /**
- * DomainManager - A reusable DomainManager component
+ * DomainManager - Domain management component for handling site domains
  * 
- * A form component for creating and editing DomainManager data.
+ * A component for managing domain settings for a site.
  * 
  * Features:
- * - Form validation with error messages
+ * - Domain validation with error messages
+ * - Add and remove domains
  * - API integration for submission
  * - Loading states and error handling
  * - Accessibility support with ARIA attributes
- * - Keyboard navigation
  */
 export interface DomainManagerProps {
   /**
@@ -19,6 +19,7 @@ export interface DomainManagerProps {
    */
   initialData?: {
     id?: string;
+    domains?: string[];
   };
   /**
    * Mode for the form (create or edit)
@@ -50,11 +51,14 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-
-  // Form state
+  // Domain state
+  const [domains, setDomains] = useState<string[]>(initialData.domains || []);
+  const [domainInput, setDomainInput] = useState('');
   
   // Validation state
   const [errors, setErrors] = useState<{
+    domains?: string;
+    domainInput?: string;
     format?: string;
   }>({});
 
@@ -62,6 +66,7 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
+    if (name === 'domainInput') setDomainInput(value);
     
     // Clear error when field is changed
     if (errors[name as keyof typeof errors]) {
@@ -72,12 +77,61 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
     }
   };
 
+  // Domain validation
+  const validateDomain = (domain: string): boolean => {
+    // Simple domain validation regex
+    const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](\.[a-zA-Z]{2,})+$/;
+    return domainRegex.test(domain);
+  };
+
+  // Handle domain management
+  const addDomain = () => {
+    if (!domainInput.trim()) return;
+    
+    // Validate domain format
+    if (!validateDomain(domainInput)) {
+      setErrors(prev => ({
+        ...prev,
+        domainInput: 'Invalid domain format'
+      }));
+      return;
+    }
+    
+    // Check if domain already exists
+    if (domains.includes(domainInput)) {
+      setErrors(prev => ({
+        ...prev,
+        domainInput: 'Domain already exists'
+      }));
+      return;
+    }
+    
+    // Add domain and clear input
+    setDomains(prev => [...prev, domainInput]);
+    setDomainInput('');
+    
+    // Clear any domain-related errors
+    setErrors(prev => ({
+      ...prev,
+      domains: undefined,
+      domainInput: undefined
+    }));
+  };
+  
+  const removeDomain = (domain: string) => {
+    setDomains(prev => prev.filter(d => d !== domain));
+  };
 
   // Validation function
   const validateForm = (): boolean => {
     const newErrors: typeof errors = {};
     let isValid = true;
 
+    // Validate domains
+    if (domains.length === 0) {
+      newErrors.domains = 'At least one domain is required';
+      isValid = false;
+    }
 
     setErrors(newErrors);
     return isValid;
@@ -99,6 +153,8 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
     try {
       // Prepare data for submission
       const dataToSubmit = {
+        domains,
+        id: initialData.id
       };
       
       // Determine API endpoint and method based on mode
@@ -119,7 +175,7 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
       const result = await response.json();
       
       if (response.ok) {
-        setSuccess(mode === 'edit' ? 'DomainManager updated successfully' : 'DomainManager created successfully');
+        setSuccess('Domain settings updated successfully');
         
         // Call success callback if provided
         if (onSuccess) {
@@ -147,7 +203,7 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
         className="text-xl font-bold mb-6"
         data-testid="domainManager-header"
       >
-        {mode === 'edit' ? 'Edit' : 'Create'} DomainManager
+        {mode === 'edit' ? 'Edit' : 'Create'} Domain Settings
       </h1>
       
       {/* Error message */}
@@ -183,13 +239,99 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
           data-testid="domainManager-fieldset"
         >
           <legend className="text-lg font-semibold mb-3" data-testid="domainManager-section-heading">
-            DomainManager Information
+            Domain Management
           </legend>
           
-
-
+          {/* Domain list */}
+          <div className="mb-4">
+            <h3 className="text-md font-medium mb-2">Current Domains</h3>
+            
+            {domains.length === 0 ? (
+              <p className="text-gray-500 italic">No domains added yet</p>
+            ) : (
+              <ul className="mb-4 border rounded divide-y">
+                {domains.map((domain, index) => (
+                  <li key={domain} className="flex justify-between items-center p-2 hover:bg-gray-50">
+                    <span data-testid={`domainManager-domain-${index}`}>
+                      {domain}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeDomain(domain)}
+                      className="text-red-500 hover:text-red-700 p-1"
+                      aria-label={`Remove domain ${domain}`}
+                      data-testid={`domainManager-remove-domain-${index}`}
+                      disabled={isLoading}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      <span className="sr-only">Remove</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            
+            {errors.domains && (
+              <p 
+                className="mt-1 text-sm text-red-500" 
+                role="alert" 
+                data-testid="domainManager-domains-error"
+              >
+                {errors.domains}
+              </p>
+            )}
+          </div>
+          
+          {/* Add domain */}
+          <div className="mb-4">
+            <h3 className="text-md font-medium mb-2">Add Domain</h3>
+            
+            <div className="flex items-center">
+              <input
+                type="text"
+                id="domainManager-domain-input"
+                name="domainInput"
+                value={domainInput}
+                onChange={handleChange}
+                placeholder="Enter domain (e.g., example.com)"
+                className={`flex-grow p-2 border rounded focus:ring-2 focus:border-blue-500 ${errors.domainInput ? 'border-red-500' : 'border-gray-300'}`}
+                aria-invalid={errors.domainInput ? "true" : "false"}
+                aria-describedby={errors.domainInput ? "domainManager-domain-input-error" : undefined}
+                data-testid="domainManager-domain-input"
+                disabled={isLoading}
+              />
+              
+              <button
+                type="button"
+                onClick={addDomain}
+                className="ml-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded flex-shrink-0"
+                data-testid="domainManager-add-domain"
+                disabled={isLoading || !domainInput.trim()}
+              >
+                + Add
+              </button>
+            </div>
+            
+            {errors.domainInput && (
+              <p 
+                className="mt-1 text-sm text-red-500" 
+                role="alert" 
+                id="domainManager-domain-input-error"
+                data-testid="domainManager-domain-input-error"
+              >
+                {errors.domainInput}
+              </p>
+            )}
+            
+            <p className="text-sm text-gray-500 mt-2">
+              Enter valid domain names without http:// or www prefixes
+            </p>
+          </div>
+          
           <p className="text-sm text-gray-500 mt-4" data-testid="domainManager-format-help">
-            * Required fields. Slugs can only contain lowercase letters, numbers, and hyphens.
+            * At least one domain is required.
           </p>
         </fieldset>
         
@@ -218,7 +360,7 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
                 Loading...
               </span>
             ) : (
-              mode === 'edit' ? `Update DomainManager` : `Create DomainManager`
+              mode === 'edit' ? `Update Domain Settings` : `Create Domain Settings`
             )}
           </button>
         </div>
