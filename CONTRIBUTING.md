@@ -71,6 +71,35 @@ Read the [testing documentation](./CLAUDE.md) for more details.
   npm run typecheck
   ```
 
+## Component Architecture
+
+### Admin Components
+
+When working with admin components, follow these guidelines:
+
+1. Use a modular component structure
+   - Each major component should be broken down into smaller, focused subcomponents
+   - Store related components in a directory structure by feature area (e.g., `admin/listings/`)
+   - Use an `index.ts` file for clean exports
+
+2. Implement custom hooks for data management
+   - Store data management logic in custom hooks (e.g., `useListings.ts`)
+   - Place hooks in a separate `hooks` directory within the feature area
+
+3. TypeScript types
+   - Define component props interfaces in a `types.ts` file
+   - Use specific and descriptive type names
+   - Export types for reuse when appropriate
+
+4. Utility functions
+   - Extract repeated logic into utility functions in a `utils.ts` file
+   - Keep utility functions pure and testable
+
+5. Testing
+   - Create comprehensive tests for each component
+   - Test both the main component and its subcomponents
+   - Mock data and API calls appropriately
+
 ## URL Construction
 
 DirectoryMonster uses a consistent approach to URL construction throughout the application. Always follow these patterns when working with URLs:

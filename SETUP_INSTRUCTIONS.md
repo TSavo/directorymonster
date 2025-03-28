@@ -25,6 +25,8 @@ The simplest way to run DirectoryMonster is using Docker. Follow these steps:
 
 3. **Access the application**:
    - Main application: http://localhost:3000/
+   - Admin interface: http://localhost:3000/admin
+   - Admin listings management: http://localhost:3000/admin/listings
    - API endpoints:
      - http://localhost:3000/api/healthcheck
      - http://localhost:3000/api/sites
