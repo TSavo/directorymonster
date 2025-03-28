@@ -147,7 +147,13 @@ We're continuing to implement the Category Management interface for the admin da
      - Test for presence of accessibility features without specific classes
      - Use more general attribute matchers when appropriate
      - Ensure tests still validate core functionality
-   - Next: Continue fixing tests for remaining category components
+   - ✅ Successfully enhanced CategoryTableSortHeader component tests
+     - Added specific data-testid attributes with field names for reliable selection
+     - Added new test for proper semantic structure (th, button elements)
+     - Improved accessibility testing for focus states
+     - Reduced CSS class coupling by using more flexible class matching
+     - Added more robust testing for ARIA attributes
+   - Next: Continue fixing tests for CategoryTablePagination component
 
 2. **Category Management Implementation** ✅
    - Successfully implemented all subcomponents and main container

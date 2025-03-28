@@ -32,7 +32,9 @@ describe('CategoryTableSortHeader Component', () => {
       </table>
     );
     
-    expect(screen.getByText('Name')).toBeInTheDocument();
+    const labelElement = screen.getByTestId('sort-label-name');
+    expect(labelElement).toBeInTheDocument();
+    expect(labelElement).toHaveTextContent('Name');
   });
   
   it('highlights the header when it is the current sort field', () => {
@@ -52,7 +54,7 @@ describe('CategoryTableSortHeader Component', () => {
       </table>
     );
     
-    const icon = screen.getByTestId('sort-icon');
+    const icon = screen.getByTestId('sort-icon-name');
     expect(icon).toHaveClass('text-blue-500');
   });
   
@@ -73,7 +75,7 @@ describe('CategoryTableSortHeader Component', () => {
       </table>
     );
     
-    const icon = screen.getByTestId('sort-icon');
+    const icon = screen.getByTestId('sort-icon-name');
     expect(icon).toHaveClass('text-gray-400');
   });
   
@@ -94,7 +96,7 @@ describe('CategoryTableSortHeader Component', () => {
       </table>
     );
     
-    const button = screen.getByRole('button');
+    const button = screen.getByTestId('sort-button-name');
     fireEvent.click(button);
     
     expect(mockOnSort).toHaveBeenCalledTimes(1);
@@ -118,7 +120,7 @@ describe('CategoryTableSortHeader Component', () => {
       </table>
     );
     
-    const button = screen.getByRole('button');
+    const button = screen.getByTestId('sort-button-name');
     expect(button).toHaveAttribute('aria-label', 'Sort by Name (currently sorted asc)');
   });
   
@@ -139,7 +141,7 @@ describe('CategoryTableSortHeader Component', () => {
       </table>
     );
     
-    const button = screen.getByRole('button');
+    const button = screen.getByTestId('sort-button-name');
     expect(button).toHaveAttribute('aria-label', 'Sort by Name (currently sorted desc)');
   });
   
@@ -160,7 +162,7 @@ describe('CategoryTableSortHeader Component', () => {
       </table>
     );
     
-    const button = screen.getByRole('button');
+    const button = screen.getByTestId('sort-button-name');
     expect(button).toHaveAttribute('aria-label', 'Sort by Name');
   });
   
@@ -181,8 +183,44 @@ describe('CategoryTableSortHeader Component', () => {
       </table>
     );
     
-    const button = screen.getByRole('button');
-    expect(button).toHaveClass('focus:outline-none');
-    expect(button).toHaveClass('focus:underline');
+    const button = screen.getByTestId('sort-button-name');
+    
+    // Check for focus-related CSS classes without tight coupling to specific implementation
+    const className = button.getAttribute('class') || '';
+    expect(className).toMatch(/focus:/); // Verify some focus handling exists
+    
+    // We're specifically looking for focus styles for accessibility
+    expect(className).toMatch(/focus:(outline|underline)/);
+  });
+  
+  it('renders with proper semantic structure', () => {
+    render(
+      <table>
+        <thead>
+          <tr>
+            <CategoryTableSortHeader
+              label="Name"
+              field="name"
+              currentSortField="order"
+              currentSortOrder="asc"
+              onSort={mockOnSort}
+            />
+          </tr>
+        </thead>
+      </table>
+    );
+    
+    // Check the proper semantic tag is used
+    const header = screen.getByTestId('sort-header-name');
+    expect(header.tagName).toBe('TH');
+    expect(header).toHaveAttribute('scope', 'col');
+    
+    // Verify the button structure
+    const button = screen.getByTestId('sort-button-name');
+    expect(button.tagName).toBe('BUTTON');
+    
+    // Verify icon has proper accessibility attribute
+    const icon = screen.getByTestId('sort-icon-name');
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
   });
 });

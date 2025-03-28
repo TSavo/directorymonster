@@ -17,18 +17,23 @@ export default function CategoryTableSortHeader({
   const ariaLabel = `Sort by ${label}${isActive ? ` (currently sorted ${currentSortOrder})` : ''}`;
   
   return (
-    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+    <th 
+      scope="col" 
+      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+      data-testid={`sort-header-${field}`}
+    >
       <button
         className="flex items-center space-x-1 focus:outline-none focus:underline"
         onClick={() => onSort(field)}
         aria-label={ariaLabel}
+        data-testid={`sort-button-${field}`}
       >
-        <span>{label}</span>
+        <span data-testid={`sort-label-${field}`}>{label}</span>
         <ArrowUpDown 
           size={14} 
           className={isActive ? 'text-blue-500' : 'text-gray-400'} 
           aria-hidden="true"
-          data-testid="sort-icon"
+          data-testid={`sort-icon-${field}`}
         />
       </button>
     </th>
