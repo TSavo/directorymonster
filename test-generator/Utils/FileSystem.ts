@@ -3,8 +3,8 @@
  * Handles directory creation, file reading and writing, and error handling.
  */
 
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * FileSystem utility class for handling file operations
@@ -12,38 +12,38 @@ import path from 'path';
 class FileSystem {
   /**
    * Check if a file exists
-   * @param {string} filePath - Path to the file to check
-   * @returns {boolean} True if the file exists, false otherwise
+   * @param filePath - Path to the file to check
+   * @returns True if the file exists, false otherwise
    */
-  static fileExists(filePath) {
+  static fileExists(filePath: string): boolean {
     try {
       return fs.existsSync(filePath) && fs.statSync(filePath).isFile();
     } catch (error) {
-      console.error(`Error checking if file exists: ${error.message}`);
+      console.error(`Error checking if file exists: ${(error as Error).message}`);
       return false;
     }
   }
 
   /**
    * Check if a directory exists
-   * @param {string} dirPath - Path to the directory to check
-   * @returns {boolean} True if the directory exists, false otherwise
+   * @param dirPath - Path to the directory to check
+   * @returns True if the directory exists, false otherwise
    */
-  static directoryExists(dirPath) {
+  static directoryExists(dirPath: string): boolean {
     try {
       return fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory();
     } catch (error) {
-      console.error(`Error checking if directory exists: ${error.message}`);
+      console.error(`Error checking if directory exists: ${(error as Error).message}`);
       return false;
     }
   }
 
   /**
    * Create a directory and any necessary parent directories
-   * @param {string} dirPath - Path to the directory to create
-   * @returns {boolean} True if the directory was created successfully or already exists
+   * @param dirPath - Path to the directory to create
+   * @returns True if the directory was created successfully or already exists
    */
-  static createDirectory(dirPath) {
+  static createDirectory(dirPath: string): boolean {
     try {
       if (this.directoryExists(dirPath)) {
         return true;
@@ -53,39 +53,40 @@ class FileSystem {
       console.log(`Created directory: ${dirPath}`);
       return true;
     } catch (error) {
-      console.error(`Error creating directory: ${error.message}`);
+      console.error(`Error creating directory: ${(error as Error).message}`);
       return false;
     }
   }
 
   /**
    * Read a file with error handling
-   * @param {string} filePath - Path to the file to read
-   * @param {string} [encoding='utf8'] - Encoding to use when reading the file
-   * @returns {string|null} The file contents or null if an error occurred
+   * @param filePath - Path to the file to read
+   * @param encoding - Encoding to use when reading the file
+   * @returns The file contents or null if an error occurred
    */
-  static readFile(filePath, encoding = 'utf8') {
+  static readFile(filePath: string, encoding: BufferEncoding = 'utf8'): string | null {
     try {
       if (!this.fileExists(filePath)) {
         console.error(`File not found: ${filePath}`);
         return null;
       }
       
-      return fs.readFileSync(filePath, encoding);
+      // Read the file
+      return fs.readFileSync(filePath, { encoding });
     } catch (error) {
-      console.error(`Error reading file: ${error.message}`);
+      console.error(`Error reading file: ${(error as Error).message}`);
       return null;
     }
   }
 
   /**
    * Write to a file with error handling
-   * @param {string} filePath - Path to the file to write
-   * @param {string} content - Content to write to the file
-   * @param {boolean} [overwrite=false] - Whether to overwrite the file if it already exists
-   * @returns {boolean} True if the file was written successfully
+   * @param filePath - Path to the file to write
+   * @param content - Content to write to the file
+   * @param overwrite - Whether to overwrite the file if it already exists
+   * @returns True if the file was written successfully
    */
-  static writeFile(filePath, content, overwrite = false) {
+  static writeFile(filePath: string, content: string, overwrite: boolean = false): boolean {
     try {
       // Check if file exists and overwrite is not allowed
       if (this.fileExists(filePath) && !overwrite) {
@@ -102,18 +103,18 @@ class FileSystem {
       console.log(`Successfully wrote file: ${filePath}`);
       return true;
     } catch (error) {
-      console.error(`Error writing file: ${error.message}`);
+      console.error(`Error writing file: ${(error as Error).message}`);
       return false;
     }
   }
 
   /**
    * Append to a file with error handling
-   * @param {string} filePath - Path to the file to append to
-   * @param {string} content - Content to append to the file
-   * @returns {boolean} True if the content was appended successfully
+   * @param filePath - Path to the file to append to
+   * @param content - Content to append to the file
+   * @returns True if the content was appended successfully
    */
-  static appendFile(filePath, content) {
+  static appendFile(filePath: string, content: string): boolean {
     try {
       // Ensure the directory exists
       const dirPath = path.dirname(filePath);
@@ -124,28 +125,28 @@ class FileSystem {
       console.log(`Successfully appended to file: ${filePath}`);
       return true;
     } catch (error) {
-      console.error(`Error appending to file: ${error.message}`);
+      console.error(`Error appending to file: ${(error as Error).message}`);
       return false;
     }
   }
 
   /**
    * List files in a directory with error handling
-   * @param {string} dirPath - Path to the directory to list
-   * @param {RegExp} [pattern] - Pattern to match filenames against
-   * @returns {string[]|null} Array of file paths, or null if an error occurred
+   * @param dirPath - Path to the directory to list
+   * @param pattern - Pattern to match filenames against
+   * @returns Array of file paths, or null if an error occurred
    */
-  static listFiles(dirPath, pattern = null) {
+  static listFiles(dirPath: string, pattern: RegExp | null = null): string[] | null {
     try {
       if (!this.directoryExists(dirPath)) {
         console.error(`Directory not found: ${dirPath}`);
         return null;
       }
       
-      let files = fs.readdirSync(dirPath);
+      const files = fs.readdirSync(dirPath);
       
       // Filter files based on pattern and only include files (not directories)
-      files = files
+      const filteredFiles = files
         .filter(file => {
           const filePath = path.join(dirPath, file);
           const isFile = fs.statSync(filePath).isFile();
@@ -153,27 +154,27 @@ class FileSystem {
         })
         .map(file => path.join(dirPath, file));
       
-      return files;
+      return filteredFiles;
     } catch (error) {
-      console.error(`Error listing files: ${error.message}`);
+      console.error(`Error listing files: ${(error as Error).message}`);
       return null;
     }
   }
 
   /**
    * Recursively list all files in a directory and its subdirectories
-   * @param {string} dirPath - Path to the directory to list
-   * @param {RegExp} [pattern] - Pattern to match filenames against
-   * @returns {string[]|null} Array of file paths, or null if an error occurred
+   * @param dirPath - Path to the directory to list
+   * @param pattern - Pattern to match filenames against
+   * @returns Array of file paths, or null if an error occurred
    */
-  static listFilesRecursive(dirPath, pattern = null) {
+  static listFilesRecursive(dirPath: string, pattern: RegExp | null = null): string[] | null {
     try {
       if (!this.directoryExists(dirPath)) {
         console.error(`Directory not found: ${dirPath}`);
         return null;
       }
       
-      let results = [];
+      const results: string[] = [];
       const entries = fs.readdirSync(dirPath, { withFileTypes: true });
       
       for (const entry of entries) {
@@ -183,7 +184,7 @@ class FileSystem {
           // Recursively process subdirectories
           const subFiles = this.listFilesRecursive(entryPath, pattern);
           if (subFiles) {
-            results = results.concat(subFiles);
+            results.push(...subFiles);
           }
         } else if (!pattern || pattern.test(entry.name)) {
           // Add file if it matches the pattern or no pattern was provided
@@ -193,17 +194,17 @@ class FileSystem {
       
       return results;
     } catch (error) {
-      console.error(`Error listing files recursively: ${error.message}`);
+      console.error(`Error listing files recursively: ${(error as Error).message}`);
       return null;
     }
   }
 
   /**
    * Delete a file with error handling
-   * @param {string} filePath - Path to the file to delete
-   * @returns {boolean} True if the file was deleted successfully
+   * @param filePath - Path to the file to delete
+   * @returns True if the file was deleted successfully
    */
-  static deleteFile(filePath) {
+  static deleteFile(filePath: string): boolean {
     try {
       if (!this.fileExists(filePath)) {
         console.warn(`File to delete not found: ${filePath}`);
@@ -214,19 +215,19 @@ class FileSystem {
       console.log(`Deleted file: ${filePath}`);
       return true;
     } catch (error) {
-      console.error(`Error deleting file: ${error.message}`);
+      console.error(`Error deleting file: ${(error as Error).message}`);
       return false;
     }
   }
 
   /**
    * Copy a file with error handling
-   * @param {string} sourcePath - Path to the source file
-   * @param {string} destPath - Path to the destination file
-   * @param {boolean} [overwrite=false] - Whether to overwrite the destination file if it already exists
-   * @returns {boolean} True if the file was copied successfully
+   * @param sourcePath - Path to the source file
+   * @param destPath - Path to the destination file
+   * @param overwrite - Whether to overwrite the destination file if it already exists
+   * @returns True if the file was copied successfully
    */
-  static copyFile(sourcePath, destPath, overwrite = false) {
+  static copyFile(sourcePath: string, destPath: string, overwrite: boolean = false): boolean {
     try {
       if (!this.fileExists(sourcePath)) {
         console.error(`Source file not found: ${sourcePath}`);
@@ -252,27 +253,27 @@ class FileSystem {
       console.log(`Copied file from ${sourcePath} to ${destPath}`);
       return true;
     } catch (error) {
-      console.error(`Error copying file: ${error.message}`);
+      console.error(`Error copying file: ${(error as Error).message}`);
       return false;
     }
   }
 
   /**
    * Get the relative path from a base directory
-   * @param {string} fullPath - The full path
-   * @param {string} baseDir - The base directory
-   * @returns {string} The relative path
+   * @param fullPath - The full path
+   * @param baseDir - The base directory
+   * @returns The relative path
    */
-  static getRelativePath(fullPath, baseDir) {
+  static getRelativePath(fullPath: string, baseDir: string): string {
     return path.relative(baseDir, fullPath);
   }
 
   /**
    * Resolve a path relative to the current working directory
-   * @param {string} relativePath - The relative path to resolve
-   * @returns {string} The absolute path
+   * @param relativePath - The relative path to resolve
+   * @returns The absolute path
    */
-  static resolvePath(relativePath) {
+  static resolvePath(relativePath: string): string {
     return path.resolve(process.cwd(), relativePath);
   }
 

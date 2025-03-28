@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2022",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -10,8 +10,9 @@
     "declaration": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "emitDeclarationOnly": false
   },
-  "include": ["test-generator/**/*.ts", "test-typescript.ts"],
+  "include": ["test-generator/**/*.ts", "test-typescript.ts", "test-template-method.ts"],
   "exclude": ["node_modules", "dist"]
 }
