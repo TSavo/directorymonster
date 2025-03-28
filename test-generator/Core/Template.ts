@@ -4,6 +4,8 @@
  */
 
 import { FileSystem } from '../Utils/FileSystem.js';
+import path from 'path';
+import fs from 'fs';
 
 /**
  * Template metadata interface
@@ -61,7 +63,7 @@ class Template {
    */
   constructor(templateDir: string) {
     this.templateDir = templateDir;
-    this.templates = new Map();
+    this.templates = new Map<string, TemplateObject>();
     this.templateSchema = {
       required: ['content'],
       properties: {
@@ -82,28 +84,59 @@ class Template {
         return false;
       }
 
-      // Load templates from directory
-      const templateFiles = FileSystem.listFiles(this.templateDir, /\.template$/);
-      if (!templateFiles || templateFiles.length === 0) {
-        console.warn(`No template files found in directory: ${this.templateDir}`);
-        return false;
-      }
-
-      // Register each template
-      for (const templateFile of templateFiles) {
-        // Extract template name from filename (remove .template extension)
-        const templateName = FileSystem.getBasename(templateFile).replace('.template', '');
-        const templateContent = FileSystem.readFile(templateFile);
+      // Only process .hbs files
+      const files = fs.readdirSync(this.templateDir).filter(file => path.extname(file) === '.hbs');
+      for (const file of files) {
+        const templateName = path.basename(file, '.hbs');
+        const templatePath = path.join(this.templateDir, file);
         
-        if (templateContent) {
-          this.registerTemplate(templateName, { content: templateContent });
-        }
+        // Load and compile the template
+        await this.loadTemplate(templateName, templatePath);
       }
 
       console.log(`Loaded ${this.templates.size} templates from ${this.templateDir}`);
       return true;
     } catch (error) {
       console.error(`Error initializing template manager: ${(error as Error).message}`);
+      return false;
+    }
+  }
+
+  /**
+   * Load a template from a file and register it with the manager
+   * @param name - Name to register the template under
+   * @param templatePath - Path to the template file
+   * @returns Promise resolving to true if the template was loaded successfully
+   */
+  async loadTemplate(name: string, templatePath: string): Promise<boolean> {
+    try {
+      if (!FileSystem.fileExists(templatePath)) {
+        console.error(`Template file not found: ${templatePath}`);
+        return false;
+      }
+
+      // Read the template content
+      const content = FileSystem.readFile(templatePath);
+      if (!content) {
+        console.error(`Failed to read template file: ${templatePath}`);
+        return false;
+      }
+
+      // Create the template object
+      const templateObject: TemplateObject = { 
+        content,
+        // Add metadata with the template file path for reference
+        metadata: {
+          path: templatePath,
+          type: path.extname(templatePath).substring(1), // Remove the dot from extension
+          lastModified: new Date().toISOString()
+        }
+      };
+
+      // Register the template with the manager
+      return this.registerTemplate(name, templateObject);
+    } catch (error) {
+      console.error(`Error loading template ${name} from ${templatePath}: ${(error as Error).message}`);
       return false;
     }
   }
@@ -141,7 +174,7 @@ class Template {
       return null;
     }
 
-    return { ...this.templates.get(name) };
+    return { ...this.templates.get(name)! };
   }
 
   /**
@@ -190,7 +223,8 @@ class Template {
       // Use filename as template name if not provided
       const templateName = name || FileSystem.getBasename(filePath, '.template');
       
-      return this.registerTemplate(templateName, { content });
+      const templateObject: TemplateObject = { content };
+      return this.registerTemplate(templateName, templateObject);
     } catch (error) {
       console.error(`Error creating template from file: ${(error as Error).message}`);
       return false;
@@ -313,4 +347,4 @@ class Template {
   }
 }
 
-export { Template };
+export { Template, TemplateObject, TemplateMetadata };
