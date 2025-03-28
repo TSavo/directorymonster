@@ -25,11 +25,13 @@ describe('DeleteConfirmationModal Component', () => {
       />
     );
     
-    expect(screen.getByText('Delete Category')).toBeInTheDocument();
-    expect(screen.getByText(/Are you sure you want to delete/)).toBeInTheDocument();
-    expect(screen.getByText('"Test Category"')).toBeInTheDocument();
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
-    expect(screen.getByText('Delete')).toBeInTheDocument();
+    // Test using data-testid attributes
+    expect(screen.getByTestId('delete-confirmation-modal')).toBeInTheDocument();
+    expect(screen.getByTestId('modal-title')).toHaveTextContent('Delete Category');
+    expect(screen.getByTestId('modal-description')).toHaveTextContent(/Are you sure you want to delete/);
+    expect(screen.getByTestId('item-name')).toHaveTextContent('"Test Category"');
+    expect(screen.getByTestId('cancel-button')).toHaveTextContent('Cancel');
+    expect(screen.getByTestId('confirm-delete-button')).toHaveTextContent('Delete');
   });
   
   it('does not render when closed', () => {
@@ -57,7 +59,7 @@ describe('DeleteConfirmationModal Component', () => {
       />
     );
     
-    fireEvent.click(screen.getByText('Delete'));
+    fireEvent.click(screen.getByTestId('confirm-delete-button'));
     expect(mockOnConfirm).toHaveBeenCalledTimes(1);
   });
   
@@ -72,7 +74,7 @@ describe('DeleteConfirmationModal Component', () => {
       />
     );
     
-    fireEvent.click(screen.getByText('Cancel'));
+    fireEvent.click(screen.getByTestId('cancel-button'));
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
   
@@ -87,8 +89,8 @@ describe('DeleteConfirmationModal Component', () => {
       />
     );
     
-    // Find the dialog background (the first element with role="dialog")
-    const backdrop = screen.getByRole('dialog');
+    // Find the dialog background using data-testid
+    const backdrop = screen.getByTestId('delete-confirmation-modal');
     fireEvent.click(backdrop);
     
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
@@ -109,6 +111,40 @@ describe('DeleteConfirmationModal Component', () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
   
+  it('does not call onCancel when other keys are pressed', () => {
+    render(
+      <DeleteConfirmationModal
+        isOpen={true}
+        title="Delete Category"
+        itemName="Test Category"
+        onConfirm={mockOnConfirm}
+        onCancel={mockOnCancel}
+      />
+    );
+    
+    fireEvent.keyDown(document, { key: 'Enter' });
+    fireEvent.keyDown(document, { key: 'Tab' });
+    expect(mockOnCancel).not.toHaveBeenCalled();
+  });
+  
+  it('properly prevents modal background click propagation', () => {
+    render(
+      <DeleteConfirmationModal
+        isOpen={true}
+        title="Delete Category"
+        itemName="Test Category"
+        onConfirm={mockOnConfirm}
+        onCancel={mockOnCancel}
+      />
+    );
+    
+    // Click on the modal content itself, which should not call onCancel
+    const modalContent = screen.getByTestId('modal-content');
+    fireEvent.click(modalContent);
+    
+    expect(mockOnCancel).not.toHaveBeenCalled();
+  });
+  
   it('has proper accessibility attributes', () => {
     render(
       <DeleteConfirmationModal
@@ -120,11 +156,12 @@ describe('DeleteConfirmationModal Component', () => {
       />
     );
     
-    const dialog = screen.getByRole('dialog');
+    const dialog = screen.getByTestId('delete-confirmation-modal');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
     expect(dialog).toHaveAttribute('aria-labelledby', 'modal-title');
+    expect(dialog).toHaveAttribute('role', 'dialog');
     
-    const title = screen.getByText('Delete Category');
+    const title = screen.getByTestId('modal-title');
     expect(title).toHaveAttribute('id', 'modal-title');
   });
 });
