@@ -1,14 +1,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SiteForm } from '@/components/admin/sites/SiteForm';
+import { {{componentName}} } from '@/components/{{#if category}}{{category}}/{{/if}}{{componentName}}';
 
-describe('SiteForm', () => {
+describe('{{componentName}}', () => {
   it('renders correctly', () => {
-    render(<SiteForm />);
+    render(<{{componentName}} />);
     
     // Basic rendering tests
-    expect(screen.getByTestId('siteForm-header')).toBeInTheDocument();
+    expect(screen.getByTestId('{{componentNameCamelCase}}-header')).toBeInTheDocument();
   });
 
   it('renders with initial props', () => {
@@ -19,7 +19,7 @@ describe('SiteForm', () => {
       domains: ['test.com']
     };
     
-    render(<SiteForm initialData={initialData} />);
+    render(<{{componentName}} initialData={initialData} />);
     
     // Component-specific assertions
     expect(screen.getByDisplayValue('Test Name')).toBeInTheDocument();
@@ -32,7 +32,7 @@ describe('SiteForm', () => {
     const user = userEvent.setup();
     const mockOnCancel = jest.fn();
     
-    render(<SiteForm onCancel={mockOnCancel} />);
+    render(<{{componentName}} onCancel={mockOnCancel} />);
     
     // Find and click the cancel button
     const cancelButton = screen.getByText('Cancel');
