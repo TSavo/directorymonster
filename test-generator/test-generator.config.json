@@ -5,6 +5,24 @@
     "components": "./src/components",
     "fixtures": "./tests/__fixtures__"
   },
+  "componentTypes": {
+    "form": {
+      "template": "form.component.template",
+      "description": "Form component with validation and submission"
+    },
+    "table": {
+      "template": "table.component.template",
+      "description": "Table component with sorting and pagination"
+    },
+    "modal": {
+      "template": "modal.component.template",
+      "description": "Modal dialog with focus management"
+    },
+    "domain": {
+      "template": "domain.component.template",
+      "description": "Domain management component with validation and submission"
+    }
+  },
   "testTypes": {
     "base": {
       "template": "base.template",
@@ -22,7 +40,7 @@
       "description": "Form submission tests including API interaction and loading states"
     },
     "domains": {
-      "template": "domains.hbs",
+      "template": "domains.template",
       "suffix": ".domains.test.tsx",
       "description": "Domain management tests including adding, removing, and validating domains"
     },

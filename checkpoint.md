@@ -1,8 +1,8 @@
 ## Current Status - [2025-03-28]
 
 ### In Progress
-- Now generating test files for all DomainManager aspects: base, validation, submission, and domains tests
-- Need to enhance DomainManager component to implement domain management functionality
+- Created domain.component.template for domain management component generation
+- Updated test-generator.config.json to include domain component type
 
 ### Completed
 1. ✅ Installed Handlebars as a dependency
