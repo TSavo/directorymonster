@@ -174,9 +174,21 @@ export class CommandProcessor {
     console.log(`Generating test files for component: ${componentName}`);
     console.log('Options:', options);
     
-    // Import test generator dynamically 
+    // Import modules dynamically
+    const { Config } = await import('../Core/Config.js');
+    const { Template } = await import('../Core/Template.js');
     const { TestGenerator } = await import('../Generators/TestGenerator.js');
-    const testGenerator = new TestGenerator();
+    
+    // Initialize configuration and template manager
+    const config = new Config();
+    await config.load();
+    
+    // Initialize template manager
+    const templateManager = new Template(config.get('paths.templates'));
+    await templateManager.initialize();
+    
+    // Create test generator
+    const testGenerator = new TestGenerator(config, templateManager);
     
     try {
       // Parse features from options
@@ -189,10 +201,17 @@ export class CommandProcessor {
       if (options.sorting) features.push('sorting');
       if (options.accessibility) features.push('accessibility');
       
-      // Generate tests
-      await testGenerator.generateTests(componentName, {
+      // Create requirements object
+      const requirements = {
+        componentName,
         features: [...new Set(features)], // Remove duplicates
+        testTypes: ['base'], // Default to base test type
         ...options
+      };
+
+      // Generate tests
+      await testGenerator.generateTests(requirements, {
+        overwrite: options.overwrite || false
       });
       
       console.log('✅ Test files generation completed successfully!');
@@ -219,20 +238,46 @@ export class CommandProcessor {
     console.log(`Scaffolding component: ${componentName}`);
     console.log('Options:', options);
     
-    // Import component scaffolder dynamically
+    // Import modules dynamically
+    const { Config } = await import('../Core/Config.js');
+    const { Template } = await import('../Core/Template.js');
     const { ComponentScaffolder } = await import('../Generators/ComponentScaffolder.js');
-    const scaffolder = new ComponentScaffolder();
+    
+    // Initialize configuration and template manager
+    const config = new Config();
+    await config.load();
+    
+    // Initialize template manager
+    const templateManager = new Template(config.get('paths.templates'));
+    await templateManager.initialize();
+    
+    // Create component scaffolder
+    const scaffolder = new ComponentScaffolder(config, templateManager);
     
     try {
       // Parse props from options
-      const props = options.props ? options.props.split(',') : [];
+      const propNames = options.props ? options.props.split(',') : [];
       
-      // Generate component
-      await scaffolder.generateComponent(componentName, {
+      // Convert to prop objects
+      const props = propNames.map(name => ({
+        name,
+        type: 'string', // Default type
+        required: false
+      }));
+      
+      // Create requirements object
+      const requirements = {
+        componentName,
         props,
+        features: [],
         withHooks: !!options.withHooks,
         withContext: !!options.withContext,
         ...options
+      };
+      
+      // Generate component
+      await scaffolder.scaffoldComponent(requirements, {
+        overwrite: options.overwrite || false
       });
       
       console.log('✅ Component scaffolding completed successfully!');
@@ -259,17 +304,36 @@ export class CommandProcessor {
     console.log(`Generating fixtures for component: ${componentName}`);
     console.log('Options:', options);
     
-    // Import fixture generator dynamically
+    // Import modules dynamically
+    const { Config } = await import('../Core/Config.js');
     const { FixtureGenerator } = await import('../Generators/FixtureGenerator.js');
-    const fixtureGenerator = new FixtureGenerator();
+    
+    // Initialize configuration
+    const config = new Config();
+    await config.load();
+    
+    // Create fixture generator
+    const fixtureGenerator = new FixtureGenerator(config);
     
     try {
-      // Generate fixtures
-      await fixtureGenerator.generateFixtures(componentName, {
-        count: options.count ? parseInt(options.count, 10) : 3,
-        withHierarchy: !!options.withHierarchy,
-        depth: options.depth ? parseInt(options.depth, 10) : 2,
+      // Create requirements object
+      const requirements = {
+        componentName,
+        props: [],
+        features: [],
         ...options
+      };
+      
+      // Add hierarchy feature if specified
+      if (options.withHierarchy) {
+        requirements.features.push('hierarchy');
+      }
+      
+      // Generate fixtures
+      await fixtureGenerator.generateFixtures(requirements, {
+        count: options.count ? parseInt(options.count, 10) : 3,
+        depth: options.depth ? parseInt(options.depth, 10) : 2,
+        overwrite: options.overwrite || false
       });
       
       console.log('✅ Fixture generation completed successfully!');
