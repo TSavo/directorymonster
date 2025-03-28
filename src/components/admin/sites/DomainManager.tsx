@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDomains } from './hooks';
 
 /**
  * DomainManager - Domain management component for handling site domains
@@ -47,152 +48,46 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
   apiEndpoint = '/api/domain-manager'
 }) => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   
-  // Domain state
-  const [domains, setDomains] = useState<string[]>(initialData.domains || []);
-  const [domainInput, setDomainInput] = useState('');
-  
-  // Validation state
-  const [errors, setErrors] = useState<{
-    domains?: string;
-    domainInput?: string;
-    format?: string;
-  }>({});
-
-  // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    
-    if (name === 'domainInput') setDomainInput(value);
-    
-    // Clear error when field is changed
-    if (errors[name as keyof typeof errors]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: undefined
-      }));
-    }
-  };
-
-  // Domain validation
-  const validateDomain = (domain: string): boolean => {
-    // Simple domain validation regex
-    const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](\.[a-zA-Z]{2,})+$/;
-    return domainRegex.test(domain);
-  };
-
-  // Handle domain management
-  const addDomain = () => {
-    if (!domainInput.trim()) return;
-    
-    // Validate domain format
-    if (!validateDomain(domainInput)) {
-      setErrors(prev => ({
-        ...prev,
-        domainInput: 'Invalid domain format'
-      }));
-      return;
-    }
-    
-    // Check if domain already exists
-    if (domains.includes(domainInput)) {
-      setErrors(prev => ({
-        ...prev,
-        domainInput: 'Domain already exists'
-      }));
-      return;
-    }
-    
-    // Add domain and clear input
-    setDomains(prev => [...prev, domainInput]);
-    setDomainInput('');
-    
-    // Clear any domain-related errors
-    setErrors(prev => ({
-      ...prev,
-      domains: undefined,
-      domainInput: undefined
-    }));
-  };
-  
-  const removeDomain = (domain: string) => {
-    setDomains(prev => prev.filter(d => d !== domain));
-  };
-
-  // Validation function
-  const validateForm = (): boolean => {
-    const newErrors: typeof errors = {};
-    let isValid = true;
-
-    // Validate domains
-    if (domains.length === 0) {
-      newErrors.domains = 'At least one domain is required';
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
+  // Initialize domains hook with initial data
+  const {
+    domains,
+    domainInput,
+    isLoading,
+    success,
+    error,
+    errors,
+    setDomainInput,
+    addDomain,
+    removeDomain,
+    validateDomains,
+    submitDomains,
+    handleInputChange
+  } = useDomains({
+    initialDomains: initialData.domains || [],
+    apiEndpoint
+  });
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
-    if (!validateForm()) {
-      return;
-    }
+    const result = await submitDomains(
+      initialData.id,
+      {},
+      mode === 'edit' ? 'PUT' : 'POST'
+    );
     
-    setIsLoading(true);
-    setError(null);
-    setSuccess(null);
-    
-    try {
-      // Prepare data for submission
-      const dataToSubmit = {
-        domains,
-        id: initialData.id
-      };
-      
-      // Determine API endpoint and method based on mode
-      const method = mode === 'edit' ? 'PUT' : 'POST';
-      const endpoint = mode === 'edit' 
-        ? `${apiEndpoint}/${initialData.id}` 
-        : apiEndpoint;
-      
-      // Submit form data
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataToSubmit)
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
-        setSuccess('Domain settings updated successfully');
-        
-        // Call success callback if provided
-        if (onSuccess) {
-          onSuccess(result);
-        }
-        
-        // Redirect after successful submission
-        setTimeout(() => {
-          router.push(`/sites/${result.id || result.slug}`);
-        }, 1500);
-      } else {
-        throw new Error(result.error || 'An error occurred');
+    if (result.success) {
+      // Call success callback if provided
+      if (onSuccess && result.data) {
+        onSuccess(result.data);
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit form');
-    } finally {
-      setIsLoading(false);
+      
+      // Redirect after successful submission
+      setTimeout(() => {
+        router.push(`/sites/${result.data?.id || result.data?.slug}`);
+      }, 1500);
     }
   };
 
@@ -294,7 +189,7 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
                 id="domainManager-domain-input"
                 name="domainInput"
                 value={domainInput}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 placeholder="Enter domain (e.g., example.com)"
                 className={`flex-grow p-2 border rounded focus:ring-2 focus:border-blue-500 ${errors.domainInput ? 'border-red-500' : 'border-gray-300'}`}
                 aria-invalid={errors.domainInput ? "true" : "false"}
