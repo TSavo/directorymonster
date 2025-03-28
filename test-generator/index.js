@@ -13,6 +13,8 @@
 import { CommandProcessor } from './CLI/CommandProcessor.js';
 import { InteractivePrompts } from './CLI/InteractivePrompts.js';
 import { Config } from './Core/Config.js';
+import { Template } from './Core/Template.js';
+import { Engine } from './Core/Engine.js';
 
 /**
  * Main function for the test generator CLI tool.

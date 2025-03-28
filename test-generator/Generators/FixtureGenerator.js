@@ -4,7 +4,7 @@
  */
 
 import path from 'path';
-import FileSystem from '../Utils/FileSystem.js';
+import { FileSystem } from '../Utils/FileSystem.js';
 
 /**
  * Fixture generator for the test generator tool
@@ -569,4 +569,4 @@ class FixtureGenerator {
   }
 }
 
-export default FixtureGenerator;
+export { FixtureGenerator };

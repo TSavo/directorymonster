@@ -314,4 +314,4 @@ class FileSystem {
   }
 }
 
-export default FileSystem;
+export { FileSystem };

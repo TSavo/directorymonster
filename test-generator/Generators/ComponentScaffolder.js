@@ -4,8 +4,8 @@
  */
 
 import path from 'path';
-import FileSystem from '../Utils/FileSystem.js';
-import Engine from '../Core/Engine.js';
+import { FileSystem } from '../Utils/FileSystem.js';
+import { Engine } from '../Core/Engine.js';
 import PropsGenerator from './ComponentScaffolder/PropsGenerator.js';
 import ImportsGenerator from './ComponentScaffolder/ImportsGenerator.js';
 import ComponentGenerator from './ComponentScaffolder/ComponentGenerator.js';
@@ -433,4 +433,4 @@ class ComponentScaffolder {
   }
 }
 
-export default ComponentScaffolder;
+export { ComponentScaffolder };

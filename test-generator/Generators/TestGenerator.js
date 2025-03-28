@@ -4,8 +4,8 @@
  */
 
 import path from 'path';
-import FileSystem from '../Utils/FileSystem.js';
-import Engine from '../Core/Engine.js';
+import { FileSystem } from '../Utils/FileSystem.js';
+import { Engine } from '../Core/Engine.js';
 
 /**
  * Test file generator for the test generator tool
@@ -456,4 +456,4 @@ class TestGenerator {
   }
 }
 
-export default TestGenerator;
+export { TestGenerator };

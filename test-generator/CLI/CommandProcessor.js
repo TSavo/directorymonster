@@ -10,6 +10,9 @@
  */
 
 import { Config } from '../Core/Config.js';
+import { TestGenerator } from '../Generators/TestGenerator.js';
+import { ComponentScaffolder } from '../Generators/ComponentScaffolder.js';
+import { FixtureGenerator } from '../Generators/FixtureGenerator.js';
 
 /**
  * @typedef {Object} CommandOptions

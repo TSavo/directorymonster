@@ -1,0 +1,21 @@
+{
+  "paths": {
+    "templates": "./test-generator/templates",
+    "tests": "./tests",
+    "components": "./src/components",
+    "fixtures": "./tests/__fixtures__"
+  },
+  "testTypes": {
+    "base": {
+      "template": "base.test.template",
+      "suffix": ".test.tsx",
+      "description": "Basic rendering, props, and state tests"
+    }
+  },
+  "features": {
+    "button": {
+      "description": "Button component features",
+      "assertions": ["click handling", "disabled state", "loading state"]
+    }
+  }
+}

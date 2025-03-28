@@ -3,7 +3,7 @@
  * Handles template registration, retrieval, and validation.
  */
 
-import FileSystem from '../Utils/FileSystem.js';
+import { FileSystem } from '../Utils/FileSystem.js';
 
 /**
  * Template manager for the test generator
@@ -266,4 +266,4 @@ class Template {
   }
 }
 
-export default Template;
+export { Template };
