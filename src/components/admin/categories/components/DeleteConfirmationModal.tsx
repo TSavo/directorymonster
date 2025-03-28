@@ -3,6 +3,19 @@
 import { useEffect, useRef } from 'react';
 import { DeleteConfirmationModalProps } from '../types';
 
+/**
+ * DeleteConfirmationModal Component
+ * 
+ * A fully accessible modal dialog for confirming delete actions.
+ * Includes focus management, keyboard navigation support, and proper ARIA attributes.
+ * 
+ * @param props - Component props
+ * @param props.isOpen - Whether the modal is visible
+ * @param props.title - Title text for the modal
+ * @param props.itemName - Name of the item being deleted
+ * @param props.onConfirm - Function to call when deletion is confirmed
+ * @param props.onCancel - Function to call when deletion is cancelled
+ */
 export default function DeleteConfirmationModal({
   isOpen,
   title,
@@ -11,9 +24,26 @@ export default function DeleteConfirmationModal({
   onCancel
 }: DeleteConfirmationModalProps) {
   // Handle Escape key press
+  // Reference to store the element that had focus before opening modal
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  // Store the previously focused element when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      previousFocusRef.current = document.activeElement as HTMLElement;
+    } else if (previousFocusRef.current) {
+      // Attempt to restore focus when modal closes
+      // This is a fallback; the parent component would typically handle this
+      setTimeout(() => {
+        previousFocusRef.current?.focus();
+      }, 0);
+    }
+  }, [isOpen]);
+  
+  // Handle Escape key press
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
+      if (event.key === 'Escape' && isOpen && onCancel) {
         onCancel();
       }
     };
@@ -36,6 +66,12 @@ export default function DeleteConfirmationModal({
         cancelButtonRef.current?.focus();
       }, 0);
     }
+    
+    return () => {
+      // When modal unmounts, we could restore focus in this cleanup function
+      // However, this would interfere with the isOpen effect above that handles focus
+      // So we leave focus restoration to that effect
+    }
   }, [isOpen]);
 
   // Handle focus trapping
@@ -43,9 +79,10 @@ export default function DeleteConfirmationModal({
     const handleTabKey = (event: KeyboardEvent) => {
       if (!isOpen || event.key !== 'Tab') return;
       
+      // Find all focusable elements in the modal
       const focusableElements = modalRef.current?.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
+    );
       
       if (!focusableElements || focusableElements.length === 0) return;
       
@@ -97,7 +134,8 @@ export default function DeleteConfirmationModal({
         <div className="flex justify-end space-x-3">
           <button
             ref={cancelButtonRef}
-            onClick={onCancel}
+            type="button"
+          onClick={() => onCancel && onCancel()}
             className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
             data-testid="cancel-button"
           >
@@ -106,7 +144,8 @@ export default function DeleteConfirmationModal({
           
           <button
             ref={confirmButtonRef}
-            onClick={onConfirm}
+            type="button"
+          onClick={() => onConfirm && onConfirm()}
             className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
             data-testid="confirm-delete-button"
           >
