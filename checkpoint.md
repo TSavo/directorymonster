@@ -130,13 +130,18 @@ We're continuing to implement the Category Management interface for the admin da
      - Used within() to scope queries to specific card components
      - Replaced generic text queries with testid-based queries
      - Reduced CSS class coupling to only essential styling checks
+   - ✅ Successfully fixed CategoryTableEmptyState tests with data-testid attributes
+     - Added test IDs to container, message, and button elements
+     - Made focus state testing more flexible
+     - Reduced reliance on specific styling classes
+     - Used attribute-based queries instead of text-based ones
    - Applied key principles for less brittle tests:
-     - Test behavior, not implementation
+     - Test behavior, not implementation details
      - Add test IDs to components for reliable selection
-     - Avoid excessive CSS class testing
-     - Use scoped queries with within()
-     - Make tests resilient to text changes
-   - Next: Apply similar improvements to CategoryTableEmptyState component
+     - Test for presence of accessibility features without specific classes
+     - Use more general attribute matchers when appropriate
+     - Ensure tests still validate core functionality
+   - Next: Apply similar improvements to CategoryTableHeader component
 =======
 
 2. **Category Management Implementation** ✅
