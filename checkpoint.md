@@ -1,7 +1,7 @@
 ## Current Status - [2025-03-28]
 
 ### In Progress
-- Implementing the domains test and feature configuration
+- Fixing Template.ts to load both .hbs and .template files
 - Testing the updated TestGenerator.js with the DomainManager component
 
 ### Completed

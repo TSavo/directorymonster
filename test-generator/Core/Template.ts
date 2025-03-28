@@ -84,10 +84,13 @@ class Template {
         return false;
       }
 
-      // Only process .hbs files
-      const files = fs.readdirSync(this.templateDir).filter(file => path.extname(file) === '.hbs');
+      // Load all template files (.hbs and .template)
+      const files = fs.readdirSync(this.templateDir).filter(file => 
+        path.extname(file) === '.hbs' || path.extname(file) === '.template'
+      );
       for (const file of files) {
-        const templateName = path.basename(file, '.hbs');
+        const fileExt = path.extname(file);
+        const templateName = path.basename(file, fileExt);
         const templatePath = path.join(this.templateDir, file);
         
         // Load and compile the template
