@@ -174,98 +174,52 @@ src/
 - CategoryTableError Component Test Enhancement: Completed (March 28, 2025) ✅
 - useCategories Hook Test Fix: Completed (March 28, 2025) ✅
 - Test Generator Tool Implementation: Completed (March 28, 2025) ✅
+- Test Generator Evaluation: Completed (March 28, 2025) ✅
+- Decision: Replace custom template engine with Handlebars: Approved (March 28, 2025) ✅
 - Test Pattern Documentation: In Progress (March 28-29, 2025) 🚧
 - Site Management Interface Testing: In Progress (March 28-30, 2025) 🚧
 - Test Suite Consolidation: In Progress (March 29-31, 2025) 🚧
+- Handlebars integration for test generator: Scheduled (March 30-April 1, 2025) ⏱️
 - Final Testing Documentation: Scheduled (April 1-3, 2025) ⏱️
 - Site Management Interface Full Implementation: Scheduled (April 5-12, 2025) ⏱️
 - Dashboard and Analytics: Scheduled (April 10-17, 2025) ⏱️
 - Docker Integration: Scheduled (April 17-24, 2025) ⏱️
 
-We have successfully implemented all core admin interface components, including ListingTable, CategoryTable, and admin layout components. We have also completed testing improvements for all Category Management components, which are now more robust, maintainable, and less brittle against UI changes.
+## Test Generator Tool Status
 
-### Applied Testing Patterns
+We've evaluated the test generator tool and identified significant issues with the custom template engine:
 
-Our comprehensive testing approach includes:
+### Issues Identified
+1. Complex custom syntax that's difficult to debug
+2. Problems with nested templates and map operations
+3. Need for multiple processing passes
+4. Limited error handling
+5. High maintenance overhead
 
-#### Component Tests
-1. Using data-testid attributes for reliable element selection
-2. Focusing on behavior rather than implementation details 
-3. Improving accessibility testing with proper ARIA attributes
-4. Reducing coupling with CSS classes
-5. Testing for edge cases (like empty states and zero-item scenarios)
-6. Verifying component structure and hierarchy
-7. Implementing focus management and keyboard accessibility tests
-8. Ensuring proper ARIA compliance throughout the components
+### Decision
+After thorough evaluation, we've decided to replace the custom template engine with Handlebars:
+- Standard, well-tested templating solution
+- Better syntax for loops, conditionals, and variable substitution
+- Proper error reporting
+- Easier maintenance
+- Extensive documentation
 
-#### Hook Tests
-1. Isolating tests from side effects (useEffect)
-2. Mocking external dependencies like fetch
-3. Using act() to properly handle state updates
-4. Testing hook state and function behavior
-5. Creating separate test instances for complex operations
-6. Focusing on how consumers would use the hooks
-7. Testing initialization, filtering, sorting, and pagination
-8. Validating error handling and edge cases
+### Implementation Plan
+1. Install Handlebars as a dependency
+2. Create a TemplateEngine wrapper class to handle Handlebars setup
+3. Convert existing templates to Handlebars syntax
+4. Update the ComponentScaffolder to use the new engine
+5. Test with simple components to verify functionality
 
-### Next Testing Tasks
+### Immediate Next Steps
+1. Implement SiteForm component manually to meet current deadline
+2. Start Handlebars integration in parallel for future component generation
+3. Gradually migrate existing templates to the new system
 
-To finalize our testing infrastructure:
+## Upcoming Focus
 
-1. Document testing patterns and best practices:
-   - ✅ Created test generator specification (March 28, 2025)
-   - ✅ Implemented test generator tool based on specification (March 28, 2025)
-     - ✅ Implemented Core modules (Config, FileSystem, Template, Engine) (March 28, 2025)
-     - ✅ Implemented Generator modules (TestGenerator, ComponentScaffolder, FixtureGenerator) (March 28, 2025)
-     - ✅ Implemented CLI modules (CommandProcessor, InteractivePrompts) (March 28, 2025)
-     - ✅ Created main entry point with template initialization (March 28, 2025)
-     - ✅ Added npm script for easy CLI access (March 28, 2025)
-     - ✅ Tested tool functionality with practical examples (March 28, 2025)
-     - ✅ Fixed path handling and template processing (March 28, 2025)
-     - ✅ Verified directory structure creation (March 28, 2025)
-   - 🚧 Create comprehensive testing guide using test generator as primary tool
-   - Include examples of different test types and use cases
-   - Document common patterns for testing hooks, components, etc.
-
-2. Consolidate the test suite:
-   - Create comprehensive test scripts in package.json
-   - Run the complete test suite to verify overall coverage
-   - Document remaining test gaps
-   - Ensure CI/CD pipeline can run all tests efficiently
-
-✅ **Successfully enhanced the test generator tool with specialized templates** (March 28, 2025)
-   - Created specialized templates for different test and component types:
-     - **Test templates**: validation, submission, accessibility, actions, table
-     - **Component templates**: form, table, modal
-   - Implemented template selection based on test and component type
-   - Added support for feature-specific test case generation
-   - Created comprehensive documentation in README.md
-
-✅ **Successfully improved test generator command-line interface** (March 28, 2025)
-   - Enhanced type specification with better argument handling:
-     - Added support for comma-separated types
-     - Added validation for supported types
-     - Created mapping between types and templates
-   - Improved feature handling:
-     - Added feature parsing into specific test cases
-     - Implemented conditional test case inclusion
-     - Added feature validation
-   - Updated CLI help system with detailed documentation
-
-✅ **Created comprehensive test generator documentation** (March 28, 2025)
-   - Updated README.md with:
-     - Command-line options reference
-     - Test and component type descriptions
-     - Feature list with corresponding functionality
-     - Template creation and customization guide
-   - Added examples for common component types:
-     - Forms: validation, submission, accessibility
-     - Tables: sorting, filtering, pagination
-     - Modals: focus management, keyboard navigation
-
-3. Finalize testing documentation:
-   - Create test summary reports
-   - Document coverage metrics and goals
-   - Provide guidelines for maintaining high test quality
-
-Once these test generator improvements are implemented, we'll continue implementing the Site Management Interface components as scheduled.
+While we await the Handlebars integration, we'll focus on:
+1. Manual implementation of the SiteForm component
+2. Complete comprehensive tests for Site Management components
+3. Create the site settings page in the admin interface
+4. Develop necessary routes and navigation links
