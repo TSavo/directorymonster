@@ -62,8 +62,36 @@ __pycache__/
 **/page_depth_*.png
 python/scraper.log
 python/ai_debug/
+python/screenshots/
+python/api_request_*.json
+python/api_error_*.json
+python/*.log
+python/scraper/*.log
 
 # SEO data logs and raw data
 /seo_data/logs/
 /seo_data/raw/
 /seo_data/screenshots/
+/seo_data/processed/
+
+# Log files
+*.log
+
+# Test output files
+*_test_output.log
+*_output.log
+test_results.log
+build.log
+cleanup.log
+restart.log
+seed*.log
+
+# Temporary files
+check-ci-workflow.bat
+create-test-pr.bat
+validate-ci-workflow.bat
+merge-ci-pr.bat
+test-local-ci.bat
+run_pythondev.*
+run-tests.sh
+commit-message.txt
