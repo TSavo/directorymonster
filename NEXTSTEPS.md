@@ -1,101 +1,67 @@
-# DirectoryMonster: Next Steps
+# DirectoryMonster Next Steps - Updated
 
-Based on our successful implementation of GitHub CI, here are the recommended next steps for the DirectoryMonster project:
+## Progress Update:
 
-## 1. Increase Test Coverage
+We've successfully implemented comprehensive test coverage for critical components and utilities:
 
-Current test coverage is only 6.78%, which is far below the target of 70-80% coverage.
+1. UI Components:
+   - ListingCard.tsx
+   - SiteHeader.tsx
 
-- **Action Items:**
-  - Create more unit tests for components in `src/components/`
-  - Add integration tests for key user flows
-  - Ensure all API endpoints have proper test coverage
-  - Implement end-to-end testing for critical user journeys
+2. Core Utilities:
+   - redis-client.ts
+   - redis-health.ts
 
-## 2. Reintroduce Docker-based Testing
+3. API Endpoints:
+   - /api/healthcheck
+   - /api/search
+   - /api/sites/[siteSlug]/listings
+   - Middleware testing (withRedis)
 
-Our simplified CI workflow successfully runs tests, but we should reintroduce Docker-based testing to ensure consistency with production environments.
+## Current Test Coverage Status:
+- Previously: 6.78%
+- Current: [Updated percentage will be available after CI run]
+- Target: 70-80%
 
-- **Action Items:**
-  - Fix Docker-related issues in the CI workflow
-  - Implement proper container health checking
-  - Ensure Redis connectivity and data persistence in Docker
-  - Create Docker-specific integration tests
+## Remaining Tasks:
 
-## 3. Implement Parallel Testing
+### Phase 1: Complete API Testing (Critical Priority)
+- Implement tests for remaining API endpoints:
+  - C:\Users\T\directorymonster\src\app\api\sites\[siteSlug]\categories\route.ts
+  - C:\Users\T\directorymonster\src\app\api\site-info\route.ts
+  - C:\Users\T\directorymonster\src\app\api\sites\[siteSlug]\route.ts
 
-Current CI runs tests sequentially, which increases build time.
+### Phase 2: Integration Testing (High Priority)
+- Create integration test directory: C:\Users\T\directorymonster\tests\integration
+- Implement tests for critical user flows:
+  - Site identity resolution
+  - Multitenancy validation
+  - Data retrieval and display
+  - Search functionality across domains
 
-- **Action Items:**
-  - Refactor the CI workflow to use GitHub Actions matrix strategy
-  - Split tests into logical groups that can run in parallel
-  - Optimize test dependencies to reduce redundant setup steps
-  - Add parallel job coordination for shared resources
+### Phase 3: Docker Integration (Medium Priority)
+- Reintroduce Docker-based testing
+- Test configurations in:
+  - C:\Users\T\directorymonster\docker-compose.yml
+  - C:\Users\T\directorymonster\Dockerfile
+- Implement container health checking
 
-## 4. Add Environment-Specific Testing
+### Phase 4: Advanced Components and Interactions (Medium Priority)
+- Test admin components and API interactions:
+  - C:\Users\T\directorymonster\src\components\admin
+- Expand search functionality tests:
+  - C:\Users\T\directorymonster\src\lib\search-indexer.ts
 
-Test the application across different environments to ensure compatibility.
+### Phase 5: Performance and Security (Low Priority)
+- Implement parallel testing using GitHub Actions matrix strategy
+- Add security scanning to the CI pipeline
+- Optimize Redis queries for better performance
 
-- **Action Items:**
-  - Implement matrix testing for different Node.js versions
-  - Test on different operating systems (Ubuntu, Windows, macOS)
-  - Verify compatibility with different browser versions
-  - Test with various Redis configurations
+## Timeline:
+- Phase 1: 1 week
+- Phase 2: 1-2 weeks
+- Phase 3: 1 week
+- Phase 4: 1-2 weeks
+- Phase 5: Ongoing
 
-## 5. Implement Deployment Automation
-
-After CI passes, automatically deploy to staging environments.
-
-- **Action Items:**
-  - Create staging environment on a cloud provider
-  - Implement automated deployment workflow
-  - Add post-deployment smoke tests
-  - Set up monitoring and alerting for the staging environment
-
-## 6. Enhance Developer Experience
-
-Improve the overall development workflow.
-
-- **Action Items:**
-  - Implement pre-commit hooks for code quality
-  - Add code coverage reports to PR comments
-  - Create automated PR reviews for common issues
-  - Improve documentation for development setup
-
-## 7. Performance Optimization
-
-Optimize the application and CI pipeline for better performance.
-
-- **Action Items:**
-  - Analyze and optimize CI execution time
-  - Implement better caching strategies
-  - Reduce Docker image size
-  - Optimize Redis queries for better performance
-
-## 8. Security Improvements
-
-Enhance security practices throughout the application.
-
-- **Action Items:**
-  - Add security scanning to the CI pipeline
-  - Implement dependency vulnerability checks
-  - Add CSRF protection
-  - Implement rate limiting for API endpoints
-
-## Priority Order
-
-1. Increase Test Coverage (Critical)
-2. Enhance Developer Experience (High)
-3. Implement Deployment Automation (High)
-4. Reintroduce Docker-based Testing (Medium)
-5. Security Improvements (Medium)
-6. Implement Parallel Testing (Medium)
-7. Add Environment-Specific Testing (Low)
-8. Performance Optimization (Low)
-
-## Timeline Estimation
-
-- **Phase 1 (1-2 weeks):** Increase test coverage and enhance developer experience
-- **Phase 2 (1-2 weeks):** Implement deployment automation and reintroduce Docker testing
-- **Phase 3 (2-3 weeks):** Add security improvements and implement parallel testing
-- **Phase 4 (3-4 weeks):** Add environment-specific testing and performance optimization
+Once these tasks are completed, we should achieve our target test coverage of 70-80% and have a robust testing infrastructure that ensures code quality through automated testing.
