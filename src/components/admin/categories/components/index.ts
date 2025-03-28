@@ -8,8 +8,8 @@ export { default as CategoryTableRow } from './CategoryTableRow';
 export { default as CategoryTableHeader } from './CategoryTableHeader';
 export { default as CategoryTableSortHeader } from './CategoryTableSortHeader';
 export { default as CategoryTablePagination } from './CategoryTablePagination';
+export { default as CategoryTableEmptyState } from './CategoryTableEmptyState';
+export { default as CategoriesMobileView } from './CategoriesMobileView';
 
 // Components to be implemented
 // export { default as CategoryTableActions } from './CategoryTableActions';
-// export { default as CategoryTableEmptyState } from './CategoryTableEmptyState';
-// export { default as CategoriesMobileView } from './CategoriesMobileView';
