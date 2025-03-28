@@ -2,7 +2,7 @@
 
 ## Current Status - Test Coverage Improvement Phase 3 - API Testing ✅
 
-We're continuing our work on Phase 3 of the test coverage improvement efforts, specifically focusing on implementing tests for the remaining API endpoints. Today we'll be completing the API endpoint testing portion of Phase 3 by implementing tests for the categories, site-info, and site-specific API endpoints.
+We're continuing our work on Phase 3 of the test coverage improvement efforts, focusing on implementing tests for the remaining API endpoints. Today we began implementing tests for the categories API endpoint and are splitting the test files into smaller, more manageable files to improve maintainability and test run performance.
 
 ### Completed Tasks
 
@@ -55,40 +55,42 @@ We're continuing our work on Phase 3 of the test coverage improvement efforts, s
 
 ### Current Work - Test Coverage Improvement (Phase 3 - Remaining API Endpoints)
 
-Today's focus is on completing the API endpoint testing by implementing tests for the remaining three API endpoints:
+Today's focus is on implementing tests for the remaining three API endpoints with an improved test organization approach:
 
 1. **Categories API Endpoint**:
-   - Test file: `C:\Users\T\directorymonster\tests\api\categories.test.ts`
+   - Test files:
+     - `C:\Users\T\directorymonster\tests\api\categories\get.test.ts` - Testing GET functionality
+     - `C:\Users\T\directorymonster\tests\api\categories\post.test.ts` - Testing POST functionality
    - Path: `C:\Users\T\directorymonster\src\app\api\sites\[siteSlug]\categories\route.ts`
-   - Testing both GET and POST functionality
    - Testing validation rules
    - Testing error handling
    - Testing Redis operations
 
 2. **Site Info API Endpoint**:
-   - Test file: `C:\Users\T\directorymonster\tests\api\site-info.test.ts`
+   - Test files:
+     - `C:\Users\T\directorymonster\tests\api\site-info\get.test.ts` - Testing GET functionality
    - Path: `C:\Users\T\directorymonster\src\app\api\site-info\route.ts` 
    - Testing site information retrieval
    - Testing domain-based site resolution
    - Testing error handling
 
 3. **Site-specific API Endpoint**:
-   - Test file: `C:\Users\T\directorymonster\tests\api\site.test.ts`
+   - Test files:
+     - `C:\Users\T\directorymonster\tests\api\site\get.test.ts` - Testing GET functionality
    - Path: `C:\Users\T\directorymonster\src\app\api\sites\[siteSlug]\route.ts`
-   - Testing site configuration retrieval and updates
-   - Testing authorization checks
-   - Testing validation rules
+   - Testing site configuration retrieval
+   - Testing error handling
 
 ### Testing Approach
 
-For each API endpoint, we'll follow this structured approach:
+For each API endpoint, we're following a structured approach with improved organization:
 
-1. **Understanding the API Logic**: Review the source code to understand the functionality
-2. **Testing Success Paths**: Verify expected behavior with valid inputs
-3. **Testing Error Paths**: Verify error handling with invalid inputs 
-4. **Testing Edge Cases**: Verify behavior with edge case inputs
-5. **Mocking External Dependencies**: Use mocks for Redis and other external dependencies
-6. **Testing Authorization**: Verify proper authorization checks where applicable
+1. **Splitting Test Files**: Separating tests for different HTTP methods (GET, POST) into individual files for better maintainability and clarity
+2. **Testing Success Paths**: Verifying expected behavior with valid inputs
+3. **Testing Error Paths**: Verifying error handling with invalid inputs 
+4. **Testing Edge Cases**: Verifying behavior with edge case inputs
+5. **Mocking External Dependencies**: Using mocks for Redis and other external dependencies
+6. **Testing Authorization**: Verifying proper authorization checks where applicable
 
 ### Next Steps (After API Testing Completion)
 
@@ -108,4 +110,4 @@ For each API endpoint, we'll follow this structured approach:
 - Begin Integration Testing (Phase 4): Next week
 - Docker Integration (Phase 5): Following week
 
-With the completion of these API tests, we will have substantially improved the test coverage for critical backend functionality, moving closer to our target of 70-80% test coverage.
+With the improved test organization, we're not only increasing test coverage but also enhancing the maintainability and readability of our test suite.
