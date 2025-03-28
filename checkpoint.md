@@ -333,10 +333,26 @@ We're continuing to implement the Category Management interface for the admin da
    - Applied comprehensive data-testid attributes for reliable test selection
    - Implemented thorough accessibility testing based on ARIA standards
    - Following test-first development approach with thorough test implementation before component creation
-   - Found improvement opportunities for the test generator tool:
-     - Need for specialized test templates beyond the base template
-     - Better support for test type specification
-     - Enhanced feature handling for specialized tests
+
+🚧 **Documenting Test Generator Tool improvements** (March 28, 2025)
+   - Identified critical enhancement needs for the test generator based on SiteForm implementation:
+     1. **Specialized test templates**: Need to create additional templates beyond the base template:
+        - validation.template.js - For form validation test cases
+        - submission.template.js - For API interaction and submission tests
+        - accessibility.template.js - For ARIA and keyboard navigation tests
+        - actions.template.js - For user interaction tests
+     2. **Enhanced test type specification**: 
+        - Improve command-line argument handling for testTypes
+        - Support multiple test types in a single command
+        - Add validation for supported test types
+        - Create mapping between test types and appropriate templates
+     3. **Feature-based test generation**: 
+        - Enhance feature parsing to generate appropriate test cases
+        - Create feature-to-test-case mapping in configuration
+        - Support conditional test case inclusion based on features
+        - Add feature validation with helpful error messages
+   - Updating NEXTSTEPS.md with detailed implementation plan
+   - Will implement these enhancements to streamline future test creation
 
 🚧 **Starting SiteForm component implementation** (March 28, 2025)
    - Next step is to implement the SiteForm component to make the tests pass
