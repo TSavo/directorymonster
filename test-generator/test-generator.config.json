@@ -19,7 +19,7 @@
       "description": "Modal dialog with focus management"
     },
     "domain": {
-      "template": "domain.component.template",
+      "template": "domain.component.hbs",
       "description": "Domain management component with validation and submission"
     }
   },
