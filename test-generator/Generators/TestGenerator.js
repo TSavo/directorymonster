@@ -149,7 +149,13 @@ class TestGenerator {
    * @private
    */
   _prepareTemplateData(requirements, testType) {
-    const { componentName, category, features = [], props = [] } = requirements;
+    const { componentName, category, props = [] } = requirements;
+    
+    // Convert features to array if it's a string
+    let features = requirements.features || [];
+    if (typeof features === 'string') {
+      features = features.split(',');
+    }
 
     // Basic template data
     const data = {
@@ -386,10 +392,18 @@ class TestGenerator {
 
     // Validate features
     if (requirements.features) {
-      for (const feature of requirements.features) {
-        if (!this.config.get(`features.${feature}`)) {
-          console.warn(`Unknown feature: ${feature}`);
-          // Don't fail validation for unknown features, just warn
+      // Handle if features is a string (comma-separated list)
+      if (typeof requirements.features === 'string') {
+        requirements.features = requirements.features.split(',');
+      }
+      
+      // Validate each feature
+      if (Array.isArray(requirements.features)) {
+        for (const feature of requirements.features) {
+          if (!this.config.get(`features.${feature}`)) {
+            console.warn(`Unknown feature: ${feature}`);
+            // Don't fail validation for unknown features, just warn
+          }
         }
       }
     }
