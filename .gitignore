@@ -67,12 +67,21 @@ python/api_request_*.json
 python/api_error_*.json
 python/*.log
 python/scraper/*.log
+python/scraper/page_candidate.py
+
+# Working Python files - should be handled carefully
+python/ai/page_analyzer.py
+python/run_scraper.py
+python/scraper/search.py
+python/scraper/utils.py
 
 # SEO data logs and raw data
 /seo_data/logs/
 /seo_data/raw/
 /seo_data/screenshots/
 /seo_data/processed/
+seo_data/screenshots/*.gif
+seo_data/processed/*.json
 
 # Log files
 *.log
