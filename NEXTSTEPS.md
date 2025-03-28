@@ -44,7 +44,7 @@ We've successfully implemented comprehensive test coverage for critical componen
   - CategoryTableError (100% with keyboard support)
   - DeleteConfirmationModal (100% with improved focus trapping)
   - CategoriesMobileView (100%)
-  - Main CategoryTable component (55.88%)
+  - Main CategoryTable component (100%)
   - useCategories hook (60% - core functionality tested)
 
 ## Current Development Focus: Admin Components
