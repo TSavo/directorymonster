@@ -214,8 +214,13 @@ class Config {
    * @returns Merged configuration
    * @private
    */
-  private _mergeConfigs(target: Record<string, any>, source: Record<string, any>): Record<string, any> {
-    const output = { ...target };
+  private _mergeConfigs(target: Record<string, any>, source: Record<string, any>): ConfigObject {
+    const output = { ...target } as ConfigObject;
+    
+    // Ensure output has the required properties of ConfigObject
+    if (!output.paths) output.paths = { ...DEFAULT_CONFIG.paths };
+    if (!output.testTypes) output.testTypes = { ...DEFAULT_CONFIG.testTypes };
+    if (!output.features) output.features = { ...DEFAULT_CONFIG.features };
     
     for (const key in source) {
       if (Object.prototype.hasOwnProperty.call(source, key)) {
@@ -273,12 +278,12 @@ class Config {
     
     for (const part of pathParts) {
       if (current === undefined || current === null) {
-        return defaultValue;
+        return defaultValue as T;
       }
       current = current[part];
     }
     
-    return current !== undefined ? current : defaultValue;
+    return (current !== undefined ? current : defaultValue) as T;
   }
 
   /**

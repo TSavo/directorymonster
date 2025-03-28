@@ -160,7 +160,7 @@ class Template {
    * @returns Map of template names to template objects
    */
   getAllTemplates(): Record<string, TemplateObject> {
-    const result = {};
+    const result: Record<string, TemplateObject> = {};
     
     for (const [name, template] of this.templates.entries()) {
       result[name] = { ...template };

@@ -176,92 +176,92 @@ class HandlebarsEngine {
    */
   private _registerHelpers(): void {
     // Convert string to camelCase
-    this.handlebars.registerHelper('camelCase', function(str: string): string {
+    this.handlebars.registerHelper('camelCase', (str: string): string => {
       if (!str) return '';
       return str.charAt(0).toLowerCase() + str.slice(1);
     });
     
     // Convert string to PascalCase
-    this.handlebars.registerHelper('pascalCase', function(str: string): string {
+    this.handlebars.registerHelper('pascalCase', (str: string): string => {
       if (!str) return '';
       return str.charAt(0).toUpperCase() + str.slice(1);
     });
     
     // Convert string to kebab-case
-    this.handlebars.registerHelper('kebabCase', function(str: string): string {
+    this.handlebars.registerHelper('kebabCase', (str: string): string => {
       if (!str) return '';
       return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
     });
     
     // Join array with separator
-    this.handlebars.registerHelper('join', function(array: any[], separator?: string): string {
+    this.handlebars.registerHelper('join', (array: any[], separator?: string): string => {
       if (!array || !Array.isArray(array)) return '';
       return array.join(separator || '');
     });
     
     // Equality comparison
-    this.handlebars.registerHelper('eq', function(a: any, b: any, options: HelperOptions): string {
-      return a === b ? options.fn(this) : options.inverse(this);
+    this.handlebars.registerHelper('eq', (a: any, b: any, options: Handlebars.HelperOptions): string => {
+      return a === b ? options.fn(options.data.root) : options.inverse(options.data.root);
     });
     
     // Greater than comparison
-    this.handlebars.registerHelper('gt', function(a: any, b: any, options: HelperOptions): string {
-      return a > b ? options.fn(this) : options.inverse(this);
+    this.handlebars.registerHelper('gt', (a: any, b: any, options: Handlebars.HelperOptions): string => {
+      return a > b ? options.fn(options.data.root) : options.inverse(options.data.root);
     });
     
     // Less than comparison
-    this.handlebars.registerHelper('lt', function(a: any, b: any, options: HelperOptions): string {
-      return a < b ? options.fn(this) : options.inverse(this);
+    this.handlebars.registerHelper('lt', (a: any, b: any, options: Handlebars.HelperOptions): string => {
+      return a < b ? options.fn(options.data.root) : options.inverse(options.data.root);
     });
     
     // Check if a value is in an array
-    this.handlebars.registerHelper('includes', function(array: any[], value: any, options: HelperOptions): string {
-      if (!array || !Array.isArray(array)) return options.inverse(this);
-      return array.includes(value) ? options.fn(this) : options.inverse(this);
+    this.handlebars.registerHelper('includes', (array: any[], value: any, options: Handlebars.HelperOptions): string => {
+      if (!array || !Array.isArray(array)) return options.inverse(options.data.root);
+      return array.includes(value) ? options.fn(options.data.root) : options.inverse(options.data.root);
     });
     
     // Get array length
-    this.handlebars.registerHelper('length', function(array: any[]): number {
+    this.handlebars.registerHelper('length', (array: any[]): number => {
       if (!array || !Array.isArray(array)) return 0;
       return array.length;
     });
     
     // Conditional check for types
-    this.handlebars.registerHelper('ifType', function(value: any, type: string, options: HelperOptions): string {
-      return typeof value === type ? options.fn(this) : options.inverse(this);
+    this.handlebars.registerHelper('ifType', (value: any, type: string, options: Handlebars.HelperOptions): string => {
+      return typeof value === type ? options.fn(options.data.root) : options.inverse(options.data.root);
     });
     
     // Get JSON string for debugging
-    this.handlebars.registerHelper('json', function(context: any): string {
+    this.handlebars.registerHelper('json', (context: any): string => {
       return JSON.stringify(context, null, 2);
     });
     
     // Get first item that matches from array
-    this.handlebars.registerHelper('find', function(array: any[], key: string, value: any): any {
+    this.handlebars.registerHelper('find', (array: any[], key: string, value: any): any => {
       if (!array || !Array.isArray(array)) return null;
       return array.find(item => item[key] === value);
     });
     
     // Lookup - access dynamic properties
-    this.handlebars.registerHelper('lookup', function(obj: Record<string, any>, field: string): any {
+    this.handlebars.registerHelper('lookup', (obj: Record<string, any>, field: string): any => {
       if (!obj) return null;
       return obj[field];
     });
     
     // Filter array
-    this.handlebars.registerHelper('filter', function(array: any[], key: string, value: any, options: HelperOptions): string {
-      if (!array || !Array.isArray(array)) return options.inverse(this);
+    this.handlebars.registerHelper('filter', (array: any[], key: string, value: any, options: Handlebars.HelperOptions): string => {
+      if (!array || !Array.isArray(array)) return options.inverse(options.data.root);
       const filtered = array.filter(item => item[key] === value);
-      return filtered.length > 0 ? options.fn({items: filtered}) : options.inverse(this);
+      return filtered.length > 0 ? options.fn({items: filtered}) : options.inverse(options.data.root);
     });
     
     // Check if a value is truthy
-    this.handlebars.registerHelper('isTruthy', function(value: any, options: HelperOptions): string {
-      return value ? options.fn(this) : options.inverse(this);
+    this.handlebars.registerHelper('isTruthy', (value: any, options: Handlebars.HelperOptions): string => {
+      return value ? options.fn(options.data.root) : options.inverse(options.data.root);
     });
     
     // Set a variable in the current context
-    this.handlebars.registerHelper('set', function(name: string, value: any, options: HelperOptions): void {
+    this.handlebars.registerHelper('set', (name: string, value: any, options: Handlebars.HelperOptions): void => {
       options.data.root[name] = value;
     });
   }
