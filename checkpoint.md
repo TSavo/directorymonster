@@ -1,8 +1,8 @@
 ## Current Status - [2025-03-28]
 
 ### In Progress
+- Implementing the domains test and feature configuration
 - Testing the updated TestGenerator.js with the DomainManager component
-- Implementing DomainManager component features
 
 ### Completed
 1. ✅ Installed Handlebars as a dependency

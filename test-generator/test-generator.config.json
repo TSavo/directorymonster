@@ -21,6 +21,11 @@
       "suffix": ".submission.test.tsx",
       "description": "Form submission tests including API interaction and loading states"
     },
+    "domains": {
+      "template": "domains.hbs",
+      "suffix": ".domains.test.tsx",
+      "description": "Domain management tests including adding, removing, and validating domains"
+    },
     "accessibility": {
       "template": "accessibility.template",
       "suffix": ".accessibility.test.tsx",
@@ -56,6 +61,11 @@
       "description": "Form submission features",
       "assertions": ["API interaction", "loading states", "success/error handling"],
       "relatedTestTypes": ["submission"]
+    },
+    "domains": {
+      "description": "Domain management features",
+      "assertions": ["domain validation", "domain addition", "domain removal", "duplicates prevention"],
+      "relatedTestTypes": ["domains"]
     },
     "accessibility": {
       "description": "Accessibility features",
