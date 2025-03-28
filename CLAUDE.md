@@ -261,6 +261,90 @@ CMD ["npm", "run", "dev"]
 - Domain tests: All registered domains
 - Page tests: All page types for each site
 
+## GitHub CLI (gh) Integration
+
+GitHub CLI (`gh`) is used for managing the CI/CD pipeline and interacting with GitHub repositories.
+
+### Installation
+
+```bash
+# Windows (using winget)
+winget install GitHub.cli
+
+# macOS (using Homebrew)
+brew install gh
+
+# Linux (using apt)
+type -p curl >/dev/null || apt install curl -y
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+apt update
+apt install gh -y
+```
+
+### Authentication
+
+Authenticate with GitHub before using the CLI:
+
+```bash
+gh auth login
+```
+
+### Common Commands
+
+1. **Pull Requests**
+   ```bash
+   # Create a PR
+   gh pr create --title "PR Title" --body "PR description" --base main --head branch-name
+   
+   # List PRs
+   gh pr list
+   
+   # View a specific PR
+   gh pr view 1
+   
+   # Check PR status
+   gh pr checks 1
+   
+   # Merge a PR
+   gh pr merge 1 --merge
+   ```
+
+2. **CI/CD Workflows**
+   ```bash
+   # List workflow runs
+   gh run list --workflow=".github/workflows/ci.yml" --limit=5
+   
+   # View a specific run
+   gh run view 12345678
+   
+   # View logs of a failed run
+   gh run view 12345678 --log-failed
+   ```
+
+3. **Repository Management**
+   ```bash
+   # Clone a repository
+   gh repo clone username/repo-name
+   
+   # Create a new repository
+   gh repo create repo-name --public
+   
+   # Fork a repository
+   gh repo fork username/repo-name
+   ```
+
+### GitHub CI Integration
+
+For the DirectoryMonster project, GitHub CLI is essential for:
+
+1. **Automating PR creation and management** during the development workflow
+2. **Monitoring CI pipeline status** to ensure tests pass
+3. **Debugging workflow issues** by accessing run logs
+4. **Managing repository settings** without using the web interface
+
+When working with the CI pipeline, use gh commands to verify that workflow runs are successful before merging changes to main branches.
+
 ## Continuous Integration
 
 The test suite is designed to run in CI environments:
