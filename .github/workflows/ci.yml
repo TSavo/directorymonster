@@ -54,7 +54,9 @@ jobs:
       
       # Skip Docker build for now and focus on testing
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm install --save-dev @testing-library/react
       
       # Run tests directly without Docker
       - name: Run linting and type checking
