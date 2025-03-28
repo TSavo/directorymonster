@@ -1,0 +1,6 @@
+/* Use @import instead of @tailwind to fix the CSS processing error */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Add any global styles below */
