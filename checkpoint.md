@@ -205,6 +205,15 @@ We have completed the implementation and testing of search components, achieving
 
 ### Currently Implementing
 
+1. **ZKP Authentication Testing** 🚧
+   - Executed tests for ZKP authentication components
+   - Identified issues with test implementation:
+     - ZKPLogin.test.tsx: 12 tests passing, 2 failing (CSRF token and spinner display)
+     - SessionManager.test.tsx: 1 test passing, 1 failing (authentication context issue)
+     - TokenRefresh.test.tsx: All tests failing with Next.js routing errors
+   - Identified root cause: Tests requiring Next.js App Router context
+   - Need to implement proper Next.js testing environment with proper mocks
+
 2. **Category Management Interface** 🚧
    - Creating category listing and management table
    - Implementing category creation and editing forms
