@@ -165,6 +165,18 @@ When working with Next.js App Router and React components:
 # Unit tests (Jest)
 npm test
 
+# Run tests with watch mode
+npm test -- --watch
+
+# Run tests with coverage report
+npm test -- --coverage
+
+# Run specific test file
+npm test -- path/to/test/file.test.tsx
+
+# Run tests matching a specific pattern
+npm test -- -t "ComponentName"
+
 # Integration tests (Jest)
 npm run test:integration 
 
@@ -182,6 +194,57 @@ npm run test:all
 
 # Docker environment tests
 npm run test:docker
+```
+
+## Test Suite Organization
+
+### Component Test Files
+
+Component tests should be organized to mirror the component structure:
+
+```
+tests/
+  └── admin/
+      ├── categories/
+      │   ├── CategoryTable.test.tsx
+      │   ├── useCategories.test.tsx
+      │   └── components/
+      │       ├── CategoryTableRow.test.tsx
+      │       ├── CategoryTableHeader.test.tsx
+      │       ├── CategoryTablePagination.test.tsx
+      │       └── DeleteConfirmationModal.test.tsx
+      └── listings/
+          ├── ListingTable.test.tsx
+          ├── useListings.test.tsx
+          └── components/
+              ├── ListingTableRow.test.tsx
+              └── ListingTableHeader.test.tsx
+```
+
+### Test Scripts in package.json
+
+The following scripts should be added to package.json for comprehensive testing:
+
+```json
+{
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:components": "jest --testPathPattern='tests/.*\\.test\\.(ts|tsx)$'",
+    "test:api": "jest --testPathPattern='tests/api/.*\\.test\\.ts$'",
+    "test:unit": "jest --testPathPattern='tests/unit/.*\\.test\\.ts$'",
+    "test:integration": "jest --testPathPattern='tests/integration/.*\\.test\\.(ts|tsx)$'",
+    "test:domain": "bash tests/scripts/domain-tests.sh",
+    "test:rendering": "bash tests/scripts/rendering-tests.sh",
+    "test:multitenancy": "bash tests/scripts/multitenancy-tests.sh",
+    "test:all": "npm run test:components && npm run test:api && npm run test:integration && npm run test:domain && npm run test:rendering && npm run test:multitenancy",
+    "test:docker": "docker-compose -f docker-compose.test.yml up --build --exit-code-from test",
+    "test:with-seed": "node scripts/seed.js && npm test",
+    "test:all-with-seed": "node scripts/seed.js && npm run test:all",
+    "test:with-server": "node scripts/seed.js && (npm run dev &) && sleep 5 && npm test && kill %1"
+  }
+}
 ```
 
 ## Test Types
@@ -347,6 +410,78 @@ CMD ["npm", "run", "dev"]
 - Integration tests: Key user flows
 - Domain tests: All registered domains
 - Page tests: All page types for each site
+
+## Component Testing Best Practices
+
+1. **Use Data Attributes for Selection**
+   - Add `data-testid` attributes to all key elements in components
+   - Use specific and descriptive test IDs (e.g., `cancel-button` not `button-1`)
+   - Scope queries to specific components using `within()`
+   - Prefer `getByTestId()` over `getByText()` or `getByRole()` when possible
+
+2. **Test Behavior, Not Implementation**
+   - Focus on component behavior and user interactions
+   - Avoid testing implementation details like state variables or props
+   - Test UI changes in response to user actions
+   - Verify correct function calls with mock functions
+
+3. **Accessibility Testing**
+   - Verify proper ARIA attributes (`aria-label`, `aria-labelledby`, etc.)
+   - Test keyboard navigation and focus management
+   - Ensure focus trapping in modals and dialogs
+   - Verify proper tab order and keyboard interactions
+
+4. **Reduce CSS Coupling**
+   - Avoid selecting elements by CSS classes when possible
+   - Use flexible class matchers when necessary (`toHaveClass` with partial matches)
+   - Focus on functional attributes rather than styling
+   - If testing CSS-related functionality, use more general attribute matchers
+
+5. **Test Edge Cases**
+   - Test empty states and zero-item scenarios
+   - Verify error handling and loading states
+   - Test boundary conditions (e.g., first/last page in pagination)
+   - Include tests for unexpected or invalid input
+
+6. **Focus Management Testing**
+   - Use `waitFor()` with focus assertions to handle async focus changes
+   - Test focus restoration when components are unmounted and remounted
+   - Verify focus is set correctly on initial render
+   - Test focus cycling with Tab key navigation
+
+7. **Organization and Documentation**
+   - Group tests logically by functionality
+   - Use descriptive test names that explain the expected behavior
+   - Add comments to clarify test assertions and setup
+   - Include references to accessibility guidelines when relevant
+
+8. **Examples**
+
+   Good test (using data-testid):
+   ```tsx
+   it('calls onCancel when backdrop is clicked', () => {
+     render(<MyModal isOpen={true} onCancel={mockOnCancel} />);
+     const backdrop = screen.getByTestId('modal-backdrop');
+     fireEvent.click(backdrop);
+     expect(mockOnCancel).toHaveBeenCalledTimes(1);
+   });
+   ```
+
+   Good accessibility test:
+   ```tsx
+   it('properly traps focus within modal', async () => {
+     const user = userEvent.setup();
+     render(<MyModal isOpen={true} />);
+     
+     // Tab to last element
+     await user.tab();
+     await user.tab();
+     
+     // Tab again should cycle to first element
+     await user.tab();
+     expect(document.activeElement).toBe(screen.getByTestId('first-focusable'));
+   });
+   ```
 
 ## GitHub CLI (gh) Integration
 
