@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "ESNext",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -13,6 +13,6 @@
     "resolveJsonModule": true,
     "emitDeclarationOnly": false
   },
-  "include": ["test-generator/**/*.ts", "test-typescript.ts", "test-template-method.ts"],
+  "include": ["test-generator/Core/HandlebarsEngine.ts", "test-generator/Core/Config.ts", "test-generator/Core/Template.ts", "test-generator/Utils/FileSystem.ts"],
   "exclude": ["node_modules", "dist"]
 }
