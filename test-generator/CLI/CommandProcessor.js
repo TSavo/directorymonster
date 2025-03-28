@@ -48,7 +48,10 @@ export class CommandProcessor {
       examples: [
         'component Button',
         'component NavBar --props=title,links,onNavChange',
-        'component Table --withHooks --withContext'
+        'component SiteForm --componentType=form --category=admin/sites --features=form,validation,submission',
+        'component SiteTable --componentType=table --category=admin/sites --features=table,pagination,sorting',
+        'component ConfirmationModal --componentType=modal --features=modal,accessibility',
+        'component DynamicForm --features=form,dynamicFields,validation --description="Form with dynamic field arrays"'
       ],
       handler: this.#handleComponentCommand.bind(this)
     },
@@ -275,29 +278,76 @@ export class CommandProcessor {
       // Parse props from options
       const propNames = options.props ? options.props.split(',') : [];
       
-      // Convert to prop objects
-      const props = propNames.map(name => ({
-        name,
-        type: 'string', // Default type
-        required: false
-      }));
+      // Get prop details if provided
+      let props = [];
+      if (options.propDetails) {
+        try {
+          props = JSON.parse(options.propDetails);
+        } catch (error) {
+          console.warn('Failed to parse propDetails, using simple props from props option');
+          // Fall back to simple props
+          props = propNames.map(name => ({
+            name,
+            type: 'string',
+            required: false
+          }));
+        }
+      } else {
+        // Convert to prop objects
+        props = propNames.map(name => ({
+          name,
+          type: 'string', // Default type
+          required: false
+        }));
+      }
+      
+      // Parse features from options
+      let features = [];
+      if (options.features) {
+        features = options.features.split(',');
+      }
+      
+      // Add individual feature flags
+      if (options.form) features.push('form');
+      if (options.validation) features.push('validation');
+      if (options.submission) features.push('submission');
+      if (options.table) features.push('table');
+      if (options.pagination) features.push('pagination');
+      if (options.sorting) features.push('sorting');
+      if (options.modal) features.push('modal');
+      if (options.accessibility) features.push('accessibility');
+      if (options.keyboard) features.push('keyboard');
+      if (options.dynamicFields) features.push('dynamicFields');
       
       // Create requirements object
       const requirements = {
         componentName,
+        category: options.category,
+        componentType: options.componentType,
         props,
-        features: [],
+        features: [...new Set(features)], // Remove duplicates
         withHooks: !!options.withHooks,
         withContext: !!options.withContext,
+        description: options.description || `A reusable ${componentName} component`,
+        itemName: options.itemName || componentName.replace(/Table|Form|Modal|List|View|s$/, ''),
         ...options
       };
       
       // Generate component
-      await scaffolder.scaffoldComponent(requirements, {
+      const result = await scaffolder.scaffoldComponent(requirements, {
         overwrite: options.overwrite || false
       });
       
-      console.log('✅ Component scaffolding completed successfully!');
+      if (result.success) {
+        console.log('✅ Component scaffolding completed successfully!');
+        
+        if (result.files && result.files.length > 0) {
+          console.log('\nGenerated files:');
+          result.files.forEach(file => console.log(` - ${file}`));
+        }
+      } else {
+        throw new Error(`Component scaffolding failed: ${result.error || 'Unknown error'}`);
+      }
     } catch (error) {
       this.#showError(`Failed to scaffold component: ${error.message}`);
     }
@@ -463,6 +513,30 @@ export class CommandProcessor {
       console.log('  accessibility              Keyboard navigation and ARIA attribute tests');
       console.log('  actions                    User interaction tests (clicks, hover, etc.)');
       console.log('  table                      Table-specific tests (sorting, pagination, etc.)');
+    } else if (command === 'component') {
+      console.log('\nCommon Options:');
+      console.log('  --category=<category>      Component category (e.g., admin/sites)');
+      console.log('  --componentType=<type>     Type of component to generate (form, table, modal)');
+      console.log('  --props=<props>            Comma-separated list of component props');
+      console.log('  --features=<features>      Comma-separated list of component features');
+      console.log('  --description=<text>       Component description for documentation');
+      console.log('  --itemName=<name>          Singular name of items for table/form components');
+      console.log('  --overwrite                Overwrite existing files');
+      console.log('\nAvailable Component Types:');
+      console.log('  form                       Form component with validation and submission');
+      console.log('  table                      Table component with sorting and pagination');
+      console.log('  modal                      Modal dialog with focus management');
+      console.log('\nFeature Flags:');
+      console.log('  --form                     Add form features');
+      console.log('  --validation               Add form validation features');
+      console.log('  --submission               Add API submission features');
+      console.log('  --table                    Add table features');
+      console.log('  --pagination               Add pagination features');
+      console.log('  --sorting                  Add sorting features');
+      console.log('  --modal                    Add modal dialog features');
+      console.log('  --accessibility            Add accessibility features');
+      console.log('  --keyboard                 Add keyboard navigation features');
+      console.log('  --dynamicFields            Add support for dynamic field arrays');
     }
     
     console.log('\nExamples:');
