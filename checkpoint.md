@@ -124,13 +124,20 @@ We're continuing to implement the Category Management interface for the admin da
 
 ### Currently Implementing
 
-1. **Category Management Testing** ✅
-   - Successfully implemented improved test structure for CategoryTableRow.test.tsx
-   - Organized test file into logical test suites with proper describe blocks
-   - Added test coverage for sorting indicators, edge cases, and styling
-   - Improved assertion quality with detailed checks for classes and attributes
-   - Enhanced testing for URL construction with and without site slugs
-   - Added proper test isolation with beforeEach cleanup
+1. **Category Management Testing** 🚧
+   - Completed running the CategoryTableRow test successfully (100% functional coverage)
+   - Ran tests for CategoryTableSortHeader and CategoryTablePagination (all passing)
+   - Found issues in CategoryTableHeader test (3 failing tests):
+     - Site filter showing in single-site mode when it should be hidden
+     - Reset filters button showing when no filters applied
+     - Layout styling classes don't match expected values
+   - Found issue in CategoryTableEmptyState test (1 failing test):
+     - Accessible focus styles not matching expected classes
+   - Found issues in CategoriesMobileView test (3 failing tests):
+     - Multiple elements with same text causing selector issues
+   - Found issues in main CategoryTable test (2 failing tests):
+     - Multiple elements with same text causing selector issues
+   - Need to update test selectors to use more specific queries
 
 2. **Category Management Implementation** ✅
    - Successfully implemented all subcomponents and main container
