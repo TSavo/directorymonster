@@ -210,8 +210,15 @@ tests/
       │   ├── useCategories.test.tsx
       │   └── components/
       │       ├── CategoryTableRow.test.tsx
+      │       ├── CategoryTableRow.hierarchy.test.tsx    # Feature-specific test file
+      │       ├── CategoryTableRow.sorting.test.tsx     # Feature-specific test file
+      │       ├── CategoryTableRow.actions.test.tsx     # Feature-specific test file 
+      │       ├── CategoryTableRow.accessibility.test.tsx # Accessibility-focused tests
       │       ├── CategoryTableHeader.test.tsx
       │       ├── CategoryTablePagination.test.tsx
+      │       ├── CategoryTableError.test.tsx
+      │       ├── CategoryTableSkeleton.test.tsx
+      │       ├── CategoryTableEmptyState.test.tsx
       │       └── DeleteConfirmationModal.test.tsx
       └── listings/
           ├── ListingTable.test.tsx
@@ -220,6 +227,21 @@ tests/
               ├── ListingTableRow.test.tsx
               └── ListingTableHeader.test.tsx
 ```
+
+#### Test File Organization Patterns
+
+For complex components, we recommend organizing tests into multiple files based on features:
+
+1. **Base Test File**: Core functionality, basic rendering, and structure tests
+   - Example: `ComponentName.test.tsx`
+
+2. **Feature-Specific Files**: Tests focusing on a specific aspect of the component
+   - Example: `ComponentName.feature.test.tsx`
+
+3. **Accessibility Files**: Tests focusing on ARIA attributes, keyboard navigation, etc.
+   - Example: `ComponentName.accessibility.test.tsx`
+
+This approach improves test clarity, maintenance, and allows developers to focus on specific aspects of a component.
 
 ### Test Scripts in package.json
 
@@ -413,6 +435,8 @@ CMD ["npm", "run", "dev"]
 
 ## Component Testing Best Practices
 
+### Component Tests
+
 1. **Use Data Attributes for Selection**
    - Add `data-testid` attributes to all key elements in components
    - Use specific and descriptive test IDs (e.g., `cancel-button` not `button-1`)
@@ -480,6 +504,53 @@ CMD ["npm", "run", "dev"]
      // Tab again should cycle to first element
      await user.tab();
      expect(document.activeElement).toBe(screen.getByTestId('first-focusable'));
+   });
+   ```
+
+### React Hook Testing
+
+1. **Isolate Tests From Side Effects**
+   - Avoid testing `useEffect` side effects directly
+   - Mock external dependencies like `fetch` with specific implementations per test
+   - Use `cleanup` between tests to prevent state leakage
+   - Restore original function implementations in `afterEach`
+
+2. **Handle Asynchronous Updates**
+   - Use `act()` to wrap state updates
+   - For async operations, use `async/await` within `act()` calls
+   - Use `waitFor()` instead of deprecated `waitForNextUpdate()`
+   - Account for multiple state updates in a single operation
+
+3. **Test Hook Behavior, Not Implementation**
+   - Test return values and state updates, not internal functions
+   - Focus on public API of the hook
+   - Verify state changes in response to function calls
+   - Test how consumers would use the hook
+
+4. **Use Separate Hook Instances for Complex Tests**
+   - Create fresh hook instances for testing multi-step operations
+   - Avoid testing multiple state transitions in a single test
+   - Use multiple `renderHook` calls for different scenarios
+
+5. **Example**
+
+   Good hook test:
+   ```tsx
+   it('should handle search filtering correctly', () => {
+     const { result } = renderHook(() => useCategories(undefined, mockData));
+     
+     act(() => {
+       result.current.setSearchTerm('Test');
+     });
+     
+     expect(result.current.filteredCategories.length).toBe(1);
+     expect(result.current.filteredCategories[0].name).toBe('Test Item');
+     
+     act(() => {
+       result.current.setSearchTerm('');
+     });
+     
+     expect(result.current.filteredCategories.length).toBe(mockData.length);
    });
    ```
 

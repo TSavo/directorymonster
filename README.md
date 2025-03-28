@@ -337,9 +337,34 @@ Run the Jest test suite to verify core functionality:
 # Run all unit tests with seeding
 npm run test:with-seed
 
+# Run specific component tests
+npm test -- -t CategoryTableRow
+
 # Run only integration tests (multitenancy and page rendering)
 npm run test:integration
+
+# Run tests with coverage report
+npm test -- --coverage
 ```
+
+#### Component Testing
+
+The project uses a comprehensive testing approach for React components:
+
+1. **Component Structure**:
+   - Tests are organized to mirror the component structure
+   - Complex components use multiple test files focused on specific features
+   - Tests validate rendering, functionality, and accessibility
+
+2. **Hook Testing**:
+   - Custom React hooks are tested with isolated test instances
+   - Mock implementations for external dependencies like fetch
+   - Tests for proper state management and function behavior
+
+3. **Test-Driven Development**:
+   - Tests are implemented before components to guide development
+   - Focus on behavior and user interactions, not implementation details
+   - Coverage targets of 90%+ for critical components
 
 ### Domain Resolution Tests
 
