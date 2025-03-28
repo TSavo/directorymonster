@@ -12,8 +12,8 @@ export interface ZKPInput {
 }
 
 export interface ZKPProof {
-  proof: string;
-  publicSignals: string[];
+  proof: any;
+  publicSignals: any;
 }
 
 export interface ZKPAdapter {
@@ -32,8 +32,8 @@ export interface ZKPAdapter {
    * @returns A promise that resolves to true if verified, false otherwise
    */
   verifyProof(params: {
-    proof: string;
-    publicSignals: string[];
+    proof: any;
+    publicSignals: any;
     publicKey: string;
   }): Promise<boolean>;
   

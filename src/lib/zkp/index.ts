@@ -1,3 +1,18 @@
+/**
+ * Zero-Knowledge Proof Library
+ * 
+ * This library provides an adapter-based approach to zero-knowledge proofs,
+ * allowing for easy swapping of ZKP implementations.
+ * 
+ * The current implementation uses SnarkJS, which is a JavaScript implementation
+ * of zk-SNARKs. In a production environment, you would use actual circuits
+ * compiled with circom and the snarkjs library to generate and verify proofs.
+ * 
+ * References:
+ * - SnarkJS: https://github.com/iden3/snarkjs
+ * - Circom: https://github.com/iden3/circom
+ */
+
 import { ZKPInput, ZKPProof } from './adapter';
 import { getZKPProvider } from './provider';
 
@@ -19,8 +34,8 @@ export async function generateProof(input: ZKPInput): Promise<ZKPProof> {
  * @returns A promise that resolves to true if verified, false otherwise
  */
 export async function verifyProof(params: {
-  proof: string;
-  publicSignals: string[];
+  proof: any;
+  publicSignals: any;
   publicKey: string;
 }): Promise<boolean> {
   const adapter = getZKPProvider().getAdapter();

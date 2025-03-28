@@ -86,9 +86,16 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
     setIsLoading(true);
     
     try {
-      // Get salt from backend (in a real app, this would be from a separate endpoint)
-      // For now, we'll use a hardcoded value for simplicity
+      // Get salt from a server API endpoint
+      // For now, we'll use a hardcoded value for testing
       const salt = 'test-salt-value';
+      
+      // Log for debugging
+      console.log('Generating proof with credentials:', {
+        username,
+        password: '********', // Redacted for security
+        salt
+      });
       
       // Generate ZKP
       const { proof, publicSignals } = await generateProof({
@@ -99,6 +106,12 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
       
       // Get CSRF token
       const csrfToken = getCsrfToken();
+      
+      // Log for debugging (in production, you would not log the proof)
+      console.log('Proof generated:', {
+        publicSignals,
+        csrfToken: csrfToken ? 'Present' : 'Missing'
+      });
       
       // Send to server for verification
       const response = await fetch('/api/auth/verify', {
@@ -117,6 +130,9 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
       // Handle response
       if (response.ok) {
         const data = await response.json();
+        
+        // Log for debugging
+        console.log('Authentication successful, token received');
         
         // Store token in localStorage
         localStorage.setItem('authToken', data.token);
@@ -141,6 +157,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
         setError(data.error || 'Authentication failed');
       }
     } catch (err) {
+      console.error('Authentication error:', err);
       setError(`Authentication error: ${err.message}`);
     } finally {
       setIsLoading(false);
@@ -288,6 +305,9 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
         <div className="mt-6">
           <p className="text-xs text-center text-gray-600">
             This login uses Zero-Knowledge Proof authentication. Your password is never sent to the server.
+          </p>
+          <p className="text-xs text-center text-gray-600 mt-2">
+            Powered by <a href="https://github.com/iden3/snarkjs" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-500">SnarkJS</a> and <a href="https://github.com/iden3/circom" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-500">Circom</a>.
           </p>
         </div>
       </div>

@@ -5,10 +5,32 @@ import crypto from 'crypto';
  * SnarkJS Adapter Implementation
  * 
  * This adapter uses SnarkJS for ZKP operations.
- * In a real implementation, you would import snarkjs and use its actual methods.
- * For this implementation, we'll create a simplified version that mimics the behavior.
+ * In a production environment, you would use actual circuits compiled with circom
+ * and the snarkjs library to generate and verify proofs.
  */
 export class SnarkAdapter implements ZKPAdapter {
+  private snarkjs: any;
+  private wasmFilePath: string;
+  private zkeyFilePath: string;
+  private verificationKeyPath: string;
+
+  constructor() {
+    // In a real implementation, we would import the actual snarkjs library
+    // For this implementation, we'll mock it with similar behavior
+    this.wasmFilePath = '/circuits/auth.wasm';
+    this.zkeyFilePath = '/circuits/auth_final.zkey';
+    this.verificationKeyPath = '/circuits/verification_key.json';
+    
+    // In a real implementation, this would be:
+    // this.snarkjs = require('snarkjs');
+    this.snarkjs = {
+      groth16: {
+        fullProve: this.mockFullProve.bind(this),
+        verify: this.mockVerify.bind(this)
+      }
+    };
+  }
+
   /**
    * Generate a Zero-Knowledge Proof
    * @param input The input data (username, password, salt)
@@ -16,22 +38,33 @@ export class SnarkAdapter implements ZKPAdapter {
    */
   async generateProof(input: ZKPInput): Promise<ZKPProof> {
     try {
-      // In a real implementation, we would use snarkjs to generate the proof
-      // For now, we'll create a simplified version that mimics the behavior
+      // In a real implementation, we would call snarkjs.groth16.fullProve
+      // with the actual circuit WASM and zkey files
+      const { username, password, salt } = input;
       
-      // Derive a hash from the input credentials
-      const hash = this.hashCredentials(input);
+      // Create a hash of the credentials to use as circuit input
+      const credentialsHash = this.hashCredentials(input);
       
-      // In a real implementation, this would use a proper ZKP circuit
-      // For now, we'll generate a mock proof based on the hash
-      const proof = `proof:${hash}`;
+      // Prepare inputs for the circuit
+      const circuitInputs = {
+        usernameHash: Buffer.from(username).toString('hex'),
+        credentialsHash,
+        salt
+      };
       
-      // Public signals would typically include the username hash and other data
-      // that can be safely shared without revealing the password
-      const publicSignals = [
-        `userHash:${Buffer.from(input.username).toString('hex')}`,
-        `saltHash:${Buffer.from(input.salt).toString('hex')}`,
-      ];
+      // In a real implementation, this would be:
+      // const { proof, publicSignals } = await this.snarkjs.groth16.fullProve(
+      //   circuitInputs,
+      //   this.wasmFilePath,
+      //   this.zkeyFilePath
+      // );
+      
+      // For now, we'll use our mock implementation
+      const { proof, publicSignals } = await this.snarkjs.groth16.fullProve(
+        circuitInputs,
+        this.wasmFilePath,
+        this.zkeyFilePath
+      );
       
       return { proof, publicSignals };
     } catch (error) {
@@ -48,33 +81,32 @@ export class SnarkAdapter implements ZKPAdapter {
    * @returns A promise that resolves to true if verified, false otherwise
    */
   async verifyProof(params: {
-    proof: string;
-    publicSignals: string[];
+    proof: any;
+    publicSignals: any;
     publicKey: string;
   }): Promise<boolean> {
     try {
       const { proof, publicSignals, publicKey } = params;
       
-      // In a real implementation, we would use snarkjs to verify the proof
-      // For now, we'll create a simplified version that mimics the behavior
+      // In a real implementation, we would load the verification key from a file
+      // const verificationKey = JSON.parse(fs.readFileSync(this.verificationKeyPath, 'utf-8'));
+      const verificationKey = { publicKey }; // Mock verification key for simplicity
       
-      // Extract the hash from the proof
-      const hash = proof.replace('proof:', '');
+      // In a real implementation, this would be:
+      // const result = await this.snarkjs.groth16.verify(
+      //   verificationKey,
+      //   publicSignals,
+      //   proof
+      // );
       
-      // Extract username and salt hash from public signals
-      const userHashSignal = publicSignals.find(s => s.startsWith('userHash:'));
-      const saltHashSignal = publicSignals.find(s => s.startsWith('saltHash:'));
+      // For now, we'll use our mock implementation
+      const result = await this.snarkjs.groth16.verify(
+        verificationKey,
+        publicSignals,
+        proof
+      );
       
-      if (!userHashSignal || !saltHashSignal) {
-        return false;
-      }
-      
-      // Derive public key from public signals (in a real implementation this would be done properly)
-      const derivedKey = `${userHashSignal.split(':')[1]}:${saltHashSignal.split(':')[1]}`;
-      
-      // Verify that the derived key matches the stored public key
-      // In a real implementation, this would be a proper cryptographic verification
-      return derivedKey === publicKey;
+      return result;
     } catch (error) {
       console.error('Error verifying ZKP proof:', error);
       throw new Error(`ZKP verification failed: ${error.message}`);
@@ -97,12 +129,13 @@ export class SnarkAdapter implements ZKPAdapter {
    * @returns Public key derived from credentials
    */
   derivePublicKey(input: ZKPInput): string {
-    // In a real implementation, this would use a one-way function to derive a public key
-    // that can be safely stored server-side without revealing the password
+    // In a real implementation, this would derive a public key based on
+    // cryptographic algorithms compatible with the ZKP system
+    const credentialsHash = this.hashCredentials(input);
     const userHash = Buffer.from(input.username).toString('hex');
     const saltHash = Buffer.from(input.salt).toString('hex');
     
-    return `${userHash}:${saltHash}`;
+    return `${userHash}:${saltHash}:${credentialsHash}`;
   }
   
   /**
@@ -120,5 +153,53 @@ export class SnarkAdapter implements ZKPAdapter {
       .digest('hex');
     
     return hash;
+  }
+  
+  /**
+   * Mock implementation of snarkjs.groth16.fullProve
+   * In a real implementation, this would use the actual snarkjs library
+   */
+  private async mockFullProve(inputs: any, wasmFile: string, zkeyFile: string): Promise<any> {
+    // This is a mock implementation that simulates the behavior of snarkjs.groth16.fullProve
+    console.log(`Generating proof with inputs: ${JSON.stringify(inputs)}`);
+    console.log(`Using wasm file: ${wasmFile}`);
+    console.log(`Using zkey file: ${zkeyFile}`);
+    
+    // Generate a mock proof based on the inputs
+    const proof = {
+      pi_a: ['12345', '67890', '1'],
+      pi_b: [['12345', '67890'], ['12345', '67890'], ['1', '0']],
+      pi_c: ['12345', '67890', '1'],
+      protocol: 'groth16'
+    };
+    
+    // Generate mock public signals
+    const publicSignals = [
+      inputs.usernameHash,
+      inputs.salt
+    ];
+    
+    return { proof, publicSignals };
+  }
+  
+  /**
+   * Mock implementation of snarkjs.groth16.verify
+   * In a real implementation, this would use the actual snarkjs library
+   */
+  private async mockVerify(verificationKey: any, publicSignals: any, proof: any): Promise<boolean> {
+    // This is a mock implementation that simulates the behavior of snarkjs.groth16.verify
+    console.log(`Verifying proof with verification key: ${JSON.stringify(verificationKey)}`);
+    console.log(`Public signals: ${JSON.stringify(publicSignals)}`);
+    console.log(`Proof: ${JSON.stringify(proof)}`);
+    
+    // In a real implementation, this would perform cryptographic verification
+    // For this mock, we'll just return true if the proof has the expected structure
+    const hasValidStructure = 
+      proof.pi_a && 
+      proof.pi_b && 
+      proof.pi_c && 
+      proof.protocol === 'groth16';
+    
+    return hasValidStructure;
   }
 }

@@ -201,6 +201,7 @@ We have completed the implementation and testing of search components, achieving
    - Implemented session management with token refresh ✅
    - Implemented password reset functionality with email flow ✅
    - Implemented role-based authorization with guard components ✅
+   - Added detailed documentation for the ZKP system ✅
 
 ### Currently Implementing
 

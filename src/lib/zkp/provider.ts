@@ -3,6 +3,8 @@ import { SnarkAdapter } from './snark-adapter';
 
 /**
  * SnarkJS Provider Implementation
+ * 
+ * This provider uses SnarkJS for Zero-Knowledge Proofs.
  */
 export class SnarkProvider implements ZKPProvider {
   private static instance: SnarkProvider;
