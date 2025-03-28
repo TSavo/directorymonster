@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DomainManager } from '@/components/admin/sites/DomainManager';
 
@@ -13,14 +13,21 @@ jest.mock('next/navigation', () => ({
 // Mock fetch function
 global.fetch = jest.fn();
 
-describe('DomainManager - Domain Management Tests', () => {
+describe('DomainManager - Domain Management', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset fetch mock before each test
     (global.fetch as jest.Mock).mockReset();
   });
 
-  it('renders domain list correctly', () => {
+  it('renders empty domain list with message when no domains are provided', () => {
+    render(<DomainManager />);
+    
+    // Check that "No domains added yet" message is displayed
+    expect(screen.getByText('No domains added yet')).toBeInTheDocument();
+  });
+
+  it('renders domain list correctly with initial data', () => {
     const initialData = {
       id: 'site-1',
       domains: ['example.com', 'test.example.com']
@@ -31,9 +38,13 @@ describe('DomainManager - Domain Management Tests', () => {
     // Check if domains are displayed
     expect(screen.getByText('example.com')).toBeInTheDocument();
     expect(screen.getByText('test.example.com')).toBeInTheDocument();
+    
+    // Check if remove buttons exist for each domain
+    expect(screen.getByTestId('domainManager-remove-domain-0')).toBeInTheDocument();
+    expect(screen.getByTestId('domainManager-remove-domain-1')).toBeInTheDocument();
   });
 
-  it('allows adding a new domain', async () => {
+  it('allows adding a new domain with valid format', async () => {
     const user = userEvent.setup();
     render(<DomainManager />);
     
@@ -47,25 +58,44 @@ describe('DomainManager - Domain Management Tests', () => {
     
     // Domain should be added to the list
     expect(screen.getByText('newdomain.com')).toBeInTheDocument();
+    
+    // Input field should be cleared after adding
+    expect(domainInput).toHaveValue('');
+    
+    // No error message should be displayed
+    expect(screen.queryByTestId('domainManager-domain-input-error')).not.toBeInTheDocument();
   });
 
   it('shows validation error for invalid domain format', async () => {
     const user = userEvent.setup();
     render(<DomainManager />);
     
-    // Find the domain input field and add button
-    const domainInput = screen.getByTestId('domainManager-domain-input');
-    const addButton = screen.getByTestId('domainManager-add-domain');
+    // Test cases with invalid domain formats
+    const invalidDomains = [
+      'invalid', // Missing TLD
+      'invalid domain.com', // Contains space
+      'invalid_domain', // Missing TLD and contains underscore
+      '.com', // Missing domain name
+      'a.b', // TLD too short
+    ];
     
-    // Enter an invalid domain and click add
-    await user.type(domainInput, 'invalid domain');
-    await user.click(addButton);
-    
-    // Error message should be displayed
-    expect(screen.getByText(/invalid domain format/i)).toBeInTheDocument();
-    
-    // Domain should not be added
-    expect(screen.queryByText('invalid domain')).not.toBeInTheDocument();
+    for (const invalidDomain of invalidDomains) {
+      // Find the domain input field and add button
+      const domainInput = screen.getByTestId('domainManager-domain-input');
+      const addButton = screen.getByTestId('domainManager-add-domain');
+      
+      // Enter an invalid domain and click add
+      await user.clear(domainInput);
+      await user.type(domainInput, invalidDomain);
+      await user.click(addButton);
+      
+      // Error message should be displayed
+      expect(screen.getByTestId('domainManager-domain-input-error')).toBeInTheDocument();
+      expect(screen.getByText(/Invalid domain format/i)).toBeInTheDocument();
+      
+      // Domain should not be added to the list
+      expect(screen.queryByText(invalidDomain)).not.toBeInTheDocument();
+    }
   });
 
   it('prevents adding duplicate domains', async () => {
@@ -86,25 +116,99 @@ describe('DomainManager - Domain Management Tests', () => {
     await user.click(addButton);
     
     // Error message for duplicate should be displayed
-    expect(screen.getByText(/domain already exists/i)).toBeInTheDocument();
+    expect(screen.getByTestId('domainManager-domain-input-error')).toBeInTheDocument();
+    expect(screen.getByText(/Domain already exists/i)).toBeInTheDocument();
+    
+    // Domain list should still contain only one entry
+    expect(screen.getAllByText('example.com').length).toBe(1);
+  });
+
+  it('accepts valid domain formats', async () => {
+    const user = userEvent.setup();
+    render(<DomainManager />);
+    
+    // Test cases with valid domain formats
+    const validDomains = [
+      'example.com',
+      'subdomain.example.com',
+      'sub-domain.example.co.uk',
+      'example-domain.org',
+      'domain123.io',
+    ];
+    
+    for (const validDomain of validDomains) {
+      // Find the domain input field and add button
+      const domainInput = screen.getByTestId('domainManager-domain-input');
+      const addButton = screen.getByTestId('domainManager-add-domain');
+      
+      // Enter a valid domain and click add
+      await user.clear(domainInput);
+      await user.type(domainInput, validDomain);
+      await user.click(addButton);
+      
+      // Domain should be added to the list
+      expect(screen.getByText(validDomain)).toBeInTheDocument();
+      
+      // No error message should be displayed
+      expect(screen.queryByTestId('domainManager-domain-input-error')).not.toBeInTheDocument();
+    }
   });
 
   it('allows removing a domain', async () => {
     const user = userEvent.setup();
     const initialData = {
       id: 'site-1',
-      domains: ['example.com', 'test.example.com']
+      domains: ['example.com', 'test.example.com', 'another.com']
     };
     
     render(<DomainManager initialData={initialData} mode="edit" />);
     
-    // Find and click the remove button for the first domain
-    const removeButtons = screen.getAllByTestId(/domainManager-remove-domain/);
-    await user.click(removeButtons[0]);
-    
-    // The domain should be removed
-    expect(screen.queryByText('example.com')).not.toBeInTheDocument();
+    // Verify initial domains are displayed
+    expect(screen.getByText('example.com')).toBeInTheDocument();
     expect(screen.getByText('test.example.com')).toBeInTheDocument();
+    expect(screen.getByText('another.com')).toBeInTheDocument();
+    
+    // Find and click the remove button for the second domain
+    const removeButtons = screen.getAllByTestId(/domainManager-remove-domain-/);
+    await user.click(removeButtons[1]);
+    
+    // The second domain should be removed
+    expect(screen.getByText('example.com')).toBeInTheDocument();
+    expect(screen.queryByText('test.example.com')).not.toBeInTheDocument();
+    expect(screen.getByText('another.com')).toBeInTheDocument();
+    
+    // Now remove the first domain
+    const updatedRemoveButtons = screen.getAllByTestId(/domainManager-remove-domain-/);
+    await user.click(updatedRemoveButtons[0]);
+    
+    // The first domain should be removed
+    expect(screen.queryByText('example.com')).not.toBeInTheDocument();
+    expect(screen.getByText('another.com')).toBeInTheDocument();
+    
+    // Only one domain should remain
+    expect(screen.getAllByTestId(/domainManager-domain-/)).toHaveLength(1);
+  });
+
+  it('validates domains on form submission', async () => {
+    const user = userEvent.setup();
+    render(<DomainManager />);
+    
+    // Try to submit the form without adding domains
+    const submitButton = screen.getByTestId('domainManager-submit');
+    await user.click(submitButton);
+    
+    // Error message should be displayed
+    expect(screen.getByText(/At least one domain is required/i)).toBeInTheDocument();
+    
+    // Now add a domain and try again
+    const domainInput = screen.getByTestId('domainManager-domain-input');
+    const addButton = screen.getByTestId('domainManager-add-domain');
+    
+    await user.type(domainInput, 'example.com');
+    await user.click(addButton);
+    
+    // The error message should be cleared
+    expect(screen.queryByText(/At least one domain is required/i)).not.toBeInTheDocument();
   });
 
   it('includes domains in form submission', async () => {
@@ -121,7 +225,14 @@ describe('DomainManager - Domain Management Tests', () => {
       json: async () => ({ id: 'site-1', domains: ['example.com', 'newdomain.com'] })
     });
     
-    render(<DomainManager initialData={initialData} mode="edit" onSuccess={onSuccess} />);
+    render(
+      <DomainManager 
+        initialData={initialData} 
+        mode="edit" 
+        onSuccess={onSuccess} 
+        apiEndpoint="/api/domain-manager"
+      />
+    );
     
     // Add a new domain
     const domainInput = screen.getByTestId('domainManager-domain-input');
@@ -145,8 +256,153 @@ describe('DomainManager - Domain Management Tests', () => {
     
     expect(requestBody.domains).toContain('example.com');
     expect(requestBody.domains).toContain('newdomain.com');
+    expect(requestBody.id).toBe('site-1');
     
     // Success callback should be called
     expect(onSuccess).toHaveBeenCalledTimes(1);
+    
+    // Success message should be displayed
+    expect(screen.getByText(/Domain settings updated successfully/i)).toBeInTheDocument();
+  });
+
+  it('disables interaction elements during loading state', async () => {
+    // Create a delayed promise to keep the loading state visible
+    (global.fetch as jest.Mock).mockImplementationOnce(() => 
+      new Promise(resolve => {
+        setTimeout(() => {
+          resolve({
+            ok: true,
+            json: () => Promise.resolve({ id: 'site-1', domains: ['example.com'] })
+          });
+        }, 100);
+      })
+    );
+    
+    const user = userEvent.setup();
+    const initialData = {
+      id: 'site-1',
+      domains: ['example.com']
+    };
+    
+    render(<DomainManager initialData={initialData} mode="edit" />);
+    
+    // Submit the form to trigger loading state
+    const submitButton = screen.getByTestId('domainManager-submit');
+    await user.click(submitButton);
+    
+    // Check that input fields and buttons are disabled during loading
+    expect(screen.getByTestId('domainManager-domain-input')).toBeDisabled();
+    expect(screen.getByTestId('domainManager-add-domain')).toBeDisabled();
+    expect(screen.getByTestId('domainManager-remove-domain-0')).toBeDisabled();
+    expect(screen.getByTestId('domainManager-cancel')).toBeDisabled();
+    
+    // Check loading state is displayed
+    expect(screen.getByTestId('domainManager-submit-loading')).toBeInTheDocument();
+    
+    // Wait for completion
+    await waitFor(() => {
+      expect(screen.queryByTestId('domainManager-submit-loading')).not.toBeInTheDocument();
+    });
+    
+    // Elements should be enabled again
+    expect(screen.getByTestId('domainManager-domain-input')).not.toBeDisabled();
+    expect(screen.getByTestId('domainManager-add-domain')).not.toBeDisabled();
+    expect(screen.getByTestId('domainManager-remove-domain-0')).not.toBeDisabled();
+    expect(screen.getByTestId('domainManager-cancel')).not.toBeDisabled();
+  });
+
+  it('handles API errors during submission', async () => {
+    const user = userEvent.setup();
+    const initialData = {
+      id: 'site-1',
+      domains: ['example.com']
+    };
+    
+    // Mock failed API response
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ error: 'Domain validation failed' })
+    });
+    
+    render(<DomainManager initialData={initialData} mode="edit" />);
+    
+    // Submit the form
+    const submitButton = screen.getByTestId('domainManager-submit');
+    await user.click(submitButton);
+    
+    // Wait for error message to appear
+    await waitFor(() => {
+      expect(screen.getByTestId('domainManager-error')).toBeInTheDocument();
+    });
+    
+    // Error message should match the API response
+    expect(screen.getByText(/Domain validation failed/i)).toBeInTheDocument();
+  });
+
+  it('handles network errors during submission', async () => {
+    const user = userEvent.setup();
+    const initialData = {
+      id: 'site-1',
+      domains: ['example.com']
+    };
+    
+    // Mock network error
+    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network connection failed'));
+    
+    render(<DomainManager initialData={initialData} mode="edit" />);
+    
+    // Submit the form
+    const submitButton = screen.getByTestId('domainManager-submit');
+    await user.click(submitButton);
+    
+    // Wait for error message to appear
+    await waitFor(() => {
+      expect(screen.getByTestId('domainManager-error')).toBeInTheDocument();
+    });
+    
+    // Error message should include the network error
+    expect(screen.getByText(/Network connection failed/i)).toBeInTheDocument();
+  });
+
+  it('clears error message when resubmitting form', async () => {
+    const user = userEvent.setup();
+    const initialData = {
+      id: 'site-1',
+      domains: ['example.com']
+    };
+    
+    // First request fails
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ error: 'Domain validation failed' })
+    });
+    
+    // Second request succeeds
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: 'site-1', domains: ['example.com'] })
+    });
+    
+    render(<DomainManager initialData={initialData} mode="edit" />);
+    
+    // Submit the form - first attempt (will fail)
+    const submitButton = screen.getByTestId('domainManager-submit');
+    await user.click(submitButton);
+    
+    // Wait for error message to appear
+    await waitFor(() => {
+      expect(screen.getByTestId('domainManager-error')).toBeInTheDocument();
+    });
+    
+    // Submit again - second attempt (will succeed)
+    await user.click(submitButton);
+    
+    // Error message should be cleared during second submission
+    expect(screen.queryByTestId('domainManager-error')).not.toBeInTheDocument();
+    
+    // Success message should appear
+    await waitFor(() => {
+      expect(screen.getByTestId('domainManager-success')).toBeInTheDocument();
+    });
   });
 });
