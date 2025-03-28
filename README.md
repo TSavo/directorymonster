@@ -24,7 +24,7 @@ DirectoryMonster consists of two main components working together:
 - Custom domain support
 - Admin dashboard for site and content management:
   - Comprehensive listing management interface
-  - Category management tools
+  - Complete category management system with hierarchical support
   - Site configuration controls
   - Modern, responsive admin UI with accessibility compliance
 - Secure API for programmatic content management
@@ -417,9 +417,15 @@ The test suite covers:
 
 3. **API Endpoints**
    - Site information
-   - Categories and listings
+   - Categories and listings with CRUD operations
    - Health checks
-   - Search functionality
+   - Search functionality with filtering
+
+4. **Admin Interface**
+   - Listing Management with filtering, sorting, and pagination
+   - Category Management with hierarchical display and parent-child relationships
+   - Authentication and authorization with ZKP (Zero-Knowledge Proof)
+   - Responsive design for mobile and desktop
 
 ## Learn More
 

@@ -32,6 +32,93 @@ DirectoryMonster consists of two main components that work together:
 - **FileEndpointSaver**: Saves data to JSON files (default implementation)
 - **APIEndpointSaver**: Saves data directly to the Next.js API endpoints (enables full automation)
 
+## Category Management System
+
+DirectoryMonster includes a comprehensive category management system with support for hierarchical relationships:
+
+### Component Architecture
+
+The category management system follows a modular architecture pattern:
+
+```
+src/components/admin/categories/
+├── CategoryTable.tsx            # Main container component
+├── hooks/
+│   ├── index.ts                # Hook exports
+│   └── useCategories.ts        # Data management hook
+├── types.ts                    # Type definitions
+└── components/
+    ├── CategoryTableRow.tsx    # Individual category display
+    ├── CategoryTableHeader.tsx # Search and filtering
+    ├── CategoryTableSortHeader.tsx # Column sorting
+    ├── CategoryTablePagination.tsx # Results navigation
+    ├── CategoryTableError.tsx  # Error handling
+    ├── CategoryTableSkeleton.tsx # Loading state
+    ├── CategoryTableEmptyState.tsx # No results guidance
+    ├── CategoriesMobileView.tsx # Mobile optimization
+    └── DeleteConfirmationModal.tsx # Safe deletion
+```
+
+### Key Features
+
+1. **Hierarchical Relationships**
+   - Parent-child category relationships
+   - Visual tree structure with indentation
+   - Filtering by parent category
+   - Child count indicators
+
+2. **Responsive Design**
+   - Table view for desktop users
+   - Card-based view for mobile users
+   - Adaptive layout for different screen sizes
+
+3. **Data Management**
+   - Comprehensive `useCategories` hook
+   - Sorting by various fields (name, order, creation date)
+   - Search with multiple filters
+   - Pagination with customizable page size
+
+4. **Accessibility**
+   - Proper ARIA attributes throughout
+   - Keyboard navigation support
+   - Focus management for modal dialogs
+   - Screen reader compatibility
+
+5. **Error Handling**
+   - Loading states with skeleton UI
+   - Error display with retry functionality
+   - Empty state guidance
+
+### Integration
+
+To use the CategoryTable component in your admin pages:
+
+```jsx
+import CategoryTable from '@/components/admin/categories/CategoryTable';
+
+export default function AdminCategoriesPage({ params }) {
+  const { siteSlug } = params;
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Category Management</h1>
+      <CategoryTable siteSlug={siteSlug} />
+    </div>
+  );
+}
+```
+
+### Testing
+
+The category management system has comprehensive test coverage:
+
+```bash
+# Run category management tests
+npm test -- -t "CategoryTable"
+```
+
+Each component has dedicated test files that verify functionality, accessibility, and error handling.
+
 ## CSS Configuration
 
 ### Tailwind CSS Setup
@@ -396,6 +483,8 @@ The test suite is designed to run in CI environments:
    - AdminSidebar provides responsive navigation with mobile support
    - AdminHeader includes user controls and notifications
    - Breadcrumbs automatically generates path-based navigation
+   - ListingTable provides comprehensive listing management
+   - CategoryTable provides hierarchical category management
    - See `/src/components/admin/layout/README.md` for detailed documentation
 
 6. **URL Construction**
@@ -404,7 +493,7 @@ The test suite is designed to run in CI environments:
    - See `docs/url-utilities.md` for detailed documentation and examples
    - Follow these patterns to ensure consistent URL construction across the application
    
-6. **Python Scraper Integration**
+7. **Python Scraper Integration**
    - To create a full automation pipeline, implement the `APIEndpointSaver` class
    - Configure with correct API endpoints and site slugs
    - Test with small batches before large-scale scraping
