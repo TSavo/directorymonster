@@ -4,8 +4,8 @@
  */
 
 import path from 'path';
-import { FileSystem } from '../Utils/FileSystem.js';
-import { Engine } from '../Core/Engine.js';
+import { FileSystem } from '../../dist/test-generator/Utils/FileSystem.js';
+import { HandlebarsEngine } from '../Core/HandlebarsEngine.js';
 
 /**
  * Test file generator for the test generator tool
@@ -19,7 +19,7 @@ class TestGenerator {
   constructor(config, templateManager) {
     this.config = config;
     this.templateManager = templateManager;
-    this.engine = new Engine();
+    this.engine = new HandlebarsEngine();
   }
 
   /**
@@ -188,7 +188,7 @@ class TestGenerator {
       const data = this._prepareTemplateData(requirements, testType);
 
       // Process template
-      const content = this.engine.generateContent(template.content, data);
+      const content = this.engine.processString(template.content, data);
 
       // Determine output path
       const outputPath = this._determineOutputPath(requirements, testType, options);
