@@ -101,12 +101,13 @@ describe('CategoryTableHeader Component', () => {
   it('renders the header with correct category count', () => {
     render(<CategoryTableHeader {...defaultProps} />);
     
-    expect(screen.getByText('Categories (3)')).toBeInTheDocument();
+    expect(screen.getByTestId('category-count')).toHaveTextContent('Categories (3)');
   });
   
   it('renders the add new category button with correct href', () => {
     render(<CategoryTableHeader {...defaultProps} />);
     
+    // Using getByText instead of getByTestId since the Link component doesn't pass data-testid to the rendered anchor
     const addButton = screen.getByText('Add Category');
     expect(addButton).toBeInTheDocument();
     expect(addButton.closest('a')).toHaveAttribute('href', '/admin/categories/new');
@@ -122,7 +123,7 @@ describe('CategoryTableHeader Component', () => {
   it('calls setSearchTerm when search input changes', () => {
     render(<CategoryTableHeader {...defaultProps} />);
     
-    const searchInput = screen.getByPlaceholderText('Search categories...');
+    const searchInput = screen.getByTestId('search-input');
     fireEvent.change(searchInput, { target: { value: 'test search' } });
     
     expect(defaultProps.setSearchTerm).toHaveBeenCalledWith('test search');
@@ -132,7 +133,7 @@ describe('CategoryTableHeader Component', () => {
     const props = { ...defaultProps, searchTerm: 'test search' };
     render(<CategoryTableHeader {...props} />);
     
-    const clearButton = screen.getByRole('button', { name: 'Clear search' });
+    const clearButton = screen.getByTestId('clear-search-button');
     expect(clearButton).toBeInTheDocument();
     
     fireEvent.click(clearButton);
@@ -142,7 +143,7 @@ describe('CategoryTableHeader Component', () => {
   it('renders parent category filter dropdown with correct options', () => {
     render(<CategoryTableHeader {...defaultProps} />);
     
-    const parentSelect = screen.getByRole('combobox', { name: 'Filter by parent' });
+    const parentSelect = screen.getByTestId('parent-filter-select');
     expect(parentSelect).toBeInTheDocument();
     
     const options = Array.from(parentSelect.querySelectorAll('option'));
@@ -155,29 +156,34 @@ describe('CategoryTableHeader Component', () => {
   it('calls setParentFilter when parent selection changes', () => {
     render(<CategoryTableHeader {...defaultProps} />);
     
-    const parentSelect = screen.getByRole('combobox', { name: 'Filter by parent' });
+    const parentSelect = screen.getByTestId('parent-filter-select');
     fireEvent.change(parentSelect, { target: { value: 'category_1' } });
     
     expect(defaultProps.setParentFilter).toHaveBeenCalledWith('category_1');
   });
   
   it('renders site filter dropdown only in multi-site mode', () => {
-    // Without siteSlug (multi-site mode)
-    render(<CategoryTableHeader {...defaultProps} />);
+    // Without siteSlug (multi-site mode) - should show filter
+    const { unmount } = render(<CategoryTableHeader {...defaultProps} />);
     
-    const siteSelect = screen.getByRole('combobox', { name: 'Filter by site' });
+    const siteSelect = screen.getByTestId('site-filter-select');
     expect(siteSelect).toBeInTheDocument();
     
-    // With siteSlug (single-site mode)
+    // Cleanup before rendering again
+    unmount();
+    
+    // With siteSlug (single-site mode) - should hide filter
     render(<CategoryTableHeader {...defaultProps} siteSlug="test-site" />);
     
-    expect(screen.queryByRole('combobox', { name: 'Filter by site' })).not.toBeInTheDocument();
+    // Try to find the select element
+    const hiddenSelect = screen.queryByTestId('site-filter-select');
+    expect(hiddenSelect).toBeNull();
   });
   
   it('excludes child categories from parent filter options', () => {
     render(<CategoryTableHeader {...defaultProps} />);
     
-    const parentSelect = screen.getByRole('combobox', { name: 'Filter by parent' });
+    const parentSelect = screen.getByTestId('parent-filter-select');
     const options = Array.from(parentSelect.querySelectorAll('option'));
     
     // Should not include the child category as an option
@@ -193,9 +199,9 @@ describe('CategoryTableHeader Component', () => {
       parentFilter: 'category_1'
     };
     
-    render(<CategoryTableHeader {...propsWithFilters} />);
+    const { unmount } = render(<CategoryTableHeader {...propsWithFilters} />);
     
-    const resetButton = screen.getByRole('button', { name: 'Reset Filters' });
+    const resetButton = screen.getByTestId('reset-filters-button');
     expect(resetButton).toBeInTheDocument();
     
     // Click reset button
@@ -204,22 +210,38 @@ describe('CategoryTableHeader Component', () => {
     expect(propsWithFilters.setParentFilter).toHaveBeenCalledWith('');
     expect(propsWithFilters.setSiteFilter).toHaveBeenCalledWith('');
     
-    // Without filters
-    render(<CategoryTableHeader {...defaultProps} />);
-    expect(screen.queryByRole('button', { name: 'Reset Filters' })).not.toBeInTheDocument();
+    // Clean up
+    unmount();
+    
+    // Without filters - create a clean instance of defaultProps to ensure no filters
+    const cleanProps = {
+      totalCategories: mockCategories.length,
+      searchTerm: '',
+      setSearchTerm: jest.fn(),
+      parentFilter: '',
+      setParentFilter: jest.fn(),
+      siteFilter: '',
+      setSiteFilter: jest.fn(),
+      categories: mockCategories,
+      sites: mockSites
+    };
+    
+    render(<CategoryTableHeader {...cleanProps} />);
+    const hiddenButton = screen.queryByTestId('reset-filters-button');
+    expect(hiddenButton).toBeNull();
   });
   
   it('uses responsive layout for filter controls', () => {
     render(<CategoryTableHeader {...defaultProps} />);
     
-    const filterContainer = screen.getByPlaceholderText('Search categories...').closest('div');
-    expect(filterContainer?.parentElement?.parentElement).toHaveClass('flex-col sm:flex-row');
+    const filterControls = screen.getByTestId('filter-controls');
+    expect(filterControls).toHaveClass('flex-col sm:flex-row');
   });
   
   it('displays "View Hierarchy" toggle button for tree view', () => {
     render(<CategoryTableHeader {...defaultProps} />);
     
-    const viewToggle = screen.getByRole('button', { name: 'View Hierarchy' });
+    const viewToggle = screen.getByTestId('view-hierarchy-button');
     expect(viewToggle).toBeInTheDocument();
   });
 });

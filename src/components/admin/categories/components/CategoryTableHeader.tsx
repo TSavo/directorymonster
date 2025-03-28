@@ -41,16 +41,17 @@ export default function CategoryTableHeader({
   };
 
   return (
-    <div className="mb-6">
+    <div className="mb-6" data-testid="category-header">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-lg font-semibold" data-testid="category-count">
           Categories ({totalCategories})
         </h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2" data-testid="header-actions">
           <button
             onClick={toggleHierarchyView}
             className="px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-1"
             aria-label="View Hierarchy"
+            data-testid="view-hierarchy-button"
           >
             <Layers size={16} />
             <span>View Hierarchy</span>
@@ -58,6 +59,7 @@ export default function CategoryTableHeader({
           <Link 
             href={siteSlug ? `/admin/sites/${siteSlug}/categories/new` : "/admin/categories/new"}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            data-testid="add-category-button"
           >
             Add Category
           </Link>
@@ -65,9 +67,9 @@ export default function CategoryTableHeader({
       </div>
       
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4" data-testid="filter-controls">
           {/* Search input */}
-          <div className="relative flex-grow">
+          <div className="relative flex-grow" data-testid="search-container">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <Search size={18} className="text-gray-400" aria-hidden="true" />
             </div>
@@ -78,12 +80,14 @@ export default function CategoryTableHeader({
               placeholder="Search categories..."
               className="w-full pl-10 pr-10 py-2 border rounded focus:ring-blue-500 focus:border-blue-500"
               aria-label="Search categories"
+              data-testid="search-input"
             />
             {searchTerm && (
               <button
                 className="absolute inset-y-0 right-0 flex items-center pr-3"
                 onClick={() => setSearchTerm('')}
                 aria-label="Clear search"
+                data-testid="clear-search-button"
               >
                 <X size={18} className="text-gray-400 hover:text-gray-600" aria-hidden="true" />
               </button>
@@ -92,16 +96,17 @@ export default function CategoryTableHeader({
           
           {/* Parent filter */}
           {parentCategories.length > 0 && (
-            <div className="w-full sm:w-64">
+            <div className="w-full sm:w-64" data-testid="parent-filter-container">
               <select
                 value={parentFilter}
                 onChange={(e) => setParentFilter(e.target.value)}
                 className="w-full py-2 border rounded focus:ring-blue-500 focus:border-blue-500"
                 aria-label="Filter by parent"
+                data-testid="parent-filter-select"
               >
                 <option value="">All Categories</option>
                 {parentCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option key={category.id} value={category.id} data-testid={`parent-option-${category.id}`}>
                     {category.name}
                   </option>
                 ))}
@@ -110,17 +115,18 @@ export default function CategoryTableHeader({
           )}
           
           {/* Site filter (only in multi-site mode) */}
-          {!siteSlug && sites.length > 0 && (
-            <div className="w-full sm:w-64">
+          {sites.length > 0 && siteSlug === undefined && (
+            <div className="w-full sm:w-64" data-testid="site-filter-container">
               <select
                 value={siteFilter}
                 onChange={(e) => setSiteFilter(e.target.value)}
                 className="w-full py-2 border rounded focus:ring-blue-500 focus:border-blue-500"
                 aria-label="Filter by site"
+                data-testid="site-filter-select"
               >
                 <option value="">All Sites</option>
                 {sites.map((site) => (
-                  <option key={site.id} value={site.id}>
+                  <option key={site.id} value={site.id} data-testid={`site-option-${site.id}`}>
                     {site.name}
                   </option>
                 ))}
@@ -128,12 +134,13 @@ export default function CategoryTableHeader({
             </div>
           )}
           
-          {/* Reset filters button */}
-          {hasFilters && (
+          {/* Reset filters button - only show when filters are actually applied */}
+          {(searchTerm !== '' || parentFilter !== '' || siteFilter !== '') && (
             <button
               onClick={handleResetFilters}
               className="px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-1"
               aria-label="Reset Filters"
+              data-testid="reset-filters-button"
             >
               <RefreshCcw size={16} />
               <span>Reset Filters</span>
