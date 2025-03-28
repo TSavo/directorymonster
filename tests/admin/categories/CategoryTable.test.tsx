@@ -125,7 +125,7 @@ describe('CategoryTable Component', () => {
     render(<CategoryTable />);
     
     // Should show loading skeleton
-    expect(screen.getByText('Loading categories data, please wait...')).toBeInTheDocument();
+    expect(screen.getByTestId('loading-status')).toHaveTextContent('Loading categories data, please wait...');
   });
 
   it('renders the error state when error is present', () => {
@@ -137,8 +137,8 @@ describe('CategoryTable Component', () => {
     render(<CategoryTable />);
     
     // Should show error message
-    expect(screen.getByText('Error Loading Categories')).toBeInTheDocument();
-    expect(screen.getByText('Failed to fetch categories')).toBeInTheDocument();
+    expect(screen.getByTestId('error-title')).toHaveTextContent('Error Loading Categories');
+    expect(screen.getByTestId('error-message')).toHaveTextContent('Failed to fetch categories');
   });
 
   it('renders the empty state when categories is empty', () => {
@@ -188,10 +188,15 @@ describe('CategoryTable Component', () => {
   it('renders the correct number of category rows', () => {
     render(<CategoryTable />);
     
-    // Should show all category names
-    expect(screen.getByText('Test Category 1')).toBeInTheDocument();
-    expect(screen.getByText('Test Category 2')).toBeInTheDocument();
-    expect(screen.getByText('Child Category')).toBeInTheDocument();
+    // Should show all category names by test IDs - using getAllByTestId since we might have duplicate IDs for desktop/mobile views
+    const category1Elements = screen.getAllByTestId('category-name-category_1');
+    expect(category1Elements[0]).toHaveTextContent('Test Category 1');
+    
+    const category2Elements = screen.getAllByTestId('category-name-category_2');
+    expect(category2Elements[0]).toHaveTextContent('Test Category 2');
+    
+    const category3Elements = screen.getAllByTestId('category-name-category_3');
+    expect(category3Elements[0]).toHaveTextContent('Child Category');
   });
 
   it('renders mobile view for small screens', () => {
@@ -205,16 +210,20 @@ describe('CategoryTable Component', () => {
   it('renders pagination with correct info', () => {
     render(<CategoryTable />);
     
-    // Should show pagination
-    expect(screen.getByText('Showing 1 to 3 of 3 categories')).toBeInTheDocument();
-    expect(screen.getByText('Page 1 of 1')).toBeInTheDocument();
+    // Should show pagination with testids
+    const paginationStatus = screen.getByTestId('pagination-status');
+    expect(paginationStatus).toHaveTextContent('Showing 1 to 3 of 3 categories');
+    
+    const pageIndicator = screen.getByTestId('page-indicator');
+    expect(pageIndicator).toHaveTextContent('Page 1 of 1');
   });
 
   it('calls confirmDelete when delete button is clicked', () => {
     render(<CategoryTable />);
     
-    // Find and click delete button
-    const deleteButtons = screen.getAllByText('Delete');
+    // Find and click delete button with testid - using getAllByTestId to handle duplicates
+    const deleteButtons = screen.getAllByTestId('delete-button-category_1');
+    // Use the first delete button found
     fireEvent.click(deleteButtons[0]);
     
     // Should call confirmDelete
@@ -245,8 +254,10 @@ describe('CategoryTable Component', () => {
 
     render(<CategoryTable />);
     
-    // Find and click confirm button
-    const confirmButton = screen.getByText('Delete', { selector: 'button' });
+    // Find and click confirm button in the modal using data-testid
+    const confirmButton = screen.getByTestId('confirm-delete-button');
+    expect(confirmButton).toBeInTheDocument();
+    expect(confirmButton).toHaveTextContent('Delete');
     fireEvent.click(confirmButton);
     
     // Should call handleDelete
@@ -280,7 +291,7 @@ describe('CategoryTable Component', () => {
     render(<CategoryTable />);
     
     // Find and click retry button
-    const retryButton = screen.getByText('Try Again');
+    const retryButton = screen.getByTestId('retry-button');
     fireEvent.click(retryButton);
     
     // Should call fetchCategories

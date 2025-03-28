@@ -108,12 +108,12 @@ export default function CategoryTableRow({
           
           {/* Category name */}
           <div>
-            <div className="font-medium text-gray-900">{category.name}</div>
+            <h3 className="font-medium text-gray-900" data-testid={`category-name-${category.id}`}>{category.name}</h3>
             
             {/* Parent name for child categories */}
             {category.parentName && (
-              <div className="text-xs text-gray-500">
-                Parent: {category.parentName}
+              <div className="text-xs text-gray-500" data-testid={`parent-name-${category.id}`}>
+                {category.parentName}
               </div>
             )}
           </div>
@@ -162,6 +162,7 @@ export default function CategoryTableRow({
             onClick={handleDelete}
             className="px-2 py-1 text-xs bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors"
             aria-label={`Delete ${category.name}`}
+            data-testid={`delete-button-${category.id}`}
           >
             Delete
           </button>

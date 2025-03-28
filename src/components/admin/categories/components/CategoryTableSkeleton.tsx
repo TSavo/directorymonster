@@ -2,7 +2,7 @@
 
 export default function CategoryTableSkeleton() {
   return (
-    <div className="w-full p-4">
+    <div className="w-full p-4" data-testid="category-table-skeleton">
       <div className="h-8 bg-gray-200 rounded animate-pulse mb-4 w-40"></div>
       
       <div className="h-10 bg-gray-200 rounded animate-pulse mb-4 w-full"></div>
@@ -19,7 +19,9 @@ export default function CategoryTableSkeleton() {
         </div>
       </div>
       
-      <div aria-hidden="true" className="sr-only">Loading categories data, please wait...</div>
+      <div role="status" className="sr-only" data-testid="loading-status">
+        Loading categories data, please wait...
+      </div>
       
       <div className="h-10 bg-gray-200 rounded animate-pulse mt-4 w-2/3 mx-auto"></div>
     </div>

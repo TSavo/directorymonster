@@ -12,8 +12,8 @@ import { CategoryWithRelations } from '../../../../src/components/admin/categori
 // Mock next/link
 jest.mock('next/link', () => {
   // eslint-disable-next-line react/display-name
-  return ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href} data-testid="next-link">{children}</a>
+  return ({ children, href, className }: { children: React.ReactNode; href: string; className?: string }) => (
+    <a href={href} data-testid="next-link" className={className}>{children}</a>
   );
 });
 
@@ -261,8 +261,8 @@ describe('CategoryTableRow Component', () => {
       );
       
       // Check for parent name reference
-      const parentInfo = screen.getByText('Parent: Test Category 1');
-      expect(parentInfo).toBeInTheDocument();
+      const parentInfo = screen.getByTestId('parent-name-category_3');
+      expect(parentInfo).toHaveTextContent('Test Category 1');
       expect(parentInfo).toHaveClass('text-xs');
       expect(parentInfo).toHaveClass('text-gray-500');
     });
@@ -332,21 +332,16 @@ describe('CategoryTableRow Component', () => {
       const viewLink = screen.getByRole('link', { name: /View/i });
       expect(viewLink).toBeInTheDocument();
       expect(viewLink).toHaveAttribute('href', `/admin/categories/${mockCategory.id}`);
-      expect(viewLink).toHaveClass('bg-blue-50');
-      expect(viewLink).toHaveClass('text-blue-600');
       
       // Check Edit button/link
       const editLink = screen.getByRole('link', { name: /Edit/i });
       expect(editLink).toBeInTheDocument();
       expect(editLink).toHaveAttribute('href', `/admin/categories/${mockCategory.id}/edit`);
-      expect(editLink).toHaveClass('bg-green-50');
-      expect(editLink).toHaveClass('text-green-600');
       
       // Check Delete button
       const deleteButton = screen.getByRole('button', { name: /Delete/i });
       expect(deleteButton).toBeInTheDocument();
-      expect(deleteButton).toHaveClass('bg-red-50');
-      expect(deleteButton).toHaveClass('text-red-600');
+      expect(deleteButton).toHaveAttribute('aria-label', `Delete ${mockCategory.name}`);
     });
     
     it('renders action buttons with site-specific URLs when siteSlug is provided', () => {

@@ -35,7 +35,14 @@ We've successfully implemented comprehensive test coverage for critical componen
 - Previously: 6.78%
 - Current: ~14% (improving with each component test enhancement)
 - Target: 70-80%
-- Component tests coverage: CategoryTablePagination (100%), CategoryTableRow (100%), CategoryTableEmptyState (100%), CategoryTableSortHeader (100%)
+- Component tests coverage: 
+  - CategoryTablePagination (100%)
+  - CategoryTableRow (100%)
+  - CategoryTableEmptyState (100%)
+  - CategoryTableSortHeader (100%)
+  - CategoryTableSkeleton (100%)
+  - CategoryTableError (100%)
+  - Main CategoryTable component tests fixed (all passing)
 
 ## Current Development Focus: Admin Components
 
