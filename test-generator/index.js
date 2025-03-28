@@ -27,6 +27,13 @@ async function main() {
     const config = new Config();
     await config.load();
     
+    // Initialize template engine
+    const templateManager = new Template(config.get('paths.templates'));
+    await templateManager.initialize();
+    
+    // Initialize engine
+    const engine = new Engine();
+    
     // Create command processor
     const commandProcessor = new CommandProcessor();
     

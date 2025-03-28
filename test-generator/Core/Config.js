@@ -102,38 +102,61 @@ class Config {
    */
   constructor(configPath) {
     this._config = { ...DEFAULT_CONFIG };
+    this._configPath = configPath || './test-generator/test-generator.config.json';
     
-    if (configPath) {
-      this._loadCustomConfig(configPath);
+    // Don't load in constructor to allow async loading
+  }
+
+  /**
+   * Load configuration from file
+   * @returns {Promise<boolean>} True if configuration was loaded successfully
+   */
+  async load() {
+    try {
+      if (fs.existsSync(this._configPath)) {
+        await this._loadCustomConfig(this._configPath);
+      } else {
+        console.warn(`Configuration file not found: ${this._configPath}`);
+        console.warn('Using default configuration.');
+      }
+      
+      this._validateConfig();
+      return true;
+    } catch (error) {
+      console.error(`Error loading configuration: ${error.message}`);
+      console.warn('Using default configuration.');
+      return false;
     }
-    
-    this._validateConfig();
   }
 
   /**
    * Load a custom configuration file and merge with defaults
    * @param {string} configPath - Path to the custom configuration file
+   * @returns {Promise<boolean>} True if configuration was loaded successfully
    * @private
    */
-  _loadCustomConfig(configPath) {
+  async _loadCustomConfig(configPath) {
     try {
       // Check if file exists
       if (!fs.existsSync(configPath)) {
         console.warn(`Configuration file not found: ${configPath}`);
         console.warn('Using default configuration.');
-        return;
+        return false;
       }
       
       // Read and parse the custom configuration
-      const customConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      const fileContent = fs.readFileSync(configPath, 'utf8');
+      const customConfig = JSON.parse(fileContent);
       
       // Deep merge with defaults
       this._config = this._mergeConfigs(this._config, customConfig);
       
       console.log(`Successfully loaded configuration from: ${configPath}`);
+      return true;
     } catch (error) {
       console.error(`Error loading configuration file: ${error.message}`);
       console.warn('Using default configuration.');
+      return false;
     }
   }
   
@@ -251,15 +274,39 @@ class Config {
   getFeatures() {
     return { ...this._config.features };
   }
+  
+  /**
+   * Set a configuration value by its path
+   * @param {string} configPath - Dot-notation path to the configuration value
+   * @param {*} value - Value to set
+   */
+  set(configPath, value) {
+    const pathParts = configPath.split('.');
+    let current = this._config;
+    
+    for (let i = 0; i < pathParts.length - 1; i++) {
+      const part = pathParts[i];
+      
+      if (!current[part] || typeof current[part] !== 'object') {
+        current[part] = {};
+      }
+      
+      current = current[part];
+    }
+    
+    current[pathParts[pathParts.length - 1]] = value;
+  }
 
   /**
    * Save the current configuration to a file
-   * @param {string} filePath - Path to save the configuration
-   * @returns {boolean} True if saved successfully
+   * @param {string} [filePath] - Path to save the configuration (defaults to this._configPath)
+   * @returns {Promise<boolean>} True if saved successfully
    */
-  saveConfig(filePath) {
+  async save(filePath) {
+    const savePath = filePath || this._configPath;
+    
     try {
-      const dirPath = path.dirname(filePath);
+      const dirPath = path.dirname(savePath);
       
       // Ensure directory exists
       if (!fs.existsSync(dirPath)) {
@@ -268,12 +315,12 @@ class Config {
       
       // Write configuration to file
       fs.writeFileSync(
-        filePath, 
+        savePath, 
         JSON.stringify(this._config, null, 2), 
         'utf8'
       );
       
-      console.log(`Configuration saved to: ${filePath}`);
+      console.log(`Configuration saved to: ${savePath}`);
       return true;
     } catch (error) {
       console.error(`Error saving configuration: ${error.message}`);
