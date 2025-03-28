@@ -99,22 +99,9 @@ We have made significant progress on Phase 4 integration testing implementation:
    - Data retrieval flow tests (user-flows/data-retrieval.test.ts)
    - Search functionality tests (search/search-indexing.test.ts)
 
-### Next Steps
+### Currently Implementing
 
-1. **Expand Integration Test Coverage**:
-   - Implement category management flow tests
-   - Add listing creation and update flow tests
-   - Create cross-site data isolation tests
-
-2. **Enhance Test Utilities**:
-   - Add more sophisticated data generators
-   - Improve test data cleanup procedures
-   - Create reporting utilities for test results
-
-3. **Prepare for Docker Integration (Phase 5)**:
-   - Review the Docker configuration files
-   - Plan approach for Docker-specific tests
-   - Investigate container health check tests
+We are currently implementing a new integration test for category management functionality:
 
 ### Timeline
 
