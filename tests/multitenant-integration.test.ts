@@ -5,6 +5,8 @@
  * They can be run manually and automatically.
  */
 
+import fetch from 'node-fetch';
+
 // Basic test function to check hostname resolution
 export async function testHostnameResolution(hostname: string, expectedSiteSlug: string): Promise<boolean> {
   try {
@@ -77,3 +79,59 @@ if (typeof require !== 'undefined' && require.main === module) {
     process.exit(results.success ? 0 : 1);
   });
 }
+
+// Add Jest test cases
+describe('Multitenancy Integration Tests', () => {
+  beforeAll(() => {
+    // This ensures that the test doesn't time out too quickly
+    jest.setTimeout(30000);
+  });
+
+  test('Domain and subdomain resolution tests', async () => {
+    // Mock the fetch response for testing
+    const mockResponse = {
+      site: {
+        name: 'Fishing Gear Reviews',
+        slug: 'fishing-gear'
+      }
+    };
+
+    global.fetch = jest.fn().mockResolvedValue({
+      json: jest.fn().mockResolvedValue(mockResponse)
+    });
+
+    const result = await testHostnameResolution('fishinggearreviews.com', 'fishing-gear');
+    expect(result).toBe(true);
+  });
+
+  test('Multiple hostnames should resolve to correct sites', async () => {
+    // Create a mock implementation that returns different responses based on hostname
+    global.fetch = jest.fn().mockImplementation((url: string) => {
+      const urlObj = new URL(url);
+      const hostname = urlObj.searchParams.get('hostname');
+      
+      let mockSite;
+      
+      if (hostname?.includes('fishing')) {
+        mockSite = { name: 'Fishing Gear Reviews', slug: 'fishing-gear' };
+      } else if (hostname?.includes('hiking')) {
+        mockSite = { name: 'Hiking Gear Reviews', slug: 'hiking-gear' };
+      } else {
+        mockSite = { name: 'Default Site', slug: 'default' };
+      }
+      
+      return Promise.resolve({
+        json: () => Promise.resolve({ site: mockSite })
+      });
+    });
+
+    // Test multiple hostnames
+    const fishingResult = await testHostnameResolution('fishinggearreviews.com', 'fishing-gear');
+    const hikingResult = await testHostnameResolution('hikinggearreviews.com', 'hiking-gear');
+    const fishingSubdomainResult = await testHostnameResolution('fishing-gear.mydirectory.com', 'fishing-gear');
+    
+    expect(fishingResult).toBe(true);
+    expect(hikingResult).toBe(true);
+    expect(fishingSubdomainResult).toBe(true);
+  });
+});

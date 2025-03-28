@@ -1,6 +1,20 @@
 # Directory Monster
 
-An SEO-Focused Multitenancy Directory Platform built with Next.js.
+An SEO-Focused Multitenancy Directory Platform built with Next.js and Python scraping capabilities.
+
+## System Overview
+
+DirectoryMonster consists of two main components working together:
+
+1. **Next.js Web Application**
+   - Multi-tenant directory platform with API endpoints
+   - Redis storage for listings, categories and site configurations
+   - SEO-optimized directory websites with customizable domains
+
+2. **Python Scraper (in `/python` directory)**
+   - AI-powered web scraping with Selenium
+   - Content extraction and analysis using Ollama models
+   - Pluggable EndpointSaver system for data export
 
 ## Features
 
@@ -160,9 +174,137 @@ Each listing includes backlink tracking with:
 
 ## Testing
 
+### GitHub CI Workflow
+
+DirectoryMonster uses GitHub Actions for continuous integration testing. The CI workflow automatically runs on pushes to main, master, and dev branches, as well as on pull requests targeting these branches.
+
+**CI Process Overview:**
+
+1. **Environment Setup**:
+   - Sets up Docker Buildx for optimized container builds
+   - Configures hostname resolution for domain testing
+   - Utilizes caching for npm dependencies and Docker layers
+
+2. **Container Build & Start**:
+   - Builds the application Docker image
+   - Starts all required containers (app, Redis)
+   - Verifies container health before proceeding
+
+3. **Testing Sequence**:
+   - Automatically seeds the database with test data
+   - Runs static analysis (linting and type checking)
+   - Executes unit, integration, domain, and multitenancy tests
+   - Performs page rendering verification
+
+4. **Artifacts & Logging**:
+   - Captures detailed logs for all testing steps
+   - Uploads logs as artifacts for debugging (retained for 7 days)
+   - Ensures proper cleanup even if tests fail
+
+**CI Benefits:**
+- Ensures code quality before merging to main branches
+- Catches integration issues early in the development process
+- Provides consistent test environment regardless of developer setup
+- Automatically documents test results for review
+
+To view CI results, check the "Actions" tab in the GitHub repository.
+
 DirectoryMonster has comprehensive testing strategies to ensure proper functioning:
 
-### Data Seeding for Tests
+### Python Scraper
+
+The Python scraper component in the `/python` directory provides powerful web scraping capabilities:
+
+```bash
+# Install Python dependencies
+cd python
+pip install -r requirements.txt
+
+# Run the scraper
+python run_scraper.py --count 10 --categories "hiking gear" "camping equipment"
+```
+
+The scraper uses AI to identify and extract detailed information about products and topics.
+
+### EndpointSaver System
+
+The scraper features a pluggable EndpointSaver system that provides flexible options for saving extracted data:
+
+1. **FileEndpointSaver**: Basic file-based storage (default)
+   - Saves extracted data to JSON files
+   - Output goes to `python/data/endpoints.json` by default
+   - Simple implementation with minimal features
+
+2. **EnhancedFileEndpointSaver**: Advanced file-based storage
+   - Creates automatic backups before saving
+   - Maintains a history of all saved endpoints
+   - Detects and filters duplicates
+   - Provides filtering by domain or category
+   - CSV export functionality
+   - Robust error handling
+
+3. **APIEndpointSaver**: Direct integration with Next.js API
+   - Creates a complete automation pipeline from scraping to website display
+   - Transforms endpoint data to match API requirements
+   - Automatic category lookup and creation
+   - Robust error handling with retry logic
+   - Configurable with API URL and site slug
+
+To use the APIEndpointSaver, configure it in your scraper script:
+
+```python
+from scraper.api_endpoint_saver import APIEndpointSaver
+
+# Initialize with API URL and site slug
+endpoint_saver = APIEndpointSaver(
+    api_base_url="http://localhost:3000/api",
+    site_slug="your-site-slug",
+    retry_attempts=3  # Optional: retry failed requests
+)
+
+# Pass to the SearchEngine component
+search_engine = SearchEngine(
+    browser.driver,
+    link_selector,
+    endpoint_saver=endpoint_saver,
+    # other parameters...
+)
+```
+
+For enhanced file-based storage:
+
+```python
+from scraper.enhanced_file_saver import EnhancedFileEndpointSaver
+
+# Initialize with custom paths
+endpoint_saver = EnhancedFileEndpointSaver(
+    output_path="./data/my_endpoints.json",
+    backup_directory="./data/backups",
+    history_directory="./data/history",
+    max_backups=5  # Keep only the 5 most recent backups
+)
+
+# Use filtering and export features
+domain_results = endpoint_saver.get_by_domain("example.com")
+category_results = endpoint_saver.get_by_category("hiking gear")
+endpoint_saver.export_csv("./data/endpoints_export.csv")
+endpoint_saver.prune_duplicates()
+```
+
+A test script is included to demonstrate all endpoint savers:
+
+```bash
+# Test all savers with sample data
+python test_endpoint_savers.py --test-all
+
+# Test only the API saver with custom settings
+python test_endpoint_savers.py --test-api --api-url "http://localhost:3000/api" --site-slug "mydirectory"
+
+# Test enhanced file saver with custom output directory
+python test_endpoint_savers.py --test-enhanced --output-dir "./custom_output"
+```
+
+## Data Seeding for Tests
 
 **Important:** Many tests require seeded data to pass. The in-memory Redis implementation will be empty when you first start, causing test failures. Always seed data through the API before testing:
 
