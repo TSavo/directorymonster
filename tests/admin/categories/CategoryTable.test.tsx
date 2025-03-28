@@ -5,75 +5,12 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// Mock CategoryTable component (uncomment when component is created)
-// import CategoryTable from '../../../src/components/admin/categories/CategoryTable';
+import CategoryTable from '../../../src/components/admin/categories/CategoryTable';
+import * as hooks from '../../../src/components/admin/categories/hooks';
 
-// Mock data
-const mockCategories = [
-  {
-    id: 'category_1',
-    siteId: 'site_1',
-    name: 'Test Category 1',
-    slug: 'test-category-1',
-    metaDescription: 'This is test category 1',
-    order: 1,
-    parentId: null,
-    createdAt: Date.now() - 86400000, // 1 day ago
-    updatedAt: Date.now() - 3600000,  // 1 hour ago
-  },
-  {
-    id: 'category_2',
-    siteId: 'site_1',
-    name: 'Test Category 2',
-    slug: 'test-category-2',
-    metaDescription: 'This is test category 2',
-    order: 2,
-    parentId: null,
-    createdAt: Date.now() - 172800000, // 2 days ago
-    updatedAt: Date.now() - 7200000,   // 2 hours ago
-  },
-  {
-    id: 'category_3',
-    siteId: 'site_1',
-    name: 'Subcategory 1',
-    slug: 'subcategory-1',
-    metaDescription: 'This is a subcategory',
-    order: 1,
-    parentId: 'category_1',
-    createdAt: Date.now() - 43200000, // 12 hours ago
-    updatedAt: Date.now() - 1800000,  // 30 minutes ago
-  }
-];
-
-// Mock site data
-const mockSites = [
-  {
-    id: 'site_1',
-    name: 'Test Site',
-    slug: 'test-site',
-    domain: 'testsite.com',
-    primaryKeyword: 'test',
-    metaDescription: 'Test site description',
-    headerText: 'Test Site Header',
-    defaultLinkAttributes: 'dofollow' as const,
-    createdAt: Date.now() - 1000000000,
-    updatedAt: Date.now() - 500000000
-  }
-];
-
-// Mock the fetch API
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve(mockCategories),
-  })
-) as jest.Mock;
-
-// Mock Next.js router
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-  }),
+// Mock the useCategories hook
+jest.mock('../../../src/components/admin/categories/hooks', () => ({
+  useCategories: jest.fn(),
 }));
 
 // Mock next/link
@@ -84,207 +21,269 @@ jest.mock('next/link', () => {
   );
 });
 
+// Mock data
+const mockCategories = [
+  { 
+    id: 'category_1', 
+    name: 'Test Category 1', 
+    slug: 'test-category-1', 
+    metaDescription: 'This is test category 1',
+    order: 1, 
+    parentId: null,
+    siteId: 'site_1', 
+    createdAt: Date.now() - 86400000, 
+    updatedAt: Date.now() - 3600000,
+    childCount: 2,
+    siteName: 'Test Site'
+  },
+  { 
+    id: 'category_2', 
+    name: 'Test Category 2', 
+    slug: 'test-category-2', 
+    metaDescription: 'This is test category 2',
+    order: 2, 
+    parentId: null,
+    siteId: 'site_1', 
+    createdAt: Date.now() - 172800000, 
+    updatedAt: Date.now() - 7200000,
+    childCount: 0,
+    siteName: 'Test Site'
+  },
+  { 
+    id: 'category_3', 
+    name: 'Child Category', 
+    slug: 'child-category', 
+    metaDescription: 'This is a child category',
+    order: 1, 
+    parentId: 'category_1',
+    siteId: 'site_1', 
+    createdAt: Date.now() - 43200000, 
+    updatedAt: Date.now() - 1800000,
+    parentName: 'Test Category 1',
+    childCount: 0,
+    siteName: 'Test Site'
+  }
+];
+
+const mockSites = [
+  { 
+    id: 'site_1', 
+    name: 'Test Site', 
+    slug: 'test-site', 
+    primaryKeyword: 'test', 
+    metaDescription: 'Test site description', 
+    headerText: 'Test Site', 
+    defaultLinkAttributes: 'dofollow' as const, 
+    createdAt: Date.now() - 1000000000, 
+    updatedAt: Date.now() - 500000000
+  }
+];
+
 describe('CategoryTable Component', () => {
+  // Default mock implementation for useCategories
+  const mockCategoriesHook = {
+    categories: mockCategories,
+    filteredCategories: mockCategories,
+    currentCategories: mockCategories,
+    allCategories: mockCategories,
+    sites: mockSites,
+    isLoading: false,
+    error: null,
+    searchTerm: '',
+    setSearchTerm: jest.fn(),
+    parentFilter: '',
+    setParentFilter: jest.fn(),
+    siteFilter: '',
+    setSiteFilter: jest.fn(),
+    sortField: 'order' as const,
+    sortOrder: 'asc' as const,
+    handleSort: jest.fn(),
+    currentPage: 1,
+    totalPages: 1,
+    itemsPerPage: 10,
+    setItemsPerPage: jest.fn(),
+    goToPage: jest.fn(),
+    isDeleteModalOpen: false,
+    categoryToDelete: null,
+    confirmDelete: jest.fn(),
+    handleDelete: jest.fn(),
+    cancelDelete: jest.fn(),
+    fetchCategories: jest.fn()
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    // Uncomment when the component is created and tests are ready to run
-    // render(<CategoryTable />);
+    (hooks.useCategories as jest.Mock).mockReturnValue(mockCategoriesHook);
   });
 
-  it('should render the loading state initially', () => {
-    // This test will check if the loading state is shown before data is loaded
-    // Uncomment when component is created
-    /*
+  it('renders the loading state when isLoading is true', () => {
+    (hooks.useCategories as jest.Mock).mockReturnValue({
+      ...mockCategoriesHook,
+      isLoading: true
+    });
+
     render(<CategoryTable />);
-    expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(screen.getByText('Loading categories data, please wait...', { selector: '.sr-only' })).toBeInTheDocument();
-    */
-    expect(true).toBe(true); // Placeholder
+    
+    // Should show loading skeleton
+    expect(screen.getByText('Loading categories data, please wait...')).toBeInTheDocument();
   });
 
-  it('should render the table with provided categories data', () => {
-    // This test will check if the table renders correctly with data
-    // Uncomment when component is created
-    /*
-    render(<CategoryTable initialCategories={mockCategories} />);
-    expect(screen.getByText('Categories (3)')).toBeInTheDocument();
-    expect(screen.getByText('Test Category 1')).toBeInTheDocument();
-    expect(screen.getByText('Test Category 2')).toBeInTheDocument();
-    expect(screen.getByText('Subcategory 1')).toBeInTheDocument();
-    */
-    expect(true).toBe(true); // Placeholder
+  it('renders the error state when error is present', () => {
+    (hooks.useCategories as jest.Mock).mockReturnValue({
+      ...mockCategoriesHook,
+      error: 'Failed to fetch categories'
+    });
+
+    render(<CategoryTable />);
+    
+    // Should show error message
+    expect(screen.getByText('Error Loading Categories')).toBeInTheDocument();
+    expect(screen.getByText('Failed to fetch categories')).toBeInTheDocument();
   });
 
-  it('should indicate parent-child relationships between categories', () => {
-    // This test will check if the parent-child relationship is visibly indicated
-    // Uncomment when component is created
-    /*
-    render(<CategoryTable initialCategories={mockCategories} />);
-    
-    // Check if Subcategory 1 is shown as a child of Test Category 1
-    // This might be indicated by indentation, an icon, or explicit text
-    const subcategoryRow = screen.getByText('Subcategory 1').closest('tr');
-    expect(subcategoryRow).toHaveClass('child-category'); // Assuming there's a class to indicate this
-    
-    // Check if the parent name is shown or linked
-    expect(screen.getByText('Test Category 1 (Parent)')).toBeInTheDocument();
-    */
-    expect(true).toBe(true); // Placeholder
-  });
+  it('renders the empty state when categories is empty', () => {
+    (hooks.useCategories as jest.Mock).mockReturnValue({
+      ...mockCategoriesHook,
+      categories: [],
+      filteredCategories: [],
+      currentCategories: []
+    });
 
-  it('should handle search filtering correctly', () => {
-    // This test will check if search functionality works
-    // Uncomment when component is created
-    /*
-    render(<CategoryTable initialCategories={mockCategories} />);
+    render(<CategoryTable />);
     
-    // Get the search input
-    const searchInput = screen.getByPlaceholderText('Search categories...');
-    
-    // Type in the search box
-    fireEvent.change(searchInput, { target: { value: 'Subcategory' } });
-    
-    // Should show only the subcategory
-    expect(screen.getByText('Subcategory 1')).toBeInTheDocument();
-    expect(screen.queryByText('Test Category 1')).not.toBeInTheDocument();
-    expect(screen.queryByText('Test Category 2')).not.toBeInTheDocument();
-    
-    // Clear the search
-    fireEvent.change(searchInput, { target: { value: '' } });
-    
-    // Should show all categories again
-    expect(screen.getByText('Test Category 1')).toBeInTheDocument();
-    expect(screen.getByText('Test Category 2')).toBeInTheDocument();
-    expect(screen.getByText('Subcategory 1')).toBeInTheDocument();
-    */
-    expect(true).toBe(true); // Placeholder
-  });
-
-  it('should sort categories when clicking on column headers', () => {
-    // This test will check if sorting works
-    // Uncomment when component is created
-    /*
-    render(<CategoryTable initialCategories={mockCategories} />);
-    
-    // Find the Name column header button
-    const nameHeader = screen.getByRole('button', { name: /Sort by name/i });
-    
-    // Click to sort by name
-    fireEvent.click(nameHeader);
-    
-    // The categories should be sorted by name in ascending order
-    const rows = screen.getAllByRole('row').slice(1); // Skip header row
-    expect(rows[0]).toHaveTextContent('Subcategory 1');
-    expect(rows[1]).toHaveTextContent('Test Category 1');
-    expect(rows[2]).toHaveTextContent('Test Category 2');
-    
-    // Click again to change sort direction
-    fireEvent.click(nameHeader);
-    
-    // Check for new aria-label to confirm sort direction changed
-    expect(nameHeader).toHaveAccessibleName(/Sort by name \(currently sorted desc\)/i);
-    */
-    expect(true).toBe(true); // Placeholder
-  });
-
-  it('should display an empty state when there are no categories', () => {
-    // This test will check if empty state is handled correctly
-    // Uncomment when component is created
-    /*
-    render(<CategoryTable initialCategories={[]} />);
-    
+    // Should show empty state
     expect(screen.getByText('No categories found.')).toBeInTheDocument();
     expect(screen.getByText('Create your first category')).toBeInTheDocument();
-    */
-    expect(true).toBe(true); // Placeholder
   });
 
-  it('should display an error state when fetch fails', async () => {
-    // This test will check if error state is handled correctly
-    // Uncomment when component is created
-    /*
-    // Mock a failed fetch
-    (global.fetch as jest.Mock).mockImplementationOnce(() => Promise.reject('API error'));
-    
+  it('renders the table with correct columns', () => {
     render(<CategoryTable />);
     
-    // Wait for the error state to appear
-    await waitFor(() => {
-      expect(screen.getByText('Error Loading Categories')).toBeInTheDocument();
-    });
-    
-    expect(screen.getByRole('button', { name: 'Retry loading categories' })).toBeInTheDocument();
-    */
-    expect(true).toBe(true); // Placeholder
+    // Should have correct column headers
+    expect(screen.getByText('Order')).toBeInTheDocument();
+    expect(screen.getByText('Name')).toBeInTheDocument();
+    expect(screen.getByText('Last Updated')).toBeInTheDocument();
+    expect(screen.getByText('Actions')).toBeInTheDocument();
   });
 
-  it('should show delete confirmation dialog when delete is clicked', async () => {
-    // This test will check if delete confirmation works
-    // Uncomment when component is created
-    /*
-    render(<CategoryTable initialCategories={mockCategories} />);
+  it('shows site column in multi-site mode', () => {
+    render(<CategoryTable />);
     
-    // Find and click the delete button for first category
-    const deleteButtons = screen.getAllByRole('button', { name: /Delete/i });
+    // Should show site column
+    expect(screen.getByText('Site')).toBeInTheDocument();
+  });
+
+  it('hides site column in single-site mode', () => {
+    (hooks.useCategories as jest.Mock).mockReturnValue({
+      ...mockCategoriesHook,
+      sites: []
+    });
+
+    render(<CategoryTable siteSlug="test-site" />);
+    
+    // Should not show site column
+    expect(screen.queryByText('Site')).not.toBeInTheDocument();
+  });
+
+  it('renders the correct number of category rows', () => {
+    render(<CategoryTable />);
+    
+    // Should show all category names
+    expect(screen.getByText('Test Category 1')).toBeInTheDocument();
+    expect(screen.getByText('Test Category 2')).toBeInTheDocument();
+    expect(screen.getByText('Child Category')).toBeInTheDocument();
+  });
+
+  it('renders mobile view for small screens', () => {
+    render(<CategoryTable />);
+    
+    // Should render mobile view (hidden on desktop)
+    const mobileView = screen.getAllByRole('article')[0].closest('div');
+    expect(mobileView).toHaveClass('md:hidden');
+  });
+
+  it('renders pagination with correct info', () => {
+    render(<CategoryTable />);
+    
+    // Should show pagination
+    expect(screen.getByText('Showing 1 to 3 of 3 categories')).toBeInTheDocument();
+    expect(screen.getByText('Page 1 of 1')).toBeInTheDocument();
+  });
+
+  it('calls confirmDelete when delete button is clicked', () => {
+    render(<CategoryTable />);
+    
+    // Find and click delete button
+    const deleteButtons = screen.getAllByText('Delete');
     fireEvent.click(deleteButtons[0]);
     
-    // Wait for the dialog to appear
-    await waitFor(() => {
-      expect(screen.getByText('Are you sure you want to delete')).toBeInTheDocument();
+    // Should call confirmDelete
+    expect(mockCategoriesHook.confirmDelete).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders delete confirmation modal when isDeleteModalOpen is true', () => {
+    (hooks.useCategories as jest.Mock).mockReturnValue({
+      ...mockCategoriesHook,
+      isDeleteModalOpen: true,
+      categoryToDelete: { id: 'category_1', name: 'Test Category 1' }
     });
+
+    render(<CategoryTable />);
     
-    // Check for confirmation and cancel buttons
-    expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-    */
-    expect(true).toBe(true); // Placeholder
+    // Should show delete confirmation modal
+    expect(screen.getByText('Delete Category')).toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to delete/)).toBeInTheDocument();
+    expect(screen.getByText('"Test Category 1"')).toBeInTheDocument();
   });
 
-  it('should support drag-and-drop reordering of categories', async () => {
-    // This test will check if drag-and-drop functionality works
-    // Uncomment when component is created
-    /*
-    render(<CategoryTable initialCategories={mockCategories} />);
+  it('calls handleDelete when delete is confirmed', () => {
+    (hooks.useCategories as jest.Mock).mockReturnValue({
+      ...mockCategoriesHook,
+      isDeleteModalOpen: true,
+      categoryToDelete: { id: 'category_1', name: 'Test Category 1' }
+    });
+
+    render(<CategoryTable />);
     
-    // This will be more complex to test and may require a specialized library for testing drag-and-drop
-    // For now, we can check if the drag handles are present
-    const dragHandles = screen.getAllByRole('button', { name: /drag handle/i });
-    expect(dragHandles.length).toBe(3);
-    */
-    expect(true).toBe(true); // Placeholder
+    // Find and click confirm button
+    const confirmButton = screen.getByText('Delete', { selector: 'button' });
+    fireEvent.click(confirmButton);
+    
+    // Should call handleDelete
+    expect(mockCategoriesHook.handleDelete).toHaveBeenCalledTimes(1);
+    expect(mockCategoriesHook.handleDelete).toHaveBeenCalledWith('category_1');
   });
 
-  it('should allow editing a category via the edit button', () => {
-    // This test will check if edit functionality works
-    // Uncomment when component is created
-    /*
-    render(<CategoryTable initialCategories={mockCategories} />);
+  it('calls cancelDelete when delete is cancelled', () => {
+    (hooks.useCategories as jest.Mock).mockReturnValue({
+      ...mockCategoriesHook,
+      isDeleteModalOpen: true,
+      categoryToDelete: { id: 'category_1', name: 'Test Category 1' }
+    });
+
+    render(<CategoryTable />);
     
-    // Find and click the edit button for first category
-    const editButtons = screen.getAllByRole('button', { name: /Edit/i });
-    fireEvent.click(editButtons[0]);
+    // Find and click cancel button
+    const cancelButton = screen.getByText('Cancel');
+    fireEvent.click(cancelButton);
     
-    // Check if we're redirected to the edit page
-    const router = require('next/navigation').useRouter();
-    expect(router.push).toHaveBeenCalledWith('/admin/categories/category_1/edit');
-    */
-    expect(true).toBe(true); // Placeholder
+    // Should call cancelDelete
+    expect(mockCategoriesHook.cancelDelete).toHaveBeenCalledTimes(1);
   });
 
-  it('should allow creation of a new category via the add button', () => {
-    // This test will check if the add category button works
-    // Uncomment when component is created
-    /*
-    render(<CategoryTable initialCategories={mockCategories} siteSlug="test-site" />);
+  it('calls fetchCategories when retry button is clicked in error state', () => {
+    (hooks.useCategories as jest.Mock).mockReturnValue({
+      ...mockCategoriesHook,
+      error: 'Failed to fetch categories'
+    });
+
+    render(<CategoryTable />);
     
-    // Find and click the add button
-    const addButton = screen.getByRole('button', { name: /Add Category/i });
-    fireEvent.click(addButton);
+    // Find and click retry button
+    const retryButton = screen.getByText('Try Again');
+    fireEvent.click(retryButton);
     
-    // Check if we're redirected to the create page
-    const router = require('next/navigation').useRouter();
-    expect(router.push).toHaveBeenCalledWith('/admin/sites/test-site/categories/new');
-    */
-    expect(true).toBe(true); // Placeholder
+    // Should call fetchCategories
+    expect(mockCategoriesHook.fetchCategories).toHaveBeenCalledTimes(1);
   });
 });
