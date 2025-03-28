@@ -26,6 +26,8 @@ export default function DeleteConfirmationModal({
   
   // Handle focus management
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     if (isOpen) {
@@ -34,6 +36,38 @@ export default function DeleteConfirmationModal({
         cancelButtonRef.current?.focus();
       }, 0);
     }
+  }, [isOpen]);
+
+  // Handle focus trapping
+  useEffect(() => {
+    const handleTabKey = (event: KeyboardEvent) => {
+      if (!isOpen || event.key !== 'Tab') return;
+      
+      const focusableElements = modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      
+      if (!focusableElements || focusableElements.length === 0) return;
+      
+      const firstElement = focusableElements[0] as HTMLElement;
+      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+      
+      // If shift+tab and on first element, move to last element
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      }
+      // If tab and on last element, move to first element
+      else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
+    
+    document.addEventListener('keydown', handleTabKey);
+    return () => {
+      document.removeEventListener('keydown', handleTabKey);
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -46,6 +80,7 @@ export default function DeleteConfirmationModal({
       aria-modal="true"
       aria-labelledby="modal-title"
       data-testid="delete-confirmation-modal"
+      ref={modalRef}
     >
       <div 
         className="bg-white rounded-lg p-6 w-full max-w-md mx-4 shadow-xl"
@@ -70,6 +105,7 @@ export default function DeleteConfirmationModal({
           </button>
           
           <button
+            ref={confirmButtonRef}
             onClick={onConfirm}
             className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
             data-testid="confirm-delete-button"
