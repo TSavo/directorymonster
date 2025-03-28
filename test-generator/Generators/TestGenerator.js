@@ -27,8 +27,8 @@ class TestGenerator {
    * @param {Object} requirements - Component requirements
    * @param {string} requirements.componentName - Name of the component
    * @param {string} requirements.category - Component category (e.g., 'admin/categories')
-   * @param {string[]} requirements.testTypes - Types of tests to generate
-   * @param {string[]} requirements.features - Component features
+   * @param {string|string[]} requirements.testTypes - Types of tests to generate
+   * @param {string|string[]} requirements.features - Component features
    * @param {Object[]} requirements.props - Component props
    * @param {Object} [options] - Generation options
    * @param {boolean} [options.overwrite=false] - Whether to overwrite existing files
@@ -36,7 +36,10 @@ class TestGenerator {
    * @returns {Object} Result object with success status and generated files
    */
   generateTests(requirements, options = {}) {
-    if (!this._validateRequirements(requirements)) {
+    // Standardize and validate requirements
+    const processedRequirements = this._processRequirements(requirements);
+    
+    if (!processedRequirements) {
       return {
         success: false,
         error: 'Invalid component requirements',
@@ -51,10 +54,12 @@ class TestGenerator {
         errors: []
       };
 
-      const testTypes = requirements.testTypes || ['base'];
+      // Determine which test types to generate
+      let testTypesToGenerate = this._determineTestTypes(processedRequirements);
       
-      for (const testType of testTypes) {
-        const testResult = this._generateTestFile(requirements, testType, options);
+      // Generate each test type
+      for (const testType of testTypesToGenerate) {
+        const testResult = this._generateTestFile(processedRequirements, testType, options);
         
         if (testResult.success) {
           result.files.push(testResult.file);
@@ -76,6 +81,72 @@ class TestGenerator {
   }
 
   /**
+   * Process and standardize component requirements
+   * @param {Object} requirements - Raw component requirements
+   * @returns {Object} Processed requirements or null if invalid
+   * @private
+   */
+  _processRequirements(requirements) {
+    if (!requirements || !requirements.componentName) {
+      console.error('Missing required field: componentName');
+      return null;
+    }
+
+    const processed = { ...requirements };
+
+    // Convert features to array if it's a string
+    if (typeof processed.features === 'string') {
+      processed.features = processed.features.split(',').map(f => f.trim());
+    } else if (!Array.isArray(processed.features)) {
+      processed.features = [];
+    }
+
+    // Convert testTypes to array if it's a string
+    if (typeof processed.testTypes === 'string') {
+      processed.testTypes = processed.testTypes.split(',').map(t => t.trim());
+    } else if (!Array.isArray(processed.testTypes)) {
+      processed.testTypes = ['base'];
+    }
+
+    // Add component name in different cases
+    processed.componentNameCamelCase = this._camelCase(processed.componentName);
+    processed.componentNameKebabCase = this._kebabCase(processed.componentName);
+
+    return processed;
+  }
+
+  /**
+   * Determine which test types to generate based on requirements
+   * @param {Object} requirements - Processed component requirements
+   * @returns {string[]} Array of test types to generate
+   * @private
+   */
+  _determineTestTypes(requirements) {
+    const { testTypes, features } = requirements;
+    
+    // Start with explicitly specified test types
+    let typesToGenerate = [...testTypes];
+    
+    // If no specific test types are requested, determine from features
+    if (typesToGenerate.length === 1 && typesToGenerate[0] === 'base') {
+      // Check each feature for related test types
+      for (const feature of features) {
+        const featureConfig = this.config.get(`features.${feature}`);
+        if (featureConfig && featureConfig.relatedTestTypes) {
+          // Add related test types from this feature
+          typesToGenerate = [
+            ...typesToGenerate,
+            ...featureConfig.relatedTestTypes
+          ];
+        }
+      }
+    }
+    
+    // Remove duplicates
+    return [...new Set(typesToGenerate)];
+  }
+
+  /**
    * Generate a single test file for a specific test type
    * @param {Object} requirements - Component requirements
    * @param {string} testType - Type of test to generate
@@ -88,13 +159,29 @@ class TestGenerator {
       // Get test type configuration
       const testTypeConfig = this.config.get(`testTypes.${testType}`);
       if (!testTypeConfig) {
-        throw new Error(`Unknown test type: ${testType}`);
+        console.warn(`Unknown test type: ${testType}`);
+        return {
+          success: false,
+          error: `Unknown test type: ${testType}`,
+          file: null
+        };
       }
 
-      // Get template for this test type
-      const template = this.templateManager.getTemplate(testType);
+      // Determine which template to use
+      const templateName = testTypeConfig.template.replace('.template', '');
+      
+      // Try to get the specific template
+      let template = this.templateManager.getTemplate(templateName);
+      
+      // Fall back to base template if specific one not found
       if (!template) {
-        throw new Error(`Template not found for test type: ${testType}`);
+        console.warn(`Template not found for test type: ${testType}, falling back to base template`);
+        template = this.templateManager.getTemplate('base');
+        
+        // If even base template not found, fail
+        if (!template) {
+          throw new Error(`Template not found for test type: ${testType} and no base template found`);
+        }
       }
 
       // Prepare data for template processing
@@ -127,6 +214,8 @@ class TestGenerator {
         };
       }
 
+      console.log(`Successfully wrote file: ${outputPath}`);
+      
       return {
         success: true,
         file: outputPath
@@ -149,17 +238,13 @@ class TestGenerator {
    * @private
    */
   _prepareTemplateData(requirements, testType) {
-    const { componentName, category, props = [] } = requirements;
+    const { componentName, componentNameCamelCase, componentNameKebabCase, category, features, props = [] } = requirements;
     
-    // Convert features to array if it's a string
-    let features = requirements.features || [];
-    if (typeof features === 'string') {
-      features = features.split(',');
-    }
-
     // Basic template data
     const data = {
       componentName,
+      componentNameCamelCase,
+      componentNameKebabCase,
       category,
       testType,
       features,
@@ -170,10 +255,8 @@ class TestGenerator {
       optionalProps: props.filter(prop => !prop.required),
       testDescription: this.config.get(`testTypes.${testType}.description`, ''),
       // Helper functions for template use
-      helpers: {
-        camelCase: s => s.charAt(0).toLowerCase() + s.slice(1),
-        pascalCase: s => s.charAt(0).toUpperCase() + s.slice(1),
-        kebabCase: s => s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(),
+      if: function(expr, options) {
+        return expr ? options.fn(this) : options.inverse(this);
       }
     };
 
@@ -181,7 +264,7 @@ class TestGenerator {
     for (const feature of features) {
       const featureConfig = this.config.get(`features.${feature}`);
       if (featureConfig) {
-        data[`has${feature.charAt(0).toUpperCase()}${feature.slice(1)}`] = true;
+        data[`has${this._pascalCase(feature)}`] = true;
         data[`${feature}Assertions`] = featureConfig.assertions || [];
       }
     }
@@ -208,130 +291,9 @@ class TestGenerator {
    * @private
    */
   _generateTestCases(requirements, testType) {
-    const { componentName, features = [] } = requirements;
-
-    // Basic test case for rendering
-    let testCases = `
-  it('renders ${componentName} component', () => {
-    // Test component rendering
-  });
-`;
-
-    // Add test type specific test cases
-    switch (testType) {
-      case 'base':
-        // Add props test cases
-        if (requirements.props && requirements.props.length > 0) {
-          testCases += `
-  it('renders with required props', () => {
-    // Test with required props
-  });
-
-  it('renders with all props', () => {
-    // Test with all props
-  });
-`;
-        }
-
-        // Add state test cases
-        if (features.includes('data-loading')) {
-          testCases += `
-  it('displays loading state when isLoading is true', () => {
-    // Test loading state
-  });
-`;
-        }
-
-        if (features.includes('errors')) {
-          testCases += `
-  it('displays error message when there is an error', () => {
-    // Test error state
-  });
-`;
-        }
-        break;
-
-      case 'actions':
-        // Add interaction test cases
-        if (features.includes('interaction')) {
-          testCases += `
-  it('handles click events', () => {
-    // Test click event handling
-  });
-`;
-        }
-
-        // Add form test cases
-        if (features.includes('form')) {
-          testCases += `
-  it('submits form with valid data', () => {
-    // Test form submission
-  });
-
-  it('validates form data before submission', () => {
-    // Test form validation
-  });
-`;
-        }
-        break;
-
-      case 'hierarchy':
-        // Add hierarchy test cases
-        if (features.includes('hierarchy')) {
-          testCases += `
-  it('displays parent-child relationships correctly', () => {
-    // Test parent-child hierarchy display
-  });
-
-  it('indents child items properly', () => {
-    // Test indentation based on depth
-  });
-`;
-        }
-        break;
-
-      case 'sorting':
-        // Add sorting test cases
-        if (features.includes('sorting')) {
-          testCases += `
-  it('indicates the current sort field', () => {
-    // Test sort field indicator
-  });
-
-  it('toggles between ascending and descending sort', () => {
-    // Test sort direction toggle
-  });
-
-  it('updates sort state when column header is clicked', () => {
-    // Test sort state update on click
-  });
-`;
-        }
-        break;
-
-      case 'accessibility':
-        // Add accessibility test cases
-        testCases += `
-  it('has proper ARIA attributes', () => {
-    // Test ARIA attribute presence
-  });
-`;
-
-        if (features.includes('keyboard')) {
-          testCases += `
-  it('supports keyboard navigation', () => {
-    // Test keyboard navigation
-  });
-
-  it('maintains proper focus states', () => {
-    // Test focus management
-  });
-`;
-        }
-        break;
-    }
-
-    return testCases;
+    // For now, we'll rely on the templates to provide the test cases
+    // as our templates already have detailed test cases
+    return '';
   }
 
   /**
@@ -361,69 +323,6 @@ class TestGenerator {
     const filename = `${componentName}${suffix}`;
     
     return path.join(outputDir, filename);
-  }
-
-  /**
-   * Validate component requirements
-   * @param {Object} requirements - Component requirements to validate
-   * @returns {boolean} True if requirements are valid, false otherwise
-   * @private
-   */
-  _validateRequirements(requirements) {
-    if (!requirements) {
-      console.error('No requirements provided');
-      return false;
-    }
-
-    if (!requirements.componentName) {
-      console.error('Missing required field: componentName');
-      return false;
-    }
-
-    // Validate test types
-    if (requirements.testTypes) {
-      for (const testType of requirements.testTypes) {
-        if (!this.config.get(`testTypes.${testType}`)) {
-          console.error(`Unknown test type: ${testType}`);
-          return false;
-        }
-      }
-    }
-
-    // Validate features
-    if (requirements.features) {
-      // Handle if features is a string (comma-separated list)
-      if (typeof requirements.features === 'string') {
-        requirements.features = requirements.features.split(',');
-      }
-      
-      // Validate each feature
-      if (Array.isArray(requirements.features)) {
-        for (const feature of requirements.features) {
-          if (!this.config.get(`features.${feature}`)) {
-            console.warn(`Unknown feature: ${feature}`);
-            // Don't fail validation for unknown features, just warn
-          }
-        }
-      }
-    }
-
-    // Validate props
-    if (requirements.props) {
-      if (!Array.isArray(requirements.props)) {
-        console.error('Props must be an array');
-        return false;
-      }
-
-      for (const prop of requirements.props) {
-        if (!prop.name) {
-          console.error('Each prop must have a name');
-          return false;
-        }
-      }
-    }
-
-    return true;
   }
 
   /**
@@ -467,6 +366,36 @@ class TestGenerator {
     }
 
     return result;
+  }
+
+  /**
+   * Convert a string to camelCase
+   * @param {string} str - String to convert
+   * @returns {string} Converted string
+   * @private
+   */
+  _camelCase(str) {
+    return str.charAt(0).toLowerCase() + str.slice(1);
+  }
+
+  /**
+   * Convert a string to PascalCase
+   * @param {string} str - String to convert
+   * @returns {string} Converted string
+   * @private
+   */
+  _pascalCase(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  /**
+   * Convert a string to kebab-case
+   * @param {string} str - String to convert
+   * @returns {string} Converted string
+   * @private
+   */
+  _kebabCase(str) {
+    return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
   }
 }
 

@@ -37,7 +37,8 @@ export class CommandProcessor {
       examples: [
         'test Button',
         'test NavBar --features=hover,click,keyboard',
-        'test Table --base --accessibility'
+        'test Table --testTypes=base,accessibility,table',
+        'test SiteForm --category=admin/sites --features=form,validation,submission --testTypes=base,validation,submission'
       ],
       handler: this.#handleTestCommand.bind(this)
     },
@@ -174,47 +175,66 @@ export class CommandProcessor {
     console.log(`Generating test files for component: ${componentName}`);
     console.log('Options:', options);
     
-    // Import modules dynamically
-    const { Config } = await import('../Core/Config.js');
-    const { Template } = await import('../Core/Template.js');
-    const { TestGenerator } = await import('../Generators/TestGenerator.js');
-    
-    // Initialize configuration and template manager
-    const config = new Config();
-    await config.load();
-    
-    // Initialize template manager
-    const templateManager = new Template(config.get('paths.templates'));
-    await templateManager.initialize();
-    
-    // Create test generator
-    const testGenerator = new TestGenerator(config, templateManager);
-    
     try {
-      // Parse features from options
-      const features = options.features ? options.features.split(',') : [];
+      // Initialize configuration and template manager
+      const config = new Config();
+      await config.load();
       
-      // Add individual feature flags
-      if (options.base) features.push('base');
-      if (options.actions) features.push('actions');
-      if (options.hierarchy) features.push('hierarchy');
-      if (options.sorting) features.push('sorting');
-      if (options.accessibility) features.push('accessibility');
+      // Initialize template manager
+      const { Template } = await import('../Core/Template.js');
+      const templateManager = new Template(config.get('paths.templates'));
+      await templateManager.initialize();
+      
+      // Create test generator
+      const testGenerator = new TestGenerator(config, templateManager);
       
       // Create requirements object
       const requirements = {
         componentName,
-        features: [...new Set(features)], // Remove duplicates
-        testTypes: ['base'], // Default to base test type
+        category: options.category || '',
+        testTypes: options.testTypes || 'base',
+        features: options.features || [],
         ...options
       };
-
+      
+      // Add additional flags as features
+      const flagsToFeatures = {
+        validation: 'validation',
+        submission: 'submission',
+        accessibility: 'accessibility',
+        keyboard: 'keyboard',
+        table: 'table',
+        form: 'form',
+        modal: 'modal'
+      };
+      
+      for (const [flag, feature] of Object.entries(flagsToFeatures)) {
+        if (options[flag]) {
+          if (typeof requirements.features === 'string') {
+            requirements.features += `,${feature}`;
+          } else if (Array.isArray(requirements.features)) {
+            requirements.features.push(feature);
+          } else {
+            requirements.features = [feature];
+          }
+        }
+      }
+      
       // Generate tests
-      await testGenerator.generateTests(requirements, {
+      const result = await testGenerator.generateTests(requirements, {
         overwrite: options.overwrite || false
       });
       
-      console.log('✅ Test files generation completed successfully!');
+      if (result.success) {
+        console.log('✅ Test files generation completed successfully!');
+        
+        if (result.files && result.files.length > 0) {
+          console.log('\nGenerated files:');
+          result.files.forEach(file => console.log(` - ${file}`));
+        }
+      } else {
+        throw new Error(`Test generation failed: ${result.error || 'Unknown error'}`);
+      }
     } catch (error) {
       this.#showError(`Failed to generate test files: ${error.message}`);
     }
@@ -238,23 +258,20 @@ export class CommandProcessor {
     console.log(`Scaffolding component: ${componentName}`);
     console.log('Options:', options);
     
-    // Import modules dynamically
-    const { Config } = await import('../Core/Config.js');
-    const { Template } = await import('../Core/Template.js');
-    const { ComponentScaffolder } = await import('../Generators/ComponentScaffolder.js');
-    
-    // Initialize configuration and template manager
-    const config = new Config();
-    await config.load();
-    
-    // Initialize template manager
-    const templateManager = new Template(config.get('paths.templates'));
-    await templateManager.initialize();
-    
-    // Create component scaffolder
-    const scaffolder = new ComponentScaffolder(config, templateManager);
-    
     try {
+      // Initialize configuration and template manager
+      const config = new Config();
+      await config.load();
+      
+      // Initialize template manager
+      const { Template } = await import('../Core/Template.js');
+      const templateManager = new Template(config.get('paths.templates'));
+      await templateManager.initialize();
+      
+      // Create component scaffolder
+      const { ComponentScaffolder } = await import('../Generators/ComponentScaffolder.js');
+      const scaffolder = new ComponentScaffolder(config, templateManager);
+      
       // Parse props from options
       const propNames = options.props ? options.props.split(',') : [];
       
@@ -304,18 +321,15 @@ export class CommandProcessor {
     console.log(`Generating fixtures for component: ${componentName}`);
     console.log('Options:', options);
     
-    // Import modules dynamically
-    const { Config } = await import('../Core/Config.js');
-    const { FixtureGenerator } = await import('../Generators/FixtureGenerator.js');
-    
-    // Initialize configuration
-    const config = new Config();
-    await config.load();
-    
-    // Create fixture generator
-    const fixtureGenerator = new FixtureGenerator(config);
-    
     try {
+      // Initialize configuration
+      const config = new Config();
+      await config.load();
+      
+      // Create fixture generator
+      const { FixtureGenerator } = await import('../Generators/FixtureGenerator.js');
+      const fixtureGenerator = new FixtureGenerator(config);
+      
       // Create requirements object
       const requirements = {
         componentName,
@@ -410,6 +424,7 @@ export class CommandProcessor {
     console.log('  test-generator help <command>');
     console.log('\nExamples:');
     console.log('  test-generator test Button --features=hover,click');
+    console.log('  test-generator test SiteForm --category=admin/sites --features=form,validation --testTypes=base,validation');
     console.log('  test-generator component NavBar --props=title,links --withHooks');
     console.log('  test-generator fixture Table --count=5 --withHierarchy');
     console.log('\n');
@@ -434,6 +449,21 @@ export class CommandProcessor {
     console.log('============================');
     console.log(`\nDescription: ${commandInfo.description}`);
     console.log(`\nUsage: test-generator ${commandInfo.usage}`);
+    
+    if (command === 'test') {
+      console.log('\nCommon Options:');
+      console.log('  --category=<category>      Component category (e.g., admin/sites)');
+      console.log('  --features=<features>      Comma-separated list of component features');
+      console.log('  --testTypes=<testTypes>    Comma-separated list of test types to generate');
+      console.log('  --overwrite               Overwrite existing files');
+      console.log('\nAvailable Test Types:');
+      console.log('  base                       Basic rendering and props tests');
+      console.log('  validation                 Form validation tests');
+      console.log('  submission                 API interaction and form submission tests');
+      console.log('  accessibility              Keyboard navigation and ARIA attribute tests');
+      console.log('  actions                    User interaction tests (clicks, hover, etc.)');
+      console.log('  table                      Table-specific tests (sorting, pagination, etc.)');
+    }
     
     console.log('\nExamples:');
     for (const example of commandInfo.examples) {

@@ -1,0 +1,202 @@
+import React from 'react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { {componentName} } from '@/components/{if category}{category}/{componentName}{else}{componentName}{/if}';
+
+/**
+ * Table component tests for the {componentName} component
+ * 
+ * These tests focus on table-specific functionality:
+ * - Column rendering and headers
+ * - Row rendering with correct data
+ * - Sorting functionality
+ * - Pagination controls
+ * - Row selection (if applicable)
+ * - Empty state handling
+ * - Loading state
+ * - Error state
+ */
+describe('{componentName}', () => {
+  
+  // Mock data for table tests
+  const mockData = [
+    { id: '1', name: 'Item 1', description: 'Description 1', status: 'Active' },
+    { id: '2', name: 'Item 2', description: 'Description 2', status: 'Inactive' },
+    { id: '3', name: 'Item 3', description: 'Description 3', status: 'Active' }
+  ];
+  
+  it('renders table with correct column headers', () => {
+    render(<{componentName} data={mockData} />);
+    
+    const table = screen.getByTestId('{componentNameCamelCase}');
+    expect(table).toBeInTheDocument();
+    
+    // Check for column headers
+    const headers = screen.getAllByTestId(/{componentNameCamelCase}-header-/);
+    expect(headers).toHaveLength(4); // Assuming 4 columns: id, name, description, status
+    
+    // Check specific headers
+    expect(screen.getByTestId('{componentNameCamelCase}-header-name')).toHaveTextContent('Name');
+    expect(screen.getByTestId('{componentNameCamelCase}-header-description')).toHaveTextContent('Description');
+    expect(screen.getByTestId('{componentNameCamelCase}-header-status')).toHaveTextContent('Status');
+  });
+  
+  it('renders table rows with correct data', () => {
+    render(<{componentName} data={mockData} />);
+    
+    // Check for correct number of rows
+    const rows = screen.getAllByTestId(/{componentNameCamelCase}-row-/);
+    expect(rows).toHaveLength(mockData.length);
+    
+    // Check data in first row
+    const firstRow = screen.getByTestId('{componentNameCamelCase}-row-1');
+    expect(within(firstRow).getByTestId('{componentNameCamelCase}-cell-name')).toHaveTextContent('Item 1');
+    expect(within(firstRow).getByTestId('{componentNameCamelCase}-cell-description')).toHaveTextContent('Description 1');
+    expect(within(firstRow).getByTestId('{componentNameCamelCase}-cell-status')).toHaveTextContent('Active');
+  });
+  
+  it('sorts data when column header is clicked', async () => {
+    const user = userEvent.setup();
+    render(<{componentName} data={mockData} />);
+    
+    // Click on the name header to sort
+    const nameHeader = screen.getByTestId('{componentNameCamelCase}-header-name');
+    await user.click(nameHeader);
+    
+    // Get all rows after sorting
+    const rows = screen.getAllByTestId(/{componentNameCamelCase}-row-/);
+    
+    // Check that first row contains Item 1 (ascending sort)
+    expect(within(rows[0]).getByTestId('{componentNameCamelCase}-cell-name')).toHaveTextContent('Item 1');
+    
+    // Click again to sort in descending order
+    await user.click(nameHeader);
+    
+    // Check that first row now contains Item 3 (descending sort)
+    const rowsAfterSecondClick = screen.getAllByTestId(/{componentNameCamelCase}-row-/);
+    expect(within(rowsAfterSecondClick[0]).getByTestId('{componentNameCamelCase}-cell-name')).toHaveTextContent('Item 3');
+  });
+  
+  it('shows correct pagination controls', () => {
+    // Create more mock data to trigger pagination
+    const paginatedData = Array.from({ length: 25 }, (_, i) => ({
+      id: String(i + 1),
+      name: `Item ${i + 1}`,
+      description: `Description ${i + 1}`,
+      status: i % 2 === 0 ? 'Active' : 'Inactive'
+    }));
+    
+    render(<{componentName} data={paginatedData} itemsPerPage={10} />);
+    
+    // Check pagination controls
+    expect(screen.getByTestId('{componentNameCamelCase}-pagination')).toBeInTheDocument();
+    
+    // Check page count
+    expect(screen.getByTestId('{componentNameCamelCase}-pagination-info')).toHaveTextContent('1-10 of 25');
+    
+    // Check previous button is disabled on first page
+    expect(screen.getByTestId('{componentNameCamelCase}-pagination-prev')).toBeDisabled();
+    
+    // Check next button is enabled
+    expect(screen.getByTestId('{componentNameCamelCase}-pagination-next')).not.toBeDisabled();
+  });
+  
+  it('navigates to next page when next button is clicked', async () => {
+    const user = userEvent.setup();
+    
+    // Create more mock data to trigger pagination
+    const paginatedData = Array.from({ length: 25 }, (_, i) => ({
+      id: String(i + 1),
+      name: `Item ${i + 1}`,
+      description: `Description ${i + 1}`,
+      status: i % 2 === 0 ? 'Active' : 'Inactive'
+    }));
+    
+    render(<{componentName} data={paginatedData} itemsPerPage={10} />);
+    
+    // Click next page button
+    const nextButton = screen.getByTestId('{componentNameCamelCase}-pagination-next');
+    await user.click(nextButton);
+    
+    // Check page count updated
+    expect(screen.getByTestId('{componentNameCamelCase}-pagination-info')).toHaveTextContent('11-20 of 25');
+    
+    // Check that previous button is now enabled
+    expect(screen.getByTestId('{componentNameCamelCase}-pagination-prev')).not.toBeDisabled();
+    
+    // Check data in first row of second page (should be item 11)
+    const firstRowSecondPage = screen.getByTestId('{componentNameCamelCase}-row-11');
+    expect(within(firstRowSecondPage).getByTestId('{componentNameCamelCase}-cell-name')).toHaveTextContent('Item 11');
+  });
+  
+  it('shows empty state when no data is provided', () => {
+    render(<{componentName} data={[]} />);
+    
+    // Table should not be present
+    expect(screen.queryByTestId('{componentNameCamelCase}-table')).not.toBeInTheDocument();
+    
+    // Empty state should be shown
+    expect(screen.getByTestId('{componentNameCamelCase}-empty-state')).toBeInTheDocument();
+    expect(screen.getByTestId('{componentNameCamelCase}-empty-state')).toHaveTextContent('No items found');
+  });
+  
+  it('shows loading state when loading prop is true', () => {
+    render(<{componentName} data={[]} loading={true} />);
+    
+    // Table should not be present
+    expect(screen.queryByTestId('{componentNameCamelCase}-table')).not.toBeInTheDocument();
+    
+    // Loading state should be shown
+    expect(screen.getByTestId('{componentNameCamelCase}-loading')).toBeInTheDocument();
+    expect(screen.getByTestId('{componentNameCamelCase}-loading')).toHaveAttribute('role', 'status');
+  });
+  
+  it('shows error state when error prop is provided', () => {
+    const errorMessage = 'Failed to load data';
+    render(<{componentName} data={[]} error={errorMessage} />);
+    
+    // Table should not be present
+    expect(screen.queryByTestId('{componentNameCamelCase}-table')).not.toBeInTheDocument();
+    
+    // Error state should be shown
+    expect(screen.getByTestId('{componentNameCamelCase}-error')).toBeInTheDocument();
+    expect(screen.getByTestId('{componentNameCamelCase}-error')).toHaveTextContent(errorMessage);
+    
+    // Retry button should be present
+    expect(screen.getByTestId('{componentNameCamelCase}-retry-button')).toBeInTheDocument();
+  });
+  
+  it('calls onRetry when retry button is clicked', async () => {
+    const mockOnRetry = jest.fn();
+    const user = userEvent.setup();
+    
+    render(<{componentName} data={[]} error="Failed to load data" onRetry={mockOnRetry} />);
+    
+    // Click retry button
+    const retryButton = screen.getByTestId('{componentNameCamelCase}-retry-button');
+    await user.click(retryButton);
+    
+    // Check onRetry was called
+    expect(mockOnRetry).toHaveBeenCalledTimes(1);
+  });
+  
+  it('selects row when checkbox is clicked', async () => {
+    const mockOnSelect = jest.fn();
+    const user = userEvent.setup();
+    
+    render(<{componentName} data={mockData} onSelectRow={mockOnSelect} />);
+    
+    // Find checkbox in first row
+    const firstRowCheckbox = within(screen.getByTestId('{componentNameCamelCase}-row-1')).getByRole('checkbox');
+    
+    // Click checkbox to select row
+    await user.click(firstRowCheckbox);
+    
+    // Check onSelect was called with correct row data
+    expect(mockOnSelect).toHaveBeenCalledTimes(1);
+    expect(mockOnSelect).toHaveBeenCalledWith('1', true);
+    
+    // Checkbox should now be checked
+    expect(firstRowCheckbox).toBeChecked();
+  });
+});

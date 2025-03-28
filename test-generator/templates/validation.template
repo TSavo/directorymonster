@@ -1,0 +1,138 @@
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { {componentName} } from '@/components/{if category}{category}/{componentName}{else}{componentName}{/if}';
+
+/**
+ * Validation tests for the {componentName} component
+ * 
+ * These tests focus on form validation behavior including:
+ * - Required field validation
+ * - Format validation for specific fields
+ * - Error message display
+ * - Character limits and restrictions
+ * - Validation state management
+ */
+describe('{componentName} Validation', () => {
+  
+  it('validates required fields and shows error messages', async () => {
+    const user = userEvent.setup();
+    render(<{componentName} />);
+    
+    // Submit form without filling required fields
+    const submitButton = screen.getByTestId('{componentNameCamelCase}-submit');
+    await user.click(submitButton);
+    
+    // Check for error messages
+    expect(screen.getByTestId('{componentNameCamelCase}-name-error')).toBeInTheDocument();
+    expect(screen.getByTestId('{componentNameCamelCase}-name-error')).toHaveTextContent('Name is required');
+    
+    // Additional field validation can be added here
+  });
+
+  it('validates format with appropriate error messages', async () => {
+    const user = userEvent.setup();
+    render(<{componentName} />);
+    
+    // Enter invalid values and check validation
+    const input = screen.getByTestId('{componentNameCamelCase}-format-field');
+    
+    // Test with invalid format
+    await user.type(input, 'invalid format');
+    await user.tab(); // Move focus to trigger validation
+    
+    expect(screen.getByTestId('{componentNameCamelCase}-format-error')).toBeInTheDocument();
+    expect(screen.getByTestId('{componentNameCamelCase}-format-error')).toHaveTextContent('Invalid format');
+    
+    // Test valid format
+    await user.clear(input);
+    await user.type(input, 'valid-format');
+    await user.tab();
+    
+    expect(screen.queryByTestId('{componentNameCamelCase}-format-error')).not.toBeInTheDocument();
+  });
+
+  it('validates character limits for fields', async () => {
+    const user = userEvent.setup();
+    render(<{componentName} />);
+    
+    // Test character limit
+    const nameInput = screen.getByTestId('{componentNameCamelCase}-name');
+    const longName = 'A'.repeat(51); // 51 characters
+    
+    await user.type(nameInput, longName);
+    await user.tab();
+    
+    expect(screen.getByTestId('{componentNameCamelCase}-name-error')).toBeInTheDocument();
+    expect(screen.getByTestId('{componentNameCamelCase}-name-error')).toHaveTextContent('Name cannot exceed 50 characters');
+  });
+
+  it('shows validation errors inline under each field', async () => {
+    const user = userEvent.setup();
+    render(<{componentName} />);
+    
+    // Submit empty form to trigger all validations
+    const submitButton = screen.getByTestId('{componentNameCamelCase}-submit');
+    await user.click(submitButton);
+    
+    // Check error message positioning and styling
+    const field = screen.getByTestId('{componentNameCamelCase}-field-container');
+    expect(field).toContainElement(screen.getByTestId('{componentNameCamelCase}-field-error'));
+    expect(screen.getByTestId('{componentNameCamelCase}-field-error')).toHaveClass('text-red-500');
+  });
+
+  it('disables submit button when form has validation errors', async () => {
+    const user = userEvent.setup();
+    render(<{componentName} />);
+    
+    // Fill in invalid data
+    const input = screen.getByTestId('{componentNameCamelCase}-format-field');
+    await user.type(input, 'invalid format');
+    await user.tab();
+    
+    // Check that submit button is disabled
+    const submitButton = screen.getByTestId('{componentNameCamelCase}-submit');
+    expect(submitButton).toBeDisabled();
+    
+    // Fix the invalid data
+    await user.clear(input);
+    await user.type(input, 'valid-format');
+    await user.tab();
+    
+    // Check that submit button is enabled
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
+  });
+
+  it('clears validation errors when fields are corrected', async () => {
+    const user = userEvent.setup();
+    render(<{componentName} />);
+    
+    // Submit empty form to trigger validations
+    const submitButton = screen.getByTestId('{componentNameCamelCase}-submit');
+    await user.click(submitButton);
+    
+    // Verify errors are shown
+    expect(screen.getByTestId('{componentNameCamelCase}-name-error')).toBeInTheDocument();
+    
+    // Fix the error by entering valid data
+    const nameInput = screen.getByTestId('{componentNameCamelCase}-name');
+    await user.type(nameInput, 'Valid Name');
+    await user.tab();
+    
+    // Check error is cleared
+    await waitFor(() => {
+      expect(screen.queryByTestId('{componentNameCamelCase}-name-error')).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows help text explaining format requirements', async () => {
+    render(<{componentName} />);
+    
+    // Check for help text
+    expect(screen.getByTestId('{componentNameCamelCase}-format-help')).toBeInTheDocument();
+    expect(screen.getByTestId('{componentNameCamelCase}-format-help')).toHaveTextContent(/format requirements/i);
+  });
+
+});

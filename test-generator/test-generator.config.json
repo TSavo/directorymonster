@@ -7,15 +7,70 @@
   },
   "testTypes": {
     "base": {
-      "template": "base.test.template",
+      "template": "base.template",
       "suffix": ".test.tsx",
       "description": "Basic rendering, props, and state tests"
+    },
+    "validation": {
+      "template": "validation.template",
+      "suffix": ".validation.test.tsx",
+      "description": "Form validation tests including field validation and error handling"
+    },
+    "submission": {
+      "template": "submission.template",
+      "suffix": ".submission.test.tsx",
+      "description": "Form submission tests including API interaction and loading states"
+    },
+    "accessibility": {
+      "template": "accessibility.template",
+      "suffix": ".accessibility.test.tsx",
+      "description": "Accessibility tests including keyboard navigation and ARIA attributes"
+    },
+    "actions": {
+      "template": "actions.template",
+      "suffix": ".actions.test.tsx",
+      "description": "User interaction tests including button clicks and event handling"
+    },
+    "table": {
+      "template": "table.template",
+      "suffix": ".table.test.tsx",
+      "description": "Table component tests including sorting, pagination, and row handling"
     }
   },
   "features": {
     "button": {
       "description": "Button component features",
       "assertions": ["click handling", "disabled state", "loading state"]
+    },
+    "form": {
+      "description": "Form component features",
+      "assertions": ["field rendering", "label associations", "default values"],
+      "relatedTestTypes": ["validation", "submission", "accessibility"]
+    },
+    "validation": {
+      "description": "Form validation features",
+      "assertions": ["required fields", "format validation", "error messages"],
+      "relatedTestTypes": ["validation"]
+    },
+    "submission": {
+      "description": "Form submission features",
+      "assertions": ["API interaction", "loading states", "success/error handling"],
+      "relatedTestTypes": ["submission"]
+    },
+    "accessibility": {
+      "description": "Accessibility features",
+      "assertions": ["keyboard navigation", "ARIA attributes", "focus management"],
+      "relatedTestTypes": ["accessibility"]
+    },
+    "table": {
+      "description": "Table component features",
+      "assertions": ["column rendering", "row rendering", "sorting", "pagination"],
+      "relatedTestTypes": ["table", "actions"]
+    },
+    "modal": {
+      "description": "Modal dialog features",
+      "assertions": ["open/close", "backdrop click", "keyboard navigation"],
+      "relatedTestTypes": ["actions", "accessibility"]
     }
   }
 }
