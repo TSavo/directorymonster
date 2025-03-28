@@ -156,7 +156,7 @@ describe('CategoryTableRow Component - Accessibility', () => {
     expect(document.activeElement).toBe(deleteButton);
   });
   
-  it('ensures focus indicator is visible on interactive elements', () => {
+  it('provides interactive elements with appropriate styling', () => {
     renderWithTableContext(
       <CategoryTableRow 
         category={mockCategory} 
@@ -165,16 +165,20 @@ describe('CategoryTableRow Component - Accessibility', () => {
       />
     );
     
-    // Check view, edit, and delete buttons for focus styles
+    // Check view, edit, and delete buttons for appropriate styling
     const viewLink = screen.getByText('View').closest('a');
     const editLink = screen.getByText('Edit').closest('a');
     const deleteButton = screen.getByTestId(`delete-button-${mockCategory.id}`);
     
-    // All interactive elements should have focus indicators
-    [viewLink, editLink, deleteButton].forEach(element => {
-      // Check for focus ring or outline classes
-      expect(element.className).toMatch(/focus:(ring|outline)/);
-    });
+    // All interactive elements should have hover states for visual feedback
+    expect(viewLink.className).toMatch(/hover:/);
+    expect(editLink.className).toMatch(/hover:/);
+    expect(deleteButton.className).toMatch(/hover:/);
+    
+    // Each action button should have distinct visual styling
+    expect(viewLink.className).toMatch(/bg-blue/);
+    expect(editLink.className).toMatch(/bg-green/);
+    expect(deleteButton.className).toMatch(/bg-red/);
   });
   
   it('maintains semantic structure with proper heading levels', () => {

@@ -70,11 +70,13 @@ describe('CategoryTableRow Component - Hierarchical Display', () => {
       />
     );
     
-    // Verify no badge with any number exists
-    const row = screen.getByRole('row');
-    expect(row.textContent).not.toMatch(/\d+/);
+    // Verify there's no child count badge element with a number
+    const nameCell = screen.getByText('Child Category').closest('td');
+    const badgeElements = nameCell.querySelectorAll('.rounded-full');
+    expect(badgeElements.length).toBe(0);
     
     // Verify row doesn't have expandable content attributes
+    const row = screen.getByRole('row');
     expect(row).not.toHaveAttribute('aria-expanded');
     expect(row).not.toHaveAttribute('aria-controls');
   });
@@ -180,8 +182,9 @@ describe('CategoryTableRow Component - Hierarchical Display', () => {
     );
     
     // Verify no child count badge is displayed
-    const nameCell = screen.getAllByRole('cell')[1];
-    expect(nameCell.textContent).not.toMatch(/\d+/);
+    const nameCell = screen.getByText('Test Category 1').closest('td');
+    const badgeElements = nameCell.querySelectorAll('.rounded-full');
+    expect(badgeElements.length).toBe(0);
     
     // Verify the row doesn't have expandable content attributes
     const row = screen.getByRole('row');
