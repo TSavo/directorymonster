@@ -1,7 +1,7 @@
 ## Current Status - [2025-03-28]
 
 ### In Progress
-- Extending test generator capabilities
+- Fixing template processing issues in test generator
 - Improving test components for site management
 - Implementing DomainManager component features
 
@@ -31,11 +31,11 @@
 20. ✅ Generated DomainManager component using the component scaffolder
 
 ### Next Steps
-1. Add domain handling capabilities to DomainManager component
-2. Create comprehensive tests for DomainManager component
-3. Implement remaining site management interface components
-4. Extend test generator to support more advanced test patterns
-5. Complete automation flow for site management functionality
+1. Fix template processing in TestGenerator.js to properly handle Handlebars templates
+2. Update TestGenerator._generateTestFile method to correctly use the HandlebarsEngine
+3. Fix template variable substitution in generated test files
+4. Add domain handling capabilities to DomainManager component
+5. Create comprehensive tests for DomainManager component
 
 ### Next Steps
 1. Implement tests for the remaining template components with Handlebars
