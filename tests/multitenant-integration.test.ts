@@ -5,8 +5,6 @@
  * They can be run manually and automatically.
  */
 
-import fetch from 'node-fetch';
-
 // Basic test function to check hostname resolution
 export async function testHostnameResolution(hostname: string, expectedSiteSlug: string): Promise<boolean> {
   try {
@@ -88,16 +86,16 @@ describe('Multitenancy Integration Tests', () => {
   });
 
   test('Domain and subdomain resolution tests', async () => {
-    // Mock the fetch response for testing
-    const mockResponse = {
-      site: {
-        name: 'Fishing Gear Reviews',
-        slug: 'fishing-gear'
-      }
-    };
-
-    global.fetch = jest.fn().mockResolvedValue({
-      json: jest.fn().mockResolvedValue(mockResponse)
+    // Create a mock implementation of fetch for testing
+    global.fetch = jest.fn().mockImplementation(() => {
+      return Promise.resolve({
+        json: () => Promise.resolve({ 
+          site: {
+            name: 'Fishing Gear Reviews',
+            slug: 'fishing-gear'
+          }
+        })
+      });
     });
 
     const result = await testHostnameResolution('fishinggearreviews.com', 'fishing-gear');
