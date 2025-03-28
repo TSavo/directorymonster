@@ -1,8 +1,8 @@
 ## Current Status - [2025-03-28]
 
 ### In Progress
-- Fixing Template.ts to load both .hbs and .template files
-- Testing the updated TestGenerator.js with the DomainManager component
+- Now generating test files for all DomainManager aspects: base, validation, submission, and domains tests
+- Need to enhance DomainManager component to implement domain management functionality
 
 ### Completed
 1. ✅ Installed Handlebars as a dependency
@@ -30,12 +30,19 @@
 20. ✅ Generated DomainManager component using the component scaffolder
 21. ✅ Fixed template processing issues in TestGenerator.js to properly handle Handlebars templates
 22. ✅ Updated TestGenerator._generateTestFile method to correctly use the HandlebarsEngine
+23. ✅ Created domains.template for domain-specific test generation
+24. ✅ Fixed Template.ts to load both .hbs and .template files
+25. ✅ Successfully generated test files for DomainManager component
 
 ### Next Steps
-1. Generate test files for the DomainManager component using the updated test generator
-2. Fix any remaining template variable substitution issues in generated test files
-3. Add domain handling capabilities to DomainManager component
-4. Create comprehensive tests for DomainManager component
+1. Enhance DomainManager component to add domain management functionality:
+   - Add domain list rendering
+   - Implement domain input field with validation
+   - Add/remove domain functionality
+   - Include domains in form submission
+2. Create useDomains custom hook for domain management
+3. Implement domain validation using regular expressions
+4. Update tests to ensure all functionality is properly covered
 
 ### Next Steps
 1. Implement tests for the remaining template components with Handlebars
