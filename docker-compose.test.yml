@@ -1,0 +1,41 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./coverage:/app/coverage
+    environment:
+      - NODE_ENV=test
+      - REDIS_URL=redis://redis:6379
+      - AUTH_SECRET=test-auth-secret
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+      - NEXT_TELEMETRY_DISABLED=1
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      - CODE_COVERAGE=true
+    depends_on:
+      - redis
+    # Add hostname aliases for multitenancy testing
+    extra_hosts:
+      - "fishinggearreviews.com:127.0.0.1"
+      - "hikinggearreviews.com:127.0.0.1"
+      - "fishing-gear.mydirectory.com:127.0.0.1"
+      - "hiking-gear.mydirectory.com:127.0.0.1"
+      - "mydirectory.com:127.0.0.1"
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  redis-data:
