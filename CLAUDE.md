@@ -390,7 +390,15 @@ The test suite is designed to run in CI environments:
    - Pass data down as props to child components
    - Avoid async components inside client components
 
-5. **URL Construction**
+5. **Admin Components**
+   - AdminLayout provides consistent structure for all admin pages
+   - WithAuth protects admin routes with authentication
+   - AdminSidebar provides responsive navigation with mobile support
+   - AdminHeader includes user controls and notifications
+   - Breadcrumbs automatically generates path-based navigation
+   - See `/src/components/admin/layout/README.md` for detailed documentation
+
+6. **URL Construction**
    - Always use the URL utility functions in `src/lib/site-utils.ts` to construct URLs
    - For components, use the Link wrapper components in `src/components/LinkUtilities.tsx`
    - See `docs/url-utilities.md` for detailed documentation and examples
