@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Import the component
@@ -55,8 +55,13 @@ const mockCategories = [
 // Mock next/link
 jest.mock('next/link', () => {
   // eslint-disable-next-line react/display-name
-  return ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
+  return ({ children, href, className, 'data-testid': dataTestId }: { 
+    children: React.ReactNode; 
+    href: string;
+    className?: string;
+    'data-testid'?: string;
+  }) => (
+    <a href={href} className={className} data-testid={dataTestId}>{children}</a>
   );
 });
 
@@ -75,58 +80,78 @@ describe('CategoriesMobileView Component', () => {
   it('renders category cards for all provided categories', () => {
     render(<CategoriesMobileView {...defaultProps} />);
     
-    // Should render 3 category cards
-    const categoryCards = screen.getAllByRole('article');
-    expect(categoryCards).toHaveLength(3);
+    // Check main container exists
+    const container = screen.getByTestId('categories-mobile-view');
+    expect(container).toBeInTheDocument();
     
-    // Should display all category names
-    expect(screen.getByText('Test Category 1')).toBeInTheDocument();
-    expect(screen.getByText('Test Category 2')).toBeInTheDocument();
-    expect(screen.getByText('Child Category')).toBeInTheDocument();
+    // Should render 3 category cards with appropriate testids
+    expect(screen.getByTestId('category-card-category_1')).toBeInTheDocument();
+    expect(screen.getByTestId('category-card-category_2')).toBeInTheDocument();
+    expect(screen.getByTestId('category-card-category_3')).toBeInTheDocument();
+    
+    // Verify category names using testids
+    expect(screen.getByTestId('category-name-category_1')).toHaveTextContent('Test Category 1');
+    expect(screen.getByTestId('category-name-category_2')).toHaveTextContent('Test Category 2');
+    expect(screen.getByTestId('category-name-category_3')).toHaveTextContent('Child Category');
   });
   
   it('shows child category indicator with parent name for child categories', () => {
     render(<CategoriesMobileView {...defaultProps} />);
     
-    // Should show parent name for child category
-    expect(screen.getByText('Parent:')).toBeInTheDocument();
-    expect(screen.getByText('Test Category 1')).toBeInTheDocument();
+    // Find the child category by its test ID
+    const childCategory = screen.getByTestId('category-card-category_3');
+    
+    // Use within to scope queries to just this card
+    const parentLabel = within(childCategory).getByTestId('parent-label');
+    expect(parentLabel).toHaveTextContent('Parent:');
+    
+    // Check parent name using testid
+    const parentName = within(childCategory).getByTestId('parent-name-category_3');
+    expect(parentName).toHaveTextContent('Test Category 1');
   });
   
   it('shows child count for categories with children', () => {
     render(<CategoriesMobileView {...defaultProps} />);
     
-    // Should show child count for first category
-    const childCountBadge = screen.getByText('2');
-    expect(childCountBadge).toBeInTheDocument();
+    // Check child count badge using test ID
+    const childCountBadge = screen.getByTestId('child-count-category_1');
+    expect(childCountBadge).toHaveTextContent('2');
+    
+    // Only verify essential styling, not implementation details
     expect(childCountBadge).toHaveClass('bg-blue-100');
+    expect(childCountBadge).toHaveClass('text-blue-800');
   });
   
   it('shows site information when showSiteColumn is true', () => {
     render(<CategoriesMobileView {...defaultProps} showSiteColumn={true} />);
     
-    // Should show site information
-    expect(screen.getAllByText('Site:')).toHaveLength(3);
-    expect(screen.getAllByText('Test Site')).toHaveLength(3);
+    // Check site labels are present
+    const siteLabels = screen.getAllByTestId('site-label');
+    expect(siteLabels).toHaveLength(3);
+    expect(siteLabels[0]).toHaveTextContent('Site:');
+    
+    // Check site names using test IDs
+    expect(screen.getByTestId('site-name-category_1')).toHaveTextContent('Test Site');
+    expect(screen.getByTestId('site-name-category_2')).toHaveTextContent('Test Site');
+    expect(screen.getByTestId('site-name-category_3')).toHaveTextContent('Test Site');
   });
   
   it('does not show site information when showSiteColumn is false', () => {
     render(<CategoriesMobileView {...defaultProps} showSiteColumn={false} />);
     
-    // Should not show site information
-    expect(screen.queryByText('Site:')).not.toBeInTheDocument();
+    // Should not show site labels
+    expect(screen.queryByTestId('site-label')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('site-name-category_1')).not.toBeInTheDocument();
   });
   
   it('calls onDeleteClick with correct parameters when delete button is clicked', () => {
     render(<CategoriesMobileView {...defaultProps} />);
     
-    // Get all delete buttons
-    const deleteButtons = screen.getAllByText('Delete');
+    // Find delete button by test ID
+    const deleteButton = screen.getByTestId('delete-button-category_1');
+    fireEvent.click(deleteButton);
     
-    // Click the first delete button
-    fireEvent.click(deleteButtons[0]);
-    
-    // Should call onDeleteClick with correct parameters
+    // Verify handler was called with correct parameters
     expect(mockOnDeleteClick).toHaveBeenCalledTimes(1);
     expect(mockOnDeleteClick).toHaveBeenCalledWith('category_1', 'Test Category 1');
   });
@@ -134,40 +159,42 @@ describe('CategoriesMobileView Component', () => {
   it('uses site-specific URLs when siteSlug is provided', () => {
     render(<CategoriesMobileView {...defaultProps} siteSlug="test-site" />);
     
-    // Get the first view button
-    const viewButtons = screen.getAllByText('View');
-    const firstViewButton = viewButtons[0];
+    // Check view link URL using test ID
+    const viewLink = screen.getByTestId('view-link-category_1');
+    expect(viewLink).toHaveAttribute('href', '/admin/sites/test-site/categories/test-category-1');
     
-    // Should have site-specific URL
-    expect(firstViewButton.closest('a')).toHaveAttribute('href', '/admin/sites/test-site/categories/test-category-1');
+    // Check edit link URL using test ID
+    const editLink = screen.getByTestId('edit-link-category_1');
+    expect(editLink).toHaveAttribute('href', '/admin/sites/test-site/categories/category_1/edit');
   });
   
   it('uses default URLs when siteSlug is not provided', () => {
     render(<CategoriesMobileView {...defaultProps} />);
     
-    // Get the first view button
-    const viewButtons = screen.getAllByText('View');
-    const firstViewButton = viewButtons[0];
+    // Check view link URL using test ID
+    const viewLink = screen.getByTestId('view-link-category_1');
+    expect(viewLink).toHaveAttribute('href', '/admin/categories/category_1');
     
-    // Should have default URL
-    expect(firstViewButton.closest('a')).toHaveAttribute('href', '/admin/categories/category_1');
+    // Check edit link URL using test ID
+    const editLink = screen.getByTestId('edit-link-category_1');
+    expect(editLink).toHaveAttribute('href', '/admin/categories/category_1/edit');
   });
   
   it('displays formatted last updated date', () => {
     render(<CategoriesMobileView {...defaultProps} />);
     
-    // Should display formatted date
-    // This will depend on your date formatting implementation, but check for a date string
-    const dateRegex = /\w+\s\d+,\s\d{4}/; // e.g., "March 28, 2025"
-    const dateElements = screen.getAllByText(dateRegex);
-    expect(dateElements.length).toBeGreaterThan(0);
+    // Check formatted date using test ID
+    const dateElement = screen.getByTestId('updated-date-category_1');
+    
+    // Only check if it contains a date pattern, not exact format which could change
+    expect(dateElement.textContent).toMatch(/\w+\s\d+,\s\d{4}/); // e.g., "March 28, 2025"
   });
   
   it('hides on larger screens (md and up)', () => {
     render(<CategoriesMobileView {...defaultProps} />);
     
-    // Container should have md:hidden class
-    const container = screen.getAllByRole('article')[0].parentElement;
+    // Check the container has the right responsive class
+    const container = screen.getByTestId('categories-mobile-view');
     expect(container).toHaveClass('md:hidden');
   });
 });
