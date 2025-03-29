@@ -64,6 +64,7 @@ I've successfully implemented a fixed version of the E2E login test that aligns 
      - src/components/admin/layout/AdminSidebar.tsx
      - src/components/admin/layout/AdminLayout.tsx
      - src/components/admin/layout/Breadcrumbs.tsx
+     - src/components/admin/layout/WithAuth.tsx
    - Fixed CSRF token handling in ZKPLogin component
    - Added auto-generation of CSRF tokens when missing
    - Enhanced ZKPLogin component with data-testid attributes for testing
