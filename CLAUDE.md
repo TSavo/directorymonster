@@ -1,5 +1,40 @@
 # DirectoryMonster Guidelines
 
+## Development Environment Setup
+
+**IMPORTANT: Always use Docker for development testing with hot reloading. Always start Docker dev first using docker compose before making changes or running tests.**
+
+```bash
+# Start the Docker development environment first
+docker-compose up -d
+
+# Then make code changes - they will be automatically detected with hot reloading
+
+# To view logs (helpful for debugging)
+docker-compose logs -f
+```
+
+For Windows users, use the convenience scripts:
+
+```bash
+# Start development environment with hot reloading
+start-dev.bat
+
+# Quick restart without rebuilding (if server needs to be restarted)
+dev-reload.bat
+
+# Complete rebuild when dependencies change
+rebuild-dev.bat
+```
+
+This setup ensures:
+- Consistent development environment across all team members
+- Hot reloading for immediate feedback during development
+- Proper Redis connection configuration
+- Working multitenancy with domain resolution
+
+Refer to [DOCKER-DEV.md](DOCKER-DEV.md) for detailed information about Docker development configuration.
+
 ## Integration Architecture
 
 DirectoryMonster consists of two main components that work together:
@@ -659,14 +694,22 @@ The test suite is designed to run in CI environments:
 
 ## Development Best Practices
 
-1. **Running Development Servers**
-   - Always run continuous processes like development servers in the background using `&`:
+1. **Always Use Docker for Development**
+   - Always start Docker development environment first:
      ```bash
-     npm run dev &
+     docker-compose up -d
+     # or using the convenience script:
+     start-dev.bat
      ```
-   - This allows you to continue using the terminal for other commands
-   - To bring the process back to the foreground: `fg`
-   - To stop the background process: `kill %1` or find the PID with `ps` and use `kill [PID]`
+   - Make code changes locally - they will be automatically detected with hot reloading
+   - To restart the Next.js server without rebuilding:
+     ```bash
+     dev-reload.bat
+     ```
+   - For complete rebuild when dependencies change:
+     ```bash
+     rebuild-dev.bat
+     ```
 
 2. **Working with Redis**
    - If Redis is not available, the app can use an in-memory fallback (configured in `src/lib/redis-client.ts`)
