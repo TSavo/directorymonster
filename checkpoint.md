@@ -13,19 +13,32 @@
    - Fixed test environment using `@jest-environment node` directive
 
 ### Current Progress
-1. 🔄 Fixed server-side rendering issues
+1. ✅ Fixed server-side rendering issues
    - Updated tsconfig.json to include proper path mappings for '@' imports
    - Modified redis-client.ts to conditionally import ioredis only on the server side
    - Created a fix for the 'dns' module issue in browser environment
+2. 🔄 Debugging Docker environment for E2E testing
+   - Configured development environment with Docker
+   - Set up Redis for test data persistence
+   - Updated login.test.js to use the correct port (3000 instead of 3002)
+   - Identified critical dependency issues in Docker environment:
+     - Missing 'jsonwebtoken' module causing 500 errors on the /login page
+     - Docker container not properly installing all required dependencies
+     - E2E tests failing because the login page isn't rendering
 
 ### Next Steps
-1. 🚧 Complete Puppeteer E2E test for login page
-   - Troubleshoot remaining server connectivity issues
-   - Update test timeouts or navigation options as needed
-   - Verify test passes against the actual login page
-2. Continue implementing E2E tests for other critical user flows
-3. Implement additional component tests for remaining components
-4. Continue improving test coverage toward 80% target
+1. 🚧 Fix Docker environment for E2E tests
+   - Ensure `jsonwebtoken` and other dependencies are properly installed in Docker
+   - Fix the Dockerfile.dev to include all necessary dependencies 
+   - Ensure the login page renders correctly for E2E tests
+2. Run Puppeteer E2E tests for login page
+   - Update test timeouts and navigation options as needed
+   - Verify tests function properly with the fixed environment
+3. Continue implementing E2E tests for other critical user flows
+   - Start with homepage test once login is working
+   - Continue with site navigation, search functionality, and admin operations
+4. Implement additional component tests for remaining components
+5. Continue improving test coverage toward 80% target
 
 ### Previous Completed Items
 - Created dedicated component test suite for better organization and faster feedback
