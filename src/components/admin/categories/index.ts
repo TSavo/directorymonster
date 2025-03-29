@@ -1,17 +1,6 @@
-// Auto-generated index file - DO NOT EDIT
-// Generated on: 2025-03-29T21:02:40.833Z
-
-export { CategoryTable } from './CategoryTable';
-
-// Default exports as named exports
+// Export the default export as named CategoryTable for backward compatibility
 import CategoryTableDefault from './CategoryTable';
+export { CategoryTableDefault as CategoryTable };
 
-// Additional named exports
-export {
-  CategoryTableDefault,
-};
-
-// Default export object
-export default {
-  CategoryTable: CategoryTableDefault,
-};
+// Also provide the default export
+export default CategoryTableDefault;
