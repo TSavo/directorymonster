@@ -1,0 +1,4 @@
+    // Look for heading that might indicate login
+    const headings = await page.$$eval('h1, h2, h3', headings => 
+      headings.map(h => h.textContent)
+    );

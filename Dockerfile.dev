@@ -5,25 +5,19 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies - force clean install
-RUN npm ci
-
-# Explicitly install jsonwebtoken and other critical dependencies
-RUN npm install jsonwebtoken@9.0.2 ioredis@5.3.2 axios@1.8.4
-
-# Copy the rest of the code
-COPY . .
+# Install dependencies
+RUN npm install
 
 # Next.js telemetry
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Expose port
 EXPOSE 3000
 
 # Environment variables for development
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-ENV NODE_ENV development
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+ENV NODE_ENV=development
 
 # Start development server
 CMD ["npm", "run", "dev"]
