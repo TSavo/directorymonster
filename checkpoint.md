@@ -63,30 +63,28 @@
    - Fixed script dependency sequence
 
 ### Next Steps
-1. ❌ Categories E2E test still failing (Priority: High)
-   - First user setup now works properly thanks to our changes
-   - Test succeeds in login and navigating to the categories page
-   - The test still fails when trying to detect category management elements
-   - Error: Expected category management elements to be found (true) but got false
+1. 🚧 Enhanced Categories E2E test debugging (Priority: High)
+   - Added extensive debugging capabilities to the categories E2E test
+   - Created HTML dumps directory for capturing page state at critical points
+   - Implemented detailed DOM element inspection for UI analysis
+   - Enhanced first-user setup handling with flexible form detection
+   - Extended timeouts and added retry mechanisms
+   - Added comprehensive error logging and recovery strategies
+   - Structured test flow with clearer separation of concerns
    
-   **Updated Analysis of Issue:**
-   - First-user setup issue has been resolved
-   - Test successfully logs into admin dashboard
-   - Test navigates to `/admin/sites/fishing-gear/categories`
-   - The category interface elements are still not being detected
-   - Likely causes:
-     1. The category management UI selectors don't match the actual elements
-     2. Seeded site data not properly loaded
-     3. Redis data persistence issues
-     4. API access issues after login
-     5. Timing issues - not enough delay for UI to load
+   **Analysis of Current Issue:**
+   - The test is now equipped with robust debugging tools
+   - HTML dumps will provide insight into what's actually rendered on the page
+   - First-user setup is now properly handled with adaptive form interaction
+   - We can identify the exact point of failure with detailed DOM structure analysis
+   - Selector strategies have been enhanced to detect category elements
    
    **Next Action Items:**
-   - Take screenshots of the page at failure points to see actual rendered content
-   - Increase delay time for page loading
-   - Verify Redis data via direct inspection
-   - Check API endpoint access and response data
-   - Improve the selector strategies in the test
+   - Run the enhanced test and analyze the HTML dumps
+   - Examine API request logs for error responses
+   - Verify seeded data in Redis is correctly accessible
+   - Update selectors based on actual HTML structure
+   - Implement wait-for-content approach instead of fixed delays
 
 2. 🚧 Implement E2E test for listings management (Priority: Medium)
    - Create a Puppeteer-based E2E test for the listings management functionality
@@ -107,7 +105,48 @@
    - Implement complete test coverage for dashboard functionality
    - Include tests for statistics, activity feed, and navigation
 
+### Latest Update - [2025-03-29]
+
+1. ✅ Enhanced debugging capabilities for Categories E2E test
+   - Implemented comprehensive HTML dumps to analyze page content at critical points
+   - Added detailed DOM structure inspection for UI elements detection
+   - Improved first-user setup handling with adaptive form detection
+   - Enhanced error recovery strategies and retry mechanisms
+   - Added dedicated debugging scripts (run-categories-debug.sh/bat) for convenience
+   - Extended timeouts and improved logging
+
+2. ✅ Created convenience scripts for running debug-enabled tests
+   - Added `run-categories-debug.sh` for Unix/Mac/Linux environments
+   - Added `run-categories-debug.bat` for Windows environments
+   - Scripts clear previous logs, set up environment variables, and provide summary reports
+   - Logs are saved to dedicated directories for easier analysis
+
+3. 🔔 Current Action Plan: Run and fix Categories E2E Test
+   I'll be executing the following steps to run the enhanced categories E2E test:
+
+   1. **Run the test with debugging enabled**
+      - Execute `run-categories-debug.bat` on Windows
+      - This will clear previous logs and run with enhanced debugging
+   
+   2. **Analyze the generated debug artifacts**
+      - Examine HTML dumps to see the actual page content at critical points
+      - Check DOM element details to understand what selectors are/aren't matching
+      - Look for API endpoints being called and potential error responses
+      - Check console logs for JavaScript errors or navigation issues
+   
+   3. **Update test implementation based on findings**
+      - If the issue is with selectors: Update selector strategies in categories.test.js
+      - If there are timing issues: Improve wait mechanisms
+      - If there are API/data issues: Verify seeded data in Redis
+      - If there are first-user setup problems: Enhance setup handling logic
+
+   4. **Retry test with fixes**
+      - Run the test again after implementing fixes
+      - Compare before/after results to validate improvements
+      - Document any remaining issues for further iteration
+
 ### Future Steps
+
 1. 🚧 Create Site Settings E2E Test (Priority: Low)
    - Test domain configuration
    - Test SEO settings
