@@ -147,17 +147,17 @@ npm run dev &
    - Created test sites data with `node scripts/create-test-sites.js`
    - Ran the E2E tests with `npm run test:e2e`
 
-7. 🚧 Current focus: Evaluate test results and fix remaining issues
-   - Analyze debug endpoint outputs to identify remaining issues
-   - Check for module resolution problems in Docker
-   - Verify authentication flow in E2E tests
-   - Ensure Redis site data is properly accessible
+8. 🔧 Fixed Redis connection issue
+   - Identified that the application was using in-memory Redis instead of the actual Redis container
+   - Found `USE_MEMORY_FALLBACK` flag set to `true` in redis-client.ts
+   - Updated the flag to use Redis in development environment
+   - Added .env.development file with proper environment variables
+   - Updated docker-compose.yml to use the environment file
+   - Created fix-redis-connection.js script for easier maintenance
 
-8. 🔄 Iterative improvements
-   - Make necessary code changes based on test results
-   - Rebuild Docker if needed with `./rebuild-docker.sh`
-   - Re-run tests to verify fixes
-   - Document lessons learned and best practices
+9. 🔄 Ongoing rebuild of Docker environment
+   - Running the complete rebuild process with updated Redis configuration
+   - This should resolve issues with site data access
 
 9. 🔜 Next development phase once tests pass
    - Expand E2E test coverage to other functionality
