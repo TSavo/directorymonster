@@ -139,10 +139,16 @@ describe('Login Page', () => {
   }, 10000); // Extend timeout to 10 seconds
 
   test('Displays validation errors for empty fields', async () => {
+    // Enable verbose logging for debugging
+    console.log(`Attempting login with username: ${ADMIN_USERNAME}`);
+    console.log('Starting login process at:', new Date().toISOString());
+
     // Navigate to the login page
+    console.log(`Navigating to ${BASE_URL}/login`);
     await page.goto(`${BASE_URL}/login`, {
       waitUntil: 'networkidle2',
     });
+    console.log('Login page loaded at:', new Date().toISOString());
 
     // Submit the form without entering any data
     await page.click('button[type="submit"]');
@@ -311,15 +317,27 @@ describe('Login Page', () => {
   }, 10000); // Extend timeout to 10 seconds
 
   test('Successfully logs in with valid credentials', async () => {
+    console.log(`Attempting login with username: ${ADMIN_USERNAME}`);
+    console.log('Starting login process at:', new Date().toISOString());
+    
     // Navigate to the login page
+    console.log(`Navigating to ${BASE_URL}/login`);
     await page.goto(`${BASE_URL}/login`, {
       waitUntil: 'networkidle2',
     });
+    console.log('Login page loaded at:', new Date().toISOString());
 
     // Find the form elements more flexibly
+    console.log('Looking for form elements...');
     const usernameInput = await page.$('input[type="text"], input[id="username"], input[name="username"]');
     const passwordInput = await page.$('input[type="password"]');
     const submitButton = await page.$('button[type="submit"]');
+    
+    console.log('Form elements found:', {
+      usernameInput: !!usernameInput,
+      passwordInput: !!passwordInput,
+      submitButton: !!submitButton
+    });
     
     // Skip test if we can't find the login form
     if (!usernameInput || !passwordInput || !submitButton) {
@@ -328,13 +346,18 @@ describe('Login Page', () => {
     }
     
     // Enter valid credentials - using admin user from first-user test
+    console.log(`Typing username: ${ADMIN_USERNAME}`);
     await usernameInput.type(ADMIN_USERNAME);
+    console.log('Typing password: [REDACTED]');
     await passwordInput.type(ADMIN_PASSWORD);
+    console.log('Credentials entered at:', new Date().toISOString());
 
     // Submit the form
+    console.log('Clicking submit button at:', new Date().toISOString());
     await submitButton.click();
+    console.log('Form submitted at:', new Date().toISOString());
 
-    console.log('Starting login process with username:', ADMIN_USERNAME);
+    console.log('Starting login navigation detection at:', new Date().toISOString());
     console.log('Current URL before login:', await page.url());
     
     // Take screenshot before submitting form
