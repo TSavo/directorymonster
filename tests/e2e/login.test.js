@@ -283,8 +283,11 @@ describe('Login Page', () => {
     });
     
     // Submit the form - this will be tracked by our request interceptor
-    console.log('About to submit login form with:', { username: ADMIN_USERNAME, password: '***********' });
-
+    console.log('About to submit login form with:', { username: 'incorrect-user', password: '***********' });
+    
+    // Actually submit the form
+    await submitButton.click();
+    
     // Wait for any error element to appear - use a more generic approach
     await page.waitForFunction(() => {
       // Look for common error patterns in the DOM, including the specific one used in ZKPLogin
