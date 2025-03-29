@@ -1,0 +1,11 @@
+
+> directorymonster@0.1.0 test
+> jest --coverage --coverageReporters=text-summary
+
+
+=============================== Coverage summary ===============================
+Statements   : 66.4% ( 1747/2631 )
+Branches     : 67.85% ( 855/1260 )
+Functions    : 67.29% ( 323/480 )
+Lines        : 66.47% ( 1604/2413 )
+================================================================================
