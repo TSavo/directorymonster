@@ -86,7 +86,6 @@ describe('First User Creation', () => {
     // Note: Users have been cleared directly from Redis via the npm script
     // The npm script uses Docker exec to directly clear the Redis database:
     // docker exec directorymonster-redis-1 redis-cli KEYS "user:*" | xargs docker exec directorymonster-redis-1 redis-cli DEL
-=======
 
     // Navigate to the login page
     await page.goto(`${BASE_URL}/login`, {
