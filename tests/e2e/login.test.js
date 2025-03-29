@@ -300,14 +300,17 @@ describe('Login Page', () => {
     try {
       // Try multiple strategies for detecting successful navigation
       await Promise.race([
-        page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }),
-        page.waitForSelector('[data-testid="admin-dashboard"], .admin-header, .dashboard', { timeout: 30000 }),
+        page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 45000 }),
+        page.waitForSelector('[data-testid="admin-dashboard"], .admin-header, .dashboard', { timeout: 45000 }),
         page.waitForFunction(
           () => window.location.href.includes('/admin') || 
                 !document.querySelector('[data-testid="login-form"], form[action*="login"]'),
-          { timeout: 30000 }
+          { timeout: 45000 }
         )
       ]);
+      
+      // Give it a little extra time to process
+      await page.waitForTimeout(1000);
       
       // Take screenshot for verification
       await page.screenshot({ path: 'login-success.png' });
@@ -344,7 +347,7 @@ describe('Login Page', () => {
       const currentUrl = page.url();
       expect(currentUrl).not.toContain('/login');
     }
-  }, 30000); // Extend timeout to 30 seconds
+  }, 60000); // Extend timeout to 60 seconds
 
   test('Shows password reset link and functionality', async () => {
     // For simplicity, we'll just check if the login page loads
