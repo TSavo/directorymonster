@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useSiteMetrics } from './hooks';
 import { StatisticCardsProps, StatisticCardProps } from './types';

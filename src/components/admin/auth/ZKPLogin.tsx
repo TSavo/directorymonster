@@ -64,7 +64,15 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
         return value;
       }
     }
-    return '';
+
+    // If no CSRF token is found, generate one and set it
+    const newToken = Math.random().toString(36).substring(2, 15) + 
+                     Math.random().toString(36).substring(2, 15);
+    
+    // Set the cookie
+    document.cookie = `csrf_token=${newToken}; path=/; max-age=3600; SameSite=Strict`;
+    
+    return newToken;
   };
   
   /**
@@ -172,16 +180,16 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
   };
   
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h2>
+    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md" data-testid="login-form-container">
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800" data-testid="login-title">Admin Login</h2>
       
       {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded" data-testid="login-error">
           {error}
         </div>
       )}
       
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">
             Username
@@ -195,9 +203,10 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
               validationErrors.username ? 'border-red-500' : 'border-gray-300'
             } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
             disabled={isLoading || isDisabled}
+            data-testid="username-input"
           />
           {validationErrors.username && (
-            <p className="mt-1 text-sm text-red-600">{validationErrors.username}</p>
+            <p className="mt-1 text-sm text-red-600" data-testid="username-error">{validationErrors.username}</p>
           )}
         </div>
         
@@ -214,9 +223,10 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
               validationErrors.password ? 'border-red-500' : 'border-gray-300'
             } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
             disabled={isLoading || isDisabled}
+            data-testid="password-input"
           />
           {validationErrors.password && (
-            <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
+            <p className="mt-1 text-sm text-red-600" data-testid="password-error">{validationErrors.password}</p>
           )}
         </div>
         
@@ -241,6 +251,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
               onClick={handleForgotPassword}
               className="font-medium text-indigo-600 hover:text-indigo-500"
               disabled={isLoading || isDisabled}
+              data-testid="forgot-password-button"
             >
               Forgot password?
             </button>
@@ -258,6 +269,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
                 : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
             }`}
             disabled={isLoading || isDisabled}
+            data-testid="submit-button"
           >
             {isLoading ? (
               <div className="flex items-center">
