@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getRedisClient } from '@/lib/redis-client';
+import { redis } from '@/lib/redis-client';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const redis = getRedisClient();
+    // Redis is already imported
     
     // Get a list of all keys
     const keys = await redis.keys('*');

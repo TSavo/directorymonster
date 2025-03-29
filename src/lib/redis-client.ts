@@ -9,7 +9,7 @@ if (typeof window === 'undefined') {
 }
 
 // Enable in-memory fallback for development without Redis
-const USE_MEMORY_FALLBACK = true;
+const USE_MEMORY_FALLBACK = process.env.NODE_ENV === "test" || (process.env.USE_MEMORY_FALLBACK === 'true');
 
 // Declare global memory store for persistence across API routes
 declare global {
