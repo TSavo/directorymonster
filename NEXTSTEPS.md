@@ -1,13 +1,52 @@
 # DirectoryMonster Implementation Progress
 
-## Recently Completed
+## Next Critical Tasks
+
+### 🔥 Fix missing routes for category management
+- Need to create route structure for `/admin/sites/[siteSlug]/categories`
+- Required routes:
+  - `/admin/sites/[siteSlug]/categories/page.tsx` - For category listing
+  - `/admin/sites/[siteSlug]/categories/new/page.tsx` - For adding new categories
+  - `/admin/sites/[siteSlug]/categories/[categoryId]/edit/page.tsx` - For editing
+- The Category component code already exists but the routes don't
+- Application components specifically reference these routes
+- Tests will continue to fail until these routes are implemented
+
+### 🔥 Address component import/export inconsistencies
+- Multiple warnings in logs about mismatched imports/exports
+- Example: "export 'CategoryTable' was not found in './CategoryTable' (possible exports: default)"
+- Need consistent approach for all components (named vs default exports)
+- Consider using barrel files (index.ts) with proper export configuration
+- Update all components to follow the same export pattern
+
+### 🔥 Fix selector issues in E2E tests
+- Tests use jQuery-style selectors like 'button:contains("Add Category")'
+- These aren't supported in standard DOM querySelector
+- Update selectors to use standard CSS selectors or use a more robust selection approach
+- Puppeteer supports $$ for more advanced selectors, consider using when appropriate
+
+## Most Recently Completed
+
+### 🔎 Identified critical route structure issue in application
+- Discovered missing page routes for `/admin/sites/[siteSlug]/categories`
+- E2E tests are failing because the expected page routes don't exist
+- Found 404 errors in server logs for category page requests
+- Components reference routes like `/admin/sites/${siteSlug}/categories` that aren't implemented
+- API routes exist (`/api/sites/[siteSlug]/categories`) but UI routes are missing
+
+### ✅ Created comprehensive admin-categories-e2e.js test suite
+- Implemented complete E2E tests for category management
+- Created tests covering all CRUD operations for categories
+- Added tests for pagination and hierarchical categories
+- Uses the navigation utilities for improved reliability
+- Includes robust error handling and diagnostics
 
 ### ✅ Implemented categories-debug-navigation.js
 - Created a comprehensive navigation utility file for E2E testing
 - Added robust functions for reliable page navigation in tests
 - Implemented multiple fallback strategies for finding UI elements
 - Added detailed logging and diagnostics for navigation issues
-- This will make category management E2E tests more reliable and easier to debug
+- This makes category management E2E tests more reliable and easier to debug
 
 ## Previously Completed Work
 
@@ -47,282 +86,3 @@
 - Implemented safeHierarchy with React.useMemo to prevent circular structures
 - Added CategoryErrorBoundary component for graceful error handling
 - Fixed exports in `src/components/admin/categories/index.ts` for proper importing
-- Added both named and default exports to support different import styles:
-  ```typescript
-  // Export the default export as named CategoryTable for backward compatibility
-  import CategoryTableDefault from './CategoryTable';
-  export { CategoryTableDefault as CategoryTable };
-  
-  // Also provide the default export
-  export default CategoryTableDefault;
-  ```
-
-## Completed Testing Execution ✅
-
-We have executed the following steps:
-
-```bash
-# Made the rebuild script executable
-chmod +x rebuild-docker.sh
-
-# Performed complete Docker rebuild
-./rebuild-docker.sh
-
-# Created seed test data in Redis
-node scripts/create-test-sites.js
-
-# Ran E2E tests
-npm run test:e2e
-```
-
-## Module Resolution Issues Identified 🚨
-
-### Key Problems
-
-1. ⚠️ Missing module exports: `@/components/admin/sites`
-   - Cannot import `SiteForm` from '@/components/admin/sites'
-   - Error appears in `/admin/sites/new/page.tsx` and potentially other files
-   - This prevents site creation and navigation to existing sites
-
-2. ⚠️ Docker environment path resolution
-   - Path aliases (@/) may not be resolving correctly in Docker environment
-   - This impacts both development and testing environments
-   - Module hot reloading appears to be working but cannot find required modules
-
-3. ⚠️ Login and authentication partially working
-   - First user creation test passes successfully
-   - Login with existing credentials fails consistently
-   - Authentication bypasses for development environment may be unreliable
-
-4. ⚠️ Site and category navigation broken
-   - Cannot access `/admin/sites/[siteSlug]/categories`
-   - 404 and 500 errors when trying to navigate to site management pages
-   - Redis contains site data but web interface cannot access it
-
-## New Issue Identified 🚨
-
-### CategoryTable Serialization Error
-
-1. ⚠️ Next.js serialization error in admin/categories page
-   - Error occurs in app-page.runtime.dev.js, specifically in Array.toJSON
-   - Root cause: Circular references in the category hierarchy data structure
-   - Problem in CategoryTable.tsx renderHierarchicalRows function creates circular references
-   - The parentMap tracking is not properly breaking circular references
-   - Next.js fails when trying to serialize this data structure
-
-## Required Fixes 🔧
-
-### 0. Fix CategoryTable circular reference issue (Critical)
-
-- Modify the `renderHierarchicalRows` function in CategoryTable.tsx to prevent circular references:
-
-```typescript
-// Fix the renderHierarchicalRows function in src/components/admin/categories/CategoryTable.tsx
-// Replace the existing implementation with this one:
-
-// Render hierarchy view rows without circular references
-const renderHierarchicalRows = (parentCategories: CategoryWithRelations[], depth = 0) => {
-  return parentCategories.flatMap((category, index, arr) => {
-    const isLastChild = index === arr.length - 1;
-    const children = childrenMap.get(category.id) || [];
-    
-    // Only get direct children, not full subtree to prevent circular references
-    return [
-      <CategoryTableRow 
-        key={category.id}
-        category={category}
-        showSiteColumn={showSiteColumn}
-        onDeleteClick={confirmDelete}
-        depth={depth}
-        isLastChild={isLastChild}
-        isDraggable={true}
-        isSortedBy={sortField}
-        sortDirection={sortOrder}
-      />,
-      // Render children without introducing circular references
-      ...renderHierarchicalRows(children, depth + 1)
-    ];
-  });
-};
-```
-
-- Also create a memoized function to safely build the hierarchy:
-
-```typescript
-// Add this function to CategoryTable.tsx
-// Use React.useMemo to optimize performance
-const safeHierarchy = React.useMemo(() => {
-  // Create a map of child categories by parent ID for hierarchy view
-  const childrenMap = new Map<string, CategoryWithRelations[]>();
-  
-  if (showHierarchy) {
-    // First pass: Create the map of child categories by parent ID
-    filteredCategories.forEach(category => {
-      if (category.parentId) {
-        if (!childrenMap.has(category.parentId)) {
-          childrenMap.set(category.parentId, []);
-        }
-        childrenMap.get(category.parentId)?.push({...category});
-      }
-    });
-    
-    // Second pass: Validate no circular references exist
-    const validateNoCircularReferences = (categoryId: string, ancestorIds: Set<string> = new Set()): boolean => {
-      if (ancestorIds.has(categoryId)) {
-        console.error(`Circular reference detected for category ${categoryId}`);
-        return false;
-      }
-      
-      const newAncestorIds = new Set(ancestorIds);
-      newAncestorIds.add(categoryId);
-      
-      const children = childrenMap.get(categoryId) || [];
-      return children.every(child => validateNoCircularReferences(child.id, newAncestorIds));
-    };
-    
-    // Get all root categories and validate their hierarchies
-    const rootCategories = filteredCategories.filter(c => !c.parentId);
-    rootCategories.forEach(root => validateNoCircularReferences(root.id));
-  }
-  
-  return {
-    // Get only the root categories (no parent ID)
-    rootCategories: filteredCategories.filter(c => !c.parentId),
-    childrenMap
-  };
-}, [filteredCategories, showHierarchy]);
-```
-
-- And implement a custom error boundary component to catch rendering errors:
-
-```typescript
-// Create a new file: src/components/admin/categories/components/CategoryErrorBoundary.tsx
-'use client';
-
-import React from 'react';
-
-interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback: React.ReactNode;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-export class CategoryErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    console.error('CategoryTable error caught by boundary:', error, errorInfo);
-  }
-
-  render(): React.ReactNode {
-    if (this.state.hasError) {
-      return this.props.fallback;
-    }
-
-    return this.props.children;
-  }
-}
-```
-
-### 1. Fix module exports and paths
-
-- Create or update `src/components/admin/sites/index.ts` to properly export all components:
-  ```typescript
-  // src/components/admin/sites/index.ts
-  export { SiteForm } from './SiteForm';
-  export { DomainManager } from './DomainManager';
-  export { SEOSettings } from './SEOSettings';
-  export { SiteSettings } from './SiteSettings';
-  ```
-
-- Check all module path imports and ensure they are correctly resolved
-- Consider using relative imports if path alias resolution continues to fail
-
-### 2. Improve Docker configuration
-
-- Verify Next.js module resolution in Docker environment works correctly
-- Add explicit module resolution configuration to `next.config.js`
-- Update Docker volumes to ensure all required files are accessible
-- Add better logging for module resolution failures
-
-### 3. Enhance error handling
-
-- Add fallback UI for when component loading fails
-- Improve error messages for common failures
-- Create diagnostic pages for troubleshooting module resolution
-- Add recovery paths for site navigation errors
-
-### 4. Update testing approach
-
-- Fix E2E test login process to reliably authenticate
-- Add direct API calls to create test data when UI navigation fails
-- Update site creation process to handle component failures
-- Add more robust error detection and reporting in tests
-
-## Long-term improvements 🔄
-
-1. 🔜 Complete module architecture overhaul
-   - Review and restructure component organization
-   - Simplify import paths and reduce dependencies between components
-   - Add explicit module boundary enforcement
-   - Create component dependency documentation
-
-2. 🔜 Improve E2E testing resilience
-   - Add alternative paths through UI when primary navigation fails
-   - Create direct API testing alternatives for UI tests
-   - Implement better error detection and reporting in test logs
-   - Add visual diffing to detect UI regressions
-
-3. 🔜 Enhance development workflow
-   - Create one-step verification for module resolution
-   - Add module dependency visualization tools
-   - Create automatic rebuild script for common errors
-   - Improve hot reloading reliability
-
-## How to Apply These Fixes
-
-1. The following files have been updated or created:
-   - `src/components/admin/sites/index.ts` - Enhanced with multiple export methods
-   - `Dockerfile.dev` - Updated to create directories and placeholder files
-   - `next.config.js` - Improved module resolution configuration
-   - `src/app/admin/sites/new/page.tsx` - Added resilient import and fallback UI
-   - `scripts/rebuild-component-exports.js` - New script to auto-generate index files
-   - `rebuild-module-paths.bat` - Windows script for easy recovery
-   - `rebuild-module-paths.sh` - Unix/Linux script for easy recovery
-   - `src/components/admin/categories/CategoryTable.tsx` - Fixed circular reference issue
-   - `src/components/admin/categories/components/CategoryErrorBoundary.tsx` - Added error boundary
-   - `src/components/admin/categories/index.ts` - Fixed export/import mismatch
-
-2. To apply these changes and test them:
-
-   ```bash
-   # On Windows
-   .\rebuild-module-paths.bat
-   npm run test:e2e > e2e-test-results.log 2>&1 &
-
-   # On Unix/Linux
-   chmod +x rebuild-module-paths.sh
-   ./rebuild-module-paths.sh
-   npm run test:e2e > e2e-test-results.log 2>&1 &
-   ```
-
-3. Check the test results and logs:
-
-   ```bash
-   # View test results
-   cat e2e-test-results.log
-
-   # Check container logs
-   docker-compose logs app | grep category
-   ```
