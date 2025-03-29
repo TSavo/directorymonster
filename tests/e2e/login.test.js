@@ -10,8 +10,8 @@ const { describe, test, beforeAll, afterAll, expect } = require('@jest/globals')
 // Configuration
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';  // Updated to use port 3000
 const SITE_DOMAIN = process.env.SITE_DOMAIN || 'mydirectory.com';
-const TEST_USER = process.env.TEST_USER || 'test@example.com';
-const TEST_PASSWORD = process.env.TEST_PASSWORD || 'password123';
+const TEST_USER = process.env.TEST_USER || 'testuser';  // Updated to match username field 
+const TEST_PASSWORD = process.env.TEST_PASSWORD || 'password123456';  // Ensure 8+ characters
 
 // Test timeouts
 const DEFAULT_TIMEOUT = 30000; // 30 seconds
@@ -90,20 +90,27 @@ describe('Login Page', () => {
     expect(title).toContain('Login');
 
     // Verify essential login page elements
-    const emailInputExists = await page.$('input[type="email"]') !== null;
-    const passwordInputExists = await page.$('input[type="password"]') !== null;
+    // Using the actual component IDs from ZKPLogin
+    const usernameInputExists = await page.$('#username') !== null;
+    const passwordInputExists = await page.$('#password') !== null;
     const loginButtonExists = await page.$('button[type="submit"]') !== null;
+    const rememberMeExists = await page.$('#remember-me') !== null;
 
-    expect(emailInputExists).toBe(true);
+    expect(usernameInputExists).toBe(true);
     expect(passwordInputExists).toBe(true);
     expect(loginButtonExists).toBe(true);
+    expect(rememberMeExists).toBe(true);
 
     // Verify login form accessibility
-    const emailInputLabel = await page.$eval('input[type="email"]', (el) => el.getAttribute('aria-label') || el.id);
-    const passwordInputLabel = await page.$eval('input[type="password"]', (el) => el.getAttribute('aria-label') || el.id);
+    const usernameInputLabel = await page.$eval('#username', (el) => el.getAttribute('aria-label') || el.id);
+    const passwordInputLabel = await page.$eval('#password', (el) => el.getAttribute('aria-label') || el.id);
     
-    expect(emailInputLabel).toBeTruthy();
+    expect(usernameInputLabel).toBeTruthy();
     expect(passwordInputLabel).toBeTruthy();
+    
+    // Verify the app has the correct heading
+    const heading = await page.$eval('h2', (el) => el.textContent);
+    expect(heading).toContain('Admin Login');
   });
 
   test('Displays validation errors for empty fields', async () => {
@@ -116,50 +123,75 @@ describe('Login Page', () => {
     await page.click('button[type="submit"]');
 
     // Wait for validation errors to appear
-    await page.waitForSelector('[data-testid="email-error"], [aria-invalid="true"]', {
+    // The component uses p.text-red-600 for error messages
+    await page.waitForSelector('p.text-red-600, [aria-invalid="true"]', {
       timeout: LOGIN_TIMEOUT,
     });
 
     // Verify validation error messages are shown
-    const emailErrorVisible = await page.evaluate(() => {
-      const emailError = document.querySelector('[data-testid="email-error"]');
-      return emailError ? window.getComputedStyle(emailError).display !== 'none' : false;
+    const usernameErrorVisible = await page.evaluate(() => {
+      // Look for error message paragraphs that follow username input
+      const usernameField = document.querySelector('#username');
+      if (!usernameField) return false;
+      const errorElement = usernameField.parentElement.querySelector('p.text-red-600, p.text-sm.text-red-600');
+      return errorElement ? window.getComputedStyle(errorElement).display !== 'none' : false;
     });
 
     const passwordErrorVisible = await page.evaluate(() => {
-      const passwordError = document.querySelector('[data-testid="password-error"]');
-      return passwordError ? window.getComputedStyle(passwordError).display !== 'none' : false;
+      // Look for error message paragraphs that follow password input
+      const passwordField = document.querySelector('#password');
+      if (!passwordField) return false;
+      const errorElement = passwordField.parentElement.querySelector('p.text-red-600, p.text-sm.text-red-600');
+      return errorElement ? window.getComputedStyle(errorElement).display !== 'none' : false;
     });
 
-    expect(emailErrorVisible || await page.$('input[type="email"][aria-invalid="true"]') !== null).toBe(true);
-    expect(passwordErrorVisible || await page.$('input[type="password"][aria-invalid="true"]') !== null).toBe(true);
+    expect(usernameErrorVisible || await page.$('#username[aria-invalid="true"]') !== null).toBe(true);
+    expect(passwordErrorVisible || await page.$('#password[aria-invalid="true"]') !== null).toBe(true);
+    
+    // Verify the error message content
+    const errorText = await page.evaluate(() => {
+      const errors = Array.from(document.querySelectorAll('p.text-red-600, p.text-sm.text-red-600'));
+      return errors.map(e => e.textContent);
+    });
+    
+    expect(errorText.some(text => text.includes('required'))).toBe(true);
   });
 
-  test('Displays validation error for invalid email format', async () => {
+  test('Displays validation error for short password', async () => {
     // Navigate to the login page
     await page.goto(`${BASE_URL}/login`, {
       waitUntil: 'networkidle2',
     });
 
-    // Enter invalid email and valid password
-    await page.type('input[type="email"]', 'invalid-email');
-    await page.type('input[type="password"]', TEST_PASSWORD);
+    // Enter username and short password
+    await page.type('#username', 'testuser');
+    await page.type('#password', 'short');
 
     // Submit the form
     await page.click('button[type="submit"]');
 
-    // Wait for email validation error to appear
-    await page.waitForSelector('[data-testid="email-error"], input[type="email"][aria-invalid="true"]', {
+    // Wait for password validation error to appear
+    await page.waitForSelector('p.text-red-600, p.text-sm.text-red-600, #password[aria-invalid="true"]', {
       timeout: LOGIN_TIMEOUT,
     });
 
-    // Verify email validation error message is shown
-    const emailErrorVisible = await page.evaluate(() => {
-      const emailError = document.querySelector('[data-testid="email-error"]');
-      return emailError ? window.getComputedStyle(emailError).display !== 'none' : false;
+    // Verify password validation error message is shown
+    const passwordErrorVisible = await page.evaluate(() => {
+      const passwordField = document.querySelector('#password');
+      if (!passwordField) return false;
+      const errorElement = passwordField.parentElement.querySelector('p.text-red-600, p.text-sm.text-red-600');
+      return errorElement ? window.getComputedStyle(errorElement).display !== 'none' : false;
     });
 
-    expect(emailErrorVisible || await page.$('input[type="email"][aria-invalid="true"]') !== null).toBe(true);
+    expect(passwordErrorVisible || await page.$('#password[aria-invalid="true"]') !== null).toBe(true);
+    
+    // Verify the error message mentions password length
+    const errorText = await page.evaluate(() => {
+      const errors = Array.from(document.querySelectorAll('p.text-red-600, p.text-sm.text-red-600'));
+      return errors.map(e => e.textContent);
+    });
+    
+    expect(errorText.some(text => text.includes('8'))).toBe(true); // The error should mention 8 characters minimum
   });
 
   test('Displays error message for incorrect credentials', async () => {
@@ -168,25 +200,36 @@ describe('Login Page', () => {
       waitUntil: 'networkidle2',
     });
 
-    // Enter valid email format but incorrect credentials
-    await page.type('input[type="email"]', 'incorrect@example.com');
-    await page.type('input[type="password"]', 'wrongpassword');
+    // Enter valid format but incorrect credentials
+    await page.type('#username', 'incorrect-user');
+    await page.type('#password', 'password123456');
 
     // Submit the form
     await page.click('button[type="submit"]');
 
     // Wait for the error message to appear
-    await page.waitForSelector('[data-testid="login-error"], .error-message, [role="alert"]', {
+    // ZKPLogin component uses a div with bg-red-100 class for error messages
+    await page.waitForSelector('div.bg-red-100, div.text-red-700, .mb-4.p-3.bg-red-100', {
       timeout: LOGIN_TIMEOUT,
     });
 
     // Verify authentication error message is shown
     const errorMessageVisible = await page.evaluate(() => {
-      const errorElement = document.querySelector('[data-testid="login-error"], .error-message, [role="alert"]');
+      const errorElement = document.querySelector('div.bg-red-100, div.text-red-700, .mb-4.p-3.bg-red-100');
       return errorElement ? window.getComputedStyle(errorElement).display !== 'none' : false;
     });
 
     expect(errorMessageVisible).toBe(true);
+    
+    // Verify the error message content
+    const errorText = await page.evaluate(() => {
+      const errorElement = document.querySelector('div.bg-red-100, div.text-red-700, .mb-4.p-3.bg-red-100');
+      return errorElement ? errorElement.textContent : '';
+    });
+    
+    expect(errorText).toBeTruthy();
+    // The error message should indicate authentication failure
+    expect(errorText.includes('Invalid') || errorText.includes('failed') || errorText.includes('incorrect')).toBe(true);
   });
 
   test('Successfully logs in with valid credentials', async () => {
@@ -196,8 +239,8 @@ describe('Login Page', () => {
     });
 
     // Enter valid credentials
-    await page.type('input[type="email"]', TEST_USER);
-    await page.type('input[type="password"]', TEST_PASSWORD);
+    await page.type('#username', TEST_USER);
+    await page.type('#password', TEST_PASSWORD);
 
     // Submit the form
     await page.click('button[type="submit"]');
@@ -213,7 +256,8 @@ describe('Login Page', () => {
     expect(currentUrl).toContain('/admin');
     
     // Verify user is logged in (check for user-specific elements)
-    const userMenuExists = await page.$('[data-testid="user-menu"], .user-profile, .avatar') !== null;
+    // The admin layout typically includes a user menu or profile element
+    const userMenuExists = await page.$('[data-testid="user-menu"], .user-profile, .avatar, .admin-header') !== null;
     expect(userMenuExists).toBe(true);
 
     // Verify access to protected content
@@ -227,23 +271,32 @@ describe('Login Page', () => {
       waitUntil: 'networkidle2',
     });
 
-    // Check for password reset link
-    const resetLinkExists = await page.$('a[href*="reset-password"], a:contains("Forgot password")') !== null;
-    expect(resetLinkExists).toBe(true);
+    // Check for forgot password button - in the component it's a button with "Forgot password?" text
+    const forgotPasswordExists = await page.evaluate(() => {
+      const elements = Array.from(document.querySelectorAll('button, a'));
+      return elements.some(el => el.textContent && el.textContent.includes('Forgot password'));
+    });
+    expect(forgotPasswordExists).toBe(true);
 
-    // Click the password reset link
+    // Click the forgot password button
+    // This needs to handle both button and link cases
     await Promise.all([
       page.waitForNavigation({ waitUntil: 'networkidle2' }),
-      page.click('a[href*="reset-password"], a:contains("Forgot password")')
+      page.evaluate(() => {
+        const elements = Array.from(document.querySelectorAll('button, a'));
+        const forgotPasswordElement = elements.find(el => el.textContent && el.textContent.includes('Forgot password'));
+        if (forgotPasswordElement) forgotPasswordElement.click();
+      })
     ]);
 
     // Verify we're on the password reset page
     const currentUrl = page.url();
-    expect(currentUrl).toContain('reset-password');
+    expect(currentUrl).toContain('forgot-password');
 
-    // Verify the reset form has an email input
-    const emailInputExists = await page.$('input[type="email"]') !== null;
-    expect(emailInputExists).toBe(true);
+    // Verify the reset form has an input field
+    // Might be username instead of email in our implementation
+    const formInputExists = await page.$('input[type="text"], input[type="email"]') !== null;
+    expect(formInputExists).toBe(true);
   });
 
   test('Logout functionality works correctly', async () => {
@@ -252,8 +305,8 @@ describe('Login Page', () => {
       waitUntil: 'networkidle2',
     });
 
-    await page.type('input[type="email"]', TEST_USER);
-    await page.type('input[type="password"]', TEST_PASSWORD);
+    await page.type('#username', TEST_USER);
+    await page.type('#password', TEST_PASSWORD);
     await page.click('button[type="submit"]');
 
     // Wait for successful login and redirection
@@ -262,54 +315,98 @@ describe('Login Page', () => {
       timeout: LOGIN_TIMEOUT,
     });
 
-    // Find and click the logout button/link
-    // Try different possible selectors for the logout button/link
-    const logoutSelectors = [
-      '[data-testid="logout-button"]',
-      'button:contains("Log out")',
-      'a:contains("Log out")',
-      '.logout-button',
-      '.user-menu button', // If there's a user menu that needs to be clicked first
-    ];
-
-    // Try to find a visible logout element
-    let logoutElement = null;
-    for (const selector of logoutSelectors) {
-      try {
-        logoutElement = await page.$(selector);
-        if (logoutElement) break;
-      } catch (e) {
-        // Continue to the next selector
+    // Find and click the logout button/link in the admin interface
+    // Looking at both header and sidebar
+    try {
+      // First check if there's a user menu that needs to be clicked
+      const userMenuSelector = '[data-testid="user-menu"], .user-menu, .avatar, button:has(.avatar)';
+      const hasUserMenu = await page.$(userMenuSelector) !== null;
+      
+      if (hasUserMenu) {
+        // Click user menu to expand it
+        await page.click(userMenuSelector);
+        await page.waitForTimeout(500); // Wait for menu animation
       }
-    }
-
-    // If we found a user menu that might contain the logout button
-    if (!logoutElement && await page.$('[data-testid="user-menu"], .user-profile, .avatar') !== null) {
-      // Click the user menu to expand it
-      await page.click('[data-testid="user-menu"], .user-profile, .avatar');
       
-      // Wait for menu to appear
-      await page.waitForTimeout(500);
+      // Look for logout button/link with various strategies
+      let logoutFound = false;
       
-      // Try again with the logout selectors
+      // Strategy 1: Try common logout selectors
+      const logoutSelectors = [
+        '[data-testid="logout-button"]',
+        '.logout-button',
+        'button.logout',
+        'a.logout'
+      ];
+      
       for (const selector of logoutSelectors) {
-        try {
-          logoutElement = await page.$(selector);
-          if (logoutElement) break;
-        } catch (e) {
-          // Continue to the next selector
+        const exists = await page.$(selector) !== null;
+        if (exists) {
+          await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle2' }),
+            page.click(selector)
+          ]);
+          logoutFound = true;
+          break;
         }
       }
-    }
-
-    // Click the logout element if found
-    if (logoutElement) {
-      await Promise.all([
-        page.waitForNavigation({ waitUntil: 'networkidle2' }),
-        logoutElement.click()
-      ]);
-    } else {
-      throw new Error('Could not find logout button/link');
+      
+      // Strategy 2: Try text content-based approach
+      if (!logoutFound) {
+        const logoutButtonExists = await page.evaluate(() => {
+          const buttons = Array.from(document.querySelectorAll('button, a'));
+          const logoutButton = buttons.find(el => 
+            el.textContent && 
+            (el.textContent.toLowerCase().includes('log out') || 
+             el.textContent.toLowerCase().includes('logout') ||
+             el.textContent.toLowerCase().includes('sign out'))
+          );
+          
+          if (logoutButton) {
+            // Mark the button for easy selection
+            logoutButton.setAttribute('data-test-logout', 'true');
+            return true;
+          }
+          return false;
+        });
+        
+        if (logoutButtonExists) {
+          await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle2' }),
+            page.click('[data-test-logout="true"]')
+          ]);
+          logoutFound = true;
+        }
+      }
+      
+      // Strategy 3: Check admin sidebar for last item (often logout)
+      if (!logoutFound) {
+        const sidebarLogoutExists = await page.evaluate(() => {
+          const sidebarLinks = document.querySelectorAll('.admin-sidebar a, .sidebar a');
+          const lastLink = sidebarLinks[sidebarLinks.length - 1];
+          
+          if (lastLink) {
+            lastLink.setAttribute('data-test-sidebar-last', 'true');
+            return true;
+          }
+          return false;
+        });
+        
+        if (sidebarLogoutExists) {
+          await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle2' }),
+            page.click('[data-test-sidebar-last="true"]')
+          ]);
+          logoutFound = true;
+        }
+      }
+      
+      if (!logoutFound) {
+        throw new Error('Could not find logout button/link');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+      throw error;
     }
 
     // Verify we've been logged out and redirected
@@ -332,16 +429,16 @@ describe('Login Page', () => {
       waitUntil: 'networkidle2',
     });
 
-    // Check if remember me checkbox exists
-    const rememberMeExists = await page.$('input[type="checkbox"][name="remember"], #remember') !== null;
+    // Check if remember me checkbox exists (using the ID from the component)
+    const rememberMeExists = await page.$('#remember-me') !== null;
     
     if (rememberMeExists) {
       // Enter valid credentials
-      await page.type('input[type="email"]', TEST_USER);
-      await page.type('input[type="password"]', TEST_PASSWORD);
+      await page.type('#username', TEST_USER);
+      await page.type('#password', TEST_PASSWORD);
       
       // Check the remember me checkbox
-      await page.click('input[type="checkbox"][name="remember"], #remember');
+      await page.click('#remember-me');
       
       // Submit the form
       await page.click('button[type="submit"]');
@@ -377,6 +474,14 @@ describe('Login Page', () => {
       await page.setViewport({
         width: 1280,
         height: 800,
+      });
+      
+      // Add hostname parameter for multitenancy testing (re-add after browser restart)
+      await page.setCookie({
+        name: 'hostname',
+        value: SITE_DOMAIN,
+        domain: 'localhost',
+        path: '/',
       });
       
       // Navigate to a protected page

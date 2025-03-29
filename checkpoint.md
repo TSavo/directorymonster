@@ -38,7 +38,14 @@
    - Modified Dockerfile.dev to explicitly install the missing `jsonwebtoken` module
    - Added explicit dependency installations to ensure all required packages are available
    - Ensured that the login page renders correctly for E2E tests
-2. 🚧 Rebuild Docker container and run E2E tests
+2. ✅ Synced E2E login test with ZKPLogin component
+   - Aligned test selectors in login.test.js with actual component HTML attributes
+   - Updated from email/password to username/password fields to match ZKPLogin
+   - Fixed form validation selectors to match actual component error styles
+   - Updated error message container selectors to match component implementation
+   - Enhanced logout detection to handle various UI patterns
+   - Improved "Remember Me" test with proper cookie handling
+3. 🚧 Rebuild Docker container and run E2E tests
    - Rebuild the Docker container with the updated Dockerfile.dev
    - Run the login.test.js E2E tests to verify the fixes
    - Validate that the homepage.test.js E2E tests pass in the Docker environment
