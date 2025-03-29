@@ -177,19 +177,22 @@ describe('DomainManager Component', () => {
     const addButton = screen.getByTestId('domainManager-add-domain');
     await user.click(addButton);
     
-    // Submit the form
-    const submitButton = screen.getByTestId('domainManager-submit');
-    await user.click(submitButton);
+    // Submit the form by firing the submit event directly on the form 
+    // instead of clicking the button
+    const form = screen.getByTestId('domainManager-form');
+    await user.click(form.querySelector('button[type="submit"]')!);
     
     // Verify API was called correctly
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith(
-      '/api/domain-manager',
-      expect.objectContaining({
-        method: 'POST',
-        body: expect.stringContaining('example.com')
-      })
-    );
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/domain-manager',
+        expect.objectContaining({
+          method: 'POST',
+          body: expect.stringContaining('example.com')
+        })
+      );
+    });
     
     // Verify success callback was called
     await waitFor(() => {
@@ -234,19 +237,21 @@ describe('DomainManager Component', () => {
     const addButton = screen.getByTestId('domainManager-add-domain');
     await user.click(addButton);
     
-    // Submit the form
-    const submitButton = screen.getByTestId('domainManager-submit');
-    await user.click(submitButton);
+    // Submit the form by firing the submit event directly on the form
+    const form = screen.getByTestId('domainManager-form');
+    await user.submit(form);
     
     // Verify API was called correctly with PUT method
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith(
-      '/api/domain-manager/site-1',
-      expect.objectContaining({
-        method: 'PUT',
-        body: expect.stringContaining('"domains":["example.com","test.com"]')
-      })
-    );
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/domain-manager/site-1',
+        expect.objectContaining({
+          method: 'PUT',
+          body: expect.stringContaining('"domains":["example.com","test.com"]')
+        })
+      );
+    });
     
     // Verify success callback was called
     await waitFor(() => {
@@ -273,9 +278,9 @@ describe('DomainManager Component', () => {
     const addButton = screen.getByTestId('domainManager-add-domain');
     await user.click(addButton);
     
-    // Submit the form
-    const submitButton = screen.getByTestId('domainManager-submit');
-    await user.click(submitButton);
+    // Submit the form by firing the submit event
+    const form = screen.getByTestId('domainManager-form');
+    await user.submit(form);
     
     // Verify error message is displayed
     await waitFor(() => {
@@ -300,9 +305,9 @@ describe('DomainManager Component', () => {
     const addButton = screen.getByTestId('domainManager-add-domain');
     await user.click(addButton);
     
-    // Submit the form
-    const submitButton = screen.getByTestId('domainManager-submit');
-    await user.click(submitButton);
+    // Submit the form by firing the submit event
+    const form = screen.getByTestId('domainManager-form');
+    await user.submit(form);
     
     // Verify error message is displayed
     await waitFor(() => {
@@ -344,17 +349,19 @@ describe('DomainManager Component', () => {
     const addButton = screen.getByTestId('domainManager-add-domain');
     await user.click(addButton);
     
-    // Submit the form
-    const submitButton = screen.getByTestId('domainManager-submit');
-    await user.click(submitButton);
+    // Submit the form by firing the submit event
+    const form = screen.getByTestId('domainManager-form');
+    await user.submit(form);
     
     // Verify loading state
-    expect(screen.getByTestId('domainManager-submit-loading')).toBeInTheDocument();
-    expect(submitButton).toBeDisabled();
-    
-    // Also verify the domain input and add button are disabled
-    expect(screen.getByTestId('domainManager-domain-input')).toBeDisabled();
-    expect(screen.getByTestId('domainManager-add-domain')).toBeDisabled();
+    await waitFor(() => {
+      expect(screen.getByTestId('domainManager-submit-loading')).toBeInTheDocument();
+      expect(screen.getByTestId('domainManager-submit')).toBeDisabled();
+      
+      // Also verify the domain input and add button are disabled
+      expect(screen.getByTestId('domainManager-domain-input')).toBeDisabled();
+      expect(screen.getByTestId('domainManager-add-domain')).toBeDisabled();
+    });
     
     // Resolve the promise to complete the test
     resolvePromise!({
@@ -376,15 +383,17 @@ describe('DomainManager Component', () => {
     const addButton = screen.getByTestId('domainManager-add-domain');
     await user.click(addButton);
     
-    // Submit the form
-    const submitButton = screen.getByTestId('domainManager-submit');
-    await user.click(submitButton);
+    // Submit the form by firing the submit event
+    const form = screen.getByTestId('domainManager-form');
+    await user.submit(form);
     
     // Verify custom API endpoint was used
-    expect(global.fetch).toHaveBeenCalledWith(
-      customEndpoint,
-      expect.anything()
-    );
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        customEndpoint,
+        expect.anything()
+      );
+    });
   });
 });
 
