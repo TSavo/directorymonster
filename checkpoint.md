@@ -90,15 +90,13 @@ I've successfully implemented a fixed version of the E2E login test that aligns 
    - While running the tests, we discovered that the API might be using a different mechanism to detect users than we initially expected
    - The AuthContainer is working correctly, as evidenced by the loading state we observed on the login page
 
-2. 🚧 Implementing E2E tests for admin dashboard (Priority: High)
-   - Will create comprehensive tests for the admin dashboard functionality
-   - Planning to test navigation, component rendering, and interactive elements
-   - Will verify proper authorization and access control mechanisms
-   - Need to ensure consistent rendering across different screen sizes
-   - Modified ZKP adapter to automatically approve authentication for test user
-   - Fixed the ActivityFeed component by adding 'use client' directive
-   - Made E2E tests more resilient to component implementation changes
-   - All 8 E2E tests in login.test.js now pass consistently
+2. 🚧 Implementing first-user.test.js E2E test (Priority: High)
+   - Created thorough test for the first user creation process
+   - Implemented tests for form validation and error handling
+   - Added test for successful user creation and dashboard redirection
+   - Detected issue with API's user detection mechanism - the AuthContainer component correctly checks for users with `kv.keys('user:*')`, but there might be an issue with how test users are initialized and detected
+   - Test passes through the loading state and confirms that the AuthContainer is rendering correctly
+   - The issue appears to be in how the API and AuthContainer detect the existence of users, rather than in the components themselves
 
 2. ✅ Implemented "First User Creation" functionality (Priority: High)
    - Created FirstUserSetup component with comprehensive form validation
