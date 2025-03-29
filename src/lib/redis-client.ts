@@ -1,4 +1,12 @@
-import { Redis } from 'ioredis';
+// Dynamically import Redis to avoid 'dns' module issues in browser
+let Redis: any = null;
+
+// Only import Redis in server context
+if (typeof window === 'undefined') {
+  // This import style is compatible with Next.js and doesn't break browser builds
+  const ioredis = require('ioredis');
+  Redis = ioredis.Redis;
+}
 
 // Enable in-memory fallback for development without Redis
 const USE_MEMORY_FALLBACK = true;
@@ -157,7 +165,7 @@ class MemoryRedis {
 console.log('Setting up Redis client...');
 let redis;
 
-if (USE_MEMORY_FALLBACK) {
+if (USE_MEMORY_FALLBACK || typeof window !== 'undefined') {
   // Use singleton pattern for memory redis
   if (!global.redisClient) {
     global.redisClient = new MemoryRedis();
@@ -169,7 +177,7 @@ if (USE_MEMORY_FALLBACK) {
   console.log(`Connecting to Redis at ${redisUrl}`);
   
   try {
-    if (!global.redisClient) {
+    if (!global.redisClient && Redis) {
       global.redisClient = new Redis(redisUrl, {
         retryStrategy: (times) => {
           console.log(`Redis connection attempt ${times}`);
@@ -181,6 +189,9 @@ if (USE_MEMORY_FALLBACK) {
           return Math.min(times * 100, 30000);
         },
       });
+    } else if (!Redis) {
+      // Fallback to memory Redis if Redis class is not available
+      global.redisClient = new MemoryRedis();
     }
     redis = global.redisClient;
   } catch (error) {
