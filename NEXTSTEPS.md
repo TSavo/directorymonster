@@ -1,123 +1,77 @@
-# Next Steps for DirectoryMonster E2E Testing
+# Next Steps for DirectoryMonster E2E Test Fixes
 
-## Current Test Status
+## Recent Fixes
 
-### Implemented Tests
-1. ✅ **First User Setup Test**: All tests passing
-   - Successfully redirects to setup when needed
-   - Shows validation errors correctly
-   - Creates first admin user
-   - Shows normal login form after user creation
+### Component Import Path Issue (FIXED)
+- Created missing `index.ts` file in `src/components/admin/sites` directory
+- Added exports for `SiteForm`, `SiteSettings`, `SEOSettings`, and `DomainManager` components
+- This resolves the module import errors that were preventing correct page rendering
 
-2. ✅ **Login Test**: All tests passing
-   - Login page renders correctly
-   - Validates form inputs
-   - Shows errors for incorrect credentials
-   - Successfully logs in with valid credentials
-   - Handles "Remember Me" functionality
+## Remaining Issues to Fix
 
-3. ✅ **Category Management Test**: Implementation complete
-   - Loads category listing page
-   - Creates top-level categories
-   - Creates child categories with parent-child relationships
-   - Edits existing categories
-   - Deletes categories
-   - This test is ready to run
+### 1. Fix Authentication Workflow
+- **Priority: HIGH**
+- Debug the ZKP (Zero-Knowledge Proof) authentication process
+- The tests show that ZKP proof generation works but server returns 401 Unauthorized
+- Actions:
+  - Review authentication API in the server logs
+  - Verify test credentials (admin/password123456) in the database
+  - Test authentication manually in the UI to isolate the issue
+  - Consider adding a direct authentication method for tests that bypasses ZKP
 
-### Tests with Known Issues
-1. ⚠️ **Homepage Test**:
-   - Title mismatch errors
-   - Navigation menu detection issues
-   - Responsive tests failing to find elements
-   - CSS selector issues
-   - Needs updating with more flexible detection strategies
+### 2. Fix E2E Test Timeouts
+- **Priority: HIGH**
+- Navigation timeouts (5000ms) are too short for the test environment
+- Actions:
+  - Increase the navigation timeout to at least 30000ms in login.test.js and categories.test.js
+  - Add more detailed logging during navigation
+  - Add page load checks before proceeding with tests
 
-2. ⚠️ **Admin Dashboard Test**:
-   - Syntax errors in configuration
-   - Missing environment variable names
-   - Incomplete implementation
+### 3. Fix Database Seeding
+- **Priority: MEDIUM**
+- The tests can't find the sites needed for testing (fishing-gear, hiking-gear)
+- Actions:
+  - Ensure seed script is running before tests
+  - Modify tests to use sites that exist in the seed data
+  - Add dynamic site creation in the tests if needed
+  - Add verification that database has the correct data before tests run
 
-## Next Steps (Prioritized)
+### 4. Standardize Component Architecture
+- **Priority: MEDIUM**
+- Many component directories are missing their index.ts files
+- Actions:
+  - Check all component directories for missing index.ts files
+  - Create missing index.ts files for correct exports
+  - Document the pattern in the codebase
+  - Consider adding linting rules to enforce this pattern
 
-### Short-term (Next week)
-1. 🚧 **Run Category Management E2E test**
-   - Run with `npm run test:e2e:categories`
-   - Fix any issues encountered during test runs
-   - Update selectors if necessary based on actual UI elements
-   - Document results and any remaining issues
+### 5. Add CI Pipeline Integration
+- **Priority: LOW**
+- Set up proper CI workflow for tests
+- Actions:
+  - Configure GitHub Actions workflow
+  - Set up proper environment for test runs
+  - Add test reporting for better visibility
+  - Create separate workflows for unit and E2E tests
 
-2. 🚧 **Fix Homepage Test Issues**
-   - Update title expectations to be more flexible
-   - Fix navigation detection with multiple selector strategies
-   - Implement better responsive detection
-   - Replace problematic CSS selectors with more reliable ones
+## How to Run Tests
 
-3. 🚧 **Complete Admin Dashboard Test**
-   - Fix syntax errors and configuration issues
-   - Add proper environment variable handling
-   - Implement complete test coverage for dashboard functionality
-   - Include tests for statistics, activity feed, and navigation
+### Login Tests
+```bash
+npm run test:e2e:login
+```
 
-### Medium-term (Next 2 weeks)
-1. 🚧 **Create Listings Management E2E Test**
-   - Implement tests for listing creation
-   - Add editing functionality tests
-   - Test category assignment
-   - Include validation tests
-   - Test filters and search
+### Category Management Tests
+```bash
+npm run test:e2e:categories
+```
 
-2. 🚧 **Create Site Settings E2E Test**
-   - Test domain configuration
-   - Test SEO settings
-   - Test general site settings
-   - Test image upload
+### Run All E2E Tests
+```bash
+npm run test:e2e
+```
 
-3. 🚧 **Fix Template Files Issues**
-   - Fix template syntax in SiteForm test files
-   - Correct broken imports in index test files
-   - Fix incomplete string definitions
-
-### Long-term (Next month)
-1. 🚧 **Implement CI/CD Pipeline Integration**
-   - Set up GitHub Actions workflow
-   - Configure automated test running
-   - Add test reporting
-   - Implement notification systems
-
-2. 🚧 **Implement Performance Testing**
-   - Add load time measurements
-   - Test response times for critical operations
-   - Add memory usage monitoring
-   - Implement network request timing
-
-3. 🚧 **Improve Test Coverage**
-   - Target 80% overall coverage
-   - Add tests for edge cases
-   - Implement error handling tests
-   - Add accessibility testing
-
-## Technical Recommendations
-
-1. **Docker Environment Stability**
-   - Ensure Redis persistence is properly configured
-   - Add health checks for all containers
-   - Implement retry mechanisms for database connections
-   - Add proper container shutdown procedures
-
-2. **Test Reliability**
-   - Use more flexible selectors for UI elements
-   - Implement proper waits and timeouts
-   - Add better error handling and reporting
-   - Use more specific assertions
-
-3. **Test Maintenance**
-   - Improve helper functions for common operations
-   - Better organize test files by functionality
-   - Add more detailed comments and documentation
-   - Create test utility libraries for shared functions
-
-4. **Monitoring and Reporting**
-   - Add detailed test run reports
-   - Implement test result visualization
-   - Set up automated reporting via email/Slack
-   - Create dashboards for test coverage trends
+## Notes
+- Run the seed script before tests: `npm run seed`
+- Make sure the server is running before E2E tests: `npm run dev &`
+- Check Redis connection if database issues persist
