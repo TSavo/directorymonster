@@ -177,6 +177,7 @@ npm run dev &
    - Created dev-reload.bat for quick restarts during development
    - Created rebuild-dev.bat for full rebuilds when dependencies change
    - This allows for live editing without requiring container rebuilds
+   - Verified that changes to local files are immediately reflected in the running container
 
 13. 👌 Next development phase
    - Expand E2E test coverage to other functionality
