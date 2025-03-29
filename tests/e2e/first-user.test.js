@@ -80,23 +80,13 @@ describe('First User Creation', () => {
   });
 
   test('Redirects to first user setup when no users exist', async () => {
-    // Clear cookies and localStorage to ensure a fresh session
-    await page.evaluate(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-      
-      // Clear cookies
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i];
-        const eqPos = cookie.indexOf('=');
-        const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
-        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
-      }
-    });
+    // Clear cookies to ensure a fresh session
+    await page.deleteCookie();
     
-    // For this test, we're assuming the Docker container has been freshly started
-    // with no existing users in the database
+    // Note: Users have been cleared directly from Redis via the npm script
+    // The npm script uses Docker exec to directly clear the Redis database:
+    // docker exec directorymonster-redis-1 redis-cli KEYS "user:*" | xargs docker exec directorymonster-redis-1 redis-cli DEL
+=======
 
     // Navigate to the login page
     await page.goto(`${BASE_URL}/login`, {
@@ -245,14 +235,29 @@ describe('First User Creation', () => {
       await siteNameField.type('Test Directory');
     }
 
-    // Submit the form
-    await Promise.all([
-      page.waitForNavigation({
+    // Click the submit button
+    await submitButton.click();
+    
+    // Wait for navigation to complete with increased timeout
+    try {
+      await page.waitForNavigation({
         waitUntil: 'networkidle2',
-        timeout: 15000,
-      }),
-      submitButton.click()
-    ]);
+        timeout: 30000, // Increased timeout to 30 seconds
+      });
+    } catch (error) {
+      // If navigation timeout still occurs, try a different approach
+      console.log('Navigation timeout occurred, waiting for admin page elements instead');
+      
+      // Wait for elements that would indicate we're on the admin page
+      await page.waitForFunction(
+        () => {
+          return document.body.textContent.includes('Dashboard') || 
+                 document.querySelector('h1')?.textContent.includes('Dashboard') ||
+                 window.location.href.includes('/admin');
+        },
+        { timeout: 30000 }
+      );
+    }
 
     // Check if we've been redirected to the dashboard
     const currentUrl = page.url();

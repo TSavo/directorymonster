@@ -21,6 +21,26 @@ The E2E tests can be configured with the following environment variables:
 - `NODE_ENV`: Set to `production` to run tests in headless mode, otherwise browser will be visible
 - `DEBUG`: Set to any value to enable console logging from the browser
 
+### Database Preparation
+
+Some tests require a specific database state. We use Docker commands to directly manipulate the Redis database:
+
+#### Clearing Users
+
+For tests that need to start with a clean database (like the first user setup test), use:
+
+```bash
+# Clear all users from Redis
+npm run clear-redis-users
+```
+
+This script works by:
+1. Connecting to the Redis container directly
+2. Finding all keys with the "user:" prefix
+3. Deleting those keys from the database
+
+The advantage of this approach is that it bypasses API and browser security restrictions by operating directly at the database level.
+
 ## Running Tests
 
 ### Running All E2E Tests
