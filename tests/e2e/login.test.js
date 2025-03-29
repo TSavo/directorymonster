@@ -1,6 +1,7 @@
 /**
  * @file E2E tests for the login page functionality
  * @description Tests the user login flow using Puppeteer
+ * @jest-environment node
  */
 
 const puppeteer = require('puppeteer');
