@@ -80,9 +80,23 @@ describe('First User Creation', () => {
   });
 
   test('Redirects to first user setup when no users exist', async () => {
-    // First, we need to make sure no users exist
-    // For testing, we would normally use a test hook to clear the database
-    // but for now we'll assume we're starting with an empty database
+    // Clear cookies and localStorage to ensure a fresh session
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear cookies
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf('=');
+        const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+      }
+    });
+    
+    // For this test, we're assuming the Docker container has been freshly started
+    // with no existing users in the database
 
     // Navigate to the login page
     await page.goto(`${BASE_URL}/login`, {
@@ -97,7 +111,8 @@ describe('First User Creation', () => {
         pageContent.includes('First User Setup') ||
         pageContent.includes('Create Admin Account') ||
         pageContent.includes('Initialize System') ||
-        pageContent.includes('Create First User')
+        pageContent.includes('Create First User') ||
+        pageContent.includes('Setup My Account')
       );
     });
 

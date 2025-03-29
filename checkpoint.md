@@ -98,6 +98,9 @@ I've successfully implemented a fixed version of the E2E login test that aligns 
    - Added ZKP utility functions for secure authentication
    - Implemented proper validation, error handling, and security measures
    - Modified login page to use the new AuthContainer component
+   - Added API endpoint for clearing users (for testing purposes)
+   - Fixed redis-client implementation to remove default user seeding
+   - Running comprehensive E2E tests to validate functionality
 
 ### Next Steps
 1. 🚧 Implement additional E2E tests (Priority: High)

@@ -21,17 +21,6 @@ declare global {
 if (!global.inMemoryRedisStore) {
   global.inMemoryRedisStore = new Map<string, any>();
   console.log('Created global in-memory Redis store');
-  
-  // Add test user for E2E tests
-  const testUser = {
-    username: 'testuser',
-    password: 'password123456',
-    role: 'admin',
-    id: '1',
-    publicKey: 'test-public-key'
-  };
-  global.inMemoryRedisStore.set('user:testuser', JSON.stringify(testUser));
-  console.log('Added test user to in-memory Redis store');
 }
 
 // In-memory Redis implementation
@@ -228,6 +217,27 @@ if (USE_MEMORY_FALLBACK || typeof window !== 'undefined') {
 
 // Export Redis client directly
 export { redis };
+
+/**
+ * Helper function to clear all users from the database
+ * This is useful for testing the first user setup flow
+ */
+export const clearUsers = async (): Promise<void> => {
+  try {
+    // Get all user keys
+    const userKeys = await redis.keys('user:*');
+    
+    if (userKeys.length > 0) {
+      // Delete each user key
+      await redis.del(...userKeys);
+      console.log(`Cleared ${userKeys.length} users from the database`);
+    } else {
+      console.log('No users found to clear');
+    }
+  } catch (error) {
+    console.error('Error clearing users:', error);
+  }
+};
 
 // Also export a simple KV-like interface for compatibility with existing code
 export const kv = {
