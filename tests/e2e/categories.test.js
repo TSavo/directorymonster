@@ -1322,3 +1322,5 @@ describe('Category Management', () => {
     expect(categoryExists).toBe(false);
   }, DEFAULT_TIMEOUT);
 
+});
+
