@@ -10,6 +10,10 @@
     "lint": "next lint",
     "test": "jest",
     "test-generator": "node test-generator/index.js",
+    "test-handlebars": "node test-generator/test-handlebars.js",
+    "test:typescript": "node test-generator/test-handlebars.js",
+    "compile-ts": "tsc",
+    "test-template": "tsc test-template-method.ts --outDir ./dist --downlevelIteration --esModuleInterop --target es2022 --module es2022 --skipLibCheck && node dist/test-template-method.js",
     "test:watch": "jest --watch",
     "test:components": "jest \"tests/admin/**/*.test.tsx\"",
     "test:components:watch": "jest \"tests/admin/**/*.test.tsx\" --watch",
@@ -64,12 +68,13 @@
     "autoprefixer": "^10.4.16",
     "eslint": "^8.52.0",
     "eslint-config-next": "^14.0.0",
+    "handlebars": "^4.7.8",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
     "tailwindcss": "^3.3.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.2"
   }
 }
