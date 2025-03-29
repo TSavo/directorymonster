@@ -1,8 +1,6 @@
 ## Current Status - [2025-03-28]
 
 ### Completed
-- ✅ Implemented comprehensive DomainManager.test.tsx with proper Next.js router mocking
-=======
 1. ✅ Installed Handlebars and integrated with component scaffolding
 2. ✅ Converted core modules to TypeScript with proper types
 3. ✅ Fixed TypeScript errors in core modules
@@ -19,17 +17,11 @@
 14. ✅ Verified StatisticCards component tests with 91.66% code coverage
 15. ✅ Fixed Next.js router mocking in test environment
 16. ✅ Improved domain validation for tests
-
-### In Progress
-- Testing Site Management Components - found issues:
-  - DomainManager tests failing due to Next.js router issues in test environment
-  - useDomains hook tests have minor validation failures (11/14 tests passing)
-  - Need to modify tests to properly mock Next.js router
-  
-### Issues Found
-1. There's a conflict with Next.js router in test environment - requires mocking
-2. Some validation tests in useDomains hook are failing
-3. DomainManager tests cannot run properly due to router dependency
+17. ✅ Implemented comprehensive DomainManager.test.tsx with proper Next.js router mocking
+18. ✅ Fixed DomainManager tests by using proper hook testing approach
+19. ✅ Achieved good code coverage for useDomains hook (87.5%)
+20. ✅ Achieved good code coverage for DomainManager component (76.47%)
+21. ✅ All DomainManager and useDomains tests now passing
 
 ### Next Steps
 1. Convert remaining templates to Handlebars
@@ -37,6 +29,9 @@
 3. Consolidate test patterns and improve testing documentation
 
 ### Recent Completed Items
+- Successfully implemented and fixed the DomainManager tests with proper router mocking
+- Achieved high code coverage for both the component and hook
+- Used direct hook testing approach to overcome Next.js router issues
 - Implemented complete Admin UI pages (dashboard, listings, categories, sites, settings)
 - Added ActivityFeed component with useActivityFeed hook
 - Created StatisticCards component with useSiteMetrics hook
