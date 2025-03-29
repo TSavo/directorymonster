@@ -8,6 +8,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Install specific packages needed for testing
+RUN npm install uuid jsonwebtoken
+
 # Next.js telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 
