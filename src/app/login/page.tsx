@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ZKPLogin } from '@/components/admin/auth';
+import { AuthContainer } from '@/components/admin/auth';
 
 export default function LoginPage() {
   return (
@@ -13,7 +13,7 @@ export default function LoginPage() {
         <p className="mt-2 text-center text-sm text-gray-600">
           Zero-Knowledge Proof Authentication
         </p>
-        <ZKPLogin redirectPath="/admin" />
+        <AuthContainer redirectPath="/admin" />
       </div>
     </div>
   );
