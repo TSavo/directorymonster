@@ -288,14 +288,18 @@ describe('Login Page', () => {
     // Actually submit the form
     await submitButton.click();
     
-    // Wait for any error element to appear - use a more generic approach
+    // Wait a short moment for the form submission to be processed
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    // Wait for any error element to appear - use a more specific approach for the ZKPLogin component
     console.log('Waiting for error message after submitting invalid credentials...');
     try {
+      // First try the specific error message selector from ZKPLogin component
       await page.waitForFunction(() => {
-        // Look for common error patterns in the DOM, including the specific one used in ZKPLogin
-        const errorElement = document.querySelector('.text-red-600, .text-red-700, .bg-red-100, [role="alert"], .error, .mb-4.p-3.bg-red-100');
-        return errorElement !== null;
-      }, { timeout: 5000 }); // Set a shorter timeout of 5 seconds
+        // ZKPLogin uses p.mt-1.text-sm.text-red-600 for validation errors
+        // And div.mb-4.p-3.bg-red-100 for authentication errors
+        return document.querySelector('p.mt-1.text-sm.text-red-600, div.mb-4.p-3.bg-red-100, div[role="alert"]') !== null;
+      }, { timeout: 3000 }); // Reduced timeout to 3 seconds
       console.log('Error message found!');
     } catch (error) {
       console.log('Error detection timed out:', error.message);
@@ -448,7 +452,7 @@ describe('Login Page', () => {
       
       // Give it a little extra time to process
       console.log('Waiting additional 1 second for processing...');
-      await page.waitForTimeout(1000);
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Take screenshot for verification
       await page.screenshot({ path: 'login-success.png' });
