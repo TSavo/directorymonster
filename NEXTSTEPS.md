@@ -1,131 +1,123 @@
-# DirectoryMonster E2E Test Results & Next Steps
+# Next Steps for DirectoryMonster E2E Testing
 
-## E2E Test Status Report
+## Current Test Status
 
-### Successful Tests
-- **First User Setup Tests**: All 4 tests passing successfully
-  - Correctly redirects to setup when needed
-  - Shows validation errors
-  - Successfully creates first admin user
-  - Shows normal login form after user creation
+### Implemented Tests
+1. ✅ **First User Setup Test**: All tests passing
+   - Successfully redirects to setup when needed
+   - Shows validation errors correctly
+   - Creates first admin user
+   - Shows normal login form after user creation
 
-### Tests with Issues
-1. **Login E2E Test**:
-   - 7 of 8 tests passing successfully
-   - Navigation timeout (15000ms) after form submission with valid credentials
-   - Login functionality works but the test needs to handle the navigation process better
-   - May need increased timeouts or more flexible navigation handling
+2. ✅ **Login Test**: All tests passing
+   - Login page renders correctly
+   - Validates form inputs
+   - Shows errors for incorrect credentials
+   - Successfully logs in with valid credentials
+   - Handles "Remember Me" functionality
 
-2. **Homepage E2E Test**:
-   - Multiple failures including:
-     - Title mismatch (expected "mydirectory.com", got "Directory Monster - SEO-Focused Directory Platform")
-     - Navigation menu detection failing
-     - Responsive design tests failing to find navigation elements
-     - CSS selector issues with non-standard selectors like `:contains()`
+3. ✅ **Category Management Test**: Implementation complete
+   - Loads category listing page
+   - Creates top-level categories
+   - Creates child categories with parent-child relationships
+   - Edits existing categories
+   - Deletes categories
+   - This test is ready to run
 
-3. **Admin Dashboard Test**:
-   - Syntax error in the file - incomplete configuration
-   - `const SITE_DOMAIN = process.env.` missing the environment variable name
+### Tests with Known Issues
+1. ⚠️ **Homepage Test**:
+   - Title mismatch errors
+   - Navigation menu detection issues
+   - Responsive tests failing to find elements
+   - CSS selector issues
+   - Needs updating with more flexible detection strategies
 
-### Template/Test Issues
-- Several test files have template syntax that wasn't properly processed:
-  - `SiteForm.validation.test.tsx` and `SiteForm.submission.test.tsx` contain handlebars syntax: `{{#if category}}`
-  - Incomplete string in `ZKPLogin.enhanced.test.tsx`
-  - Broken imports in index test files that cannot find test modules
+2. ⚠️ **Admin Dashboard Test**:
+   - Syntax errors in configuration
+   - Missing environment variable names
+   - Incomplete implementation
 
-## Next Steps
+## Next Steps (Prioritized)
 
-### 1. Fix Login Test Navigation Issue
-```javascript
-// Add more resilient navigation handling:
-await submitButton.click();
+### Short-term (Next week)
+1. 🚧 **Run Category Management E2E test**
+   - Run with `npm run test:e2e:categories`
+   - Fix any issues encountered during test runs
+   - Update selectors if necessary based on actual UI elements
+   - Document results and any remaining issues
 
-try {
-  // Try multiple strategies for detecting successful navigation
-  await Promise.race([
-    page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }),
-    page.waitForSelector('[data-testid="admin-dashboard"], .admin-header, .dashboard', { timeout: 30000 })
-  ]);
-  
-  // Consider alternative verification methods if navigation times out
-  const isLoggedIn = await page.evaluate(() => {
-    return document.querySelector('[data-testid="admin-dashboard"], .admin-header, .dashboard') !== null ||
-           !document.querySelector('[data-testid="login-form"], form');
-  });
-  
-  expect(isLoggedIn).toBe(true);
-} catch (error) {
-  // Take screenshot for debugging
-  await page.screenshot({ path: 'login-timeout.png' });
-  console.error('Navigation detection error:', error.message);
-  
-  // Add fallback verification
-  const currentUrl = page.url();
-  expect(currentUrl).not.toContain('/login');
-}
-```
+2. 🚧 **Fix Homepage Test Issues**
+   - Update title expectations to be more flexible
+   - Fix navigation detection with multiple selector strategies
+   - Implement better responsive detection
+   - Replace problematic CSS selectors with more reliable ones
 
-### 2. Fix Admin Dashboard Test
-```javascript
-// Complete the environment configuration
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-const SITE_DOMAIN = process.env.SITE_DOMAIN || 'mydirectory.com'; // Add missing variable name
-const TEST_USER = process.env.TEST_USER || 'testuser';
-const TEST_PASSWORD = process.env.TEST_PASSWORD || 'password123456';
-```
+3. 🚧 **Complete Admin Dashboard Test**
+   - Fix syntax errors and configuration issues
+   - Add proper environment variable handling
+   - Implement complete test coverage for dashboard functionality
+   - Include tests for statistics, activity feed, and navigation
 
-### 3. Update Homepage Test
-```javascript
-// Update title expectation
-const title = await page.title();
-expect(title).toContain('Directory Monster'); // More flexible title check
+### Medium-term (Next 2 weeks)
+1. 🚧 **Create Listings Management E2E Test**
+   - Implement tests for listing creation
+   - Add editing functionality tests
+   - Test category assignment
+   - Include validation tests
+   - Test filters and search
 
-// Improve navigation detection
-const navExists = await page.evaluate(() => {
-  // Check for any navigation element using multiple strategies
-  return Boolean(
-    document.querySelector('[data-testid="navigation"]') ||
-    document.querySelector('nav') ||
-    document.querySelector('header a') ||
-    document.querySelectorAll('a').length > 3
-  );
-});
-expect(navExists).toBe(true);
+2. 🚧 **Create Site Settings E2E Test**
+   - Test domain configuration
+   - Test SEO settings
+   - Test general site settings
+   - Test image upload
 
-// Fix CSS selector for copyright/footer
-const footerExists = await page.evaluate(() => {
-  return Boolean(
-    document.querySelector('footer') ||
-    document.querySelector('[data-testid="footer"]') ||
-    document.querySelector('.footer')
-  );
-});
-expect(footerExists).toBe(true);
-```
+3. 🚧 **Fix Template Files Issues**
+   - Fix template syntax in SiteForm test files
+   - Correct broken imports in index test files
+   - Fix incomplete string definitions
 
-### 4. Fix Template Files
-Identify and fix all files with template syntax that weren't properly processed. Example fixes:
+### Long-term (Next month)
+1. 🚧 **Implement CI/CD Pipeline Integration**
+   - Set up GitHub Actions workflow
+   - Configure automated test running
+   - Add test reporting
+   - Implement notification systems
 
-```javascript
-// From:
-import { {SiteForm} } from '@/components/{{#if category}}{admin/sites}/{{/if}}{SiteForm}';
+2. 🚧 **Implement Performance Testing**
+   - Add load time measurements
+   - Test response times for critical operations
+   - Add memory usage monitoring
+   - Implement network request timing
 
-// To:
-import { SiteForm } from '@/components/admin/sites/SiteForm';
-```
+3. 🚧 **Improve Test Coverage**
+   - Target 80% overall coverage
+   - Add tests for edge cases
+   - Implement error handling tests
+   - Add accessibility testing
 
-Complete incomplete tests like the ZKPLogin test with unterminated string.
+## Technical Recommendations
 
-### 5. Implementation Strategy
-1. First fix all syntax errors in test files 
-2. Then fix the navigation and timeout issues in login tests
-3. Update homepage tests with more flexible structure detection
-4. Finalize and complete admin-dashboard.test.js
-5. Run tests individually to ensure each passes
-6. Finally run the full test suite
+1. **Docker Environment Stability**
+   - Ensure Redis persistence is properly configured
+   - Add health checks for all containers
+   - Implement retry mechanisms for database connections
+   - Add proper container shutdown procedures
 
-### Future Enhancements
-- Add more robust error reporting with screenshots
-- Create detailed test reports for each run
-- Implement test fixtures for consistent database state
-- Add CI/CD integration for automated test runs
+2. **Test Reliability**
+   - Use more flexible selectors for UI elements
+   - Implement proper waits and timeouts
+   - Add better error handling and reporting
+   - Use more specific assertions
+
+3. **Test Maintenance**
+   - Improve helper functions for common operations
+   - Better organize test files by functionality
+   - Add more detailed comments and documentation
+   - Create test utility libraries for shared functions
+
+4. **Monitoring and Reporting**
+   - Add detailed test run reports
+   - Implement test result visualization
+   - Set up automated reporting via email/Slack
+   - Create dashboards for test coverage trends
