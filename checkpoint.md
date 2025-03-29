@@ -181,7 +181,14 @@ npm run dev &
    - Created comprehensive DOCKER-DEV.md documentation
    - Verified that file changes are detected in real-time without rebuilding
 
-13. 👌 Next development phase
+13. ✅ Documentation updates for Docker development workflow
+   - Updated README.md to emphasize Docker for development testing with hot reloading
+   - Updated CLAUDE.md to make Docker development instructions more prominent
+   - Added clear instructions to always start Docker dev first using docker compose
+   - Added references to convenience scripts (start-dev.bat, dev-reload.bat, rebuild-dev.bat)
+   - Reorganized development best practices to prioritize Docker workflow
+
+14. 👌 Next development phase
    - Expand E2E test coverage to other functionality
    - Improve CI/CD pipeline for automated testing
    - Enhance Python scraper integration

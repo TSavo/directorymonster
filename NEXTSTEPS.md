@@ -135,7 +135,7 @@ npx jest "tests/e2e/first-user.test.js" --testTimeout=60000
 - Authentication flow working properly in development with ZKP bypass
 - First user setup creates administrator accounts correctly
 
-## Docker Development Environment Improvements ✅
+## Docker Development Environment Improvements ✅ (Documentation Updated)
 
 ### 1. Configuration Changes
 - Updated docker-compose.yml to mount the entire project directory
@@ -153,12 +153,24 @@ npx jest "tests/e2e/first-user.test.js" --testTimeout=60000
   REM Full rebuild for dependency changes
   rebuild-dev.bat
   ```
+- Created start-dev.bat for convenient Docker startup
+  ```bat
+  REM Start Docker development environment
+  start-dev.bat
+  ```
 
 ### 3. Development Workflow
-1. Make changes to local files
-2. Changes are immediately reflected in the running container
-3. If server needs to be restarted: `dev-reload.bat`
-4. If dependencies change: `rebuild-dev.bat`
+1. **ALWAYS START DOCKER DEV FIRST**: `start-dev.bat` or `docker-compose up -d`
+2. Make changes to local files
+3. Changes are immediately reflected in the running container with hot reloading
+4. If server needs to be restarted: `dev-reload.bat`
+5. If dependencies change: `rebuild-dev.bat`
+
+### 4. Documentation Updates ✅
+- Updated README.md with clear Docker development instructions
+- Updated CLAUDE.md to prioritize Docker development workflow
+- Added prominent warnings to start Docker first before development
+- Referenced the detailed DOCKER-DEV.md documentation
 
 ## Next Development Phase 🚀
 

@@ -33,6 +33,10 @@ DirectoryMonster consists of two main components working together:
 
 ### Local Development
 
+**⚠️ IMPORTANT: The recommended approach is to use Docker for development (see section below). Local development without Docker may lead to inconsistent behavior, especially with Redis and multitenancy features.**
+
+If you must develop without Docker, follow these steps:
+
 First, install dependencies:
 
 ```bash
@@ -57,22 +61,44 @@ This runs the server in the background so you can continue using your terminal. 
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Docker Development
+### Docker Development (Recommended Workflow)
 
-For a containerized development environment:
+**IMPORTANT:** Always use Docker for development testing. This project is configured with hot reloading to provide the best development experience. Always start Docker dev first before making any changes or running tests.
+
+For a containerized development environment with hot reloading:
 
 ```bash
-# Start the development environment in detached mode (background)
-docker-compose -f docker-compose.dev.yml up -d
+# Start the development environment (recommended approach)
+docker-compose up -d
 
 # View logs while running in detached mode
-docker-compose -f docker-compose.dev.yml logs -f
+docker-compose logs -f
 
 # Stop the development environment
-docker-compose -f docker-compose.dev.yml down
+docker-compose down
 ```
 
 The `-d` flag runs containers in the background (detached mode), which is recommended for development.
+
+This setup provides:
+- Hot reloading (file changes are automatically detected)
+- Proper Redis connection for database testing
+- Multi-tenant domain setup with hostname resolution
+- Consistent environment across all developers
+
+**Windows users:** Use the provided convenience scripts:
+```bash
+# Start development environment
+start-dev.bat
+
+# Restart the Next.js server without rebuilding
+dev-reload.bat
+
+# Completely rebuild when dependencies change
+rebuild-dev.bat
+```
+
+Refer to [DOCKER-DEV.md](DOCKER-DEV.md) for detailed information about the Docker development setup.
 
 ### Production Docker Build
 
