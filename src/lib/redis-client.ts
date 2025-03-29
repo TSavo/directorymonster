@@ -51,11 +51,19 @@ class MemoryRedis {
   }
   
   async keys(pattern: string): Promise<string[]> {
+    console.log(`[MemoryRedis] Searching for keys matching pattern: ${pattern}`);
     const wildcard = pattern.includes('*');
     const prefix = pattern.replace('*', '');
-    return Array.from(this.store.keys()).filter(k => 
+    
+    const allKeys = Array.from(this.store.keys());
+    console.log(`[MemoryRedis] All keys in store:`, allKeys);
+    
+    const matchingKeys = allKeys.filter(k => 
       wildcard ? k.startsWith(prefix) : k === pattern
     );
+    
+    console.log(`[MemoryRedis] Matching keys:`, matchingKeys);
+    return matchingKeys;
   }
   
   // Set operations
@@ -226,16 +234,30 @@ export const clearUsers = async (): Promise<void> => {
   try {
     // Get all user keys
     const userKeys = await redis.keys('user:*');
+    console.log('[clearUsers] Found user keys to clear:', userKeys);
     
     if (userKeys.length > 0) {
       // Delete each user key
-      await redis.del(...userKeys);
-      console.log(`Cleared ${userKeys.length} users from the database`);
+      if (redis instanceof MemoryRedis) {
+        // For memory Redis, delete each key individually
+        for (const key of userKeys) {
+          redis.store.delete(key);
+          console.log(`[clearUsers] Deleted key: ${key}`);
+        }
+      } else {
+        // For real Redis, delete all keys at once
+        await redis.del(...userKeys);
+      }
+      console.log(`[clearUsers] Cleared ${userKeys.length} users from the database`);
     } else {
-      console.log('No users found to clear');
+      console.log('[clearUsers] No users found to clear');
     }
+    
+    // Double-check user keys were cleared
+    const remainingUserKeys = await redis.keys('user:*');
+    console.log('[clearUsers] User keys after clearing:', remainingUserKeys);
   } catch (error) {
-    console.error('Error clearing users:', error);
+    console.error('[clearUsers] Error clearing users:', error);
   }
 };
 

@@ -22,6 +22,9 @@ export async function GET(request: NextRequest) {
     // Get all keys with the "user:" prefix
     const userKeys = await kv.keys('user:*');
     
+    // Debug output to identify existing keys
+    console.log('Checking for users, found keys:', userKeys);
+    
     // Return the result
     return NextResponse.json({
       success: true,

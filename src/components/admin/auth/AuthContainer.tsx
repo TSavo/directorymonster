@@ -19,6 +19,7 @@ export function AuthContainer({ redirectPath = '/admin' }: AuthContainerProps) {
     const checkForUsers = async () => {
       try {
         setIsLoading(true);
+        console.log('[AuthContainer] Checking for users...');
         
         // Get CSRF token or generate one
         const getCsrfToken = (): string => {
@@ -42,8 +43,10 @@ export function AuthContainer({ redirectPath = '/admin' }: AuthContainerProps) {
         
         // Get CSRF token
         const csrfToken = getCsrfToken();
+        console.log('[AuthContainer] Got CSRF token');
         
         // Make API request to check if users exist
+        console.log('[AuthContainer] Calling /api/auth/check-users');
         const response = await fetch('/api/auth/check-users', {
           headers: {
             'Content-Type': 'application/json',
@@ -53,16 +56,17 @@ export function AuthContainer({ redirectPath = '/admin' }: AuthContainerProps) {
         
         if (response.ok) {
           const data = await response.json();
+          console.log('[AuthContainer] Response from check-users:', data);
           setHasUsers(data.hasUsers);
         } else {
           // If there's an error, assume users exist for security
           // This prevents bypassing login if the API is down
-          console.error('Error checking for users:', response.statusText);
+          console.error('[AuthContainer] Error checking for users:', response.statusText);
           setHasUsers(true);
           setError('Error checking system status. Please try again later.');
         }
       } catch (err) {
-        console.error('Error checking for users:', err);
+        console.error('[AuthContainer] Error checking for users:', err);
         // Assume users exist for security
         setHasUsers(true);
         setError('Error checking system status. Please try again later.');

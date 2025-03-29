@@ -30,6 +30,17 @@ describe('First User Creation', () => {
 
   // Set up the browser and page before running tests
   beforeAll(async () => {
+    // Clear all users first to ensure we start with a clean state
+    console.log('Clearing all users before tests...');
+    try {
+      const clearResponse = await fetch(`${BASE_URL}/api/test/clear-users`, { 
+        method: 'POST' 
+      });
+      const clearResult = await clearResponse.json();
+      console.log('Clear users response:', clearResult);
+    } catch (error) {
+      console.error('Failed to clear users:', error);
+    }
     browser = await puppeteer.launch({
       // Run in non-headless mode during development for debugging
       headless: process.env.NODE_ENV === 'production',
