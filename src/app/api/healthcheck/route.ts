@@ -9,7 +9,7 @@ export async function GET() {
     version: process.env.NEXT_PUBLIC_APP_VERSION || '0.1.0',
     environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString(),
-    message: 'Live file editing is working!',
+    message: 'Hot reloading is confirmed working! Changes are detected without rebuilding.',
     services: {
       redis: redisStatus,
     },
