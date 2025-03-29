@@ -49,17 +49,33 @@ I've successfully implemented a fixed version of the E2E login test that aligns 
    - Added handling for variations in page structure between environments
    - Enhanced error message detection for authentication failures
 
+3. ✅ Identified server-side issues through Docker log analysis
+   - Confirmed SSR errors related to React hooks usage in server components
+   - Identified "Missing CSRF token in request" errors in authentication API
+   - Verified hostname resolution issues with "No site found for hostname: localhost" errors
+   - Documented cascade of 500 errors that occur after SSR hook errors
+
 ### Next Steps
-1. 🚧 Fix the Server-Side Rendering Issues
-   - Add 'use client' directives to components using React hooks
+1. 🚧 Fix the Server-Side Rendering Issues (Priority: Critical)
+   - Add 'use client' directives to these components:
+     - src/components/admin/dashboard/hooks/useActivityFeed.ts
+     - Other components importing useState/useEffect
    - Fix the CSRF token handling in auth API routes
-   - Fix the hostname/domain configuration for testing
-   - Address the "No site found for hostname: localhost" error
-2. 🚧 Update the ZKPLogin Component for Better Testability
-   - Add appropriate data-testid attributes to ZKPLogin component
+   - Create a proper middleware for CSRF token validation
+   - Update the ZKPLogin component to properly handle CSRF tokens
+
+2. 🚧 Fix Hostname Resolution (Priority: High)
+   - Update hostname configuration for local development and testing
+   - Add default site configuration for "localhost" domain 
+   - Modify the site-utils.ts file to handle test environments more gracefully
+   - Address the "No site found for hostname: localhost" error with proper fallbacks
+
+3. 🚧 Update the ZKPLogin Component for Better Testability (Priority: Medium)
+   - Add data-testid attributes to all interactive elements
    - Ensure consistent error message containers and classes
    - Standardize form validation error handling
-3. 🚧 Rebuild Docker container and run E2E tests
+
+4. 🚧 Rebuild Docker container and run E2E tests (Priority: Medium)
    - Rebuild the Docker container with the updated Dockerfile.dev
    - Run the login.test.js E2E tests to verify the fixes
    - Validate that the homepage.test.js E2E tests pass in the Docker environment
