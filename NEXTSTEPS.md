@@ -51,6 +51,74 @@ node scripts/create-test-sites.js
 npm run test:e2e
 ```
 
+## Detailed Run Instructions
+
+### Windows Environment
+
+```bat
+REM Make the rebuild-docker.bat script executable (Windows doesn't require chmod)
+
+REM Rebuild Docker completely
+rebuild-docker.bat
+
+REM Seed test data
+node scripts\create-test-sites.js
+
+REM Run E2E tests with the Windows batch script
+run-e2e-tests.bat
+```
+
+### Unix/Linux/macOS Environment
+
+```bash
+# Make the rebuild script executable
+chmod +x rebuild-docker.sh
+
+# Rebuild Docker completely
+./rebuild-docker.sh
+
+# Seed test data
+node scripts/create-test-sites.js
+
+# Run E2E tests
+npm run test:e2e
+```
+
+### Running Individual Tests
+
+```bash
+# Run login tests
+npx jest "tests/e2e/login.test.js" --testTimeout=60000
+
+# Run category management tests
+npx jest "tests/e2e/categories.test.js" --testTimeout=60000
+
+# Run first user setup test
+npx jest "tests/e2e/first-user.test.js" --testTimeout=60000
+```
+
+### Troubleshooting Tips
+
+1. **Redis Connection Issues**:
+   - Ensure Redis is running: `docker-compose ps`
+   - Check Redis logs: `docker-compose logs redis`
+   - Use Redis CLI: `docker-compose exec redis redis-cli ping`
+
+2. **Module Resolution Problems**:
+   - Check `/api/debug/module-paths` endpoint
+   - Verify Docker volume mounts
+   - Rebuild Docker completely with `rebuild-docker.bat` or `./rebuild-docker.sh`
+
+3. **Authentication Issues**:
+   - Check `/api/debug/auth-bypass` endpoint
+   - Verify NODE_ENV=development in Docker
+   - Check logs for ZKP verification details
+
+4. **404 Errors for Sites**:
+   - Verify test sites data with `node scripts/verify-seed-data.js`
+   - Check `/api/debug/redis-data` endpoint
+   - Use `/api/debug/site-resolver` to diagnose access issues
+
 ## Remaining Focus Areas
 
 ### 1. Test Results Analysis 🚧
