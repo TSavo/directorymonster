@@ -5,8 +5,11 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies - force clean install
 RUN npm ci
+
+# Explicitly install jsonwebtoken and other critical dependencies
+RUN npm install jsonwebtoken@9.0.2 ioredis@5.3.2 axios@1.8.4
 
 # Copy the rest of the code
 COPY . .
