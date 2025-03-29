@@ -289,12 +289,26 @@ describe('Login Page', () => {
     await submitButton.click();
     
     // Wait for any error element to appear - use a more generic approach
-    await page.waitForFunction(() => {
-      // Look for common error patterns in the DOM, including the specific one used in ZKPLogin
-      return document.querySelector('.text-red-600, .text-red-700, .bg-red-100, [role="alert"], .error, .mb-4.p-3.bg-red-100') !== null;
-    }, { timeout: LOGIN_TIMEOUT });
+    console.log('Waiting for error message after submitting invalid credentials...');
+    try {
+      await page.waitForFunction(() => {
+        // Look for common error patterns in the DOM, including the specific one used in ZKPLogin
+        const errorElement = document.querySelector('.text-red-600, .text-red-700, .bg-red-100, [role="alert"], .error, .mb-4.p-3.bg-red-100');
+        return errorElement !== null;
+      }, { timeout: 5000 }); // Set a shorter timeout of 5 seconds
+      console.log('Error message found!');
+    } catch (error) {
+      console.log('Error detection timed out:', error.message);
+      console.log('Taking screenshot of current state...');
+      await page.screenshot({ path: 'error-message-timeout.png' });
+      
+      // Dump the HTML content for debugging
+      const content = await page.content();
+      console.log('Page content preview:', content.substring(0, 500));
+    }
 
     // Verify some kind of error message is shown
+    console.log('Checking for visible error messages on the page...');
     const errorDisplayed = await page.evaluate(() => {
       // Check for any elements that could be error messages
       const errorSelectors = [
@@ -307,16 +321,45 @@ describe('Login Page', () => {
         '.mb-4.p-3'
       ];
       
+      const results = {};
+      
       for (const selector of errorSelectors) {
-        const element = document.querySelector(selector);
-        if (element && element.textContent.trim() !== '') {
-          return true;
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+          results[selector] = [];
+          elements.forEach(el => {
+            results[selector].push({
+              text: el.textContent.trim(),
+              visible: window.getComputedStyle(el).display !== 'none'
+            });
+          });
         }
       }
-      return false;
+      
+      // Log what we found for debugging
+      console.log('Error elements found:', JSON.stringify(results));
+      
+      // Return true if any matching elements with text are found
+      return Object.values(results).some(arr => 
+        arr.some(item => item.text !== '' && item.visible)
+      );
     });
+    
+    console.log('Error message displayed?', errorDisplayed);
 
-    expect(errorDisplayed).toBe(true);
+    // Check if we need to bypass the test due to timing issues
+    if (!errorDisplayed) {
+      console.log('WARNING: Could not find error message in expected time.');
+      // Take a screenshot to help debug
+      await page.screenshot({ path: 'no-error-message.png' });
+      
+      // Print the page content for better debugging
+      const content = await page.content();
+      console.log('Current page content snippet:', content.substring(0, 300));
+      console.log('Current URL:', await page.url());
+    }
+
+    expect(errorDisplayed).toBe(true, 'Error message should be displayed for incorrect credentials');
   }, 10000); // Extend timeout to 10 seconds
 
   test('Successfully logs in with valid credentials', async () => {
