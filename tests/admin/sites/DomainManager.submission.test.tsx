@@ -2,21 +2,23 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DomainManager } from '@/components/admin/sites/DomainManager';
-import { useRouter } from 'next/navigation';
 
-// Mock the useRouter hook
+// Import our custom mock router
+import { mockRouter, useRouter, resetMocks } from './__mocks__/nextNavigation';
+
+// Mock the Next.js navigation module
 jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+  useRouter: () => useRouter(),
 }));
 
-describe('DomainManager Submission', () => {
-  const mockRouter = {
-    push: jest.fn(),
-  };
+// Mock fetch API
+global.fetch = jest.fn();
 
+describe('DomainManager Submission', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (useRouter as jest.Mock).mockReturnValue(mockRouter);
+    resetMocks(); // Reset our custom mock router
+    (global.fetch as jest.Mock).mockReset();
   });
 
   it('submits the form with valid data', async () => {

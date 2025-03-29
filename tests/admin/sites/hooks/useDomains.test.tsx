@@ -64,9 +64,9 @@ describe('useDomains Hook', () => {
   it('validates and rejects invalid domains', () => {
     const { result } = renderHook(() => useDomains());
     
-    // Set invalid domain input
+    // Set invalid domain input - doesn't have a valid TLD
     act(() => {
-      result.current.setDomainInput('invalid');
+      result.current.setDomainInput('invalid-domain');
     });
     
     // Try to add domain
@@ -75,7 +75,7 @@ describe('useDomains Hook', () => {
     });
     
     // Check domain was not added
-    expect(result.current.domains).not.toContain('invalid');
+    expect(result.current.domains).not.toContain('invalid-domain');
     
     // Error should be set
     expect(result.current.errors.domainInput).toBe('Invalid domain format');
@@ -121,11 +121,13 @@ describe('useDomains Hook', () => {
     const { result } = renderHook(() => useDomains());
     
     // Try to submit without domains
+    let isValid;
     act(() => {
-      result.current.validateDomains();
+      isValid = result.current.validateDomains();
     });
     
     // Error should be set
+    expect(isValid).toBe(false);
     expect(result.current.errors.domains).toBe('At least one domain is required');
     
     // Add a domain and try again
@@ -135,7 +137,6 @@ describe('useDomains Hook', () => {
     });
     
     // Validate again
-    let isValid;
     act(() => {
       isValid = result.current.validateDomains();
     });
@@ -237,16 +238,16 @@ describe('useDomains Hook', () => {
   it('clears errors on input change', () => {
     const { result } = renderHook(() => useDomains());
     
-    // Set an error
+    // First simulate adding an invalid domain to trigger error
     act(() => {
-      result.current.setDomainInput('invalid');
+      result.current.setDomainInput('invalid-domain');
       result.current.addDomain();
     });
     
-    // Check error is set
+    // Make sure the error is set
     expect(result.current.errors.domainInput).toBe('Invalid domain format');
     
-    // Change input
+    // Change input to clear error
     act(() => {
       result.current.handleInputChange({
         target: { name: 'domainInput', value: 'example.com' }
