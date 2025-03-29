@@ -32,9 +32,83 @@ describe('Category Management', () => {
   // Helper functions
   async function loginAsAdmin() {
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle2' });
-    await page.type('#username', ADMIN_USERNAME);
-    await page.type('#password', ADMIN_PASSWORD);
-    await page.click('button[type="submit"]');
+    
+    // Check if we're on the first user setup page
+    const isFirstUserSetup = await page.evaluate(() => {
+      const pageContent = document.body.textContent;
+      return (
+        pageContent.includes('First User Setup') ||
+        pageContent.includes('Create Admin Account') ||
+        pageContent.includes('Initialize System') ||
+        pageContent.includes('Create First User') ||
+        pageContent.includes('Setup My Account')
+      );
+    });
+    
+    if (isFirstUserSetup) {
+      console.log('Detected first user setup page, setting up initial admin user');
+      
+      // Find all form fields for first user setup
+      const usernameField = await page.$('input[type="text"], input[id="username"], input[name="username"], input[id="email"], input[name="email"]');
+      const passwordField = await page.$('input[type="password"], input[id="password"], input[name="password"]');
+      const confirmPasswordField = await page.$('input[id="confirmPassword"], input[name="confirmPassword"], input[placeholder*="confirm"]');
+      const submitButton = await page.$('button[type="submit"], input[type="submit"]');
+      
+      // Optional fields that might be present in setup forms
+      const nameField = await page.$('input[id="name"], input[name="name"]');
+      const emailField = nameField ? await page.$('input[id="email"], input[name="email"]') : null;
+      const siteNameField = await page.$('input[id="siteName"], input[name="siteName"]');
+      
+      // Fill in required fields
+      await usernameField.type(ADMIN_USERNAME);
+      await passwordField.type(ADMIN_PASSWORD);
+      
+      // Fill optional fields if they exist
+      if (confirmPasswordField) {
+        await confirmPasswordField.type(ADMIN_PASSWORD);
+      }
+      
+      if (nameField) {
+        await nameField.type('Admin User');
+      }
+      
+      if (emailField) {
+        await emailField.type('admin@example.com');
+      }
+      
+      if (siteNameField) {
+        await siteNameField.type('Test Directory');
+      }
+      
+      // Click the submit button
+      await submitButton.click();
+      
+      // Wait for navigation to complete with increased timeout
+      try {
+        await page.waitForNavigation({
+          waitUntil: 'networkidle2',
+          timeout: 30000, // Increased timeout to 30 seconds
+        });
+      } catch (error) {
+        console.log('Navigation timeout occurred, waiting for admin page elements instead');
+        
+        await page.waitForFunction(
+          () => {
+            return document.body.textContent.includes('Dashboard') || 
+                  document.querySelector('h1')?.textContent.includes('Dashboard') ||
+                  window.location.href.includes('/admin');
+          },
+          { timeout: 30000 }
+        );
+      }
+      
+      console.log('First user setup completed');
+    } else {
+      console.log('On regular login page, logging in with admin credentials');
+      await page.type('#username', ADMIN_USERNAME);
+      await page.type('#password', ADMIN_PASSWORD);
+      await page.click('button[type="submit"]');
+    }
     
     try {
       await Promise.race([
@@ -50,6 +124,7 @@ describe('Category Management', () => {
     }
     
     const currentUrl = await page.url();
+    console.log(`After login, current URL: ${currentUrl}`);
     expect(currentUrl).toContain('/admin');
   }
 

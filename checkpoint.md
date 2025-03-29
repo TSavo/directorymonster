@@ -56,11 +56,69 @@
    - Added detailed console logging for easier debugging
 
 ### Next Steps
-1. 🚧 Run the categories E2E test (Priority: High)
-   - Execute the test using `npm run test:e2e:categories`
-   - Monitor for any errors or issues
-   - Fix any issues that arise during testing
-   - Update test documentation based on results
+1. ❌ Categories E2E test failed (Priority: High)
+   - Executed the test using `npm run test:e2e:categories`
+   - Test fails at the first step: "Category listing page loads correctly"
+   - The page doesn't seem to contain category management elements
+   - Error: Expected category management elements to be found (true) but got false
+   - All tests fail because they can't find the category management interface
+   
+   **Analysis of Issue:**
+   - Test successfully logs into admin dashboard
+   - Test navigates to `/admin/sites/fishing-gear/categories`
+   - The category interface elements are not being detected
+   - Possible causes:
+     1. The category management UI has changed and the selectors in the test no longer match
+     2. The category UI is not loading properly
+     3. CSS classes or data-testid attributes may have been renamed
+     4. The test might be running before the UI fully loads
+     5. The fishing-gear site may not be properly seeded or accessible
+     6. The backend API for categories may be failing
+     7. The test is getting stuck on the first user setup page and cannot proceed
+   
+   **Next Action Items:**
+   - Identified root cause: The categories test doesn't properly handle the first user setup page
+   - Need to modify the categories test to run first-user setup script before testing
+
+### Analysis of E2E Test Issue - [2025-03-29]
+After examining the code, I've identified the root cause of the categories E2E test failure:
+
+1. **First User Setup Dependency:**
+   - The categories test assumes a user already exists and tries to log in directly
+   - However, it appears the system is in first-user mode, requiring initial setup
+   - The first-user.test.js script successfully handles this by clearing users and creating the first admin
+   - The categories test doesn't have this setup included
+
+2. **Missing Test Sequence:**
+   - Current test execution:
+     - `npm run test:e2e:categories` runs only the categories test
+     - Categories test tries to log in without running the first user setup
+     - Login fails because it's redirected to first user setup page
+     - Test fails because it can't find category management elements
+
+3. **Solution Options:**
+   - Option 1: Modify the categories.test.js to handle the first user setup
+   - Option 2: Create a dependency between tests so first-user test runs first
+   - Option 3: Update the test:e2e:categories script to run first-user test first
+
+### Action Plan - [2025-03-29]
+1. **Implement Sequential Test Execution:**
+   - Modify the test:e2e:categories script in package.json to:
+     ```
+     "test:e2e:categories": "npm run test:e2e:first-user && jest \"tests/e2e/categories.test.js\" --testTimeout=60000"
+     ```
+   - This ensures the first user setup is completed before running the categories test
+
+2. **Improve Error Handling in Categories Test:**
+   - Update loginAsAdmin() function in categories test to check for first-user setup
+   - Add detection and processing for first-user setup form
+   - Add better debug logging to track test flow
+
+3. **Test Execution:**
+   - Run the modified test script with proper sequencing
+   - Verify the categories test now passes
+
+I'll implement these changes now and verify the test execution.
 
 2. 🚧 Implement E2E test for listings management (Priority: Medium)
    - Create a Puppeteer-based E2E test for the listings management functionality
