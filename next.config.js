@@ -27,6 +27,19 @@ const nextConfig = {
         aggregateTimeout: 300, // Delay before rebuilding
         ignored: /node_modules/,
       };
+
+      // Improve module resolution
+      config.resolve.modules = [
+        ...(config.resolve.modules || []),
+        './src',
+        './node_modules'
+      ];
+      
+      // Ensure aliases work correctly
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@': require('path').resolve(__dirname, './src'),
+      };
     }
     return config;
   },

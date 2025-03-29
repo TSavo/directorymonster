@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useCategories } from './hooks';
 import { CategoryWithRelations } from './types';
 import {
@@ -12,7 +12,8 @@ import {
   CategoryTableSortHeader,
   CategoryTablePagination,
   CategoriesMobileView,
-  DeleteConfirmationModal
+  DeleteConfirmationModal,
+  CategoryErrorBoundary
 } from './components';
 
 export interface CategoryTableProps {
@@ -67,64 +68,71 @@ export default function CategoryTable({ siteSlug, initialCategories }: CategoryT
   // Determine if the site column should be visible (multi-tenant mode)
   const showSiteColumn = !siteSlug && sites.length > 0;
 
-  // Build a map of child categories by parent ID for hierarchy view
-  const childrenMap = new Map<string, CategoryWithRelations[]>();
-  
-  if (showHierarchy) {
-    currentCategories.forEach(category => {
-      if (category.parentId) {
-        if (!childrenMap.has(category.parentId)) {
-          childrenMap.set(category.parentId, []);
+  // Safe hierarchy construction with memo to prevent recomputation
+  const safeHierarchy = React.useMemo(() => {
+    // Create a map of child categories by parent ID for hierarchy view
+    const childrenMap = new Map<string, CategoryWithRelations[]>();
+    
+    if (showHierarchy) {
+      // First pass: Create the map of child categories by parent ID
+      currentCategories.forEach(category => {
+        if (category.parentId) {
+          if (!childrenMap.has(category.parentId)) {
+            childrenMap.set(category.parentId, []);
+          }
+          // Create a shallow copy to avoid modifying the original
+          childrenMap.get(category.parentId)?.push({...category});
         }
-        childrenMap.get(category.parentId)?.push(category);
-      }
-    });
-  }
+      });
+      
+      // Second pass: Validate no circular references exist
+      const validateNoCircularReferences = (categoryId: string, ancestorIds: Set<string> = new Set()): boolean => {
+        if (ancestorIds.has(categoryId)) {
+          console.error(`Circular reference detected for category ${categoryId}`);
+          return false;
+        }
+        
+        const newAncestorIds = new Set(ancestorIds);
+        newAncestorIds.add(categoryId);
+        
+        const children = childrenMap.get(categoryId) || [];
+        return children.every(child => validateNoCircularReferences(child.id, newAncestorIds));
+      };
+      
+      // Get all root categories and validate their hierarchies
+      const rootCategories = currentCategories.filter(c => !c.parentId);
+      rootCategories.forEach(root => validateNoCircularReferences(root.id));
+    }
+    
+    return {
+      // Get only the root categories (no parent ID)
+      rootCategories: currentCategories.filter(c => !c.parentId),
+      childrenMap
+    };
+  }, [currentCategories, showHierarchy]);
 
-  // Render hierarchy view rows recursively
-  const renderHierarchicalRows = (categories: CategoryWithRelations[], depth = 0, parentMap = new Map<string, boolean>()) => {
-    return categories.map((category, index, arr) => {
+  // Improved hierarchy rendering without circular references
+  const renderHierarchicalRows = (parentCategories: CategoryWithRelations[], depth = 0) => {
+    return parentCategories.flatMap((category, index, arr) => {
       const isLastChild = index === arr.length - 1;
-      const hasChildren = childrenMap.has(category.id);
+      const children = safeHierarchy.childrenMap.get(category.id) || [];
       
-      // Track parent chain to avoid circular references
-      if (parentMap.has(category.id)) {
-        return null;
-      }
-      
-      const newParentMap = new Map(parentMap);
-      newParentMap.set(category.id, true);
-      
-      return (
-        <>
-          <CategoryTableRow 
-            key={category.id}
-            category={category}
-            showSiteColumn={showSiteColumn}
-            onDeleteClick={confirmDelete}
-            depth={depth}
-            isLastChild={isLastChild}
-            isDraggable={true}
-            isSortedBy={sortField}
-            sortDirection={sortOrder}
-          />
-          
-          {/* Recursively render children */}
-          {hasChildren && childrenMap.get(category.id)?.map((childCategory, childIndex, childArr) => (
-            <CategoryTableRow 
-              key={childCategory.id}
-              category={childCategory}
-              showSiteColumn={showSiteColumn}
-              onDeleteClick={confirmDelete}
-              depth={depth + 1}
-              isLastChild={childIndex === childArr.length - 1}
-              isDraggable={true}
-              isSortedBy={sortField}
-              sortDirection={sortOrder}
-            />
-          ))}
-        </>
-      );
+      // Only get direct children, not full subtree to prevent circular references
+      return [
+        <CategoryTableRow 
+          key={category.id}
+          category={category}
+          showSiteColumn={showSiteColumn}
+          onDeleteClick={confirmDelete}
+          depth={depth}
+          isLastChild={isLastChild}
+          isDraggable={true}
+          isSortedBy={sortField}
+          sortDirection={sortOrder}
+        />,
+        // Render children recursively but without circular references
+        ...renderHierarchicalRows(children, depth + 1)
+      ];
     });
   };
 
@@ -202,20 +210,30 @@ export default function CategoryTable({ siteSlug, initialCategories }: CategoryT
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {showHierarchy
-              ? renderHierarchicalRows(currentCategories.filter(c => !c.parentId))
-              : currentCategories.map(category => (
-                  <CategoryTableRow
-                    key={category.id}
-                    category={category}
-                    showSiteColumn={showSiteColumn}
-                    onDeleteClick={confirmDelete}
-                    isDraggable={true}
-                    isSortedBy={sortField}
-                    sortDirection={sortOrder}
-                  />
-                ))
-            }
+            <CategoryErrorBoundary
+              fallback={
+                <tr>
+                  <td colSpan={showSiteColumn ? 5 : 4} className="px-4 py-3 text-center text-red-500">
+                    Error rendering category hierarchy. Please try disabling hierarchy view or contact support.
+                  </td>
+                </tr>
+              }
+            >
+              {showHierarchy
+                ? renderHierarchicalRows(safeHierarchy.rootCategories)
+                : currentCategories.map(category => (
+                    <CategoryTableRow
+                      key={category.id}
+                      category={category}
+                      showSiteColumn={showSiteColumn}
+                      onDeleteClick={confirmDelete}
+                      isDraggable={true}
+                      isSortedBy={sortField}
+                      sortDirection={sortOrder}
+                    />
+                  ))
+              }
+            </CategoryErrorBoundary>
           </tbody>
         </table>
       </div>

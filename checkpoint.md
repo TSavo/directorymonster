@@ -188,8 +188,58 @@ npm run dev &
    - Added references to convenience scripts (start-dev.bat, dev-reload.bat, rebuild-dev.bat)
    - Reorganized development best practices to prioritize Docker workflow
 
-14. 👌 Next development phase
-   - Expand E2E test coverage to other functionality
-   - Improve CI/CD pipeline for automated testing
-   - Enhance Python scraper integration
-   - Document the entire E2E testing setup for team onboarding
+14. 🚨 Identified module resolution issue with category management components
+   - Started Docker development environment using `docker-compose up -d`
+   - Ran E2E tests to verify category management functionality
+   - Found critical module resolution error: `Module not found: Can't resolve '@/components/admin/sites'`
+   - E2E tests failed during login and site navigation phases
+   - Site creation form not rendering due to missing components
+   - Category management elements not accessible due to upstream failures
+   - Error occurs in multiple contexts: `/admin/sites/new/page.tsx` trying to import from missing module path
+
+15. 🔍 Key issues requiring immediate attention
+   - Module path '@/components/admin/sites' cannot be resolved in Docker environment
+   - This prevents users from creating new sites or accessing existing ones
+   - E2E tests unable to proceed past login phase in some cases
+   - 404 errors occurring when trying to access site by slug
+   - Sites created with Redis scripts not accessible through web interface
+   - Index exports may be missing for admin components
+
+17. ✅ Implemented fixes for module resolution issues
+   - Enhanced index.ts in sites directory with multiple export methods for better compatibility
+   - Updated Dockerfile.dev to explicitly create directories and placeholder files
+   - Improved webpack configuration in next.config.js for better module resolution
+   - Added fallback mechanism in the site creation page for more resilient loading
+   - Created rebuild-component-exports.js script to auto-generate index files
+   - Added rebuild-module-paths.bat and rebuild-module-paths.sh for easy recovery
+   - Implemented resilient import strategy with graceful fallbacks
+
+18. 🔧 Testing implementation
+   - Started E2E tests to validate the fixes
+   - Created comprehensive logs for analysis
+   - Added hooks for monitoring category component loading
+   - Piped test output to file for better analysis
+   - Implemented search in logs to identify remaining issues
+
+19. 📚 Documentation improvements
+   - Added detailed "How to Apply These Fixes" section to NEXTSTEPS.md
+   - Updated implementation steps in checkpoint.md
+   - Provided platform-specific instructions for Windows and Unix/Linux
+   - Added verification steps to confirm fixes are working
+   - Created troubleshooting guide for common issues
+
+20. 🔍 Analyzed Next.js error in admin/categories
+   - Investigated a call stack error encountered in admin/categories UI
+   - Error occurs in app-page.runtime.dev.js, specifically in Array.toJSON
+   - Root cause: Circular references in the category hierarchy data structure
+   - Problem in CategoryTable.tsx renderHierarchicalRows function which creates circular references
+   - The parentMap tracking in renderHierarchicalRows function is not properly preventing circular references
+   - Next.js serialization fails when it encounters these circular references
+
+21. 🔧 Implemented solution for category component circular reference issue
+   - Fixed the renderHierarchicalRows function in CategoryTable.tsx to properly break circular references
+   - Created a memoized safeHierarchy function to prevent creating circular structures during rendering
+   - Implemented validateNoCircularReferences function to detect and log circular references
+   - Added a CategoryErrorBoundary component to gracefully handle rendering errors
+   - Created proper error fallback UI with clear user instructions
+   - Improved component data handling to prevent circular structure serialization issues

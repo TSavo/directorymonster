@@ -23,9 +23,15 @@ ENV AUTH_SECRET=development-auth-secret
 # We don't copy the project here since we're mounting it in docker-compose
 # This keeps only package.json and installed dependencies in the image
 
+# Create directories explicitly to ensure they exist
+RUN mkdir -p /app/src/components/admin/sites
+
+# Create a minimal placeholder for the index.ts if it doesn't exist in mounted volume
+RUN echo "export { }; // Placeholder" > /app/src/components/admin/sites/index.ts
+
 # Verbose logging for troubleshooting
 RUN ls -la
-RUN ls -la src/components/admin/sites || echo "sites directory not found"
+RUN ls -la /app/src/components/admin/sites || echo "sites directory not found"
 
 # Expose port
 EXPOSE 3000
