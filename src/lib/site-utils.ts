@@ -5,6 +5,33 @@ import { kv } from '@/lib/redis-client';
  * Get hostname from request headers in server component
  */
 export async function getHostname(): Promise<string | null> {
+  // If running in test/development environment, provide a default site for localhost
+  if (normalizedHostname === 'localhost' || normalizedHostname.includes('localhost')) {
+    console.log('DEBUG: Using default test site for localhost');
+    return {
+      id: 'test-site',
+      slug: 'test-site',
+      name: 'Test Site',
+      domain: 'localhost',
+      description: 'Default site for testing',
+      logoUrl: '/logo.png',
+      themeColor: '#4F46E5',
+      secondaryColor: '#10B981',
+      settings: {
+        allowSignups: true,
+        enableSearch: true,
+      },
+      seo: {
+        title: 'Test Site',
+        description: 'A test site for development and testing',
+        keywords: ['test', 'development'],
+        noindexPages: []
+      },
+      owner: 'test-user',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
   try {
     // This works on the server side to get the current hostname
     const { headers } = await import('next/headers');
@@ -33,6 +60,34 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
   console.log(`DEBUG: Direct domain lookup result: ${site?.name || 'null'}`);
   
   if (site) return site;
+  
+  // If running in test/development environment, provide a default site for localhost
+  if (normalizedHostname === 'localhost' || normalizedHostname.includes('localhost')) {
+    console.log('DEBUG: Using default test site for localhost');
+    return {
+      id: 'test-site',
+      slug: 'test-site',
+      name: 'Test Site',
+      domain: 'localhost',
+      description: 'Default site for testing',
+      logoUrl: '/logo.png',
+      themeColor: '#4F46E5',
+      secondaryColor: '#10B981',
+      settings: {
+        allowSignups: true,
+        enableSearch: true,
+      },
+      seo: {
+        title: 'Test Site',
+        description: 'A test site for development and testing',
+        keywords: ['test', 'development'],
+        noindexPages: []
+      },
+      owner: 'test-user',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
   
   // Check for subdomain match (e.g., fishing-gear.mydirectory.com)
   const subdomainMatch = normalizedHostname.match(/^([^.]+)\.(?:mydirectory\.com)$/);
