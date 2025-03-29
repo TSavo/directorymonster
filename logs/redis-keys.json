@@ -1,0 +1,21 @@
+{
+  "site": [
+    "site:1c067010-1804-47b8-bddf-1042750bdb90",
+    "site:id:site_1743271425998",
+    "site:slug:fishing-gear",
+    "site:domain:fishinggearreviews.com",
+    "site:id:site_1743271426432",
+    "site:slug:hiking-gear",
+    "site:domain:hikinggearreviews.com",
+    "site:ede260d4-7105-42e0-be3f-b23537f7afe2"
+  ],
+  "sites": [
+    "sites:by-slug:test-directory"
+  ],
+  "domains": [
+    "domains:localhost"
+  ],
+  "user": [
+    "user:admin"
+  ]
+}

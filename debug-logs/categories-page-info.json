@@ -1,0 +1,36 @@
+{
+  "title": "Directory Monster - SEO-Focused Directory Platform",
+  "h1": [
+    "404 - Site Not Found"
+  ],
+  "h2": [],
+  "buttons": [],
+  "formElements": {
+    "forms": 0,
+    "inputs": 0,
+    "selects": 0,
+    "textareas": 0
+  },
+  "tables": {
+    "count": 0,
+    "rows": 0,
+    "headers": []
+  },
+  "links": [
+    {
+      "text": "Return to Main Platform",
+      "href": "http://localhost:3000/"
+    }
+  ],
+  "bodyText": "404 - Site Not FoundThe directory site you are looking for does not exist or has been moved.Return to Main Platform(self.__next_f=self.__next_f||[]).push([0]);self.__next_f.push([2,null])self.__next_f.push([1,\"1:HL[\\\"/_next/static/css/app/layout.css?v=1743271890037\\\",\\\"style\\\"]\\n0:D{\\\"name\\\":\\\"r2\\\",\\\"env\\\":\\\"Server\\\"}\\n\"])self.__next_f.push([1,\"2:I[\\\"(app-pages-browser)/./node_modules/next/dist/client/components/app-router.js\\\",[\\\"app-pages-internals\\\",\\\"static/chunks/app-pages-internals.js\\\"],\\",
+  "urls": {
+    "current": "http://localhost:3000/admin/sites/hiking-gear/categories",
+    "pathname": "/admin/sites/hiking-gear/categories"
+  },
+  "possibleErrors": {
+    "hasError": true,
+    "hasUnauthorized": false,
+    "hasPermissionDenied": false,
+    "hasNotFound": true
+  }
+}

@@ -1,0 +1,2 @@
+URL: http://localhost:3000/admin/sites/hiking-gear/categories
+Timestamp: 2025-03-29T17:31:25.781Z

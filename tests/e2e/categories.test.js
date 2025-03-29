@@ -20,9 +20,9 @@ const SITE_SLUG = 'hiking-gear'; // Changed from fishing-gear to hiking-gear
 
 // Enable debug mode by default and increase timeouts
 process.env.DEBUG = process.env.DEBUG || 'true';
-const DEFAULT_TIMEOUT = 45000;
-const NAVIGATION_TIMEOUT = 30000;
-const FORM_TIMEOUT = 10000;
+const DEFAULT_TIMEOUT = 45000; // Increased timeout for stability
+const NAVIGATION_TIMEOUT = 30000; // Increased from 15000 to 30000
+const FORM_TIMEOUT = 10000; // Increased from 5000 to 10000
 
 // Helper function to generate unique category name
 const getUniqueCategoryName = () => `${CATEGORY_PREFIX} ${Date.now()}`;

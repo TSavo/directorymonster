@@ -7,7 +7,12 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/app
+      # Mount only specific directories to avoid overriding index.ts files
+      - ./public:/app/public
+      - ./styles:/app/styles
+      - ./tests:/app/tests
+      - ./scripts:/app/scripts
+      # Don't mount node_modules or .next
       - /app/node_modules
       - /app/.next
     environment:

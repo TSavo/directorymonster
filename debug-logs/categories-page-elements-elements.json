@@ -1,0 +1,22 @@
+{
+  "forms": [],
+  "inputs": [],
+  "buttons": [],
+  "tables": [],
+  "categoryElements": {
+    "categoryTable": false,
+    "categoryRows": 0,
+    "addCategoryButton": false,
+    "categoryHeading": false,
+    "breadcrumbs": false,
+    "anyTable": false
+  },
+  "apiEndpoints": [],
+  "errorStates": {
+    "hasErrorMessage": false,
+    "hasErrorText": true,
+    "hasRedirectMessage": false,
+    "hasLoadingState": false,
+    "hasEmptyState": false
+  }
+}

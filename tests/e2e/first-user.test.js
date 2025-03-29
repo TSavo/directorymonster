@@ -8,7 +8,7 @@ const puppeteer = require('puppeteer');
 const { describe, test, beforeAll, afterAll, expect } = require('@jest/globals');
 
 // Configuration
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3003';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const SITE_DOMAIN = process.env.SITE_DOMAIN || 'mydirectory.com';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password123456';

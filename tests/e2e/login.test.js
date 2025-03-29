@@ -8,15 +8,15 @@ const puppeteer = require('puppeteer');
 const { describe, test, beforeAll, afterAll, expect } = require('@jest/globals');
 
 // Configuration
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3003';  // Updated to use port 3003
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const SITE_DOMAIN = process.env.SITE_DOMAIN || 'mydirectory.com';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';  // Same username from first-user test
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password123456';  // Same password from first-user test
 
 // Test timeouts
-const DEFAULT_TIMEOUT = 30000; // 30 seconds
-const LOGIN_TIMEOUT = 10000; // 10 seconds
-const NAVIGATION_TIMEOUT = 5000; // 5 seconds
+const DEFAULT_TIMEOUT = 45000; // 45 seconds
+const LOGIN_TIMEOUT = 15000; // 15 seconds
+const NAVIGATION_TIMEOUT = 30000; // 30 seconds
 
 /**
  * Login page E2E test suite

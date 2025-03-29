@@ -8,18 +8,27 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install \
     && npm install -g uuid jsonwebtoken \
-    && npm install --save uuid jsonwebtoken
+    && npm install --save uuid jsonwebtoken \
+    && npm install -D tailwindcss postcss autoprefixer
 
 # Next.js telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Expose port
-EXPOSE 3000
-
-# Environment variables for development
+# Set environment variables for development
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 ENV NODE_ENV=development
+ENV AUTH_SECRET=development-auth-secret
+
+# Copy the entire project
+COPY . .
+
+# Verbose logging for troubleshooting
+RUN ls -la
+RUN ls -la src/components/admin/sites || echo "sites directory not found"
+
+# Expose port
+EXPOSE 3000
 
 # Start development server
 CMD ["npm", "run", "dev"]

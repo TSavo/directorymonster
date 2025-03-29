@@ -1,0 +1,26 @@
+[
+  {
+    "id": "site_1743271425998",
+    "name": "Fishing Gear Reviews",
+    "slug": "fishing-gear",
+    "domain": "fishinggearreviews.com",
+    "primaryKeyword": "fishing-gear directory",
+    "metaDescription": "A directory of fishing-gear for testing purposes",
+    "headerText": "Fishing Gear Reviews",
+    "defaultLinkAttributes": "dofollow",
+    "createdAt": 1743271425998,
+    "updatedAt": 1743271425998
+  },
+  {
+    "id": "site_1743271426432",
+    "name": "Hiking Gear Directory",
+    "slug": "hiking-gear",
+    "domain": "hikinggearreviews.com",
+    "primaryKeyword": "hiking-gear directory",
+    "metaDescription": "A directory of hiking-gear for testing purposes",
+    "headerText": "Hiking Gear Directory",
+    "defaultLinkAttributes": "dofollow",
+    "createdAt": 1743271426432,
+    "updatedAt": 1743271426432
+  }
+]

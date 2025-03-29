@@ -3,9 +3,8 @@ import axios from 'axios';
 import { SiteConfig, Category, Listing } from '../src/types';
 
 // Base URL for API requests (can be configured for dev/prod environments)
-// Try port 3001 if port 3000 doesn't work
-const API_BASE_URL = process.env.API_BASE_URL || 
-  (process.env.NODE_ENV === 'development' ? 'http://localhost:3001/api' : 'http://localhost:3000/api');
+// Always use port 3000 for Docker environment
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000/api';
 
 /**
  * Create a site via the API
