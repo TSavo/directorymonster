@@ -20,8 +20,8 @@ ENV HOSTNAME="0.0.0.0"
 ENV NODE_ENV=development
 ENV AUTH_SECRET=development-auth-secret
 
-# Copy the entire project
-COPY . .
+# We don't copy the project here since we're mounting it in docker-compose
+# This keeps only package.json and installed dependencies in the image
 
 # Verbose logging for troubleshooting
 RUN ls -la
