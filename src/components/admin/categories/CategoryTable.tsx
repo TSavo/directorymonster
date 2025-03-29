@@ -21,7 +21,7 @@ export interface CategoryTableProps {
   initialCategories?: CategoryWithRelations[];
 }
 
-export default function CategoryTable({ siteSlug, initialCategories }: CategoryTableProps) {
+export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProps) {
   const [showHierarchy, setShowHierarchy] = useState(false);
   
   // Use the categories hook for state management
@@ -269,3 +269,6 @@ export default function CategoryTable({ siteSlug, initialCategories }: CategoryT
     </div>
   );
 }
+
+// Also export as default for backward compatibility
+export default CategoryTable;

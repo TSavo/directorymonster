@@ -274,3 +274,6 @@ export function useCategories(siteSlug?: string, initialCategories?: CategoryWit
     fetchCategories
   };
 }
+
+// Default export for backward compatibility
+export default useCategories;

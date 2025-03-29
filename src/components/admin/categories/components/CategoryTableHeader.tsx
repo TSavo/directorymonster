@@ -8,7 +8,7 @@ import { useState } from 'react';
 /**
  * Header component with search and filtering controls for the category table
  */
-export default function CategoryTableHeader({
+export function CategoryTableHeader({
   totalCategories,
   siteSlug,
   searchTerm,
@@ -151,3 +151,6 @@ export default function CategoryTableHeader({
     </div>
   );
 }
+
+// Also export as default for backward compatibility
+export default CategoryTableHeader;
