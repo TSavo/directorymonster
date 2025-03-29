@@ -4,11 +4,23 @@ This directory contains comprehensive documentation for testing the DirectoryMon
 
 ## Directory Structure
 
+### Main Testing Guides
 - **[TESTING.md](./TESTING.md)**: Main testing guide with an overview of testing approaches, structure, and practices
 - **[COMPONENT_TESTING.md](./COMPONENT_TESTING.md)**: Detailed patterns and examples for component testing
 - **[API_TESTING.md](./API_TESTING.md)**: Patterns and examples for API endpoint testing
 - **[INTEGRATION_TESTING.md](./INTEGRATION_TESTING.md)**: Guide for integration testing, including multitenancy and end-to-end flows
 - **[TEST_HELPERS.md](./TEST_HELPERS.md)**: Documentation for test helpers, fixtures, mocks, and utilities
+
+### Specialized Testing Guides
+- **[ACCESSIBILITY.md](./ACCESSIBILITY.md)**: Guide for accessibility testing practices
+- **[AUTH_TESTING.md](./AUTH_TESTING.md)**: Guide for authentication and authorization testing
+- **[HOOK_TESTING.md](./HOOK_TESTING.md)**: Guide for testing React hooks
+
+### Project Component Documentation
+- **[api/](./api/)**: API endpoints documentation
+- **[seeding/](./seeding/)**: Data seeding scripts and procedures
+- **[seo/](./seo/)**: SEO configuration and practices
+- **[utilities/](./utilities/)**: Utility functions documentation
 
 ## Quick Links
 
