@@ -243,3 +243,11 @@ npm run dev &
    - Added a CategoryErrorBoundary component to gracefully handle rendering errors
    - Created proper error fallback UI with clear user instructions
    - Improved component data handling to prevent circular structure serialization issues
+
+22. 🔧 Fixed export mismatch in CategoryTable component
+   - Identified an export/import mismatch issue in the CategoryTable component
+   - The component was exported as default but imported as a named export
+   - Updated src/components/admin/categories/index.ts to properly export both named and default exports
+   - Simplified the export structure to be more consistent and reliable
+   - Fixed the error "export 'CategoryTable' was not found in './CategoryTable' (possible exports: default)"
+   - This complements the circular reference fix by ensuring the component can be properly imported

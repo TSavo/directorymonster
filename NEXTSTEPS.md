@@ -33,6 +33,21 @@
 - Updated import paths for better module resolution
 - Added documentation with clear run instructions
 
+### 6. Category Component Fixes ✅
+- Fixed circular reference issue in CategoryTable.tsx renderHierarchicalRows function
+- Implemented safeHierarchy with React.useMemo to prevent circular structures
+- Added CategoryErrorBoundary component for graceful error handling
+- Fixed exports in `src/components/admin/categories/index.ts` for proper importing
+- Added both named and default exports to support different import styles:
+  ```typescript
+  // Export the default export as named CategoryTable for backward compatibility
+  import CategoryTableDefault from './CategoryTable';
+  export { CategoryTableDefault as CategoryTable };
+  
+  // Also provide the default export
+  export default CategoryTableDefault;
+  ```
+
 ## Completed Testing Execution ✅
 
 We have executed the following steps:
@@ -77,15 +92,14 @@ npm run test:e2e
 
 ## New Issue Identified 🚨
 
-### CategoryTable Serialization Error ✅
+### CategoryTable Serialization Error
 
-1. ⚠️ Next.js serialization error in admin/categories page - FIXED
+1. ⚠️ Next.js serialization error in admin/categories page
    - Error occurs in app-page.runtime.dev.js, specifically in Array.toJSON
    - Root cause: Circular references in the category hierarchy data structure
    - Problem in CategoryTable.tsx renderHierarchicalRows function creates circular references
    - The parentMap tracking is not properly breaking circular references
    - Next.js fails when trying to serialize this data structure
-   - Solution: Implemented proper tree-based rendering with error boundary and validation
 
 ## Required Fixes 🔧
 
@@ -278,7 +292,8 @@ export class CategoryErrorBoundary extends React.Component<ErrorBoundaryProps, E
    - `rebuild-module-paths.bat` - Windows script for easy recovery
    - `rebuild-module-paths.sh` - Unix/Linux script for easy recovery
    - `src/components/admin/categories/CategoryTable.tsx` - Fixed circular reference issue
-   - `src/components/admin/categories/components/CategoryErrorBoundary.tsx` - Added error boundary component
+   - `src/components/admin/categories/components/CategoryErrorBoundary.tsx` - Added error boundary
+   - `src/components/admin/categories/index.ts` - Fixed export/import mismatch
 
 2. To apply these changes and test them:
 
@@ -301,19 +316,4 @@ export class CategoryErrorBoundary extends React.Component<ErrorBoundaryProps, E
 
    # Check container logs
    docker-compose logs app | grep category
-   ```
-
-4. Specifically verify the CategoryTable fix:
-
-   ```bash
-   # Start the development server
-   docker-compose up -d
-   
-   # Access the admin/categories page
-   # Navigate to: http://localhost:3000/admin/sites/[your-site-slug]/categories
-   
-   # Test with hierarchy view enabled
-   # Click the "Show Hierarchy" button and verify the page renders correctly
-   
-   # Check browser console for any errors related to serialization or circular references
    ```
