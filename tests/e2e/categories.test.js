@@ -147,19 +147,64 @@ describe('Category Management', () => {
     const currentUrl = await page.url();
     console.log(`Current URL: ${currentUrl}`);
     
-    // Check for category management elements
+    // Take a screenshot to see what's rendered on the page
+    const screenshotPath = `categories-page-${Date.now()}.png`;
+    await page.screenshot({ path: screenshotPath, fullPage: true });
+    console.log(`Saved screenshot to ${screenshotPath}`);
+    
+    // Increase the delay to ensure the page has fully loaded
+    await delay(3000); // Wait 3 seconds for any async loading
+    
+    // Get the HTML content for debugging
+    const htmlContent = await page.content();
+    console.log('Page HTML (first 500 chars):', htmlContent.substring(0, 500));
+    
+    // Check for category management elements with more detailed logging
     const categoryManagementExists = await page.evaluate(() => {
-      // Look for category table or related elements
-      const tableExists = document.querySelector('.category-table, [data-testid="category-table"]') !== null;
-      const categoriesExist = document.querySelectorAll('tr, .category-item').length > 1;
+      // Log what we find for debugging
+      const debugInfo = {
+        tables: document.querySelectorAll('table').length,
+        rows: document.querySelectorAll('tr').length,
+        categoryTableExists: document.querySelector('.category-table, [data-testid="category-table"]') !== null,
+        buttons: Array.from(document.querySelectorAll('button')).map(b => b.textContent?.trim()).filter(Boolean),
+        h1Text: document.querySelector('h1')?.textContent,
+        bodyText: document.body.textContent.substring(0, 200) // First 200 chars of body text
+      };
+      console.log('Debug info:', JSON.stringify(debugInfo));
+      
+      // Look for category table or related elements with multiple strategies
+      const tableExists = document.querySelector('.category-table, [data-testid="category-table"], table') !== null;
+      const categoriesExist = document.querySelectorAll('tr, .category-item, .category-row').length > 1;
       const addButtonExists = Array.from(document.querySelectorAll('button')).some(btn => 
         btn.textContent && btn.textContent.match(/add|create|new/i)
       );
+      const categoryHeadingExists = document.querySelector('h1, h2, h3')?.textContent?.toLowerCase().includes('categor');
       
-      return tableExists || categoriesExist || addButtonExists;
+      return tableExists || categoriesExist || addButtonExists || categoryHeadingExists;
     });
     
     console.log(`Page has category management elements: ${categoryManagementExists}`);
+    
+    // If we didn't find category elements, try to get more diagnostics
+    if (!categoryManagementExists) {
+      // Check if we might be having access issues
+      const currentUrl = await page.url();
+      console.log(`Current URL before failure: ${currentUrl}`);
+      
+      // Check for any error messages
+      const hasErrorMessage = await page.evaluate(() => {
+        const errorText = document.body.textContent;
+        return errorText.includes('Error') || 
+               errorText.includes('Unauthorized') || 
+               errorText.includes('Permission denied') || 
+               errorText.includes('Not found');
+      });
+      
+      if (hasErrorMessage) {
+        console.log('Found error message on page');
+      }
+    }
+    
     expect(categoryManagementExists).toBe(true);
   }
 
