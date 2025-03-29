@@ -6,10 +6,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
-
-# Install specific packages needed for testing
-RUN npm install uuid jsonwebtoken
+RUN npm install \
+    && npm install -g uuid jsonwebtoken \
+    && npm install --save uuid jsonwebtoken
 
 # Next.js telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
