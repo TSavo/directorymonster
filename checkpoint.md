@@ -16,6 +16,17 @@
 13. ✅ Verified ActivityFeed component tests with 100% code coverage
 14. ✅ Verified StatisticCards component tests with 91.66% code coverage
 
+### In Progress
+- Testing Site Management Components - found issues:
+  - DomainManager tests failing due to Next.js router issues in test environment
+  - useDomains hook tests have minor validation failures (11/14 tests passing)
+  - Need to modify tests to properly mock Next.js router
+  
+### Issues Found
+1. There's a conflict with Next.js router in test environment - requires mocking
+2. Some validation tests in useDomains hook are failing
+3. DomainManager tests cannot run properly due to router dependency
+
 ### Next Steps
 1. Convert remaining templates to Handlebars
 2. Update documentation
