@@ -15,14 +15,8 @@ services:
       # Don't mount node_modules or .next
       - /app/node_modules
       - /app/.next
-    environment:
-      - NODE_ENV=development
-      - REDIS_URL=redis://redis:6379
-      - AUTH_SECRET=development-auth-secret
-      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
-      - NEXT_RUNTIME=nodejs
-      - PORT=3000
-      - HOSTNAME=0.0.0.0
+    env_file:
+      - .env.development
     depends_on:
       - redis
     # Add hostname aliases for multitenancy testing
