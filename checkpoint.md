@@ -251,3 +251,14 @@ npm run dev &
    - Simplified the export structure to be more consistent and reliable
    - Fixed the error "export 'CategoryTable' was not found in './CategoryTable' (possible exports: default)"
    - This complements the circular reference fix by ensuring the component can be properly imported
+
+23. ✅ Implemented categories-debug-navigation.js for E2E testing
+   - Created comprehensive navigation utilities for category management testing
+   - Implemented navigateToSitesPage() for reliable navigation to the sites list
+   - Added navigateToSiteCategories() to directly access a site's categories
+   - Implemented navigateToAddCategoryForm() with multiple selector strategies
+   - Added navigateToEditCategoryForm() for accessing category edit forms
+   - Created navigateBackToCategories() for returning to the categories list
+   - Added pagination utilities with navigateToCategoryPage() and changeRowsPerPage()
+   - Each function includes comprehensive error handling and diagnostics
+   - All navigation functions include detailed logging and page analysis
