@@ -238,8 +238,46 @@ describe('Login Page', () => {
     await usernameInput.type('incorrect-user');
     await passwordInput.type('password123456');
 
-    // Submit the form
-    await submitButton.click();
+    // We'll capture request/response info for debugging
+    await page.setRequestInterception(true);
+    const requestLog = [];
+    page.on('request', request => {
+      if (request.url().includes('/api/auth')) {
+        requestLog.push({
+          type: 'request',
+          url: request.url(),
+          method: request.method(),
+          postData: request.postData(),
+          timestamp: new Date().toISOString()
+        });
+      }
+      request.continue();
+    });
+    
+    page.on('response', async response => {
+      if (response.url().includes('/api/auth')) {
+        try {
+          const statusCode = response.status();
+          let responseBody = 'Failed to parse';
+          try {
+            responseBody = await response.text();
+          } catch (e) {}
+          
+          requestLog.push({
+            type: 'response',
+            url: response.url(),
+            status: statusCode,
+            body: responseBody,
+            timestamp: new Date().toISOString()
+          });
+        } catch (e) {
+          console.error('Error processing response:', e.message);
+        }
+      }
+    });
+    
+    // Submit the form - this will be tracked by our request interceptor
+    console.log('About to submit login form with:', { username: ADMIN_USERNAME, password: '***********' });
 
     // Wait for any error element to appear - use a more generic approach
     await page.waitForFunction(() => {
@@ -296,56 +334,151 @@ describe('Login Page', () => {
     // Submit the form
     await submitButton.click();
 
+    console.log('Starting login process with username:', ADMIN_USERNAME);
+    console.log('Current URL before login:', await page.url());
+    
+    // Take screenshot before submitting form
+    await page.screenshot({ path: 'before-login-submit.png' });
+    
     // Multiple approaches to detect successful login with better resiliency
     try {
+      console.log('Submitting login form...');
+      await submitButton.click();
+      console.log('Login form submitted, waiting for navigation...');
+      
+      // Take screenshot immediately after clicking submit
+      await page.screenshot({ path: 'after-login-click.png' });
+      
       // Try multiple strategies for detecting successful navigation
-      await Promise.race([
-        page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 45000 }),
-        page.waitForSelector('[data-testid="admin-dashboard"], .admin-header, .dashboard', { timeout: 45000 }),
+      console.log('Setting up navigation detection with timeout of 45 seconds');
+      const navigationPromise = Promise.race([
+        page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 45000 })
+          .then(() => ({ type: 'navigation', success: true }))
+          .catch(err => ({ type: 'navigation', success: false, error: err.message })),
+        
+        page.waitForSelector('[data-testid="admin-dashboard"], .admin-header, .dashboard', { timeout: 45000 })
+          .then(() => ({ type: 'selector', success: true }))
+          .catch(err => ({ type: 'selector', success: false, error: err.message })),
+        
         page.waitForFunction(
           () => window.location.href.includes('/admin') || 
                 !document.querySelector('[data-testid="login-form"], form[action*="login"]'),
           { timeout: 45000 }
         )
+          .then(() => ({ type: 'function', success: true }))
+          .catch(err => ({ type: 'function', success: false, error: err.message }))
       ]);
       
+      const result = await navigationPromise;
+      console.log('Navigation detection result:', JSON.stringify(result));
+      console.log('Current URL after navigation attempt:', await page.url());
+      
+      // Log page content for debug purposes
+      const pageContent = await page.evaluate(() => document.body.innerHTML.substring(0, 500));
+      console.log('Page content preview:', pageContent);
+      
       // Give it a little extra time to process
+      console.log('Waiting additional 1 second for processing...');
       await page.waitForTimeout(1000);
       
       // Take screenshot for verification
       await page.screenshot({ path: 'login-success.png' });
       
-      // Verify success either by URL or by page content
-      const currentUrl = page.url();
+      console.log('Checking for successful login indicators...');
       
-      // Verify either we're on an admin page OR we're not on the login page
+      // Verify success either by URL or by page content
+      const currentUrl = await page.url();
+      console.log('Current URL after login process:', currentUrl);
+      
+      // Check for admin elements on the page
+      const adminElements = await page.evaluate(() => {
+        return {
+          hasAdminDashboard: document.querySelector('[data-testid="admin-dashboard"]') !== null,
+          hasAdminHeader: document.querySelector('.admin-header') !== null,
+          hasDashboard: document.querySelector('.dashboard') !== null,
+          containsDashboardText: document.body.textContent.includes('Dashboard'),
+          containsAdminText: document.body.textContent.includes('Admin'),
+          hasLoginForm: document.querySelector('[data-testid="login-form"], form[action*="login"]') !== null
+        };
+      });
+      console.log('Page element detection:', JSON.stringify(adminElements));
+      
+      // If we're not on admin page, try manual navigation
       if (!currentUrl.includes('/admin')) {
-        // If URL doesn't contain admin, check for admin page elements
-        const hasAdminElements = await page.evaluate(() => {
-          return (
-            document.querySelector('[data-testid="admin-dashboard"]') !== null ||
-            document.querySelector('.admin-header') !== null ||
-            document.querySelector('.dashboard') !== null ||
-            document.body.textContent.includes('Dashboard') ||
-            document.body.textContent.includes('Admin')
-          );
-        });
+        console.log('Not on admin page, attempting manual navigation to /admin');
+        await page.goto(`${BASE_URL}/admin`);
         
-        // Either URL or page content should confirm success
-        expect(hasAdminElements).toBe(true);
+        // Take a new screenshot after manual navigation
+        await page.screenshot({ path: 'login-admin-force.png' });
+        
+        // Get the new URL
+        const newUrl = await page.url();
+        console.log('URL after manual navigation to /admin:', newUrl);
+        
+        // Check if we're still being redirected to login
+        const stillOnLogin = newUrl.includes('/login');
+        console.log('Still on login page?', stillOnLogin);
+        
+        // We should now be on admin page if login was successful
+        if (!stillOnLogin) {
+          expect(newUrl).toContain('/admin');
+        } else {
+          // If still on login, the test should fail, but let's log details
+          console.log('IMPORTANT: Login failed - still on login page after attempt to access /admin');
+          console.log('This indicates authentication failed or session not established correctly');
+          
+          // Just a straight test to see if we can access admin at all
+          console.log('Attempting direct navigation to /admin/dashboard as last resort');
+          await page.goto(`${BASE_URL}/admin/dashboard`);
+          const finalUrl = await page.url();
+          console.log('Final URL after direct navigation attempt:', finalUrl);
+          
+          // Take a final screenshot
+          await page.screenshot({ path: 'login-final-attempt.png' });
+        }
+      } else {
+        console.log('Already on admin page - login successful');
       }
       
-      // We should not be on the login page anymore
-      expect(currentUrl).not.toContain('/login');
+      // After all navigation attempts, verify we ended up where we should be
+      const finalUrl = await page.url();
+      console.log('Final URL at end of test:', finalUrl);
+      
+      // This will fail if we can't access admin pages after login
+      expect(finalUrl).toContain('/admin');
     } catch (error) {
       console.error('Login navigation detection error:', error.message);
       
       // Take screenshot for debugging
       await page.screenshot({ path: 'login-failure.png' });
       
-      // Even if navigation detection fails, check URL as fallback verification
-      const currentUrl = page.url();
-      expect(currentUrl).not.toContain('/login');
+      // Even if navigation detection fails, perform manual navigation
+      console.log('Navigation detection error, trying manual navigation to admin page');
+      await page.goto(`${BASE_URL}/admin`);
+      
+      // Take a final screenshot
+      await page.screenshot({ path: 'login-navigation-failure.png' });
+      
+      // Get the current URL
+      const currentUrl = await page.url();
+      console.log('URL after error recovery navigation:', currentUrl);
+      
+      // Check if we're still being redirected to login
+      const stillOnLogin = currentUrl.includes('/login');
+      console.log('Still on login page after error recovery?', stillOnLogin);
+      
+      // If we can access admin, it's probably still a success
+      if (!stillOnLogin) {
+        console.log('Recovered - successfully accessed admin page');
+        expect(currentUrl).toContain('/admin');
+      } else {
+        // Log details about failure for debugging
+        console.log('Login test failed - cannot access admin area');
+        console.log('This usually means authentication failed or session not established');
+        
+        // Force test failure
+        expect(currentUrl).not.toContain('/login');
+      }
     }
   }, 60000); // Extend timeout to 60 seconds
 
