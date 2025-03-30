@@ -1,5 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TenantService } from '@/lib/tenant';
+
+// Safely import the TenantService
+let TenantService: any;
+try {
+  // Use dynamic import to avoid edge runtime errors with Redis
+  const { TenantService: Service } = require('./lib/tenant-service');
+  TenantService = Service;
+} catch (error) {
+  console.error('Failed to import TenantService:', error);
+  // Create a fallback implementation
+  TenantService = {
+    getTenantByHostname: async () => ({
+      id: 'default',
+      slug: 'default',
+      name: 'Default'
+    }),
+    tenantsExist: async () => true,
+    createDefaultTenant: async () => ({
+      id: 'default',
+      slug: 'default',
+      name: 'Default'
+    })
+  };
+}
 
 // Specify runtime
 export const runtime = 'nodejs';
@@ -135,6 +158,31 @@ export async function middleware(request: NextRequest) {
     }
   } catch (error) {
     console.error('Middleware error:', error);
+    
+    // Check if this is a Redis-related error
+    const isRedisError = error instanceof Error && 
+      (error.message?.includes('Redis') || 
+       error.message?.includes('ECONNREFUSED') || 
+       error.stack?.includes('ioredis') ||
+       error.message?.includes('charCodeAt'));
+    
+    if (isRedisError) {
+      console.warn('Redis error in middleware, proceeding with degraded functionality');
+      responseHeaders.set('x-redis-error', 'true');
+      
+      // For login page, special handling
+      if (pathname === '/login' || pathname.includes('auth')) {
+        console.warn('Redis error on auth path, using memory fallback');
+        const response = NextResponse.next();
+        // Add special headers that can be detected by the page
+        responseHeaders.set('x-redis-fallback', 'true');
+        // Merge all response headers
+        for (const [key, value] of responseHeaders.entries()) {
+          response.headers.set(key, value);
+        }
+        return response;
+      }
+    }
     
     // For API paths, return a JSON error
     if (isApiPath) {

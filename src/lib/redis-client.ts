@@ -1,34 +1,19 @@
-// Dynamically import Redis to avoid 'dns' module issues in browser
-let Redis: any = null;
-
-// Only import Redis in server context
-if (typeof window === 'undefined') {
-  // This import style is compatible with Next.js and doesn't break browser builds
-  const ioredis = require('ioredis');
-  Redis = ioredis.Redis;
-}
-
-// Enable in-memory fallback for development without Redis
-const USE_MEMORY_FALLBACK = process.env.NODE_ENV === "test" || (process.env.USE_MEMORY_FALLBACK === 'true');
-
-// Declare global memory store for persistence across API routes
-declare global {
-  var inMemoryRedisStore: Map<string, any>;
-  var redisClient: any;
-}
-
-// Initialize global memory store if needed
-if (!global.inMemoryRedisStore) {
-  global.inMemoryRedisStore = new Map<string, any>();
-  console.log('Created global in-memory Redis store');
-}
-
-// In-memory Redis implementation
+// In-memory Redis implementation that doesn't depend on ioredis
 class MemoryRedis {
   store: Map<string, any>;
   
   constructor() {
-    this.store = global.inMemoryRedisStore;
+    // Create a new store if it doesn't exist globally
+    if (typeof global !== 'undefined' && !global.inMemoryRedisStore) {
+      global.inMemoryRedisStore = new Map<string, any>();
+      console.log('Created global in-memory Redis store');
+    }
+    
+    // Use the global store if available, otherwise create a local one
+    this.store = (typeof global !== 'undefined' && global.inMemoryRedisStore) 
+      ? global.inMemoryRedisStore 
+      : new Map<string, any>();
+      
     console.log(`Using in-memory Redis with ${this.store.size} keys`);
   }
   
@@ -56,13 +41,11 @@ class MemoryRedis {
     const prefix = pattern.replace('*', '');
     
     const allKeys = Array.from(this.store.keys());
-    console.log(`[MemoryRedis] All keys in store:`, allKeys);
     
     const matchingKeys = allKeys.filter(k => 
       wildcard ? k.startsWith(prefix) : k === pattern
     );
     
-    console.log(`[MemoryRedis] Matching keys:`, matchingKeys);
     return matchingKeys;
   }
   
@@ -119,6 +102,11 @@ class MemoryRedis {
     return Array.from(result);
   }
   
+  async scard(key: string): Promise<number> {
+    if (!this.store.has(key)) return 0;
+    return this.store.get(key).size;
+  }
+  
   // Transaction support
   multi(): any {
     const commands: { cmd: string; args: any[] }[] = [];
@@ -158,6 +146,7 @@ class MemoryRedis {
       srem: addCommand('srem'),
       smembers: addCommand('smembers'),
       sinter: addCommand('sinter'),
+      scard: addCommand('scard'),
     };
     
     return multi;
@@ -184,25 +173,55 @@ class MemoryRedis {
   }
 }
 
+// Load real Redis conditionally
+let Redis: any = null;
+let isRedisAvailable = false;
+
+// Only import Redis in server context and if not in test mode
+if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test') {
+  try {
+    // This import style is compatible with Next.js and doesn't break browser builds
+    const ioredis = require('ioredis');
+    Redis = ioredis.Redis;
+    isRedisAvailable = true;
+    console.log('Successfully loaded ioredis');
+  } catch (error) {
+    console.error('Failed to load ioredis, will use memory fallback:', error);
+    isRedisAvailable = false;
+  }
+}
+
+// Only use real Redis if explicitly enabled and we're in a server context
+const USE_MEMORY_FALLBACK = !isRedisAvailable || 
+  process.env.NODE_ENV === "test" || 
+  (process.env.USE_MEMORY_FALLBACK === 'true');
+
+// Declare global memory store for persistence across API routes
+declare global {
+  var inMemoryRedisStore: Map<string, any>;
+  var redisClient: any;
+}
+
 // Setup Redis client (real or in-memory)
 console.log('Setting up Redis client...');
 let redis;
 
 if (USE_MEMORY_FALLBACK || typeof window !== 'undefined') {
+  console.log('Using memory fallback for Redis');
   // Use singleton pattern for memory redis
-  if (!global.redisClient) {
+  if (typeof global !== 'undefined' && !global.redisClient) {
     global.redisClient = new MemoryRedis();
   }
-  redis = global.redisClient;
-} else {
+  redis = typeof global !== 'undefined' ? global.redisClient : new MemoryRedis();
+} else if (isRedisAvailable) {
   // Create Redis client with retry options
-  const redisUrl = process.env.REDIS_URL || 'redis://redis:6379';
-  console.log(`Connecting to Redis at ${redisUrl}`);
-  
   try {
-    if (!global.redisClient && Redis) {
+    const redisUrl = process.env.REDIS_URL || 'redis://redis:6379';
+    console.log(`Connecting to Redis at ${redisUrl}`);
+    
+    if (typeof global !== 'undefined' && !global.redisClient) {
       global.redisClient = new Redis(redisUrl, {
-        retryStrategy: (times) => {
+        retryStrategy: (times: number) => {
           console.log(`Redis connection attempt ${times}`);
           if (times > 3) {
             console.log('Max Redis connection attempts reached, using memory fallback');
@@ -212,15 +231,22 @@ if (USE_MEMORY_FALLBACK || typeof window !== 'undefined') {
           return Math.min(times * 100, 30000);
         },
       });
-    } else if (!Redis) {
-      // Fallback to memory Redis if Redis class is not available
-      global.redisClient = new MemoryRedis();
     }
-    redis = global.redisClient;
+    redis = typeof global !== 'undefined' ? global.redisClient : new MemoryRedis();
   } catch (error) {
     console.error('Redis connection error:', error);
-    redis = new MemoryRedis();
+    if (typeof global !== 'undefined') {
+      global.redisClient = new MemoryRedis();
+    }
+    redis = typeof global !== 'undefined' ? global.redisClient : new MemoryRedis();
   }
+} else {
+  // Fallback to memory Redis if Redis class is not available
+  console.log('Redis not available, using memory fallback');
+  if (typeof global !== 'undefined') {
+    global.redisClient = new MemoryRedis();
+  }
+  redis = typeof global !== 'undefined' ? global.redisClient : new MemoryRedis();
 }
 
 // Export Redis client directly
@@ -252,10 +278,6 @@ export const clearUsers = async (): Promise<void> => {
     } else {
       console.log('[clearUsers] No users found to clear');
     }
-    
-    // Double-check user keys were cleared
-    const remainingUserKeys = await redis.keys('user:*');
-    console.log('[clearUsers] User keys after clearing:', remainingUserKeys);
   } catch (error) {
     console.error('[clearUsers] Error clearing users:', error);
   }
@@ -264,43 +286,56 @@ export const clearUsers = async (): Promise<void> => {
 // Also export a simple KV-like interface for compatibility with existing code
 export const kv = {
   get: async <T>(key: string): Promise<T | null> => {
-    const value = await redis.get(key);
-    if (!value) return null;
     try {
-      return JSON.parse(value) as T;
-    } catch (e) {
-      return value as unknown as T;
+      const value = await redis.get(key);
+      if (!value) return null;
+      try {
+        return JSON.parse(value) as T;
+      } catch (e) {
+        return value as unknown as T;
+      }
+    } catch (error) {
+      console.error(`[kv.get] Error getting key ${key}:`, error);
+      return null;
     }
   },
   
   set: async (key: string, value: any, options?: { ex?: number }): Promise<void> => {
-    const serializedValue = typeof value === 'string' ? value : JSON.stringify(value);
-    if (options?.ex) {
-      await redis.set(key, serializedValue, 'EX', options.ex);
-    } else {
-      await redis.set(key, serializedValue);
+    try {
+      const serializedValue = typeof value === 'string' ? value : JSON.stringify(value);
+      if (options?.ex) {
+        await redis.set(key, serializedValue, 'EX', options.ex);
+      } else {
+        await redis.set(key, serializedValue);
+      }
+    } catch (error) {
+      console.error(`[kv.set] Error setting key ${key}:`, error);
     }
   },
   
   del: async (key: string): Promise<void> => {
-    await redis.del(key);
+    try {
+      await redis.del(key);
+    } catch (error) {
+      console.error(`[kv.del] Error deleting key ${key}:`, error);
+    }
   },
   
   keys: async (pattern: string): Promise<string[]> => {
-    return await redis.keys(pattern);
+    try {
+      return await redis.keys(pattern);
+    } catch (error) {
+      console.error(`[kv.keys] Error getting keys with pattern ${pattern}:`, error);
+      return [];
+    }
   },
   
   // Add expire function for rate limiting
   expire: async (key: string, seconds: number): Promise<void> => {
-    if (redis instanceof MemoryRedis) {
-      // For in-memory implementation, we don't have a real expire
-      // We could implement a setTimeout to delete the key after the specified time
-      // but for now, we'll just make it a no-op for simplicity
-      console.log(`[Memory Redis] Set expiry on ${key} for ${seconds} seconds`);
-      return;
-    } else {
-      // For real Redis, call the expire command
+    try {
       await redis.expire(key, seconds);
+    } catch (error) {
+      console.error(`[kv.expire] Error setting expiry for key ${key}:`, error);
     }
   }
 };
