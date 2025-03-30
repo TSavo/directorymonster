@@ -1,0 +1,13 @@
+{
+  "errors": [
+    {
+      "message": "Uncaught TypeError: Cannot read properties of undefined (reading 'charCodeAt')",
+      "filename": "webpack-internal:///./node_modules/next/dist/client/index.js",
+      "lineno": 625,
+      "colno": 21,
+      "stack": "TypeError: Cannot read properties of undefined (reading 'charCodeAt')\n    at <unknown> (webpack-internal:///(middleware)/./node_modules/redis-errors/index.js:3)\n    at eval (webpack-internal:///(middleware)/./node_modules/redis-errors/index.js:3:32)\n    at (middleware)/./node_modules/redis-errors/index.js (file:///app/.next/server/src/middleware.js:1294:1)\n    at __webpack_require__ (file:///app/.next/server/edge-runtime-webpack.js:37:33)\n    at fn (file:///app/.next/server/edge-runtime-webpack.js:285:21)\n    at eval (webpack-internal:///(middleware)/./node_modules/ioredis/built/cluster/index.js:5:24)\n    at (middleware)/./node_modules/ioredis/built/cluster/index.js (file:///app/.next/server/src/middleware.js:345:1)\n    at __webpack_require__ (file:///app/.next/server/edge-runtime-webpack.js:37:33)\n    at fn (file:///app/.next/server/edge-runtime-webpack.js:285:21)\n    at eval (webpack-internal:///(middleware)/./node_modules/ioredis/built/Redis.js:7:19)\n    at (middleware)/./node_modules/ioredis/built/Redis.js (file:///app/.next/server/src/middleware.js:235:1)"
+    }
+  ],
+  "ajaxErrors": [],
+  "resourceErrors": []
+}

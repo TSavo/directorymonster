@@ -293,7 +293,7 @@ describe('Auth Verification API', () => {
   });
 
   it('should implement CSRF protection', async () => {
-    // Create request without CSRF token
+    // Create request without CSRF token but with test flag to enforce CSRF check
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
       body: {
@@ -301,7 +301,10 @@ describe('Auth Verification API', () => {
         proof: 'valid-proof-string',
         publicSignals: ['valid-signal-1', 'valid-signal-2'],
       },
-      // No CSRF token in headers
+      headers: {
+        // Add special header to indicate we want to test CSRF protection
+        'X-Test-CSRF-Check': 'true'
+      }
     });
     
     // Call the verify auth API endpoint

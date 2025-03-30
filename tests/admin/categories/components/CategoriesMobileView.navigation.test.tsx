@@ -119,4 +119,48 @@ describe('CategoriesMobileView Navigation Tests', () => {
     
     // Check URLs with a different site slug
     expect(screen.getByTestId('view-link-category_1')).toHaveAttribute('href', '/admin/sites/another-site/categories/test-category-1');
-    expect(screen.getByTestId('edit-link-category_1')).toHaveAttribute('href',
+    expect(screen.getByTestId('edit-link-category_1')).toHaveAttribute('href', '/admin/sites/another-site/categories/category_1/edit');
+  });
+
+  it('navigates correctly when links are clicked', async () => {
+    const user = userEvent.setup();
+    
+    render(
+      <CategoriesMobileView 
+        categories={mockCategories} 
+        showSiteColumn={false}
+        onDeleteClick={mockOnDeleteClick}
+      />
+    );
+    
+    // Click the view link
+    await user.click(screen.getByTestId('view-link-category_1'));
+    
+    // Check navigation was triggered with correct URL
+    expect(mockPush).toHaveBeenCalledWith('/admin/categories/category_1');
+    
+    // Click the edit link
+    await user.click(screen.getByTestId('edit-link-category_1'));
+    
+    // Check navigation was triggered with correct URL
+    expect(mockPush).toHaveBeenCalledWith('/admin/categories/category_1/edit');
+  });
+  
+  it('calls onDeleteClick with the correct category ID', async () => {
+    const user = userEvent.setup();
+    
+    render(
+      <CategoriesMobileView 
+        categories={mockCategories} 
+        showSiteColumn={false}
+        onDeleteClick={mockOnDeleteClick}
+      />
+    );
+    
+    // Click the delete button
+    await user.click(screen.getByTestId('delete-btn-category_1'));
+    
+    // Check onDeleteClick was called with the correct category ID
+    expect(mockOnDeleteClick).toHaveBeenCalledWith('category_1');
+  });
+});

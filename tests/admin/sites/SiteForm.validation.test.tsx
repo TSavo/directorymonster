@@ -1,15 +1,15 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { {SiteForm} } from '@/components/{{#if category}}{admin/sites}/{{/if}}{SiteForm}';
+import { SiteForm } from '@/components/admin/sites/SiteForm';
 
-describe('{SiteForm} Validation', () => {
+describe('SiteForm Validation', () => {
   it('validates required fields and shows error messages', async () => {
     const user = userEvent.setup();
-    render(<{SiteForm} />);
+    render(<SiteForm />);
     
     // Submit form without filling required fields
-    const submitButton = screen.getByTestId('{siteForm}-submit');
+    const submitButton = screen.getByTestId('siteForm-submit');
     await user.click(submitButton);
     
     // Check for error messages
@@ -20,7 +20,7 @@ describe('{SiteForm} Validation', () => {
 
   it('validates field formats with appropriate error messages', async () => {
     const user = userEvent.setup();
-    render(<{SiteForm} />);
+    render(<SiteForm />);
     
     // Fill fields with invalid values
     await user.type(screen.getByLabelText(/name/i), 'A'.repeat(51)); // Too long
@@ -28,7 +28,7 @@ describe('{SiteForm} Validation', () => {
     await user.type(screen.getByLabelText(/description/i), 'A'.repeat(501)); // Too long
     
     // Submit the form
-    await user.click(screen.getByTestId('{siteForm}-submit'));
+    await user.click(screen.getByTestId('siteForm-submit'));
     
     // Check for validation errors
     expect(await screen.findByText(/name cannot exceed 50 characters/i)).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe('{SiteForm} Validation', () => {
 
   it('validates domain format', async () => {
     const user = userEvent.setup();
-    render(<{SiteForm} />);
+    render(<SiteForm />);
     
     // Try to add invalid domain
     await user.type(screen.getByPlaceholderText(/enter domain/i), 'invalid');
@@ -59,7 +59,7 @@ describe('{SiteForm} Validation', () => {
 
   it('prevents adding duplicate domains', async () => {
     const user = userEvent.setup();
-    render(<{SiteForm} />);
+    render(<SiteForm />);
     
     // Add a domain
     await user.type(screen.getByPlaceholderText(/enter domain/i), 'example.com');
@@ -75,10 +75,10 @@ describe('{SiteForm} Validation', () => {
 
   it('clears field errors when values are changed', async () => {
     const user = userEvent.setup();
-    render(<{SiteForm} />);
+    render(<SiteForm />);
     
     // Submit empty form to trigger validation errors
-    await user.click(screen.getByTestId('{siteForm}-submit'));
+    await user.click(screen.getByTestId('siteForm-submit'));
     
     // Check for validation errors
     expect(await screen.findByText(/name is required/i)).toBeInTheDocument();
