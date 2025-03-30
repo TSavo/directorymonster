@@ -7,10 +7,24 @@ const createJestConfig = nextJest({
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/tests/mocks/ui-setup.js'],
+  setupFilesAfterEnv: [
+    '<rootDir>/jest.setup.js', 
+    '<rootDir>/tests/mocks/ui-setup.js',
+    '<rootDir>/tests/__setup__/global-test-data.js'
+  ],
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
+    // Main app path aliases
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@/app/(.*)$': '<rootDir>/src/app/$1',
+    '^@/components/(.*)$': '<rootDir>/src/components/$1',
+    '^@/hooks/(.*)$': '<rootDir>/src/hooks/$1',
+    '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
+    '^@/services/(.*)$': '<rootDir>/src/services/$1',
+    '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@/types/(.*)$': '<rootDir>/src/types/$1',
+    
+    // UI component mocks at various relative path depths
     '^../../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
     '^../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
     '^../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',

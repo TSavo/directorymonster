@@ -1,0 +1,142 @@
+[
+  {
+    "name": "http://localhost:3000/_next/static/chunks/webpack.js",
+    "type": "script",
+    "duration": 223.30000001192093,
+    "startTime": 331.3999999910593,
+    "size": 10827
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/main.js",
+    "type": "script",
+    "duration": 422,
+    "startTime": 331.59999999403954,
+    "size": 1129833
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/pages/_app.js",
+    "type": "script",
+    "duration": 357.79999999701977,
+    "startTime": 331.70000000298023,
+    "size": 1756
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/pages/_error.js",
+    "type": "script",
+    "duration": 408.19999998807907,
+    "startTime": 331.70000000298023,
+    "size": 1734
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/react-refresh.js",
+    "type": "script",
+    "duration": 230,
+    "startTime": 331.79999999701977,
+    "size": 25389
+  },
+  {
+    "name": "http://localhost:3000/_next/static/development/_buildManifest.js",
+    "type": "script",
+    "duration": 411.79999999701977,
+    "startTime": 331.79999999701977,
+    "size": 535
+  },
+  {
+    "name": "http://localhost:3000/_next/static/development/_ssgManifest.js",
+    "type": "script",
+    "duration": 415.20000000298023,
+    "startTime": 331.79999999701977,
+    "size": 376
+  },
+  {
+    "name": "http://localhost:3000/_next/static/development/_devMiddlewareManifest.json",
+    "type": "fetch",
+    "duration": 3.3999999910593033,
+    "startTime": 918.2000000029802,
+    "size": 492
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=webpack-internal%3A%2F%2F%2F%28middleware%29%2F.%2Fnode_modules%2Fredis-errors%2Findex.js&methodName=%3Cunknown%3E&arguments=&lineNumber=3&column=",
+    "type": "fetch",
+    "duration": 3.9000000059604645,
+    "startTime": 954.3999999910593,
+    "size": 459
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=webpack-internal%3A%2F%2F%2F%28middleware%29%2F.%2Fnode_modules%2Fredis-errors%2Findex.js&methodName=eval&arguments=&lineNumber=3&column=32",
+    "type": "fetch",
+    "duration": 3.7000000029802322,
+    "startTime": 955,
+    "size": 454
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=file%3A%2F%2F%2Fapp%2F.next%2Fserver%2Fsrc%2Fmiddleware.js&methodName=%28middleware%29%2F.%2Fnode_modules%2Fredis-errors%2Findex.js&arguments=&lineNumber=1294&column=1",
+    "type": "fetch",
+    "duration": 30.700000002980232,
+    "startTime": 955.2999999970198,
+    "size": 300
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=file%3A%2F%2F%2Fapp%2F.next%2Fserver%2Fedge-runtime-webpack.js&methodName=__webpack_require__&arguments=&lineNumber=37&column=33",
+    "type": "fetch",
+    "duration": 6.4000000059604645,
+    "startTime": 955.3999999910593,
+    "size": 324
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=file%3A%2F%2F%2Fapp%2F.next%2Fserver%2Fedge-runtime-webpack.js&methodName=fn&arguments=&lineNumber=285&column=21",
+    "type": "fetch",
+    "duration": 34.29999999701977,
+    "startTime": 955.7000000029802,
+    "size": 324
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=webpack-internal%3A%2F%2F%2F%28middleware%29%2F.%2Fnode_modules%2Fioredis%2Fbuilt%2Fcluster%2Findex.js&methodName=eval&arguments=&lineNumber=5&column=24",
+    "type": "fetch",
+    "duration": 33.400000005960464,
+    "startTime": 955.7999999970198,
+    "size": 464
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=file%3A%2F%2F%2Fapp%2F.next%2Fserver%2Fsrc%2Fmiddleware.js&methodName=%28middleware%29%2F.%2Fnode_modules%2Fioredis%2Fbuilt%2Fcluster%2Findex.js&arguments=&lineNumber=345&column=1",
+    "type": "fetch",
+    "duration": 59.8999999910593,
+    "startTime": 956,
+    "size": 300
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=file%3A%2F%2F%2Fapp%2F.next%2Fserver%2Fedge-runtime-webpack.js&methodName=__webpack_require__&arguments=&lineNumber=37&column=33",
+    "type": "fetch",
+    "duration": 64.79999999701977,
+    "startTime": 956.2000000029802,
+    "size": 324
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=file%3A%2F%2F%2Fapp%2F.next%2Fserver%2Fedge-runtime-webpack.js&methodName=fn&arguments=&lineNumber=285&column=21",
+    "type": "fetch",
+    "duration": 92.90000000596046,
+    "startTime": 956.3999999910593,
+    "size": 324
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=webpack-internal%3A%2F%2F%2F%28middleware%29%2F.%2Fnode_modules%2Fioredis%2Fbuilt%2FRedis.js&methodName=eval&arguments=&lineNumber=7&column=19",
+    "type": "fetch",
+    "duration": 39.5,
+    "startTime": 956.5999999940395,
+    "size": 456
+  },
+  {
+    "name": "http://localhost:3000/__nextjs_original-stack-frame?isServer=false&isEdgeServer=true&isAppDirectory=false&errorMessage=TypeError%3A+Cannot+read+properties+of+undefined+%28reading+%27charCodeAt%27%29&file=file%3A%2F%2F%2Fapp%2F.next%2Fserver%2Fsrc%2Fmiddleware.js&methodName=%28middleware%29%2F.%2Fnode_modules%2Fioredis%2Fbuilt%2FRedis.js&arguments=&lineNumber=235&column=1",
+    "type": "fetch",
+    "duration": 91.79999999701977,
+    "startTime": 956.7999999970198,
+    "size": 300
+  },
+  {
+    "name": "http://localhost:3000/favicon.ico",
+    "type": "other",
+    "duration": 906.9000000059605,
+    "startTime": 2044.5999999940395,
+    "size": 3995
+  }
+]

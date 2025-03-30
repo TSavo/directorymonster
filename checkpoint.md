@@ -1,19 +1,70 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - March 30, 2025 (4:15 PM)
+## Current Status - March 30, 2025 (6:30 PM)
 
-### Created Critical Issue for Test Failure Tracking
+### Working on Issue #37: Fix failing tests systematically
 
-- Created GitHub issue #37: "[CRITICAL] Fix failing tests systematically"
-- Set priority as critical and assigned to project owner
-- Established a systematic workflow for addressing failures:
-  1. Run failing tests reporter
-  2. Select a group of related failing tests
-  3. Fix the underlying issue
-  4. Verify tests pass
-  5. Commit and create PR
-  6. Repeat until all tests pass
-- Prioritized API tests first due to common failure pattern
+I've implemented the fix for the NextResponse mock in jest.setup.js and have committed the changes. Here's what I did:
+
+#### Implemented Fix for NextResponse Mock
+
+1. **Root Cause Confirmed**: 
+   - Verified that the issue was with NextResponse.json() returning a Response object that didn't have a proper json() method
+   - Ran tests to confirm this specific error scenario
+
+2. **Implementation Details**:
+   - Added a proper Enhanced Response class that extends the standard Response
+   - Ensured the mock includes the json() method that returns the original data
+   - Added a verification mechanism to check if the mock is working correctly after tests run
+   - Made the NextRequest mock better structured to work with the enhanced response
+
+3. **Current Status**:
+   - The NextResponse mock is now correctly implemented in jest.setup.js
+   - The fix ensures any Response object returned by NextResponse.json() has a working json() method
+   - Verified the fix using a test run
+
+#### Identified Additional Issues
+
+After reviewing the codebase and failing tests, I've identified several key issues that need to be fixed:
+
+1. **Circular Dependency in useSites.ts**:
+   - The file at `src/components/admin/sites/hooks/useSites.ts` has an immediate circular dependency
+   - It tries to import from itself with `export * from './useSites'` while there's also a directory with the same name
+   - This is causing "Maximum call stack size exceeded" errors in site-related tests
+
+2. **Missing Global Test Data Setup**:
+   - Many integration tests expect `global.__TEST_DATA__` to be available
+   - Currently no setup file is creating and populating this object
+   - Need to create a global test data setup file that runs before tests
+
+3. **Module Resolution Issues in Jest Config**:
+   - The current moduleNameMapper in jest.config.js may not be correctly handling all path aliases
+   - Several tests have "Cannot find module" errors
+   - Need to enhance the moduleNameMapper configuration
+
+#### Action Plan
+
+1. **Fix Circular Dependency in useSites.ts**:
+   - First priority as it causes immediate test failures
+   - Restructure the imports to eliminate the circular reference
+   - Ensure proper directory/file organization
+
+2. **Create Global Test Data Setup**:
+   - Create a new setup file that initializes global.__TEST_DATA__
+   - Add fixtures for common test data (sites, users, categories, listings)
+   - Update jest.config.js to include this setup file
+
+3. **Enhance Module Resolution in Jest Config**:
+   - Improve the moduleNameMapper in jest.config.js
+   - Add additional path mappings as needed
+   - Verify with specific tests that previously failed
+
+4. **Run Specific Test Groups**:
+   - Test each fix incrementally with specific test groups
+   - Document progress on each group of failing tests
+   - Prioritize API route tests first, then component tests
+
+The NextResponse fix is a good first step, but there are clearly multiple issues causing tests to fail. I'll continue addressing them systematically.
 
 ### Enhanced Failing Tests Reporter
 
@@ -132,10 +183,11 @@ Completed work on issue #11: [BUG] fetch API not available in Jest test environm
 
 ## Next Steps
 
-1. Begin working on issue #37 to systematically fix test failures
-   - Start with the NextResponse.json error in API tests
-   - Create a dedicated mock for NextResponse in the Jest setup
-   - Fix tests in groups of related functionality
+1. Begin implementing the fix for issue #37:
+   - Create branch `fix/issue-37-nextresponse-mock`
+   - Update jest.setup.js with a proper NextResponse mock
+   - Test on a small subset of API test files
+   - Verify and extend to all failing API tests
 
 2. Complete and merge PR #35 to exclude E2E tests from main test command
 
