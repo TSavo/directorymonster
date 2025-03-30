@@ -1,40 +1,54 @@
-# DirectoryMonster Next Steps - [2025-03-31 14:50]
+# DirectoryMonster Next Steps - [2025-03-31 15:45]
 
-## Test Framework Issues
+## Test Framework Improvements
 
-After attempting to run the integration tests, I've identified several critical issues that need to be addressed:
+After analyzing the integration tests, I've identified and addressed several critical issues:
 
-1. **Project Structure Issues**:
-   - The component tests expect a structure that doesn't match the actual codebase
-   - Missing hook files in expected locations (e.g., `components/admin/auth/hooks/useAuth`)
-   - Path resolution problems with the '@/' alias in Jest configuration
+1. **Project Structure Alignment**:
+   - ✅ Created missing hook directory structure (`src/components/admin/auth/hooks`)
+   - ✅ Implemented proper `useAuth` hook based on existing auth logic
+   - ✅ Made the sites hooks available at the expected paths
 
-2. **Incomplete Source Files**:
-   - The `useListings.ts` hook had incomplete implementation (now fixed)
-   - Other hooks may have similar issues that need to be fixed
+2. **Path Resolution Fixes**:
+   - ✅ Updated cross-cutting tests to use direct relative imports
+   - ✅ Fixed path references in DataPersistence.test.tsx
+   - ✅ Fixed path references in ErrorRecovery.test.tsx
 
-3. **Mocking Infrastructure Problems**:
-   - Tests rely on mocking objects that don't exist in the current structure
-   - The test suite needs a more robust mocking approach
+## Remaining Test Framework Issues
+
+While progress has been made, there are still several issues that need to be addressed:
+
+1. **Path Resolution Strategy**:
+   - Create a consistent approach to imports in tests (relative paths vs. aliases)
+   - Consider updating Jest configuration to properly handle module aliases
+
+2. **Shared Test Utilities**:
+   - Create a unified mocking approach for common hooks
+   - Implement shared fixtures and test helpers
+
+3. **Test Suite Organization**:
+   - Ensure all tests follow consistent patterns
+   - Refactor remaining tests with fixed imports
 
 ## Priority Tasks
 
 ### Testing Framework Refactoring
-- [ ] Audit and map the actual project structure to understand component relationships
-- [ ] Create missing hook utility modules that tests depend on
-- [ ] Update Jest configuration to properly handle module aliases
-- [ ] Implement a standardized mocking strategy for tests
+- [ ] Update remaining integration tests with correct imports
+- [ ] Create a centralized mock repository for hooks
+- [ ] Run a full test suite to identify any remaining issues
+- [ ] Document the proper test patterns for future development
 
 ### Documentation Update
 - [ ] Document the actual project structure to help with test refactoring
 - [ ] Create a comprehensive test setup guide for the team
 - [ ] Update the component documentation to reflect the current architecture
 
-### Integration Tests Refactoring
-- [ ] Refactor cross-cutting tests to match the actual project structure
-- [ ] Update filtering tests to use proper component imports
-- [ ] Revise listing-category tests with the correct mocks
-- [ ] Refactor site-listing and site-management tests
+## Git Management
+- [ ] Commit current changes with descriptive message ("Fix project structure and hook imports")
+- [ ] Create pull request with comprehensive description
+- [ ] Ensure CI pipeline runs all tests successfully
+
+# DirectoryMonster Next Steps - [2025-03-31 14:50]
 
 # DirectoryMonster Next Steps - [2025-03-31 01:50]
 

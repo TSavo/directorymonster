@@ -3,10 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingForm } from '@/components/admin/listings/ListingForm';
+import { ListingForm } from '../../../../src/components/admin/listings/ListingForm';
 
 // Mock the hooks and API calls
-jest.mock('@/hooks/useListings', () => ({
+jest.mock('../../../../src/components/admin/listings/components/form/useListingForm', () => ({
   useListingForm: jest.fn(),
 }));
 
@@ -37,7 +37,7 @@ jest.mock('next/router', () => ({
 }));
 
 // Mock hooks implementation
-import { useListingForm } from '@/components/admin/listings/components/form/useListingForm';
+import { useListingForm } from '../../../../src/components/admin/listings/components/form/useListingForm';
 import { useRouter } from 'next/router';
 
 const mockStore = configureStore([]);

@@ -3,21 +3,21 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingTable } from '@/components/admin/listings/ListingTable';
-import { ErrorBoundary } from '@/components/error/ErrorBoundary';
-import { retry } from '@/utils/api';
+import { ListingTable } from '../../../../src/components/admin/listings/ListingTable';
+import { ErrorBoundary } from '../../../../src/components/error/ErrorBoundary';
+import { retry } from '../../../../src/utils/api';
 
 // Mock the hooks and API calls
-jest.mock('@/hooks/useListings', () => ({
+jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
   useListings: jest.fn(),
 }));
 
-jest.mock('@/utils/api', () => ({
+jest.mock('../../../../src/utils/api', () => ({
   retry: jest.fn(),
 }));
 
 // Mock hooks implementation
-import { useListings } from '@/hooks/useListings';
+import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
 
 const mockStore = configureStore([]);
 
