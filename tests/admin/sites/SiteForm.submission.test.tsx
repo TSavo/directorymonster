@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { {SiteForm} } from '@/components/{{#if category}}{admin/sites}/{{/if}}{SiteForm}';
+import { SiteForm } from '@/components/admin/sites/SiteForm';
 import { useRouter } from 'next/navigation';
 
 // Mock the useRouter hook
@@ -9,7 +9,7 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
-describe('{SiteForm} Submission', () => {
+describe('SiteForm Submission', () => {
   const mockRouter = {
     push: jest.fn(),
   };
@@ -28,7 +28,7 @@ describe('{SiteForm} Submission', () => {
     const user = userEvent.setup();
     const onSuccess = jest.fn();
     
-    render(<{SiteForm} onSuccess={onSuccess} />);
+    render(<SiteForm onSuccess={onSuccess} />);
     
     // Fill in form with valid data
     await user.type(screen.getByLabelText(/name/i), 'Test Site');
@@ -38,7 +38,7 @@ describe('{SiteForm} Submission', () => {
     await user.click(screen.getByText(/\\+ add/i));
     
     // Submit the form
-    await user.click(screen.getByTestId('{siteForm}-submit'));
+    await user.click(screen.getByTestId('siteForm-submit'));
     
     // Verify fetch was called with correct data
     await waitFor(() => {
@@ -82,7 +82,7 @@ describe('{SiteForm} Submission', () => {
     
     const user = userEvent.setup();
     
-    render(<{SiteForm} />);
+    render(<SiteForm />);
     
     // Fill in form with valid data
     await user.type(screen.getByLabelText(/name/i), 'Test Site');
@@ -91,7 +91,7 @@ describe('{SiteForm} Submission', () => {
     await user.click(screen.getByText(/\\+ add/i));
     
     // Submit the form
-    await user.click(screen.getByTestId('{siteForm}-submit'));
+    await user.click(screen.getByTestId('siteForm-submit'));
     
     // Check error message is displayed
     expect(await screen.findByText(/API error message/i)).toBeInTheDocument();
@@ -112,14 +112,14 @@ describe('{SiteForm} Submission', () => {
       domains: ['initial.com']
     };
     
-    render(<{SiteForm} mode="edit" initialData={initialData} />);
+    render(<SiteForm mode="edit" initialData={initialData} />);
     
     // Update some fields
     await user.clear(screen.getByLabelText(/name/i));
     await user.type(screen.getByLabelText(/name/i), 'Updated Name');
     
     // Submit the form
-    await user.click(screen.getByTestId('{siteForm}-submit'));
+    await user.click(screen.getByTestId('siteForm-submit'));
     
     // Verify fetch was called with PUT method and correct URL
     await waitFor(() => {
@@ -140,7 +140,7 @@ describe('{SiteForm} Submission', () => {
     
     const user = userEvent.setup();
     
-    render(<{SiteForm} />);
+    render(<SiteForm />);
     
     // Fill in form with valid data
     await user.type(screen.getByLabelText(/name/i), 'Test Site');
@@ -149,7 +149,7 @@ describe('{SiteForm} Submission', () => {
     await user.click(screen.getByText(/\\+ add/i));
     
     // Submit the form
-    await user.click(screen.getByTestId('{siteForm}-submit'));
+    await user.click(screen.getByTestId('siteForm-submit'));
     
     // Check error message is displayed
     expect(await screen.findByText(/network error/i)).toBeInTheDocument();
@@ -170,7 +170,7 @@ describe('{SiteForm} Submission', () => {
     
     const user = userEvent.setup();
     
-    render(<{SiteForm} />);
+    render(<SiteForm />);
     
     // Fill in form with valid data
     await user.type(screen.getByLabelText(/name/i), 'Test Site');
@@ -179,14 +179,14 @@ describe('{SiteForm} Submission', () => {
     await user.click(screen.getByText(/\\+ add/i));
     
     // Submit the form
-    await user.click(screen.getByTestId('{siteForm}-submit'));
+    await user.click(screen.getByTestId('siteForm-submit'));
     
     // Check loading state is displayed
-    expect(screen.getByTestId('{siteForm}-submit-loading')).toBeInTheDocument();
+    expect(screen.getByTestId('siteForm-submit-loading')).toBeInTheDocument();
     
     // Wait for completion
     await waitFor(() => {
-      expect(screen.queryByTestId('{siteForm}-submit-loading')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('siteForm-submit-loading')).not.toBeInTheDocument();
     });
   });
 });

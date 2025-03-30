@@ -1,5 +1,11 @@
 "use client";
 
+// Import the components first
+import BasicInfoPreview from './BasicInfoPreview';
+import DomainsPreview from './DomainsPreview';
+import ThemePreview from './ThemePreview';
+import SEOPreview from './SEOPreview';
+
 // Export all named exports
 export * from './BasicInfoPreview';
 export * from './DomainsPreview';
