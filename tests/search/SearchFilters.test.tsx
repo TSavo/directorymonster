@@ -124,7 +124,10 @@ describe('SearchFilters Component', () => {
     
     // Check if filter change handler was called with correct args
     expect(mockFilterChangeHandler).toHaveBeenCalledWith({
-      categoryId: 'cat2'
+      categoryId: 'cat2',
+      featured: false,
+      sortBy: 'relevance',
+      status: ''
     });
   });
 
@@ -142,7 +145,10 @@ describe('SearchFilters Component', () => {
     
     // Check if filter change handler was called with correct args
     expect(mockFilterChangeHandler).toHaveBeenCalledWith({
-      featured: true
+      categoryId: '',
+      featured: true,
+      sortBy: 'relevance',
+      status: ''
     });
   });
 
@@ -160,7 +166,10 @@ describe('SearchFilters Component', () => {
     
     // Check if filter change handler was called with correct args
     expect(mockFilterChangeHandler).toHaveBeenCalledWith({
-      sortBy: 'newest'
+      categoryId: '',
+      featured: false,
+      sortBy: 'newest',
+      status: ''
     });
   });
 
@@ -179,6 +188,9 @@ describe('SearchFilters Component', () => {
     
     // Check if filter change handler was called with correct args
     expect(mockFilterChangeHandler).toHaveBeenCalledWith({
+      categoryId: '',
+      featured: false,
+      sortBy: 'relevance',
       status: 'draft'
     });
   });

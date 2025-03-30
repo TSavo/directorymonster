@@ -12,6 +12,13 @@ jest.mock('../../../src/lib/redis-client', () => ({
   },
 }));
 
+// Mock the searchKeys
+jest.mock('../../../src/lib/tenant', () => ({
+  searchKeys: {
+    listingIndex: jest.fn((siteId) => `search:site:${siteId}:listings`),
+  },
+}));
+
 describe('Search Utility Functions', () => {
   describe('getIntersection', () => {
     it('returns empty array for empty input', () => {
@@ -83,9 +90,12 @@ describe('Search Utility Functions', () => {
 
     it('scores title matches higher than description or content', async () => {
       const mockListingData = JSON.stringify({
+        id: 'listing1',
         title: 'test title',
         description: 'some description',
-        content: 'content without match'
+        content: 'content without match',
+        createdAt: Date.now(),
+        featured: false
       });
       
       (redis.hget as jest.Mock).mockResolvedValue(mockListingData);
@@ -101,6 +111,7 @@ describe('Search Utility Functions', () => {
       
       // Newer listing (created 1 day ago)
       const newListingData = JSON.stringify({
+        id: 'new-listing',
         title: 'test',
         description: 'test',
         content: 'test',
@@ -110,6 +121,7 @@ describe('Search Utility Functions', () => {
       
       // Older listing (created 180 days ago)
       const oldListingData = JSON.stringify({
+        id: 'old-listing',
         title: 'test',
         description: 'test',
         content: 'test',
@@ -130,6 +142,7 @@ describe('Search Utility Functions', () => {
     it('adds score bonus for featured listings', async () => {
       // Featured listing
       const featuredListingData = JSON.stringify({
+        id: 'featured-listing',
         title: 'test',
         description: 'test',
         content: 'test',
@@ -139,6 +152,7 @@ describe('Search Utility Functions', () => {
       
       // Non-featured listing
       const regularListingData = JSON.stringify({
+        id: 'regular-listing',
         title: 'test',
         description: 'test',
         content: 'test',
