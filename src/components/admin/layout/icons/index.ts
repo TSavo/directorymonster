@@ -1,17 +1,6 @@
-// Auto-generated index file - DO NOT EDIT
-// Generated on: 2025-03-29T21:14:15.449Z
+// Re-export all named exports from index.tsx
+export * from './index.tsx';
 
-export { index } from './index';
+// Re-export default export as named export
+export { default as Icons } from './index.tsx';
 
-// Default exports as named exports
-import indexDefault from './index';
-
-// Additional named exports
-export {
-  indexDefault,
-};
-
-// Default export object
-export default {
-  index: indexDefault,
-};

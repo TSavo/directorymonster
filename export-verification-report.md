@@ -1,12 +1,12 @@
 # Export Pattern Verification Report
 
-Generated on: 2025-03-30T01:28:38.765Z
+Generated on: 2025-03-30T01:34:01.111Z
 
 ## Summary
 
-- Total files checked: 3
-- Components checked: 2
-- Barrel files checked: 1
+- Total files checked: 64
+- Components checked: 44
+- Barrel files checked: 14
 - Components with issues: 0
 - Barrel files with issues: 0
 

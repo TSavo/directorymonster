@@ -76,3 +76,22 @@ export const ChevronRightIcon: React.FC<IconProps> = ({ className = 'w-6 h-6' })
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
   </svg>
 );
+
+// Group all icons together for default export
+const Icons = {
+  HomeIcon,
+  ListIcon,
+  FolderIcon,
+  GlobeIcon,
+  UsersIcon,
+  ChartIcon,
+  SettingsIcon,
+  CloseIcon,
+  MenuIcon,
+  BellIcon,
+  UserIcon,
+  ChevronRightIcon
+};
+
+// Add default export
+export default Icons;

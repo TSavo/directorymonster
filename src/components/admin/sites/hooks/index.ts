@@ -1,2 +1,5 @@
-// Export all hooks from this directory
+// Export all named exports from hooks
 export * from './useDomains';
+
+// Re-export default exports as named exports
+export { default as useDomains } from './useDomains';
