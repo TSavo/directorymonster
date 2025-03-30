@@ -38,52 +38,92 @@ jest.mock('next/headers', () => ({
 
 // Mock NextResponse for API routes
 jest.mock('next/server', () => {
-  // Use a standard Response class with json method for mocking
-  class EnhancedResponse extends Response {
-    constructor(body, init) {
-      super(body, init);
-      this.status = init?.status || 200;
-      this.statusText = init?.statusText || 'OK';
-      this.headers = new Headers(init?.headers || {});
-      
-      // Store the original data for the json() method
-      this._data = null;
+  // Factory function to create a proper mock response
+  function createMockResponse(body, init = {}) {
+    // First create an actual Response object to inherit from
+    const responseInit = {
+      status: init.status || 200,
+      statusText: init.statusText || 'OK',
+      headers: new Headers(init.headers || {})
+    };
+    
+    // Parse the body if needed
+    let parsedBody = body;
+    if (typeof body === 'object' && body !== null && !(body instanceof Blob) && !(body instanceof ArrayBuffer)) {
+      parsedBody = JSON.stringify(body);
     }
     
-    // Add json() method that returns the data
-    json() {
-      if (this._data) {
-        return Promise.resolve(this._data);
+    // Create the base response with the correct status code
+    const baseResponse = new Response(parsedBody, responseInit);
+    
+    // Create meta storage for additional properties
+    const meta = {
+      url: init.url || 'https://test.com',
+      originalBody: body,
+      init: init
+    };
+    
+    // Create a proxy to handle property access
+    return new Proxy(baseResponse, {
+      get(target, prop) {
+        // Handle special cases
+        if (prop === 'clone') {
+          return () => createMockResponse(meta.originalBody, meta.init);
+        }
+        
+        // Handle meta properties
+        if (prop in meta) {
+          return meta[prop];
+        }
+        
+        // Handle status code properly - return from init or from the base response
+        if (prop === 'status') {
+          return meta.init.status || target.status;
+        }
+        
+        // Handle nextjs-specific methods
+        if (prop === 'cookies') {
+          return {
+            get: jest.fn(),
+            set: jest.fn(),
+            delete: jest.fn(),
+            has: jest.fn().mockReturnValue(false),
+            getAll: jest.fn().mockReturnValue([])
+          };
+        }
+        
+        // Default behavior: return the property/method from the Response object
+        const value = target[prop];
+        if (typeof value === 'function') {
+          return value.bind(target);
+        }
+        
+        return value;
       }
-      
-      return super.json();
-    }
+    });
   }
   
   return {
+    // Mock NextRequest
     NextRequest: jest.fn().mockImplementation((input, init) => {
       const request = new Request(input || 'https://test.com', init);
       request.nextUrl = new URL(input || 'https://test.com');
       return request;
     }),
+    
+    // Mock NextResponse
     NextResponse: {
       json: (data, init) => {
-        const jsonString = JSON.stringify(data);
-        const response = new EnhancedResponse(jsonString, {
+        return createMockResponse(data, {
           ...init,
           headers: {
             'Content-Type': 'application/json',
             ...(init?.headers || {})
           }
         });
-        
-        // Store the original data
-        response._data = data;
-        
-        return response;
       },
       redirect: (url, init) => {
-        return new EnhancedResponse(null, {
+        return createMockResponse(null, {
           ...init,
           status: 302,
           headers: {
@@ -93,10 +133,10 @@ jest.mock('next/server', () => {
         });
       },
       next: (init) => {
-        return new EnhancedResponse(null, init);
+        return createMockResponse(null, init);
       },
       rewrite: (url, init) => {
-        return new EnhancedResponse(null, {
+        return createMockResponse(null, {
           ...init,
           headers: {
             'x-middleware-rewrite': url,
@@ -115,8 +155,11 @@ afterAll(() => {
   const responseObj = { test: 'data' };
   const response = NextResponse.json(responseObj);
   
+  // Test various properties and methods
   if (typeof response.json !== 'function') {
     console.error('MOCK ISSUE: NextResponse.json() did not return an object with a json() method');
+  } else if (response.status !== 200) {
+    console.error('MOCK ISSUE: NextResponse status is not correct');
   } else {
     console.log('NextResponse mock working correctly');
   }

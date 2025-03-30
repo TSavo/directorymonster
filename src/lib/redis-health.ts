@@ -6,7 +6,7 @@ import { redis, isRedisConnected, getRedisConnectionState } from './redis';
 export async function checkRedisConnection(): Promise<{
   status: 'ok' | 'error';
   message?: string;
-  connectionState: string;
+  connectionState?: string;
   timestamp: number;
 }> {
   try {
