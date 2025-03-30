@@ -1,17 +1,26 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - March 30, 2025 (1:30 PM)
+## Current Status - March 30, 2025 (2:30 PM)
+
+### Completed fix/exclude-e2e-tests branch
+
+- Updated the main `npm test` command to exclude the e2e tests by adding the `--testPathIgnorePatterns=tests/e2e` flag
+- Added a new `test:with-e2e` command that runs all tests including e2e tests
+- This change speeds up the development workflow as e2e tests take a long time to run
+- All changes are committed and ready for PR creation
+
+### Previous Work (1:30 PM)
 
 Completed work on issue #11: [BUG] fetch API not available in Jest test environment
 
-### Plan:
+#### Plan:
 1. Investigate Jest configuration files to understand current setup
 2. Research best approach for adding fetch polyfill (jest-fetch-mock vs. isomorphic-fetch vs. node-fetch)
 3. Implement the fix in Jest setup files
 4. Test solution by running tests that use fetch API
 5. Create PR with the fix
 
-### Progress:
+#### Progress:
 - Created branch `fix/issue-11-fetch-api-jest`
 - Marked issue as "status:in-progress"
 - Completed investigation of Jest configuration:
@@ -21,7 +30,7 @@ Completed work on issue #11: [BUG] fetch API not available in Jest test environm
   - Node v18+ has native fetch support, but the project may be running in an environment where it's not available
   - Tests are running in Jest's JSDOM environment which doesn't have fetch by default
 
-### Solution Implemented:
+#### Solution Implemented:
 1. Updated `jest.setup.js`:
    ```javascript
    // Make sure fetch is defined globally before enabling mocks
@@ -59,13 +68,27 @@ Completed work on issue #11: [BUG] fetch API not available in Jest test environm
    - Test failures due to "fetch is not defined" should be resolved
    - Created PR #34 with the solution
 
-### Previous Work:
-Successfully fixed failing tests for PR #32 which implements basic search functionality:
+### Earlier Work
 
-1. **PR #32: Implement basic search functionality**
-   - Addresses issue #24
-   - Added enhanced search API with filtering capabilities
-   - Fixed all failing tests
+Successfully addressed failing tests in PR #33 related to issue #9:
+
+1. **Issue #9: Complete Implementation of Incomplete useListings Hook**
+   - Confirmed that the `setSearchTerm` function in `useListings.ts` is properly implemented
+   - Fixed failing tests in PR #33 by:
+     - Restoring fetch mocking configuration in jest.setup.js
+     - Fixing test implementations in search-indexer.test.ts and listing-indexer.test.ts
+   - Added comments to the PR explaining the changes
+
+2. **Test Status**
+   - Individual test files are now passing:
+     - search-indexer.test.ts: ✅ PASS (9/9 tests)
+     - listing-indexer.test.ts: ✅ PASS (11/11 tests)
+
+3. **Summary of Changes**
+   - The main issue was related to test mocking configurations
+   - The PR had removed important fetch mocking setup which caused the tests to fail
+   - Fixed the test files to properly match the implementation of the indexer classes
+   - All modifications have been committed to the PR branch
 
 ## Test Results
 
@@ -90,3 +113,12 @@ Successfully fixed failing tests for PR #32 which implements basic search functi
   - Fixed issue with undefined properties
   - Improved test setup for countSearchResults
   - Added explicit mock implementation for sorting test
+
+## Next Steps
+
+1. Complete and merge PR #35 to exclude E2E tests from main test command
+2. Return to addressing integration test failures in PR #32
+   - Fix the search API endpoints in the test environment
+   - Update the mock implementations to match expected behavior
+   - Ensure proper test data setup for integration tests
+   - Make sure the response format matches expectations
