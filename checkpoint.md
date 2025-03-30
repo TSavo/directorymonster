@@ -1,7 +1,84 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - March 30, 2025
+## Current Status - March 30, 2025 (1:30 PM)
 
+Working on issue #11: [BUG] fetch API not available in Jest test environment
+
+### Plan:
+1. Investigate Jest configuration files to understand current setup
+2. Research best approach for adding fetch polyfill (jest-fetch-mock vs. isomorphic-fetch vs. node-fetch)
+3. Implement the fix in Jest setup files
+4. Test solution by running tests that use fetch API
+5. Create PR with the fix
+
+### Progress:
+- Created branch `fix/issue-11-fetch-api-jest`
+- Marked issue as "status:in-progress"
+- Completed investigation of Jest configuration and identified issues
+- Successfully implemented a solution!
+
+### Implementation Details:
+Updated `jest.setup.js` with the following improvements:
+
+1. Added TextEncoder and TextDecoder polyfill from Node.js util module:
+   ```javascript
+   // TextEncoder/TextDecoder polyfill for node environments
+   if (typeof global.TextEncoder === 'undefined') {
+     const { TextEncoder, TextDecoder } = require('util');
+     global.TextEncoder = TextEncoder;
+     global.TextDecoder = TextDecoder;
+   }
+   ```
+
+2. Improved fetch availability with fallbacks:
+   ```javascript
+   // Ensure fetch is available globally - Node.js v22 already has it natively
+   // but Jest JSDOM environment might not
+   if (typeof global.fetch !== 'function') {
+     // First try Node's native fetch if available
+     try {
+       const nodeFetch = require('node-fetch');
+       global.fetch = nodeFetch.default || nodeFetch;
+     } catch (e) {
+       // Fallback to a simple mock implementation
+       global.fetch = function fetch() {
+         return Promise.resolve({ 
+           json: () => Promise.resolve({}),
+           text: () => Promise.resolve(''),
+           ok: true
+         });
+       };
+     }
+   }
+   ```
+
+3. Better node-fetch mocking:
+   ```javascript
+   // Mock node-fetch for any explicit imports
+   jest.mock('node-fetch', () => {
+     return jest.fn().mockImplementation(() => {
+       return Promise.resolve({
+         ok: true,
+         json: () => Promise.resolve({}),
+         text: () => Promise.resolve(''),
+         status: 200,
+         headers: new Map()
+       });
+     });
+   });
+   ```
+
+### Test Results:
+- Successfully ran tests that use the fetch API
+- Tests now fail for normal test reasons (assertions, etc.) instead of with `ReferenceError: fetch is not defined`
+- Fixed the TextEncoder/TextDecoder errors that were also appearing in some tests
+
+### Next steps:
+1. Create a pull request with the fixes
+2. Update issue #11 with the solution
+3. Add documentation to the project about the Jest setup for future contributors
+
+### Previous Work:
 Successfully fixed failing tests for PR #32 which implements basic search functionality:
 
 1. **PR #32: Implement basic search functionality**
