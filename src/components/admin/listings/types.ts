@@ -1,108 +1,261 @@
-import { Listing, Category, SiteConfig } from '@/types';
+import { Category } from '../categories/types';
 
 /**
- * Extended Listing type with additional properties for UI display
+ * Listing status enum
  */
-export interface ListingWithRelations extends Listing {
-  categoryName?: string;
-  siteName?: string;
+export enum ListingStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  ARCHIVED = 'archived',
+  PENDING_REVIEW = 'pending_review',
+  REJECTED = 'rejected',
 }
 
 /**
- * Fields that can be sorted
+ * Media type enum
  */
-export type SortField = 'title' | 'categoryName' | 'createdAt' | 'updatedAt' | 'backlinkVerifiedAt';
+export enum MediaType {
+  IMAGE = 'image',
+  VIDEO = 'video',
+  DOCUMENT = 'document',
+}
+
+/**
+ * Price type enum
+ */
+export enum PriceType {
+  FREE = 'free',
+  FIXED = 'fixed',
+  STARTING_AT = 'starting_at',
+  VARIABLE = 'variable',
+  CONTACT = 'contact',
+}
+
+/**
+ * Listing Media interface
+ */
+export interface ListingMedia {
+  id: string;
+  url: string;
+  type: MediaType;
+  alt?: string;
+  width?: number;
+  height?: number;
+  isPrimary?: boolean;
+  sortOrder?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Listing Price interface
+ */
+export interface ListingPrice {
+  priceType: PriceType;
+  amount?: number;
+  currency?: string;
+  description?: string;
+  oldPrice?: number;
+  salePrice?: number;
+  onSale?: boolean;
+}
+
+/**
+ * Contact information interface
+ */
+export interface ContactInfo {
+  email?: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+}
+
+/**
+ * SEO Data interface
+ */
+export interface SEOData {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  ogImage?: string;
+  canonical?: string;
+  noIndex?: boolean;
+}
+
+/**
+ * Backlink information interface
+ */
+export interface BacklinkInfo {
+  url: string;
+  anchorText?: string;
+  targetPage?: string;
+  verified?: boolean;
+  verifiedAt?: string;
+  status?: 'pending' | 'verified' | 'failed';
+}
+
+/**
+ * Custom field interface
+ */
+export interface CustomField {
+  key: string;
+  value: string | number | boolean | string[];
+  label: string;
+  type: 'text' | 'number' | 'boolean' | 'select' | 'multiselect';
+  options?: string[];
+}
+
+/**
+ * Main Listing interface
+ */
+export interface Listing {
+  id: string;
+  siteId: string;
+  title: string;
+  slug: string;
+  description: string;
+  status: ListingStatus;
+  categoryIds: string[];
+  categories?: Category[];
+  media: ListingMedia[];
+  price?: ListingPrice;
+  contactInfo?: ContactInfo;
+  seoData?: SEOData;
+  backlinkInfo?: BacklinkInfo;
+  customFields?: CustomField[];
+  featured?: boolean;
+  featuredUntil?: string;
+  viewCount?: number;
+  clickCount?: number;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string;
+  expiresAt?: string;
+  userId: string;
+  userDisplayName?: string;
+}
+
+/**
+ * Form data for creating/updating a listing
+ */
+export interface ListingFormData {
+  title: string;
+  description: string;
+  status: ListingStatus;
+  categoryIds: string[];
+  media: ListingMedia[];
+  price?: ListingPrice;
+  contactInfo?: ContactInfo;
+  seoData?: SEOData;
+  backlinkInfo?: BacklinkInfo;
+  customFields?: CustomField[];
+  featured?: boolean;
+  featuredUntil?: string;
+}
+
+/**
+ * Listing sort options
+ */
+export type ListingSortField = 
+  | 'title' 
+  | 'createdAt' 
+  | 'updatedAt' 
+  | 'publishedAt' 
+  | 'viewCount' 
+  | 'clickCount' 
+  | 'status';
 
 /**
  * Sort direction
  */
-export type SortOrder = 'asc' | 'desc';
+export type SortDirection = 'asc' | 'desc';
 
 /**
- * Props for the ListingTable component
+ * Listing filters interface
  */
-export interface ListingTableProps {
-  siteSlug?: string; // Optional: If provided, only show listings for this site
-  initialListings?: ListingWithRelations[]; // Optional: For server-side rendering
+export interface ListingFilters {
+  search?: string;
+  status?: ListingStatus[];
+  categoryIds?: string[];
+  featured?: boolean;
+  fromDate?: string;
+  toDate?: string;
+  userId?: string;
 }
 
 /**
- * Props for the ListingTableHeader component
+ * Listing pagination interface
  */
-export interface ListingTableHeaderProps {
-  totalListings: number;
-  siteSlug?: string;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  categoryFilter: string;
-  setCategoryFilter: (categoryId: string) => void;
-  siteFilter: string;
-  setSiteFilter: (siteId: string) => void;
-  categories: Category[];
-  sites: SiteConfig[];
-}
-
-/**
- * Props for the ListingTableRow component
- */
-export interface ListingTableRowProps {
-  listing: ListingWithRelations;
-  siteSlug?: string;
-  showSiteColumn: boolean;
-}
-
-/**
- * Props for the ListingTablePagination component
- */
-export interface ListingTablePaginationProps {
-  currentPage: number;
+export interface ListingPagination {
+  page: number;
+  perPage: number;
+  total: number;
   totalPages: number;
-  goToPage: (page: number) => void;
-  itemsPerPage: number;
-  setItemsPerPage: (items: number) => void;
-  totalItems: number;
 }
 
 /**
- * Props for the ListingTableActions component
+ * Table state interface
  */
-export interface ListingTableActionsProps {
-  listingId: string;
-  listingSlug: string;
-  listingTitle: string;
-  siteSlug?: string;
-  onDeleteClick: (id: string, title: string) => void;
+export interface ListingTableState {
+  items: Listing[];
+  loading: boolean;
+  error: string | null;
+  filters: ListingFilters;
+  pagination: ListingPagination;
+  sort: {
+    field: ListingSortField;
+    direction: SortDirection;
+  };
+  selected: string[];
 }
 
 /**
- * Props for the ListingTableSkeleton component
+ * Listing API response
  */
-export interface ListingTableSkeletonProps {
-  rows?: number;
+export interface ListingApiResponse {
+  data: Listing[];
+  pagination: ListingPagination;
 }
 
 /**
- * Props for the ListingTableError component
+ * Form validation errors interface
  */
-export interface ListingTableErrorProps {
-  error: string;
-  onRetry: () => void;
+export interface ListingFormErrors {
+  title?: string;
+  description?: string;
+  status?: string;
+  categoryIds?: string;
+  media?: string;
+  price?: {
+    priceType?: string;
+    amount?: string;
+    currency?: string;
+  };
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+    website?: string;
+  };
+  backlinkInfo?: {
+    url?: string;
+  };
+  [key: string]: any;
 }
 
 /**
- * Props for the ListingTableEmptyState component
+ * Multi-step form state interface
  */
-export interface ListingTableEmptyStateProps {
-  siteSlug?: string;
-}
-
-/**
- * Props for the ListingTableSortHeader component
- */
-export interface ListingTableSortHeaderProps {
-  label: string;
-  field: SortField;
-  currentSortField: SortField;
-  currentSortOrder: SortOrder;
-  onSort: (field: SortField) => void;
+export interface ListingFormState {
+  formData: ListingFormData;
+  currentStep: number;
+  totalSteps: number;
+  errors: ListingFormErrors;
+  touched: Record<string, boolean>;
+  isSubmitting: boolean;
+  isValid: boolean;
+  isDirty: boolean;
 }

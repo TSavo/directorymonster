@@ -1,300 +1,135 @@
-'use client';
+"use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { Category, SiteConfig } from '@/types';
-import { ListingWithRelations, SortField, SortOrder } from '../types';
+import { 
+  Listing, 
+  ListingFilters, 
+  ListingSortField, 
+  SortDirection, 
+  ListingPagination, 
+  ListingApiResponse,
+  ListingStatus 
+} from '../types';
+
+interface UseListingsProps {
+  siteSlug?: string;
+  initialFilters?: ListingFilters;
+  initialSort?: {
+    field: ListingSortField;
+    direction: SortDirection;
+  };
+  initialPagination?: {
+    page: number;
+    perPage: number;
+  };
+}
 
 /**
- * Custom hook for managing listings data with filtering, sorting and pagination
+ * Hook for fetching and managing listings data
  */
-export function useListings(siteSlug?: string, initialListings?: ListingWithRelations[]) {
-  // State for listings data
-  const [listings, setListings] = useState<ListingWithRelations[]>(initialListings || []);
-  const [filteredListings, setFilteredListings] = useState<ListingWithRelations[]>([]);
-  
-  // State for loading and error handling
-  const [isLoading, setIsLoading] = useState<boolean>(!initialListings);
+export const useListings = ({
+  siteSlug,
+  initialFilters = {},
+  initialSort = { field: 'updatedAt', direction: 'desc' },
+  initialPagination = { page: 1, perPage: 10 }
+}: UseListingsProps = {}) => {
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // State for filtering and sorting
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('');
-  const [siteFilter, setSiteFilter] = useState<string>(siteSlug || '');
-  const [sortField, setSortField] = useState<SortField>('updatedAt');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  
-  // State for pagination
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  
-  // State for available categories and sites
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [sites, setSites] = useState<SiteConfig[]>([]);
-  
-  // State for dialog
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-  const [listingToDelete, setListingToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [filters, setFilters] = useState<ListingFilters>(initialFilters);
+  const [sort, setSort] = useState<{
+    field: ListingSortField;
+    direction: SortDirection;
+  }>(initialSort);
+  const [pagination, setPagination] = useState<ListingPagination>({
+    page: initialPagination.page,
+    perPage: initialPagination.perPage,
+    total: 0,
+    totalPages: 0
+  });
+  const [selected, setSelected] = useState<string[]>([]);
 
-  // Fetch listings data
+  /**
+   * Fetch listings from the API
+   */
   const fetchListings = useCallback(async () => {
-    setIsLoading(true);
+    if (!siteSlug) return;
+
+    setLoading(true);
     setError(null);
-    
+
     try {
-      // If siteSlug is provided, fetch listings only for that site
-      const endpoint = siteSlug 
-        ? `/api/sites/${siteSlug}/listings` 
-        : '/api/listings'; // Note: This endpoint may need to be implemented
+      const queryParams = new URLSearchParams();
       
-      const response = await fetch(endpoint);
+      // Add pagination params
+      queryParams.append('page', pagination.page.toString());
+      queryParams.append('perPage', pagination.perPage.toString());
+      
+      // Add sort params
+      queryParams.append('sortField', sort.field);
+      queryParams.append('sortDirection', sort.direction);
+      
+      // Add filter params
+      if (filters.search) {
+        queryParams.append('search', filters.search);
+      }
+      
+      if (filters.status && filters.status.length > 0) {
+        filters.status.forEach(status => {
+          queryParams.append('status', status);
+        });
+      }
+      
+      if (filters.categoryIds && filters.categoryIds.length > 0) {
+        filters.categoryIds.forEach(categoryId => {
+          queryParams.append('categoryId', categoryId);
+        });
+      }
+      
+      if (filters.featured !== undefined) {
+        queryParams.append('featured', filters.featured.toString());
+      }
+      
+      if (filters.fromDate) {
+        queryParams.append('fromDate', filters.fromDate);
+      }
+      
+      if (filters.toDate) {
+        queryParams.append('toDate', filters.toDate);
+      }
+      
+      if (filters.userId) {
+        queryParams.append('userId', filters.userId);
+      }
+
+      const response = await fetch(`/api/sites/${siteSlug}/listings?${queryParams.toString()}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch listings: ${response.statusText}`);
       }
       
-      const data = await response.json();
+      const data: ListingApiResponse = await response.json();
       
-      // Enrich listings with category and site names
-      const enrichedListings = await Promise.all(data.map(async (listing: ListingWithRelations) => {
-        const categoryResponse = await fetch(`/api/sites/${siteSlug || listing.siteId}/categories`);
-        const categories = categoryResponse.ok ? await categoryResponse.json() : [];
-        
-        const category = categories.find((cat: Category) => cat.id === listing.categoryId);
-        
-        // If we're in multi-site mode, fetch site details
-        let siteName = '';
-        if (!siteSlug) {
-          const siteResponse = await fetch(`/api/sites/${listing.siteId}`);
-          if (siteResponse.ok) {
-            const site = await siteResponse.json();
-            siteName = site.name;
-          }
-        }
-        
-        return {
-          ...listing,
-          categoryName: category ? category.name : 'Unknown Category',
-          siteName: siteName || 'Unknown Site',
-        };
-      }));
-      
-      setListings(enrichedListings);
+      setListings(data.data);
+      setPagination(data.pagination);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
       console.error('Error fetching listings:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch listings');
+      setListings([]);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  }, [siteSlug]);
+  }, [siteSlug, filters, sort, pagination.page, pagination.perPage]);
 
-  // Fetch categories for filtering
-  const fetchCategories = useCallback(async () => {
-    if (!siteSlug) return; // Don't fetch categories if no site is selected
-    
-    try {
-      const response = await fetch(`/api/sites/${siteSlug}/categories`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch categories: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      setCategories(data);
-    } catch (err) {
-      console.error('Error fetching categories:', err);
-    }
-  }, [siteSlug]);
-
-  // Fetch sites for filtering in multi-site mode
-  const fetchSites = useCallback(async () => {
-    if (siteSlug) return; // Don't fetch sites if a site is already selected
-    
-    try {
-      const response = await fetch('/api/sites');
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch sites: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      setSites(data);
-    } catch (err) {
-      console.error('Error fetching sites:', err);
-    }
-  }, [siteSlug]);
-
-  // Handle deletion of a listing
-  const handleDelete = async (id: string) => {
-    try {
-      const endpoint = siteSlug 
-        ? `/api/sites/${siteSlug}/listings/${id}` 
-        : `/api/listings/${id}`;
-      
-      const response = await fetch(endpoint, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to delete listing: ${response.statusText}`);
-      }
-      
-      // Remove the listing from the state
-      setListings(prevListings => prevListings.filter(listing => listing.id !== id));
-      setIsDeleteModalOpen(false);
-      setListingToDelete(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred while deleting');
-      console.error('Error deleting listing:', err);
-    }
-  };
-
-  // Open delete confirmation modal
-  const confirmDelete = (id: string, title: string) => {
-    setListingToDelete({ id, title });
-    setIsDeleteModalOpen(true);
-  };
-
-  // Cancel delete operation
-  const cancelDelete = () => {
-    setIsDeleteModalOpen(false);
-    setListingToDelete(null);
-  };
-
-  // Filter, sort, and paginate listings
+  /**
+   * Fetch listings on initial load and when dependencies change
+   */
   useEffect(() => {
-    // Apply filters
-    let result = [...listings];
-    
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(listing => 
-        listing.title.toLowerCase().includes(term) ||
-        listing.metaDescription.toLowerCase().includes(term) ||
-        (listing.categoryName && listing.categoryName.toLowerCase().includes(term))
-      );
-    }
-    
-    if (categoryFilter) {
-      result = result.filter(listing => listing.categoryId === categoryFilter);
-    }
-    
-    if (siteFilter && !siteSlug) {
-      result = result.filter(listing => listing.siteId === siteFilter);
-    }
-    
-    // Apply sorting
-    result.sort((a, b) => {
-      let valA, valB;
-      
-      switch (sortField) {
-        case 'title':
-          valA = a.title;
-          valB = b.title;
-          break;
-        case 'categoryName':
-          valA = a.categoryName || '';
-          valB = b.categoryName || '';
-          break;
-        case 'createdAt':
-          valA = a.createdAt;
-          valB = b.createdAt;
-          break;
-        case 'updatedAt':
-          valA = a.updatedAt;
-          valB = b.updatedAt;
-          break;
-        case 'backlinkVerifiedAt':
-          valA = a.backlinkVerifiedAt || 0;
-          valB = b.backlinkVerifiedAt || 0;
-          break;
-        default:
-          valA = a.updatedAt;
-          valB = b.updatedAt;
-      }
-      
-      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
-    
-    setFilteredListings(result);
-    
-    // Reset to first page when filters change
-    setCurrentPage(1);
-  }, [listings, searchTerm, categoryFilter, siteFilter, sortField, sortOrder, siteSlug]);
+    fetchListings();
+  }, [fetchListings]);
 
-  // Data fetching on component mount
-  useEffect(() => {
-    if (!initialListings) {
-      fetchListings();
-    }
-    fetchCategories();
-    fetchSites();
-  }, [fetchListings, fetchCategories, fetchSites, initialListings]);
-
-  // Handle sort toggle
-  const handleSort = (field: SortField) => {
-    if (field === sortField) {
-      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
-  };
-
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredListings.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentListings = filteredListings.slice(startIndex, endIndex);
-
-  // Pagination controls
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  return {
-    // Data
-    listings,
-    filteredListings,
-    currentListings,
-    categories,
-    sites,
-    
-    // Loading and error states
-    isLoading,
-    error,
-    
-    // Filtering
-    searchTerm,
-    setSearchTerm,
-    categoryFilter,
-    setCategoryFilter,
-    siteFilter,
-    setSiteFilter,
-    
-    // Sorting
-    sortField,
-    sortOrder,
-    handleSort,
-    
-    // Pagination
-    currentPage,
-    totalPages,
-    itemsPerPage,
-    setItemsPerPage,
-    goToPage,
-    
-    // Delete handling
-    isDeleteModalOpen,
-    listingToDelete,
-    confirmDelete,
-    handleDelete,
-    cancelDelete,
-    
-    // Refetch
-    fetchListings
-  };
-}
+  /**
+   * Set search filter
+   */
+  const setSearchTerm = useCallback((search: string) => {
+    setFilters
