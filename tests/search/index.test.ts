@@ -10,12 +10,13 @@ describe('Search Component Exports', () => {
     expect(searchExports.SearchResults).toBeDefined();
     expect(searchExports.SearchBar).toBeDefined();
     expect(searchExports.SearchIcon).toBeDefined();
+    expect(searchExports.SearchFilters).toBeDefined();
     
     // Verify that there are no unexpected exports
     const exportKeys = Object.keys(searchExports);
-    expect(exportKeys).toHaveLength(4);
+    expect(exportKeys).toHaveLength(5);
     expect(exportKeys).toEqual(
-      expect.arrayContaining(['SearchForm', 'SearchResults', 'SearchBar', 'SearchIcon'])
+      expect.arrayContaining(['SearchForm', 'SearchResults', 'SearchBar', 'SearchIcon', 'SearchFilters'])
     );
   });
 });

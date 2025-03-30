@@ -5,20 +5,14 @@ import { NextRequest } from 'next/server';
 import { GET } from '../../src/app/api/search/route';
 
 // Mock the searchIndexer
-jest.mock('../../src/lib/search-indexer', () => ({
+jest.mock('../../src/lib/search', () => ({
   searchIndexer: {
-    searchAll: jest.fn(),
+    searchListings: jest.fn(),
+    countSearchResults: jest.fn(),
   },
 }));
 
-// Mock Redis client
-jest.mock('../../src/lib/redis-client', () => ({
-  kv: {
-    get: jest.fn(),
-  },
-}));
-
-// Mock withRedis middleware to pass through the handler
+// Mock withRedis middleware
 jest.mock('../../src/middleware/withRedis', () => ({
   withRedis: (handler: Function) => handler,
 }));
@@ -28,292 +22,182 @@ describe('Search API', () => {
     jest.clearAllMocks();
   });
 
-  it('should return an error when query is missing', async () => {
-    // Create request without a query parameter
-    const request = new NextRequest('http://localhost:3000/api/search');
-    
-    // Execute the route handler
+  it('returns error when siteId is missing', async () => {
+    const request = new NextRequest('http://localhost:3000/api/search?q=test');
     const response = await GET(request);
-    
-    // Parse the response
     const data = await response.json();
     
-    // Verify the response
     expect(response.status).toBe(400);
     expect(data).toEqual({
-      error: 'Missing search query',
+      error: 'Missing site ID',
     });
   });
 
-  it('should return an error when query is too short', async () => {
-    // Create request with a short query
-    const request = new NextRequest('http://localhost:3000/api/search?q=ab');
-    
-    // Execute the route handler
+  it('returns error when no search criteria provided', async () => {
+    const request = new NextRequest('http://localhost:3000/api/search?siteId=site1');
     const response = await GET(request);
-    
-    // Parse the response
     const data = await response.json();
     
-    // Verify the response
+    expect(response.status).toBe(400);
+    expect(data).toEqual({
+      error: 'Missing search query or filters',
+    });
+  });
+
+  it('returns error when query is too short', async () => {
+    const request = new NextRequest('http://localhost:3000/api/search?q=ab&siteId=site1');
+    const response = await GET(request);
+    const data = await response.json();
+    
     expect(response.status).toBe(400);
     expect(data).toEqual({
       error: 'Search query too short',
     });
   });
 
-  it('should return search results for a valid query', async () => {
-    // Mock the search indexer
-    const { searchIndexer } = require('../../src/lib/search-indexer');
-    (searchIndexer.searchAll as jest.Mock).mockResolvedValue(['listing1', 'listing2']);
+  it('handles query with category filter correctly', async () => {
+    const { searchIndexer } = require('../../src/lib/search');
     
-    // Mock the Redis client
-    const { kv } = require('../../src/lib/redis-client');
-    (kv.get as jest.Mock).mockImplementation((key) => {
-      if (key === 'listing:id:listing1') {
-        return Promise.resolve({
-          id: 'listing1',
-          title: 'Test Listing 1',
-          slug: 'test-listing-1',
-          categoryId: 'cat1',
-          siteId: 'site1',
-          metaDescription: 'Test description 1',
-          content: 'Test content 1',
-          backlinkUrl: 'https://example.com/1',
-          backlinkAnchorText: 'Example 1',
-          backlinkPosition: 'prominent',
-          backlinkType: 'dofollow',
-          customFields: {},
-          createdAt: 1000,
-          updatedAt: 1000,
-        });
-      }
-      if (key === 'listing:id:listing2') {
-        return Promise.resolve({
-          id: 'listing2',
-          title: 'Test Listing 2',
-          slug: 'test-listing-2',
-          categoryId: 'cat1',
-          siteId: 'site1',
-          metaDescription: 'Test description 2',
-          content: 'Test content 2',
-          backlinkUrl: 'https://example.com/2',
-          backlinkAnchorText: 'Example 2',
-          backlinkPosition: 'prominent',
-          backlinkType: 'dofollow',
-          customFields: {},
-          createdAt: 2000,
-          updatedAt: 2000,
-        });
-      }
-      return Promise.resolve(null);
-    });
+    // Mock implementation of searchListings and countSearchResults
+    searchIndexer.searchListings.mockResolvedValue([
+      { id: 'listing1', title: 'Test Listing 1' },
+      { id: 'listing2', title: 'Test Listing 2' }
+    ]);
     
-    // Create request with a valid query
-    const request = new NextRequest('http://localhost:3000/api/search?q=test query');
+    searchIndexer.countSearchResults.mockResolvedValue(2);
     
-    // Execute the route handler
+    const request = new NextRequest(
+      'http://localhost:3000/api/search?q=test&siteId=site1&categoryId=cat1'
+    );
+    
     const response = await GET(request);
-    
-    // Parse the response
     const data = await response.json();
     
-    // Verify the response
     expect(response.status).toBe(200);
+    
+    // Verify search indexer was called with correct parameters
+    expect(searchIndexer.searchListings).toHaveBeenCalledWith(
+      'site1',
+      'test',
+      expect.objectContaining({
+        categoryId: 'cat1',
+        limit: 20,
+        offset: 0
+      })
+    );
+    
+    // Verify count was called with correct parameters
+    expect(searchIndexer.countSearchResults).toHaveBeenCalledWith(
+      'site1',
+      'test',
+      expect.objectContaining({
+        categoryId: 'cat1'
+      })
+    );
+    
+    // Verify response structure
     expect(data).toEqual({
       results: [
-        {
-          id: 'listing1',
-          title: 'Test Listing 1',
-          slug: 'test-listing-1',
-          categoryId: 'cat1',
-          siteId: 'site1',
-          metaDescription: 'Test description 1',
-          content: 'Test content 1',
-          backlinkUrl: 'https://example.com/1',
-          backlinkAnchorText: 'Example 1',
-          backlinkPosition: 'prominent',
-          backlinkType: 'dofollow',
-          customFields: {},
-          createdAt: 1000,
-          updatedAt: 1000,
-        },
-        {
-          id: 'listing2',
-          title: 'Test Listing 2',
-          slug: 'test-listing-2',
-          categoryId: 'cat1',
-          siteId: 'site1',
-          metaDescription: 'Test description 2',
-          content: 'Test content 2',
-          backlinkUrl: 'https://example.com/2',
-          backlinkAnchorText: 'Example 2',
-          backlinkPosition: 'prominent',
-          backlinkType: 'dofollow',
-          customFields: {},
-          createdAt: 2000,
-          updatedAt: 2000,
-        },
+        { id: 'listing1', title: 'Test Listing 1' },
+        { id: 'listing2', title: 'Test Listing 2' }
       ],
-      totalResults: 2,
-      query: 'test query',
-    });
-    
-    // Verify the searchIndexer was called correctly
-    expect(searchIndexer.searchAll).toHaveBeenCalledWith(['test', 'query'], undefined);
-  });
-
-  it('should filter out null listing results', async () => {
-    // Mock the search indexer
-    const { searchIndexer } = require('../../src/lib/search-indexer');
-    (searchIndexer.searchAll as jest.Mock).mockResolvedValue(['listing1', 'non-existent']);
-    
-    // Mock the Redis client
-    const { kv } = require('../../src/lib/redis-client');
-    (kv.get as jest.Mock).mockImplementation((key) => {
-      if (key === 'listing:id:listing1') {
-        return Promise.resolve({
-          id: 'listing1',
-          title: 'Test Listing 1',
-          slug: 'test-listing-1',
-          categoryId: 'cat1',
-          siteId: 'site1',
-          metaDescription: 'Test description 1',
-          content: 'Test content 1',
-          backlinkUrl: 'https://example.com/1',
-          backlinkAnchorText: 'Example 1',
-          backlinkPosition: 'prominent',
-          backlinkType: 'dofollow',
-          customFields: {},
-          createdAt: 1000,
-          updatedAt: 1000,
-        });
+      pagination: {
+        page: 1,
+        perPage: 20,
+        totalResults: 2,
+        totalPages: 1
+      },
+      query: 'test',
+      filters: {
+        categoryId: 'cat1',
+        featured: undefined,
+        status: undefined
       }
-      return Promise.resolve(null);
     });
-    
-    // Create request with a valid query
-    const request = new NextRequest('http://localhost:3000/api/search?q=test query');
-    
-    // Execute the route handler
-    const response = await GET(request);
-    
-    // Parse the response
-    const data = await response.json();
-    
-    // Verify that only valid listings are returned
-    expect(response.status).toBe(200);
-    expect(data.results.length).toBe(1);
-    expect(data.totalResults).toBe(1);
-    expect(data.results[0].id).toBe('listing1');
   });
 
-  it('should support site-specific search', async () => {
-    // Mock the search indexer
-    const { searchIndexer } = require('../../src/lib/search-indexer');
-    (searchIndexer.searchAll as jest.Mock).mockResolvedValue(['listing1']);
+  it('handles featured filter correctly', async () => {
+    const { searchIndexer } = require('../../src/lib/search');
     
-    // Mock the Redis client
-    const { kv } = require('../../src/lib/redis-client');
-    (kv.get as jest.Mock).mockResolvedValue({
-      id: 'listing1',
-      title: 'Test Listing 1',
-      slug: 'test-listing-1',
-      categoryId: 'cat1',
-      siteId: 'site1',
-      metaDescription: 'Test description 1',
-      content: 'Test content 1',
-      backlinkUrl: 'https://example.com/1',
-      backlinkAnchorText: 'Example 1',
-      backlinkPosition: 'prominent',
-      backlinkType: 'dofollow',
-      customFields: {},
-      createdAt: 1000,
-      updatedAt: 1000,
-    });
+    searchIndexer.searchListings.mockResolvedValue([
+      { id: 'listing1', title: 'Featured Listing', featured: true }
+    ]);
     
-    // Create request with a valid query and siteId
-    const request = new NextRequest('http://localhost:3000/api/search?q=test query&siteId=site1');
+    searchIndexer.countSearchResults.mockResolvedValue(1);
     
-    // Execute the route handler
+    const request = new NextRequest(
+      'http://localhost:3000/api/search?siteId=site1&featured=true'
+    );
+    
     const response = await GET(request);
-    
-    // Parse the response
     const data = await response.json();
     
-    // Verify the response
     expect(response.status).toBe(200);
     
-    // Verify the searchIndexer was called with the site ID
-    expect(searchIndexer.searchAll).toHaveBeenCalledWith(['test', 'query'], 'site1');
+    expect(searchIndexer.searchListings).toHaveBeenCalledWith(
+      'site1',
+      '',
+      expect.objectContaining({
+        featuredOnly: true
+      })
+    );
+    
+    expect(data.filters.featured).toBe(true);
   });
 
-  it('should handle search errors', async () => {
-    // Mock the search indexer to throw an error
-    const { searchIndexer } = require('../../src/lib/search-indexer');
-    (searchIndexer.searchAll as jest.Mock).mockRejectedValue(new Error('Search failed'));
+  it('handles pagination parameters correctly', async () => {
+    const { searchIndexer } = require('../../src/lib/search');
     
-    // Create request with a valid query
-    const request = new NextRequest('http://localhost:3000/api/search?q=test query');
+    searchIndexer.searchListings.mockResolvedValue([
+      { id: 'listing21', title: 'Listing 21' },
+      { id: 'listing22', title: 'Listing 22' }
+    ]);
     
-    // Execute the route handler
+    searchIndexer.countSearchResults.mockResolvedValue(30);
+    
+    const request = new NextRequest(
+      'http://localhost:3000/api/search?q=test&siteId=site1&page=3&perPage=10'
+    );
+    
     const response = await GET(request);
-    
-    // Parse the response
     const data = await response.json();
     
-    // Verify the response
+    expect(response.status).toBe(200);
+    
+    // Verify pagination parameters
+    expect(searchIndexer.searchListings).toHaveBeenCalledWith(
+      'site1',
+      'test',
+      expect.objectContaining({
+        limit: 10,
+        offset: 20 // (page-1) * perPage
+      })
+    );
+    
+    // Verify pagination response
+    expect(data.pagination).toEqual({
+      page: 3,
+      perPage: 10,
+      totalResults: 30,
+      totalPages: 3
+    });
+  });
+
+  it('handles search errors gracefully', async () => {
+    const { searchIndexer } = require('../../src/lib/search');
+    
+    searchIndexer.searchListings.mockRejectedValue(new Error('Search failed'));
+    
+    const request = new NextRequest(
+      'http://localhost:3000/api/search?q=test&siteId=site1'
+    );
+    
+    const response = await GET(request);
+    const data = await response.json();
+    
     expect(response.status).toBe(500);
     expect(data).toEqual({
       error: 'Search failed',
     });
-  });
-
-  it('should limit results to 20 items', async () => {
-    // Create an array of 25 listing IDs
-    const listingIds = Array.from({ length: 25 }, (_, i) => `listing${i + 1}`);
-    
-    // Mock the search indexer
-    const { searchIndexer } = require('../../src/lib/search-indexer');
-    (searchIndexer.searchAll as jest.Mock).mockResolvedValue(listingIds);
-    
-    // Mock the Redis client to return a listing for each ID
-    const { kv } = require('../../src/lib/redis-client');
-    (kv.get as jest.Mock).mockImplementation((key) => {
-      const listingId = key.replace('listing:id:', '');
-      if (listingIds.includes(listingId)) {
-        return Promise.resolve({
-          id: listingId,
-          title: `Test Listing ${listingId}`,
-          slug: `test-listing-${listingId}`,
-          categoryId: 'cat1',
-          siteId: 'site1',
-          metaDescription: `Test description ${listingId}`,
-          content: `Test content ${listingId}`,
-          backlinkUrl: `https://example.com/${listingId}`,
-          backlinkAnchorText: `Example ${listingId}`,
-          backlinkPosition: 'prominent',
-          backlinkType: 'dofollow',
-          customFields: {},
-          createdAt: 1000,
-          updatedAt: 1000,
-        });
-      }
-      return Promise.resolve(null);
-    });
-    
-    // Create request with a valid query
-    const request = new NextRequest('http://localhost:3000/api/search?q=test query');
-    
-    // Execute the route handler
-    const response = await GET(request);
-    
-    // Parse the response
-    const data = await response.json();
-    
-    // Verify the response is limited to 20 results
-    expect(response.status).toBe(200);
-    expect(data.results.length).toBe(20);
-    expect(data.totalResults).toBe(20);
   });
 });
