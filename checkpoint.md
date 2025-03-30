@@ -1,8 +1,27 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - March 30, 2025 (3:00 PM)
+## Current Status - March 30, 2025 (3:30 PM)
 
-### Executed NPM Tests
+### Created Failing Tests Reporter
+
+- Implemented a custom Jest reporter that shows only failing test files
+- Created two configuration files:
+  - `jest.failures.config.js`: Uses jest-silent-reporter for detailed failure output
+  - `jest.simple-failures.config.js`: Uses a custom reporter to show only failing files
+- Added new npm scripts:
+  - `test:failures-only`: Shows detailed failure information
+  - `test:failing-files`: Shows just the failing file paths
+- Created batch files for easier command execution:
+  - `test-few-files.bat`: Tests a small subset of files to demonstrate the reporter
+  - `test-api-files.bat`: Tests the API files (where most failures are occurring)
+- Discovered major issues with API tests:
+  - Most API test failures involve `TypeError: Response.json is not a function`
+  - Found 11 failing test files with 45 total test failures
+  - Main issues appear to be related to NextResponse mocking in tests
+
+### Previous Status (3:00 PM)
+
+#### Executed NPM Tests
 
 - Ran the project's test suite using `npm test` command
 - Tests ran successfully without errors
@@ -104,34 +123,16 @@ Successfully addressed failing tests in PR #33 related to issue #9:
    - Fixed the test files to properly match the implementation of the indexer classes
    - All modifications have been committed to the PR branch
 
-## Test Results
-
-### Component Tests: ✅ ALL PASSING
-- **SearchResults.test.tsx**: ✅ PASS (4/4 tests)
-- **SearchFilters.test.tsx**: ✅ PASS (8/8 tests)
-  - Fixed tests to match the component implementation
-  - Updated test expectations to include all filter properties
-- **SearchForm.test.tsx**: ✅ PASS
-- **SearchBar.test.tsx**: ✅ PASS
-- **SearchIcon.test.tsx**: ✅ PASS
-
-### Library Tests: ✅ ALL PASSING
-- **category-indexer.test.ts**: ✅ PASS 
-- **search-indexer.test.ts**: ✅ PASS 
-  - Fixed mock implementation approach using jest.spyOn
-  - Corrected object references for mocking
-- **utils.test.ts**: ✅ PASS
-  - Fixed issue with missing data in mock JSON objects
-  - Resolved NaN errors in calculateSearchScore tests
-- **listing-indexer.test.ts**: ✅ PASS
-  - Fixed issue with undefined properties
-  - Improved test setup for countSearchResults
-  - Added explicit mock implementation for sorting test
-
 ## Next Steps
 
-1. Complete and merge PR #35 to exclude E2E tests from main test command
-2. Return to addressing integration test failures in PR #32
+1. Investigate the NextResponse.json error in API tests
+   - The error appears to be related to a mocking issue with the Next.js Response object
+   - Most API test failures involve the same error: `TypeError: Response.json is not a function`
+   - This suggests a common issue with the test setup for API route tests
+
+2. Complete and merge PR #35 to exclude E2E tests from main test command
+
+3. Return to addressing integration test failures in PR #32
    - Fix the search API endpoints in the test environment
    - Update the mock implementations to match expected behavior
    - Ensure proper test data setup for integration tests
