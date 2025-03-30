@@ -397,6 +397,34 @@ Some tests are still failing due to component rendering and hydration issues:
    - Fix page title and content detection for homepage tests
    - Add more data-testid attributes to the homepage components
 
+## Latest Work - [2025-03-29] - Incorporating First-User Tests into Login Directory
+
+### Completed Integration of First-User Tests
+
+1. **Created dedicated first-user directory structure**:
+   - Added `login/first-user/` directory to organize tests
+   - Created shared selectors and setup utilities
+   - Split tests into logical components
+
+2. **Implemented new first-user test files**:
+   - `first-user.selectors.js` - Centralized selectors with fallbacks
+   - `first-user.setup.js` - Shared utilities and helpers
+   - `first-user.suite.test.js` - Main test orchestrator
+   - `first-user.setup-page.test.js` - Setup page rendering tests
+   - `first-user.validation.test.js` - Form validation tests
+   - `first-user.creation.test.js` - User creation tests
+   - `first-user.login-flow.test.js` - Login flow after user creation
+
+3. **Improved test reliability**:
+   - Added proper hydration waiting
+   - Created flexible selector strategy with fallbacks
+   - Implemented detailed error handling
+   - Added screenshot capture for debugging
+
+4. **Removed old test file**:
+   - Deleted `tests/e2e/first-user.test.js`
+   - Completely migrated all functionality to new structure
+
 ## Latest Work - [2025-03-29] - Converting E2E Tests to New Structure
 
 ### Completed Conversion of Homepage and Login Tests

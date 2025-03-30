@@ -5,33 +5,6 @@ import { kv } from '@/lib/redis-client';
  * Get hostname from request headers in server component
  */
 export async function getHostname(): Promise<string | null> {
-  // If running in test/development environment, provide a default site for localhost
-  if (normalizedHostname === 'localhost' || normalizedHostname.includes('localhost')) {
-    console.log('DEBUG: Using default test site for localhost');
-    return {
-      id: 'test-site',
-      slug: 'test-site',
-      name: 'Test Site',
-      domain: 'localhost',
-      description: 'Default site for testing',
-      logoUrl: '/logo.png',
-      themeColor: '#4F46E5',
-      secondaryColor: '#10B981',
-      settings: {
-        allowSignups: true,
-        enableSearch: true,
-      },
-      seo: {
-        title: 'Test Site',
-        description: 'A test site for development and testing',
-        keywords: ['test', 'development'],
-        noindexPages: []
-      },
-      owner: 'test-user',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-  }
   try {
     // This works on the server side to get the current hostname
     const { headers } = await import('next/headers');
@@ -61,9 +34,43 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
   
   if (site) return site;
   
-  // If running in test/development environment, provide a default site for localhost
+  // If running in test/development environment, use the configured default site for localhost
   if (normalizedHostname === 'localhost' || normalizedHostname.includes('localhost')) {
-    console.log('DEBUG: Using default test site for localhost');
+    // First, check if a default site is explicitly configured
+    console.log('DEBUG: Looking up configured default site');
+    const defaultSiteSlug = await getDefaultSiteSlug();
+    
+    if (defaultSiteSlug) {
+      console.log(`DEBUG: Found configured default site: ${defaultSiteSlug}`);
+      const defaultSite = await kv.get<SiteConfig>(`site:slug:${defaultSiteSlug}`);
+      if (defaultSite) {
+        console.log(`DEBUG: Using configured default site: ${defaultSite.name}`);
+        return defaultSite;
+      }
+    }
+    
+    // If no default site configured or not found, try to use hiking-gear
+    console.log('DEBUG: No default site configured, trying hiking-gear');
+    const hikingGearSite = await kv.get<SiteConfig>('site:slug:hiking-gear');
+    if (hikingGearSite) {
+      console.log('DEBUG: Using hiking-gear as default site');
+      return hikingGearSite;
+    }
+    
+    // Last resort - try to get any site from the database
+    console.log('DEBUG: Trying to find any site to use as default');
+    const siteKeys = await kv.keys('site:slug:*');
+    if (siteKeys.length > 0) {
+      const firstSiteKey = siteKeys[0];
+      const firstSite = await kv.get<SiteConfig>(firstSiteKey);
+      if (firstSite) {
+        console.log(`DEBUG: Using first available site as default: ${firstSite.name}`);
+        return firstSite;
+      }
+    }
+    
+    // Ultimate fallback - return a dummy test site
+    console.log('DEBUG: No sites found, using basic test site');
     return {
       id: 'test-site',
       slug: 'test-site',
@@ -144,6 +151,41 @@ export function generateCategoryHref(categorySlug: string): string {
  */
 export function generateListingHref(categorySlug: string, listingSlug: string): string {
   return `/${categorySlug}/${listingSlug}`;
+}
+
+/**
+ * Get the configured default site slug
+ */
+export async function getDefaultSiteSlug(): Promise<string | null> {
+  try {
+    // Try to get the default site slug from Redis
+    const defaultSiteSlug = await kv.get<string>('config:default-site');
+    return defaultSiteSlug;
+  } catch (error) {
+    console.error('Error getting default site slug:', error);
+    return null;
+  }
+}
+
+/**
+ * Set the default site slug
+ */
+export async function setDefaultSite(siteSlug: string): Promise<boolean> {
+  try {
+    // Verify the site exists before setting it as default
+    const site = await kv.get<SiteConfig>(`site:slug:${siteSlug}`);
+    if (!site) {
+      console.error(`Site with slug "${siteSlug}" not found`);
+      return false;
+    }
+    
+    // Set the default site slug in Redis
+    await kv.set('config:default-site', siteSlug);
+    return true;
+  } catch (error) {
+    console.error('Error setting default site:', error);
+    return false;
+  }
 }
 
 /**

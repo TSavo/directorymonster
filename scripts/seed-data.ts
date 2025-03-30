@@ -73,6 +73,22 @@ async function createListing(siteSlug: string, listingData: Partial<Listing>): P
 }
 
 /**
+ * Set the default site via API
+ */
+async function setDefaultSite(siteSlug: string): Promise<void> {
+  try {
+    console.log(`Setting default site to: ${siteSlug}...`);
+    const response = await axios.post(`${API_BASE_URL}/config/default-site`, { siteSlug });
+    console.log(`✅ Default site set to: ${siteSlug}`);
+    return;
+  } catch (error: any) {
+    console.error(`❌ Error setting default site:`, error.response?.data || error.message);
+    // Don't throw error for this - it's not critical to seeding
+    console.log(`Note: Default site setup is available in DirectoryMonster 1.1.0+`);
+  }
+}
+
+/**
  * Main function to seed all data
  */
 async function seedData(): Promise<void> {
@@ -217,6 +233,14 @@ async function seedData(): Promise<void> {
       await createListing(hikingSite.slug, listingData);
     }
 
+    // Set hiking-gear as the default site for local development
+    try {
+      await setDefaultSite('hiking-gear');
+      console.log('✅ Set hiking-gear as the default site for localhost');
+    } catch (error) {
+      console.warn('⚠️ Could not set default site. You may need to run: set-default-site.bat hiking-gear');
+    }
+
     console.log('✅ All sample data has been successfully seeded via API');
   } catch (error) {
     console.error('❌ Error seeding data:', error);
@@ -233,5 +257,6 @@ export {
   seedData,
   createSite,
   createCategory,
-  createListing
+  createListing,
+  setDefaultSite
 };

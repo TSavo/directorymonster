@@ -43,14 +43,14 @@
 - [ ] Convert all E2E tests to follow the new testing pattern:
   - [x] Homepage tests converted to new structure
   - [x] Login tests conversion to new structure
+  - [x] First-user test conversion to new structure
   - [ ] Admin dashboard tests conversion to new structure
-  - [ ] First-user test conversion to new structure
   - [x] Create shared test setup and teardown
 - [ ] Create a selectors file for each major component area:
   - [x] homepage.selectors.js (completed)
   - [x] login.selectors.js (completed)
+  - [x] first-user.selectors.js (completed)
   - [ ] admin.selectors.js
-  - [ ] firstuser.selectors.js
 - [ ] Document the new E2E testing pattern
 - [ ] Create script to automate test file generation
 
@@ -81,6 +81,8 @@
 - ✅ Convert login.test.js to new test structure pattern
 - ✅ Create login.selectors.js with centralized selectors
 - ✅ Create shared test setup utilities for login tests
+- ✅ Convert first-user.test.js to new test structure pattern
+- ✅ Create first-user.selectors.js with centralized selectors
 - [ ] Add data-testid attributes to admin components
 - [ ] Create admin.selectors.js file
 - [ ] Refactor admin dashboard tests into specialized test files
