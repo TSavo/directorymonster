@@ -1,26 +1,8 @@
 # DirectoryMonster Project Checkpoint
 
-## Import Path Fixes Progress Update - [2025-04-01 09:00]
+## Import Path Fixes Progress Update - [2025-04-01 09:30]
 
-After analyzing the remaining integration test files that still use `@/` aliases for imports, I've identified 22 additional test files that need to be updated. These files are distributed across 5 test categories:
-
-1. **site-management/** - 4 files
-2. **site-listing/** - 7 files
-3. **listing-category/** - 2 files
-4. **filtering/** - 4 files
-5. **cross-cutting/** - 5 files (2 already fixed)
-
-I'll update these files using the same approach that worked for the first two test files - converting `@/` import aliases to direct relative paths like `../../../../src/components/...`.
-
-### Implementation Plan
-
-1. Categorize the import updates by test directory
-2. Create a pattern for each import type (hooks, components)
-3. Consistently apply updates with proper path resolution
-4. Make the changes incrementally, focusing on one directory at a time
-5. Use the edit_file function to ensure proper updates
-
-This approach will maintain consistency and ensure all tests follow the same import pattern.
+I've successfully fixed the import paths in two testing files and committed the changes. This establishes the pattern for fixing the remaining test files.
 
 ### Progress Update
 
@@ -35,6 +17,27 @@ Each file is updated by:
 1. Updating component imports to use direct relative paths
 2. Updating hook mocks to use the correct paths
 3. Updating hook imports to match the mock paths
+
+### Next Steps
+
+I'll continue updating the remaining test files in batches, focusing on one directory at a time:
+
+1. Complete the remaining **filtering** tests:
+   - FilterPersistence.test.tsx
+   - CombinedFilters.test.tsx
+
+2. Fix **listing-category** tests:
+   - CategoryFilteringNavigation.test.tsx
+   - CategorySelectionInListing.test.tsx
+
+3. Fix **cross-cutting** tests:
+   - NotificationSystems.test.tsx
+
+4. Fix **site-listing** tests (all 7 files)
+
+5. Fix **site-management** tests (all 4 files)
+
+After all tests have been updated, I'll run the full test suite to verify the fixes work correctly.
 
 ## Integration Tests Progress Summary - [2025-03-31 16:00]
 
