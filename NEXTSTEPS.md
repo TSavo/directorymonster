@@ -47,8 +47,17 @@
 5. Add export verification to CI pipeline
 
 ## Future Work
+
+### Export Standardization Improvements
+- Add export verification to CI pipeline via GitHub Actions
+- Create tooling to automatically generate standardized component files
+- Update project documentation with export pattern guidelines
+- Add eslint rules to enforce proper export patterns
+
+### Upcoming DirectoryMonster Features
 - Enhance data handling and state management
 - Improve error handling for API requests
 - Optimize loading states and UI feedback
 - Implement caching for performance gains
 - Add data validation on client and server
+- Expand test coverage for recently standardized components
