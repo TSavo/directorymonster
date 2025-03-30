@@ -1,16 +1,43 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - [2025-03-29] - Export Standardization
+## Current Status - [2025-03-29] - E2E Testing Improvements
 
-### Completed Work
-- ✅ Standardized export patterns in dashboard and layout module components
-- ✅ Created verification script to check export compliance across codebase
-- ✅ Fixed dual-export pattern in core components (named + default exports)
-- ✅ Eliminated try/catch blocks in barrel files causing syntax errors
-- ✅ Reduced export-related warnings in Docker logs
-- ✅ Standardized auth module components with dual-export pattern (7 components)
-- ✅ Standardized category module components with dual-export pattern (5 components)
-- ✅ Standardized dashboard subcomponents with dual-export pattern (2 components)
+### Planned Work - [2025-03-29]
+
+#### 1. Add data-testid attributes to homepage components
+- Add data-testid to SiteHeader.tsx main container, logo, and navigation
+- Add data-testid to homepage hero section, category section, and footer
+- Add data-testid to search form and search input elements
+- Follow consistent naming pattern (e.g., site-header, site-navigation, etc.)
+
+#### 2. Implement component hydration waiting utility
+- Create a new utility function in tests/e2e/utils/hydration-utils.js
+- Implement robust function to wait for component hydration
+- Add retry mechanism for finding form elements with exponential backoff
+- Make utility reusable across all E2E tests
+
+#### 3. Fix homepage test expectations
+- Update title expectations to handle dynamic site titles
+- Improve content detection using data-testid attributes
+- Add proper waiting for dynamic content loading
+
+### Initial Analysis
+After examining the E2E test files:
+
+1. **homepage.test.js issues**:
+   - Uses generic selectors that may not reliably find components
+   - Doesn't account for dynamic content loading and hydration timing
+   - Uses `:contains()` CSS selector syntax which isn't supported by Puppeteer
+
+2. **login.test.js issues**:
+   - Form elements are not consistently found during testing
+   - Test has timing issues related to component hydration
+   - Element selection is brittle and relies on CSS classes
+
+3. **Component Selection Strategy**:
+   - Need to add consistent data-testid attributes to all key components
+   - Create utilities for reliable component selection
+   - Implement proper waiting for component hydration
 
 ### Current Issues (Verification Report)
 - ✅ All components follow the standardized export pattern

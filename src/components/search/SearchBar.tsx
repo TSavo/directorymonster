@@ -48,11 +48,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} data-testid="search-bar">
       <form 
         onSubmit={handleSubmit}
         role="search"
         className="flex items-center"
+        data-testid="search-form"
       >
         <button
           type="button"
@@ -77,6 +78,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             placeholder="Search..."
             className="w-full border-b-2 border-gray-300 focus:border-blue-500 outline-none py-1 px-2 text-sm"
             aria-label="Search query"
+            data-testid="search-input"
           />
           
           <button

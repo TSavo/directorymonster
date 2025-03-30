@@ -11,7 +11,7 @@ interface SiteHeaderProps {
 
 export default function SiteHeader({ site, categories }: SiteHeaderProps) {
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-white shadow-sm" data-testid="site-header">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6">
           <div className="flex items-center">
@@ -22,6 +22,7 @@ export default function SiteHeader({ site, categories }: SiteHeaderProps) {
                   alt={site.name}
                   fill
                   className="object-contain"
+                  data-testid="site-logo"
                 />
               </div>
             )}
@@ -40,7 +41,7 @@ export default function SiteHeader({ site, categories }: SiteHeaderProps) {
         </div>
         
         {/* Navigation */}
-        <nav className="py-4 border-t border-gray-100">
+        <nav className="py-4 border-t border-gray-100" data-testid="site-navigation">
           <ul className="flex flex-wrap gap-8">
             <li>
               <Link 
