@@ -1,4 +1,4 @@
-# DirectoryMonster Next Steps - [2025-03-30 21:00]
+# DirectoryMonster Next Steps - [2025-03-30 22:15]
 
 ## Completed
 - ✅ Category Management functionality
@@ -59,31 +59,41 @@
 ### Testing & Documentation
 - [ ] Site Component Tests
   - [ ] Core Component Tests
+    - [x] StepNavigation.test.tsx (basic rendering)
+    - [x] StepNavigation.interaction.test.tsx
+    - [x] StepNavigation.accessibility.test.tsx
+    - [x] FormActions.test.tsx
+    - [x] FormActions.interaction.test.tsx
     - [ ] SiteForm.test.tsx (container component)
-    - [ ] StepNavigation.test.tsx (step logic)
-    - [ ] FormActions.test.tsx (buttons and validation)
   - [ ] Form Step Tests
     - [ ] BasicInfoStep.test.tsx
     - [ ] DomainStep.test.tsx
     - [ ] ThemeStep.test.tsx
     - [ ] SEOStep.test.tsx
   - [ ] Table Component Tests
-    - [ ] SiteTable.test.tsx (container)
-    - [ ] SiteTableHeader.test.tsx (search and actions)
-    - [ ] SiteTableRow.test.tsx (individual site)
-    - [ ] SiteTablePagination.test.tsx (navigation)
-    - [ ] DeleteConfirmationModal.test.tsx (deletion flow)
+    - [x] SiteTable.test.tsx (basic rendering)
+    - [x] SiteTable.loading.test.tsx
+    - [x] SiteTable.error.test.tsx
+    - [x] SiteTableHeader.test.tsx
+    - [x] SiteTableHeader.interaction.test.tsx
+    - [x] SiteTableRow.test.tsx
+    - [x] SiteTableRow.interaction.test.tsx
+    - [x] SiteTablePagination.test.tsx
+    - [x] SiteTablePagination.interaction.test.tsx
+    - [x] DeleteConfirmationModal.test.tsx
+    - [x] DeleteConfirmationModal.interaction.test.tsx
+    - [x] DeleteConfirmationModal.keyboard.test.tsx
   - [ ] Mobile Component Tests
     - [ ] SiteMobileCard.test.tsx (responsive layout)
-    - [ ] Responsive behavior tests for all components
+    - [ ] SiteMobileCard.interaction.test.tsx
   - [ ] Hook Tests
     - [ ] useSites.test.tsx (data management)
     - [ ] Validation function tests
     - [ ] API integration tests
   - [ ] Accessibility Tests
-    - [ ] Keyboard navigation
-    - [ ] Screen reader compatibility
-    - [ ] ARIA attributes verification
+    - [ ] Keyboard navigation tests for remaining components
+    - [ ] Screen reader compatibility tests
+    - [ ] ARIA attributes verification tests
 - [ ] Documentation
   - [x] sites/README.md (implementation guide)
   - [ ] Document the new E2E testing pattern
