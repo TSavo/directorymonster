@@ -1,36 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Safely import the TenantService
-let TenantService: any;
-try {
-  // Use dynamic import to avoid edge runtime errors with Redis
-  const { TenantService: Service } = require('./lib/tenant-service');
-  TenantService = Service;
-} catch (error) {
-  console.error('Failed to import TenantService:', error);
-  // Create a fallback implementation
-  TenantService = {
-    getTenantByHostname: async () => ({
-      id: 'default',
-      slug: 'default',
-      name: 'Default'
-    }),
-    tenantsExist: async () => true,
-    createDefaultTenant: async () => ({
-      id: 'default',
-      slug: 'default',
-      name: 'Default'
-    })
-  };
-}
-
 // Specify runtime
 export const runtime = 'nodejs';
+
+// Simple hostname mapping without database dependencies
+const getBasicTenantInfo = (hostname: string) => {
+  // Special case for localhost
+  if (hostname.includes('localhost') || hostname === '127.0.0.1') {
+    return {
+      id: 'default',
+      slug: 'default',
+      name: 'Default'
+    };
+  }
+  
+  // For subdomains like hiking-gear.mydirectory.com
+  const parts = hostname.split('.');
+  if (parts.length > 2 && !hostname.endsWith('.localhost')) {
+    const subdomain = parts[0];
+    return {
+      id: subdomain,
+      slug: subdomain,
+      name: subdomain.charAt(0).toUpperCase() + subdomain.slice(1).replace(/-/g, ' ')
+    };
+  }
+  
+  // For custom domains, just use the domain name as identifier
+  // The actual resolution will happen in the API or server component
+  return {
+    id: hostname,
+    slug: hostname.replace(/\./g, '-'),
+    name: hostname
+  };
+};
 
 /**
  * Multi-tenant middleware for hostname detection and request handling
  * Handles:
- * - Tenant identification based on hostname
+ * - Basic tenant identification based on hostname patterns
  * - Custom domain routing
  * - Debug hostname support for testing
  * - Admin paths, API paths, and static paths
@@ -72,25 +79,38 @@ export async function middleware(request: NextRequest) {
   responseHeaders.set('x-hostname', actualHostname);
   
   try {
-    // Get the tenant for the hostname
-    const tenant = await TenantService.getTenantByHostname(actualHostname);
+    // Get basic tenant info (NO DATABASE ACCESS)
+    const tenantInfo = getBasicTenantInfo(actualHostname);
     
-    // If a tenant is found, add tenant info to headers
-    if (tenant) {
-      responseHeaders.set('x-tenant-id', tenant.id);
-      responseHeaders.set('x-tenant-slug', tenant.slug);
-      responseHeaders.set('x-tenant-name', tenant.name);
-      
-      // For API paths, add tenant info to the request
-      if (isApiPath) {
-        const response = NextResponse.next();
-        response.headers.set('x-tenant-id', tenant.id);
-        response.headers.set('x-tenant-slug', tenant.slug);
-        return response;
+    // Add tenant info to headers
+    responseHeaders.set('x-tenant-id', tenantInfo.id);
+    responseHeaders.set('x-tenant-slug', tenantInfo.slug);
+    responseHeaders.set('x-tenant-name', tenantInfo.name);
+    
+    // For API paths, add tenant info to the request
+    if (isApiPath) {
+      const response = NextResponse.next();
+      // Merge all response headers
+      for (const [key, value] of responseHeaders.entries()) {
+        response.headers.set(key, value);
       }
-      
-      // For admin paths, just add tenant info
-      if (isAdminPath) {
+      return response;
+    }
+    
+    // For admin paths, just add tenant info
+    if (isAdminPath) {
+      const response = NextResponse.next();
+      // Merge all response headers
+      for (const [key, value] of responseHeaders.entries()) {
+        response.headers.set(key, value);
+      }
+      return response;
+    }
+    
+    // Handle localhost development specially
+    if (actualHostname.includes('localhost') || actualHostname === '127.0.0.1') {
+      // Special case for setup path
+      if (pathname === '/admin/setup') {
         const response = NextResponse.next();
         // Merge all response headers
         for (const [key, value] of responseHeaders.entries()) {
@@ -99,56 +119,7 @@ export async function middleware(request: NextRequest) {
         return response;
       }
       
-      // For other paths, continue with tenant info
-      const response = NextResponse.next();
-      // Merge all response headers
-      for (const [key, value] of responseHeaders.entries()) {
-        response.headers.set(key, value);
-      }
-      return response;
-    } else {
-      // Handle localhost development and no tenant found
-      if (actualHostname.includes('localhost') || actualHostname === '127.0.0.1') {
-        // For development, check if we need to create a default tenant
-        if (process.env.NODE_ENV !== 'production' && !(await TenantService.tenantsExist())) {
-          // Create default tenant for development
-          try {
-            await TenantService.createDefaultTenant();
-            console.log('Created default tenant for development');
-          } catch (error) {
-            console.error('Error creating default tenant:', error);
-          }
-          
-          // Forward the request
-          const response = NextResponse.next();
-          responseHeaders.set('x-tenant-created', 'true');
-          // Merge all response headers
-          for (const [key, value] of responseHeaders.entries()) {
-            response.headers.set(key, value);
-          }
-          return response;
-        }
-        
-        // For localhost without tenant in dev, redirect to setup
-        if (process.env.NODE_ENV !== 'production') {
-          // Redirect to first-time setup if no tenant exists
-          if (pathname !== '/admin/setup') {
-            return NextResponse.redirect(new URL('/admin/setup', request.url));
-          }
-          return NextResponse.next();
-        }
-      }
-      
-      // No tenant found, return 404 for non-admin paths
-      if (!isAdminPath && !isApiPath && !isStaticPath) {
-        return NextResponse.next({
-          status: 404,
-          statusText: 'Not Found',
-          headers: responseHeaders,
-        });
-      }
-      
-      // Let admin and API paths proceed
+      // Let server component determine if first-time setup is needed
       const response = NextResponse.next();
       // Merge all response headers
       for (const [key, value] of responseHeaders.entries()) {
@@ -156,33 +127,16 @@ export async function middleware(request: NextRequest) {
       }
       return response;
     }
+    
+    // For all other paths, just forward with tenant info headers
+    const response = NextResponse.next();
+    // Merge all response headers
+    for (const [key, value] of responseHeaders.entries()) {
+      response.headers.set(key, value);
+    }
+    return response;
   } catch (error) {
     console.error('Middleware error:', error);
-    
-    // Check if this is a Redis-related error
-    const isRedisError = error instanceof Error && 
-      (error.message?.includes('Redis') || 
-       error.message?.includes('ECONNREFUSED') || 
-       error.stack?.includes('ioredis') ||
-       error.message?.includes('charCodeAt'));
-    
-    if (isRedisError) {
-      console.warn('Redis error in middleware, proceeding with degraded functionality');
-      responseHeaders.set('x-redis-error', 'true');
-      
-      // For login page, special handling
-      if (pathname === '/login' || pathname.includes('auth')) {
-        console.warn('Redis error on auth path, using memory fallback');
-        const response = NextResponse.next();
-        // Add special headers that can be detected by the page
-        responseHeaders.set('x-redis-fallback', 'true');
-        // Merge all response headers
-        for (const [key, value] of responseHeaders.entries()) {
-          response.headers.set(key, value);
-        }
-        return response;
-      }
-    }
     
     // For API paths, return a JSON error
     if (isApiPath) {

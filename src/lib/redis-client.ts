@@ -177,8 +177,14 @@ class MemoryRedis {
 let Redis: any = null;
 let isRedisAvailable = false;
 
-// Only import Redis in server context and if not in test mode
-if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test') {
+// First check if we're in a proper Node.js environment
+// Edge runtime or certain Next.js contexts might lack full Node.js APIs
+const isNodeEnvironment = typeof process !== 'undefined' 
+                          && typeof process.version === 'string'
+                          && typeof process.version.charCodeAt === 'function';
+
+// Only import Redis in server context, in a proper Node environment, and if not in test mode
+if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test' && isNodeEnvironment) {
   try {
     // This import style is compatible with Next.js and doesn't break browser builds
     const ioredis = require('ioredis');
@@ -188,6 +194,15 @@ if (typeof window === 'undefined' && process.env.NODE_ENV !== 'test') {
   } catch (error) {
     console.error('Failed to load ioredis, will use memory fallback:', error);
     isRedisAvailable = false;
+  }
+} else {
+  // Log the reason for not attempting to load ioredis
+  if (typeof window !== 'undefined') {
+    console.log('Browser environment detected, using memory fallback');
+  } else if (process.env.NODE_ENV === 'test') {
+    console.log('Test environment detected, using memory fallback');
+  } else if (!isNodeEnvironment) {
+    console.log('Not a full Node.js environment (possibly Edge runtime), using memory fallback');
   }
 }
 
