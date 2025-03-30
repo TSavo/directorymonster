@@ -1,83 +1,73 @@
-# Checkpoint: Running Homepage E2E Test
+# Checkpoint: E2E Tests Improvement
 
-## Current Status - COMPLETED
+## Current Status - IN PROGRESS
 
-I ran the homepage.rendering.test.js E2E test and analyzed its results. This test is part of the more specialized E2E test suite that focuses on specific homepage functionality.
+I'm working on improving the E2E tests for the DirectoryMonster project, focusing on implementing robust 404 error detection and improved error reporting.
 
-## Test Execution Summary
+## Progress Summary
 
-1. **Test Selected**:
-   - `homepage.rendering.test.js` was chosen to evaluate how the homepage renders across different states
-   - This test is more robust than the smoketest and includes specific waiting for client-side hydration
+### Completed
 
-2. **Execution Results**:
-   - The test passed successfully
-   - Test: "Homepage renders correctly with essential elements" ✓
-   - Total execution time: ~22.17 seconds
-   - However, there were several warnings during test execution:
-     - Client-side hydration timed out after 20007ms
-     - The test detected a 404 page but passed anyway with a warning
+1. **Smoke Test Improvements**:
+   - Added 404 error detection for network requests
+   - Implemented allowlist for expected 404s to reduce false positives
+   - Added content validation to detect unexpected 404 pages
+   - Improved error messaging and debugging
 
-3. **Environment Status**:
-   - The Docker environment was running with the same status as the previous test
-     - directorymonster-app-1: Up (unhealthy)
-     - directorymonster-redis-1: Up (healthy)
+2. **Login Authentication Test Improvements**:
+   - Modified `login.authentication.test.js` with similar 404 detection patterns
+   - Added content validation to detect 404 errors on both login and admin pages
+   - Implemented network request monitoring for 404 responses
+   - Added filtering of expected 404s via allowlist
+   - Enhanced error reporting with more descriptive messages
+
+### Current Implementation Patterns
+
+I've established consistent patterns across tests:
+
+1. **404 Detection Approaches**:
+   - **Network Request Monitoring**: Tracking all network requests that result in 404 errors
+   - **Content Validation**: Checking page content for 404 indicators
+   - **Allowlist Filtering**: Ignoring known/expected 404s to reduce false positives
+
+2. **Error Handling Improvements**:
+   - Detailed error messages with context about where the error occurred
+   - Screenshots at critical points for visual debugging
+   - Console logging of 404 errors for easier troubleshooting
+
+3. **Test Resilience**:
+   - Tests now detect when they're interacting with 404 pages instead of expected content
+   - Better detection of application state during login flows
+   - Improved handling of client-side hydration issues
 
 ## Observations
 
-1. **Test Design Patterns**:
-   - The test uses a more sophisticated approach than the smoketest, including:
-     - Waiting for client-side hydration with timeout handling
-     - Taking multiple screenshots at different stages for debugging
-     - Using shared selectors from a dedicated selectors file
-     - Comprehensive logging with timestamps
-   
-2. **Resilience Features**:
-   - The test includes adaptive verification that works even for 404 pages
-   - It includes fallback selectors when data-testid attributes aren't available
-   - Test doesn't fail even when client-side hydration times out
-   - It handles dynamic page titles and content variations
+1. **Common 404 Patterns**:
+   - Several static assets consistently return 404s (favicon.ico, logo.png, manifest.json)
+   - API endpoints sometimes return 404s in test environment
+   - Next.js client-side resources sometimes 404 during development mode
 
-3. **Screenshots**:
-   - The test captures multiple diagnostic screenshots at key points:
-     - Before hydration check
-     - After hydration check
-     - Homepage loaded
-
-4. **Issues Identified**:
-   - Client-side hydration is timing out (20 seconds)
-   - The page is showing as a 404 rather than the expected homepage
-   - Despite these issues, the test passes due to its resilient design
-
-## Relation to GitHub Issues
-
-This test execution provides valuable insights related to GitHub issue #37: "[CRITICAL] Fix failing tests systematically". Both tests we've run show the same pattern:
-
-1. Tests are designed to be resilient and pass even when encountering certain types of failures (404 pages, hydration issues)
-2. The app is displaying 404 pages where it should be showing actual content
-3. Client-side hydration is experiencing timeouts
-4. Redis is using in-memory fallback rather than connecting to the Redis service
-
-These patterns suggest that the issue with failing tests may not be with the tests themselves, but with the underlying application environment. The tests are actually quite robust, but they're detecting real issues in the application.
+2. **Test Design Considerations**:
+   - Tests need to be resilient to certain expected 404s while catching critical ones
+   - The distinction between "expected" vs "critical" 404s needs to be maintained as the app evolves
+   - Screenshots and logging are essential for diagnosing issues in CI environments
 
 ## Next Steps
 
-1. **Investigate Environment Issues**:
-   - Determine why the app container is in "unhealthy" state
-   - Look into why pages are returning 404s instead of content
-   - Investigate client-side hydration timeouts
-   - Check Redis connectivity issues
+1. **Apply Pattern to More Tests**:
+   - Identify and update additional E2E tests with the same patterns
+   - Prioritize tests that interact with critical functionality (categories, admin dashboard)
 
-2. **Document Test Patterns**:
-   - The resilient test patterns used in both tests we've run could be applied to other tests
-   - Focus on making tests pass with warnings rather than fail outright when non-critical issues occur
+2. **Consider Extracting Helper Functions**:
+   - Centralize 404 detection logic into shared utility functions
+   - Make the allowlist configurable per test but with common defaults
 
-3. **Application Seeding**:
-   - The 404 errors suggest data seeding may be inconsistent
-   - Verify the seeding process is working correctly for the test environment
+3. **Test Run**:
+   - Run the modified tests to verify improvements
+   - Document any new issues discovered
 
-4. **Update GitHub Issue #37**:
-   - Share findings about the resilient test designs vs. actual application issues
-   - Propose separating test improvements from application fixes
+4. **Update Issue #37**:
+   - Comment on the GitHub issue with progress and findings
+   - Highlight the systematic approach being taken
 
-This analysis supports the ongoing work on issue #37, highlighting that many tests might be failing due to application environment issues rather than flaws in the tests themselves.
+This systematic approach should make tests more robust and provide better diagnostic information when failures occur.
