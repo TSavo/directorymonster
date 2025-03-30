@@ -19,12 +19,12 @@ const customJestConfig = {
   },
   // No coverage
   collectCoverage: false,
-  // No noise from passing tests
-  silent: true,
+  // No noise from passing tests 
+  verbose: false,
   // Use a custom reporter that only shows failures
   reporters: [
     ["default", { "silent": true }],
-    ["<rootDir>/scripts/jest-failures-reporter.js"]
+    "<rootDir>/scripts/jest-failures-reporter.js"
   ],
   // Test path patterns to ignore
   testPathIgnorePatterns: ['/node_modules/', '/tests/e2e/'],
