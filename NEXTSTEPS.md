@@ -56,11 +56,15 @@
 - [ ] Add documentation on proper component organization with app router
 - [ ] Create documentation for E2E test best practices
 
-### Testing Improvements
-- [ ] Add automated test for export verification in CI pipeline
-- [ ] Improve test coverage for dashboard components
-- [ ] Fix flaky e2e tests that fail sporadically
-- [ ] Add more robust error handling in tests
+### E2E Testing Improvements
+- [x] Fix first-user.test.js by updating text detection and implementing data-testid attributes
+- [x] Remove `:contains()` syntax from tests, replacing with JavaScript-based text detection
+- [x] Add consistent data-testid attributes to login and admin components
+- [ ] Add more data-testid attributes to homepage components
+- [ ] Implement waiting for component hydration in tests
+- [ ] Create test utilities for form element detection with retry mechanisms
+- [ ] Fix title and content detection for homepage tests
+- [ ] Create documentation for E2E testing best practices and component standards
 
 ## Future Work
 
