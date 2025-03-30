@@ -7,12 +7,26 @@ import { MemoryRedis } from './memory-store';
 // Create or reuse the global client instance
 declare global {
   var redisClient: any;
+  var redisInitTime: number;
 }
 
 // Initialize Redis client if not already created
-if (typeof global !== 'undefined' && !global.redisClient) {
+if (typeof global !== 'undefined' && (!global.redisClient || !global.redisInitTime)) {
   console.log('[Redis] Initializing Redis client');
-  global.redisClient = createRedisClient();
+  
+  // Track when we initialized Redis - for debugging connection cycles
+  global.redisInitTime = Date.now();
+  
+  // Only create a new client if one doesn't exist
+  if (!global.redisClient) {
+    global.redisClient = createRedisClient();
+  } else {
+    console.log('[Redis] Reusing existing Redis client');
+  }
+} else if (typeof global !== 'undefined' && global.redisClient) {
+  // Log but don't recreate if client already exists
+  const timeSinceInit = Date.now() - (global.redisInitTime || 0);
+  console.log(`[Redis] Redis client already initialized ${timeSinceInit}ms ago`);
 }
 
 // The Redis client (real or in-memory)
@@ -56,35 +70,57 @@ export {
 // Key-value interface for simplified Redis operations
 export const kv = {
   get: async <T>(key: string): Promise<T | null> => {
-    const value = await redis.get(key);
-    if (!value) return null;
     try {
-      return JSON.parse(value) as T;
-    } catch (e) {
-      return value as unknown as T;
+      const value = await redis.get(key);
+      if (!value) return null;
+      try {
+        return JSON.parse(value) as T;
+      } catch (e) {
+        return value as unknown as T;
+      }
+    } catch (error) {
+      console.error(`[Redis] Error getting key ${key}:`, error);
+      return null;
     }
   },
   
   set: async (key: string, value: any, options?: { ex?: number }): Promise<void> => {
-    const serializedValue = typeof value === 'string' ? value : JSON.stringify(value);
-    if (options?.ex) {
-      await redis.setex(key, options.ex, serializedValue);
-    } else {
-      await redis.set(key, serializedValue);
+    try {
+      const serializedValue = typeof value === 'string' ? value : JSON.stringify(value);
+      if (options?.ex) {
+        await redis.setex(key, options.ex, serializedValue);
+      } else {
+        await redis.set(key, serializedValue);
+      }
+    } catch (error) {
+      console.error(`[Redis] Error setting key ${key}:`, error);
     }
   },
   
   del: async (key: string): Promise<void> => {
-    await redis.del(key);
+    try {
+      await redis.del(key);
+    } catch (error) {
+      console.error(`[Redis] Error deleting key ${key}:`, error);
+    }
   },
   
   keys: async (pattern: string): Promise<string[]> => {
-    return await redis.keys(pattern);
+    try {
+      return await redis.keys(pattern);
+    } catch (error) {
+      console.error(`[Redis] Error getting keys with pattern ${pattern}:`, error);
+      return [];
+    }
   },
   
   // Add expire function for rate limiting
   expire: async (key: string, seconds: number): Promise<void> => {
-    await redis.expire(key, seconds);
+    try {
+      await redis.expire(key, seconds);
+    } catch (error) {
+      console.error(`[Redis] Error setting expiry for key ${key}:`, error);
+    }
   },
   
   // Check connection status
