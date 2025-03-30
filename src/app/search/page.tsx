@@ -2,7 +2,9 @@ import { Metadata } from 'next';
 import { SearchForm, SearchResults } from '@/components/search';
 import { getSiteFromRequest } from '@/lib/site-utils';
 import { kv } from '@/lib/redis-client';
-import { SiteConfig } from '@/types';
+import { Category, SiteConfig } from '@/types';
+import { categoryKeys } from '@/lib/tenant';
+import { currentUser } from '@/lib/auth';
 
 interface SearchPageProps {
   searchParams: {
@@ -39,6 +41,31 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     }
   }
   
+  // Get all categories for this site
+  const allCategoriesKeys = await kv.keys(categoryKeys.allForSite(activeSite.id));
+  const categories: Category[] = [];
+  
+  if (allCategoriesKeys.length > 0) {
+    const categoryPromises = allCategoriesKeys.map(key => kv.get<Category>(key));
+    const categoryResults = await Promise.all(categoryPromises);
+    
+    categoryResults.forEach(category => {
+      if (category) {
+        categories.push(category);
+      }
+    });
+    
+    // Sort categories by name
+    categories.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  
+  // Check if user is admin
+  const user = await currentUser();
+  const isAdmin = user && (
+    user.isAdmin || 
+    (user.adminSites && user.adminSites.includes(activeSite.id))
+  );
+  
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="space-y-8">
@@ -58,6 +85,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             query={q} 
             siteId={activeSite.id}
             site={activeSite}
+            categories={categories}
+            isAdmin={isAdmin}
           />
         ) : (
           <div className="text-center py-12 border rounded-lg bg-gray-50">

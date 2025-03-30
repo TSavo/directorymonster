@@ -150,6 +150,41 @@ export const searchKeys = {
    * Key for listing search index
    */
   listingIndex: (siteId: string) => `search:site:${siteId}:listings`,
+  
+  /**
+   * Key for category term index (for full-text search)
+   */
+  categoryTermIndex: (siteId: string, term: string) => `search:site:${siteId}:category:term:${term}`,
+  
+  /**
+   * Key for listing term index (for full-text search)
+   */
+  listingTermIndex: (siteId: string, term: string) => `search:site:${siteId}:listing:term:${term}`,
+  
+  /**
+   * Key for tracking all terms for a category
+   */
+  categoryTermsSet: (siteId: string, categoryId: string) => `search:site:${siteId}:category:${categoryId}:terms`,
+  
+  /**
+   * Key for tracking all terms for a listing
+   */
+  listingTermsSet: (siteId: string, listingId: string) => `search:site:${siteId}:listing:${listingId}:terms`,
+  
+  /**
+   * Key for tracking all listings in a category
+   */
+  categoryListings: (siteId: string, categoryId: string) => `search:site:${siteId}:category:${categoryId}:listings`,
+  
+  /**
+   * Key for tracking all featured listings
+   */
+  featuredListings: (siteId: string) => `search:site:${siteId}:featured`,
+  
+  /**
+   * Key for tracking listings by status
+   */
+  statusListings: (siteId: string, status: string) => `search:site:${siteId}:status:${status}`
 };
 
 /**
