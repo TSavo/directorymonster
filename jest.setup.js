@@ -2,39 +2,23 @@
 import '@testing-library/jest-dom';
 import { enableFetchMocks } from 'jest-fetch-mock';
 
-// TextEncoder/TextDecoder polyfill for node environments
-if (typeof global.TextEncoder === 'undefined') {
-  const { TextEncoder, TextDecoder } = require('util');
-  global.TextEncoder = TextEncoder;
-  global.TextDecoder = TextDecoder;
-}
-
-// Ensure fetch is available globally - Node.js v22 already has it natively
-// but Jest JSDOM environment might not
+// Make sure fetch is defined globally before enabling mocks
 if (typeof global.fetch !== 'function') {
-  // First try Node's native fetch if available
-  try {
-    const nodeFetch = require('node-fetch');
-    global.fetch = nodeFetch.default || nodeFetch;
-  } catch (e) {
-    // Fallback to a simple mock implementation
-    global.fetch = function fetch() {
-      return Promise.resolve({ 
-        json: () => Promise.resolve({}),
-        text: () => Promise.resolve(''),
-        ok: true
-      });
-    };
-  }
+  // Using function to create a proper polyfill first
+  global.fetch = function fetch() {
+    return Promise.resolve({ json: () => Promise.resolve({}) });
+  };
 }
 
-// Initialize and configure fetch-mock
+// Enable fetch mocks for the entire test suite
 enableFetchMocks();
+
+// Make sure fetch is properly configured for tests
 const fetchMock = require('jest-fetch-mock');
 global.fetch = fetchMock;
 global.fetch.mockResponse(JSON.stringify({}));
 
-// Mock node-fetch for any explicit imports
+// Properly mock node-fetch for integration tests
 jest.mock('node-fetch', () => {
   return jest.fn().mockImplementation(() => {
     return Promise.resolve({
