@@ -1,53 +1,31 @@
-// Auto-generated index file - DO NOT EDIT
-// Generated on: 2025-03-29T21:14:15.451Z
+// Standard barrel file for component exports
+// Last updated: 2025-03-29
 
-export { DeleteConfirmationModal } from './DeleteConfirmationModal';
-export { ListingsMobileView } from './ListingsMobileView';
-export { ListingTableActions } from './ListingTableActions';
-export { ListingTableEmptyState } from './ListingTableEmptyState';
-export { ListingTableError } from './ListingTableError';
-export { ListingTableHeader } from './ListingTableHeader';
-export { ListingTablePagination } from './ListingTablePagination';
-export { ListingTableRow } from './ListingTableRow';
-export { ListingTableSkeleton } from './ListingTableSkeleton';
-export { ListingTableSortHeader } from './ListingTableSortHeader';
+// For each component, we export in three different ways:
+// 1. Export all named exports from the component file
+// 2. Re-export the default export as a named export
+// 3. Individual components can be imported via default import from this index
 
-// Default exports as named exports
-import DeleteConfirmationModalDefault from './DeleteConfirmationModal';
-import ListingsMobileViewDefault from './ListingsMobileView';
-import ListingTableActionsDefault from './ListingTableActions';
-import ListingTableEmptyStateDefault from './ListingTableEmptyState';
-import ListingTableErrorDefault from './ListingTableError';
-import ListingTableHeaderDefault from './ListingTableHeader';
-import ListingTablePaginationDefault from './ListingTablePagination';
-import ListingTableRowDefault from './ListingTableRow';
-import ListingTableSkeletonDefault from './ListingTableSkeleton';
-import ListingTableSortHeaderDefault from './ListingTableSortHeader';
+// Named exports
+export * from './DeleteConfirmationModal';
+export * from './ListingsMobileView';
+export * from './ListingTableActions';
+export * from './ListingTableEmptyState';
+export * from './ListingTableError';
+export * from './ListingTableHeader';
+export * from './ListingTablePagination';
+export * from './ListingTableRow';
+export * from './ListingTableSkeleton';
+export * from './ListingTableSortHeader';
 
-// Additional named exports
-export {
-  DeleteConfirmationModalDefault,
-  ListingsMobileViewDefault,
-  ListingTableActionsDefault,
-  ListingTableEmptyStateDefault,
-  ListingTableErrorDefault,
-  ListingTableHeaderDefault,
-  ListingTablePaginationDefault,
-  ListingTableRowDefault,
-  ListingTableSkeletonDefault,
-  ListingTableSortHeaderDefault,
-};
-
-// Default export object
-export default {
-  DeleteConfirmationModal: DeleteConfirmationModalDefault,
-  ListingsMobileView: ListingsMobileViewDefault,
-  ListingTableActions: ListingTableActionsDefault,
-  ListingTableEmptyState: ListingTableEmptyStateDefault,
-  ListingTableError: ListingTableErrorDefault,
-  ListingTableHeader: ListingTableHeaderDefault,
-  ListingTablePagination: ListingTablePaginationDefault,
-  ListingTableRow: ListingTableRowDefault,
-  ListingTableSkeleton: ListingTableSkeletonDefault,
-  ListingTableSortHeader: ListingTableSortHeaderDefault,
-};
+// Re-export defaults as named exports
+export { default as DeleteConfirmationModal } from './DeleteConfirmationModal';
+export { default as ListingsMobileView } from './ListingsMobileView';
+export { default as ListingTableActions } from './ListingTableActions';
+export { default as ListingTableEmptyState } from './ListingTableEmptyState';
+export { default as ListingTableError } from './ListingTableError';
+export { default as ListingTableHeader } from './ListingTableHeader';
+export { default as ListingTablePagination } from './ListingTablePagination';
+export { default as ListingTableRow } from './ListingTableRow';
+export { default as ListingTableSkeleton } from './ListingTableSkeleton';
+export { default as ListingTableSortHeader } from './ListingTableSortHeader';

@@ -28,7 +28,7 @@ import {
  * - Error handling with retry options
  * - ARIA accessibility
  */
-export default function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
+export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
   const {
     // Data
     filteredListings,
@@ -195,3 +195,6 @@ export default function ListingTable({ siteSlug, initialListings }: ListingTable
     </div>
   );
 }
+
+// Enable both named and default exports
+export default ListingTable;

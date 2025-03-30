@@ -57,3 +57,6 @@ export function ListingTableSkeleton({ rows = 5 }: ListingTableSkeletonProps) {
     </div>
   );
 }
+
+// Enable both named and default exports
+export default ListingTableSkeleton;

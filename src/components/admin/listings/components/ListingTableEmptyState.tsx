@@ -21,3 +21,6 @@ export function ListingTableEmptyState({ siteSlug }: ListingTableEmptyStateProps
     </div>
   );
 }
+
+// Enable both named and default exports
+export default ListingTableEmptyState;

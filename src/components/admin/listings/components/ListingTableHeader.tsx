@@ -101,3 +101,6 @@ export function ListingTableHeader({
     </div>
   );
 }
+
+// Enable both named and default exports
+export default ListingTableHeader;

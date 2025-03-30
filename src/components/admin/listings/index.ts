@@ -1,17 +1,11 @@
-// Auto-generated index file - DO NOT EDIT
-// Generated on: 2025-03-29T21:14:15.450Z
+// Standard barrel file for consistent exports
+// Last updated: 2025-03-29
 
-export { ListingTable } from './ListingTable';
+// Named exports
+export * from './ListingTable';
 
-// Default exports as named exports
-import ListingTableDefault from './ListingTable';
+// Re-export default as named export
+export { default as ListingTable } from './ListingTable';
 
-// Additional named exports
-export {
-  ListingTableDefault,
-};
-
-// Default export object
-export default {
-  ListingTable: ListingTableDefault,
-};
+// Default export
+export { default } from './ListingTable';

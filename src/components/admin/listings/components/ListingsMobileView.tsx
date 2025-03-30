@@ -77,3 +77,6 @@ export function ListingsMobileView({
     </div>
   );
 }
+
+// Enable both named and default exports
+export default ListingsMobileView;

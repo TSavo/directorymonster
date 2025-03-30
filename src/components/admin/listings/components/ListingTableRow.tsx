@@ -57,3 +57,6 @@ export function ListingTableRow({
     </tr>
   );
 }
+
+// Enable both named and default exports
+export default ListingTableRow;

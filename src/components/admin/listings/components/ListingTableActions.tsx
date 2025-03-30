@@ -51,3 +51,6 @@ export function ListingTableActions({
     </td>
   );
 }
+
+// Enable both named and default exports
+export default ListingTableActions;

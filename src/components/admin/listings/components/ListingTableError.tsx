@@ -29,3 +29,6 @@ export function ListingTableError({ error, onRetry }: ListingTableErrorProps) {
     </div>
   );
 }
+
+// Enable both named and default exports
+export default ListingTableError;

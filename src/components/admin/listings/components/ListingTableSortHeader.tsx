@@ -33,3 +33,6 @@ export function ListingTableSortHeader({
     </th>
   );
 }
+
+// Enable both named and default exports
+export default ListingTableSortHeader;

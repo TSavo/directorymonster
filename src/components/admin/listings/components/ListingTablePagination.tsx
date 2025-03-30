@@ -72,3 +72,6 @@ export function ListingTablePagination({
     </div>
   );
 }
+
+// Enable both named and default exports
+export default ListingTablePagination;

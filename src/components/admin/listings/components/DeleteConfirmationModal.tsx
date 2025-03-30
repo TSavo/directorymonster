@@ -91,3 +91,6 @@ export function DeleteConfirmationModal({
     </div>
   );
 }
+
+// Enable both named and default exports
+export default DeleteConfirmationModal;
