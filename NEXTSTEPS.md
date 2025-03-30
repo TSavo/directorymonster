@@ -40,17 +40,17 @@
 ## New Priority Tasks
 
 ### E2E Testing Standardization
-- [ ] Convert all E2E tests to follow the new testing pattern:
+- [x] Convert all E2E tests to follow the new testing pattern:
   - [x] Homepage tests converted to new structure
   - [x] Login tests conversion to new structure
   - [x] First-user test conversion to new structure
-  - [ ] Admin dashboard tests conversion to new structure
+  - [x] Admin dashboard tests conversion to new structure
   - [x] Create shared test setup and teardown
-- [ ] Create a selectors file for each major component area:
+- [x] Create a selectors file for each major component area:
   - [x] homepage.selectors.js (completed)
   - [x] login.selectors.js (completed)
   - [x] first-user.selectors.js (completed)
-  - [ ] admin.selectors.js
+  - [x] admin-dashboard.selectors.js (completed)
 - [ ] Document the new E2E testing pattern
 - [ ] Create script to automate test file generation
 
@@ -83,9 +83,9 @@
 - ✅ Create shared test setup utilities for login tests
 - ✅ Convert first-user.test.js to new test structure pattern
 - ✅ Create first-user.selectors.js with centralized selectors
-- [ ] Add data-testid attributes to admin components
-- [ ] Create admin.selectors.js file
-- [ ] Refactor admin dashboard tests into specialized test files
+- ✅ Add data-testid attributes to admin components
+- ✅ Create admin-dashboard.selectors.js file
+- ✅ Refactor admin dashboard tests into specialized test files
 - [ ] Create documentation for E2E testing best practices
 
 ## Future Work
