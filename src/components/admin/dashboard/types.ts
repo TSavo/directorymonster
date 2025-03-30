@@ -8,6 +8,8 @@ export interface StatisticCardProps {
   icon?: React.ReactNode;
   className?: string;
   isLoading?: boolean;
+  subtitle?: string;
+  onRefresh?: () => void;
 }
 
 export interface ActivityItem {

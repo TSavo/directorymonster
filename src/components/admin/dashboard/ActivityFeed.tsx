@@ -2,10 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { ActivityFeedProps, ActivityItem } from './types';
-import ActivityFeedItem from './components/ActivityFeedItem';
+
+// Import modular components
+import ActivityFeedHeader from './components/ActivityFeedHeader';
+import ActivityFeedList from './components/ActivityFeedList';
+import ActivityFeedLoading from './components/ActivityFeedLoading';
+import ActivityFeedEmpty from './components/ActivityFeedEmpty';
+import ActivityFeedError from './components/ActivityFeedError';
+import ActivityFeedLoadMore from './components/ActivityFeedLoadMore';
+import ActivityFeedFilter, { ActivityFilter } from './components/ActivityFeedFilter';
+import DateRangeSelector, { DateRange } from './components/DateRangeSelector';
 
 /**
  * ActivityFeed component displays a feed of recent activities
+ * Uses composition pattern with smaller, specialized components
  *
  * @param {string} siteSlug - Optional site slug to fetch activities for a specific site
  * @param {number} limit - Number of activities to display
@@ -17,7 +27,7 @@ import ActivityFeedItem from './components/ActivityFeedItem';
 export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   siteSlug,
   limit = 10,
-  filter,
+  filter: initialFilter,
   showHeader = true,
   className = '',
   isLoading: propIsLoading,
@@ -27,6 +37,17 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const [hookIsLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [filter, setFilter] = useState<ActivityFilter>(initialFilter || {});
+  
+  // Default date range - last 30 days
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+  
+  const [dateRange, setDateRange] = useState<DateRange>({
+    startDate: thirtyDaysAgo.toISOString().split('T')[0],
+    endDate: today.toISOString().split('T')[0]
+  });
 
   // Function to get mock activity data 
   const getMockActivityData = (count: number = 10): ActivityItem[] => {
@@ -116,23 +137,33 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       
       // Apply filters if any
       let filteredData = [...data];
-      if (filter) {
-        if (filter.entityType?.length) {
-          filteredData = filteredData.filter(item => 
-            filter.entityType?.includes(item.entityType)
-          );
-        }
-        if (filter.actionType?.length) {
-          filteredData = filteredData.filter(item => 
-            filter.actionType?.includes(item.type)
-          );
-        }
-        if (filter.userId) {
-          filteredData = filteredData.filter(item => 
-            item.userId === filter.userId
-          );
-        }
+      
+      // Apply entity type filter
+      if (filter.entityType?.length) {
+        filteredData = filteredData.filter(item => 
+          filter.entityType?.includes(item.entityType)
+        );
       }
+      
+      // Apply action type filter
+      if (filter.actionType?.length) {
+        filteredData = filteredData.filter(item => 
+          filter.actionType?.includes(item.type)
+        );
+      }
+      
+      // Apply user ID filter
+      if (filter.userId) {
+        filteredData = filteredData.filter(item => 
+          item.userId === filter.userId
+        );
+      }
+      
+      // Apply date range filter
+      filteredData = filteredData.filter(item => {
+        const itemDate = new Date(item.timestamp).toISOString().split('T')[0];
+        return itemDate >= dateRange.startDate && itemDate <= dateRange.endDate;
+      });
       
       // Sort by timestamp (newest first)
       filteredData.sort((a, b) => 
@@ -157,7 +188,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   // Load data on mount and when dependencies change
   useEffect(() => {
     fetchActivities();
-  }, [siteSlug, limit, filter]);
+  }, [siteSlug, limit, filter, dateRange]);
 
   // Function to load more items
   const loadMore = async () => {
@@ -171,111 +202,99 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     await fetchActivities(true);
   };
 
+  // Handle filter changes
+  const handleFilterChange = (newFilter: ActivityFilter) => {
+    setFilter(newFilter);
+  };
+
+  // Handle date range changes
+  const handleDateRangeChange = (newRange: DateRange) => {
+    setDateRange(newRange);
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilter({});
+    setDateRange({
+      startDate: thirtyDaysAgo.toISOString().split('T')[0],
+      endDate: today.toISOString().split('T')[0]
+    });
+  };
+
+  // Combine loading state from props and hook
   const isLoading = propIsLoading !== undefined ? propIsLoading : hookIsLoading;
+
+  // Determine if filters are active
+  const hasActiveFilters = Boolean(
+    (filter.entityType && filter.entityType.length > 0) || 
+    (filter.actionType && filter.actionType.length > 0) ||
+    filter.userId
+  );
 
   return (
     <div 
       className={`bg-white rounded-lg shadow border border-gray-100 ${className}`}
       data-testid="activity-feed"
     >
+      {/* Header section with title and filter controls */}
       {showHeader && (
-        <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-          <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
-          <button
-            onClick={refresh}
-            className="text-sm text-blue-600 hover:text-blue-700"
-            data-testid="refresh-button"
-            aria-label="Refresh activity feed"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-            </svg>
-          </button>
-        </div>
+        <>
+          <ActivityFeedHeader 
+            onRefresh={refresh}
+            onFilterChange={handleFilterChange}
+            currentFilter={filter}
+          />
+          
+          {/* Filter and date controls row */}
+          <div className="px-4 py-3 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <ActivityFeedFilter 
+              onApplyFilter={handleFilterChange}
+              initialFilter={filter}
+            />
+            
+            <DateRangeSelector 
+              onChange={handleDateRangeChange}
+              initialRange={dateRange}
+            />
+          </div>
+        </>
       )}
 
+      {/* Content area */}
       <div className="p-2" data-testid="activity-feed-content">
-        {/* Display error if there is one */}
+        {/* Error state */}
         {error && (
-          <div 
-            className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-2"
-            data-testid="activity-feed-error"
-          >
-            <p>Failed to load activities: {error.message}</p>
-            <button 
-              className="text-red-600 underline mt-1" 
-              onClick={refresh}
-            >
-              Retry
-            </button>
-          </div>
+          <ActivityFeedError 
+            message={error.message} 
+            onRetry={refresh} 
+          />
         )}
 
         {/* Loading state */}
         {isLoading && activities.length === 0 && (
-          <div data-testid="activity-feed-loading">
-            {[...Array(3)].map((_, index) => (
-              <div key={index} className="flex items-start space-x-3 py-3 px-3 animate-pulse">
-                <div className="bg-gray-200 rounded-full h-10 w-10"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-100 rounded w-1/2"></div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ActivityFeedLoading count={3} />
         )}
 
         {/* Empty state */}
         {!isLoading && activities.length === 0 && !error && (
-          <div 
-            className="py-6 text-center text-gray-500"
-            data-testid="activity-feed-empty"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-12 w-12 mx-auto text-gray-400 mb-2" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p>No activity found</p>
-            {filter && (
-              <button 
-                className="text-blue-600 underline mt-1" 
-                onClick={refresh}
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
+          <ActivityFeedEmpty 
+            hasFilters={hasActiveFilters}
+            onClearFilters={clearFilters}
+            message={hasActiveFilters ? "No activity matches the current filters" : "No activity found"}
+          />
         )}
 
-        {/* Activity items */}
+        {/* Activity items list */}
         {activities.length > 0 && (
-          <div className="divide-y divide-gray-100">
-            {activities.map((activity) => (
-              <div key={activity.id} className="px-3">
-                <ActivityFeedItem activity={activity} />
-              </div>
-            ))}
-          </div>
+          <ActivityFeedList activities={activities} />
         )}
 
         {/* Load more button */}
         {hasMore && activities.length > 0 && (
-          <div className="pt-2 pb-3 px-4 text-center">
-            <button
-              onClick={loadMore}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-              disabled={isLoading}
-              data-testid="load-more-button"
-            >
-              {isLoading ? 'Loading...' : 'Load more'}
-            </button>
-          </div>
+          <ActivityFeedLoadMore 
+            onClick={loadMore}
+            isLoading={isLoading}
+          />
         )}
       </div>
     </div>
