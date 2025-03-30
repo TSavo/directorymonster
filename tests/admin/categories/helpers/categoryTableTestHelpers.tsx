@@ -8,9 +8,46 @@ import * as hooks from '../../../../src/components/admin/categories/hooks';
 import { CategoryWithRelations } from '../../../../src/components/admin/categories/types';
 import { SiteConfig } from '../../../../src/types';
 
+// Mock the global fetch API
+const originalFetch = global.fetch;
+global.fetch = jest.fn().mockImplementation((url) => {
+  if (url.includes('/categories')) {
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(mockCategories)
+    });
+  }
+  if (url.includes('/sites')) {
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(mockSites)
+    });
+  }
+  return Promise.reject(new Error(`Unhandled fetch url: ${url}`));
+});
+
 // Mock the useCategories hook
 jest.mock('../../../../src/components/admin/categories/hooks', () => ({
   useCategories: jest.fn(),
+  useCategoryTable: jest.fn().mockImplementation((siteSlug, initialCategories) => {
+    // Use the mocked useCategories hook to get its return value
+    const categoriesState = require('../../../../src/components/admin/categories/hooks').useCategories();
+    
+    // Add additional UI state values that useCategoryTable would provide
+    return {
+      ...categoriesState,
+      showHierarchy: false,
+      formModalOpen: false,
+      selectedCategoryId: undefined,
+      showSiteColumn: !siteSlug && (categoriesState.sites || []).length > 0,
+      toggleHierarchy: jest.fn(),
+      handleEditCategory: jest.fn(),
+      handleCreateCategory: jest.fn(),
+      handleCloseFormModal: jest.fn(),
+      handleCategorySaved: jest.fn(),
+      handleViewCategory: jest.fn()
+    };
+  }),
 }));
 
 // Mock next/link
@@ -140,42 +177,71 @@ export const mockHierarchicalCategories: CategoryWithRelations[] = [
 /**
  * Default mock implementation for useCategories hook
  */
-export const createMockCategoriesHook = (overrides = {}) => ({
-  categories: mockCategories,
-  filteredCategories: mockCategories,
-  currentCategories: mockCategories,
-  allCategories: mockCategories,
-  sites: mockSites,
-  isLoading: false,
-  error: null,
-  searchTerm: '',
-  setSearchTerm: jest.fn(),
-  parentFilter: '',
-  setParentFilter: jest.fn(),
-  siteFilter: '',
-  setSiteFilter: jest.fn(),
-  sortField: 'order' as const,
-  sortOrder: 'asc' as const,
-  handleSort: jest.fn(),
-  currentPage: 1,
-  totalPages: 1,
-  itemsPerPage: 10,
-  setItemsPerPage: jest.fn(),
-  goToPage: jest.fn(),
-  isDeleteModalOpen: false,
-  categoryToDelete: null,
-  confirmDelete: jest.fn(),
-  handleDelete: jest.fn(),
-  cancelDelete: jest.fn(),
-  fetchCategories: jest.fn(),
-  ...overrides
-});
+export const createMockCategoriesHook = (overrides = {}) => {
+  // Create a mock setSearchTerm function that actually updates searchTerm
+  const mockSetSearchTerm = jest.fn().mockImplementation((term) => {
+    // When called multiple times in the test, ensure the latest call is used
+    if (overrides.searchTerm !== undefined) {
+      overrides.searchTerm = term;
+    }
+  });
+
+  // Similarly for other setter functions
+  const mockSetParentFilter = jest.fn().mockImplementation((filter) => {
+    if (overrides.parentFilter !== undefined) {
+      overrides.parentFilter = filter;
+    }
+  });
+
+  const mockSetSiteFilter = jest.fn().mockImplementation((filter) => {
+    if (overrides.siteFilter !== undefined) {
+      overrides.siteFilter = filter;
+    }
+  });
+  
+  // Create base mock
+  return {
+    categories: mockCategories,
+    filteredCategories: mockCategories,
+    currentCategories: mockCategories,
+    allCategories: mockCategories,
+    sites: mockSites,
+    isLoading: false,  // Ensure loading is off by default
+    error: null,
+    searchTerm: '',
+    setSearchTerm: mockSetSearchTerm,
+    parentFilter: '',
+    setParentFilter: mockSetParentFilter,
+    siteFilter: '',
+    setSiteFilter: mockSetSiteFilter,
+    sortField: 'order' as const,
+    sortOrder: 'asc' as const,
+    handleSort: jest.fn(),
+    currentPage: 1,
+    totalPages: 1,
+    itemsPerPage: 10,
+    setItemsPerPage: jest.fn(),
+    goToPage: jest.fn(),
+    isDeleteModalOpen: false,
+    categoryToDelete: null,
+    confirmDelete: jest.fn(),
+    handleDelete: jest.fn(),
+    cancelDelete: jest.fn(),
+    fetchCategories: jest.fn(),
+    ...overrides
+  };
+};
 
 /**
  * Setup function for CategoryTable tests with configurable hook mocks
  */
 export const setupCategoryTableTest = (overrides = {}) => {
-  const mockHook = createMockCategoriesHook(overrides);
+  // Make sure loading is explicitly set to false unless overridden
+  const mockHook = createMockCategoriesHook({
+    isLoading: false,
+    ...overrides
+  });
+  
   (hooks.useCategories as jest.Mock).mockReturnValue(mockHook);
   return mockHook;
 };
@@ -185,6 +251,9 @@ export const setupCategoryTableTest = (overrides = {}) => {
  */
 export const resetMocks = () => {
   jest.clearAllMocks();
+  
+  // Reset the fetch mock to ensure clean state between tests
+  (global.fetch as jest.Mock).mockClear();
 };
 
 /**

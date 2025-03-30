@@ -5,11 +5,11 @@ echo Starting development environment refresh...
 
 REM Stop the containers but keep volumes
 echo Stopping containers...
-docker-compose down
+docker-compose -f docker-compose.dev.yml down
 
 REM Restart containers
 echo Starting containers...
-docker-compose up -d
+docker-compose up -f docker-compose.dev.yml -d
 
 echo Waiting for services to start...
 timeout /t 5 /nobreak > nul

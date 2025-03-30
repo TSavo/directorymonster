@@ -5,11 +5,28 @@ import { redis } from '@/lib/redis-client';
 export function withRedis(handler: Function) {
   return async (req: Request, ...args: any[]) => {
     try {
-      // Verify Redis connection is healthy
-      await redis.ping();
+      // First check if Redis is connected without throwing
+      let isConnected = false;
+      try {
+        await redis.ping();
+        isConnected = true;
+      } catch (pingError) {
+        console.warn('[withRedis] Redis ping failed, using degraded functionality:', pingError.message);
+      }
       
-      // If Redis is connected, proceed with the handler
-      return await handler(req, ...args);
+      // If Redis is connected, proceed with the handler normally
+      // Otherwise, add a header and proceed anyway, letting the handler
+      // use fallback mechanisms if available
+      const response = await handler(req, ...args);
+      
+      // Add Redis status header to the response if it exists
+      if (response && response.headers) {
+        if (!isConnected) {
+          response.headers.set('x-redis-unavailable', 'true');
+        }
+      }
+      
+      return response;
     } catch (error) {
       console.error('Redis connection error:', error);
       
