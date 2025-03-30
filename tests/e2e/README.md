@@ -1,105 +1,78 @@
-# E2E Testing for DirectoryMonster
+# E2E Testing Framework
 
-This directory contains end-to-end (E2E) tests for the DirectoryMonster application using Puppeteer.
+This directory contains end-to-end (E2E) tests using Jest and Puppeteer, with a focus on organization and maintainability.
 
-## New Test Architecture
+## Core Principles
 
-The E2E tests have been refactored to follow a modular, maintainable approach:
+- **Organize by Page**: Each major page or feature gets its own folder
+- **One Test = One File**: Each user behavior or test case has a dedicated file
+- **Centralized Selectors**: All `data-testid` selectors live in a single file per page
+- **Suite Orchestration**: A suite file imports all test cases for a page
+- **Isolated Concerns**: Utilities, setup, and teardown are clearly separated
 
-### Directory Structure
+## Directory Structure
 
 ```
-tests/e2e/
-├── utils/                  # Shared utility functions
-│   ├── test-utils.js       # Core test utilities
-│   ├── auth-utils.js       # Authentication-related utilities
-│   ├── browser-utils.js    # Browser setup and management
-│   └── category-utils.js   # Category management utilities
-├── category-management.test.js  # New focused category tests
-├── categories.test.js           # Legacy category tests
-└── README.md                    # This file
+/e2e
+  /global
+    - setup.js          # Global Puppeteer setup
+    - teardown.js       # Global Puppeteer teardown
+    - globals.js        # Injects browser/page globally
+  /utils
+    - test-utils.js     # Common test utilities
+    - hydration-utils.js # Utilities for component hydration
+  /homepage
+    - homepage.suite.test.js      # Suite file to run all homepage tests
+    - homepage.selectors.js       # Selectors using data-testid
+    - homepage.rendering.test.js  # Test for basic rendering
+    - homepage.navigation.test.js # Test for navigation functionality
+    - homepage.responsive.test.js # Test for responsive design
+    - homepage.search.test.js     # Test for search functionality
+    - homepage.content.test.js    # Test for content sections
+    - homepage.404.test.js        # Test for 404 error handling
+    - homepage.performance.test.js # Test for performance
+  /login
+    - login.suite.test.js         # Suite file for login tests
+    - login.selectors.js          # Login selectors
+    - login.valid-login.test.js   # Test for valid login
+    - login.invalid-login.test.js # Test for invalid login
 ```
 
-### Key Improvements
+## Running Tests
 
-1. **Modular Design**: Functions are organized by domain for better reusability and maintainability.
-2. **Standard DOM Selectors**: Replaced jQuery-style selectors with standard DOM APIs.
-3. **Better Error Handling**: Added comprehensive error handling and fallbacks.
-4. **Improved Logging**: Enhanced logging with timestamps, categories, and file output.
-5. **Screenshot Capture**: Added automatic screenshot capture for debugging.
-6. **Focused Test Files**: Each test file focuses on a specific area of functionality.
-
-## Running the Tests
-
-### Prerequisites
-
-- Node.js and npm
-- Docker (recommended for consistent environment)
-
-### Test Commands
+To run all E2E tests using the new organized structure:
 
 ```bash
-# Run all E2E tests
-npm run test:e2e
-
-# Run only the new category management tests
-npm run test:e2e:category-management
-
-# Run the legacy category tests
-npm run test:e2e:categories
-
-# Run with debugging output
-npm run test:e2e:categories:debug
-
-# Run in watch mode
-npm run test:e2e:watch
+npm run test:e2e:organized
 ```
 
-### Environment Variables
+To run tests for a specific page:
 
-- `BASE_URL`: Application URL (default: http://localhost:3000)
-- `HEADLESS`: Set to "false" to run tests with browser visible
-- `TEST_SITE_SLUG`: Site slug to test with (default: hiking-gear)
-- `ADMIN_USERNAME`: Admin username for tests (default: admin)
-- `ADMIN_PASSWORD`: Admin password for tests (default: password123456)
-
-## Writing New Tests
-
-### Using Utility Functions
-
-The utility functions are designed to be composable and reusable:
-
-```javascript
-// Import required utilities
-const { loginAsAdmin } = require('./utils/auth-utils');
-const { navigateToCategories } = require('./utils/category-utils');
-
-// Use in tests
-test('Should navigate to categories page', async () => {
-  await loginAsAdmin(page);
-  const success = await navigateToCategories(page, 'site-slug');
-  expect(success).toBe(true);
-});
+```bash
+npm run test:e2e:homepage
 ```
 
-### Best Practices
+## Creating New Tests
 
-1. **Focused Tests**: Each test should focus on a single feature or workflow.
-2. **Clear Names**: Use descriptive test and function names.
-3. **Standard Selectors**: Use standard DOM selectors instead of jQuery-style selectors.
-4. **Error Handling**: Always handle errors and provide fallback mechanisms.
-5. **Screenshots**: Capture screenshots at key points for debugging.
-6. **Logging**: Use the logging utilities to provide context.
-7. **Timeouts**: Set appropriate timeouts for network operations.
+1. Create a new folder for your page/feature in `tests/e2e/`
+2. Create a `<page>.selectors.js` file with all your selectors
+3. Create individual test files for each behavior you want to test
+4. Create a suite file that imports all your test files
+5. Add the test command to package.json
 
-## Debugging
+## Best Practices
 
-Tests output logs and screenshots to help with debugging:
+1. **Use Selectors File**: Always use selectors from the selectors file, not hardcoded in tests
+2. **Add Fallbacks**: Include fallback selectors when data-testid attributes aren't available
+3. **Handle Hydration**: Use hydration utilities for Next.js component hydration
+4. **Error Handling**: Add try/catch blocks and don't fail tests unnecessarily
+5. **Screenshots**: Take screenshots at key points for debugging
+6. **Graceful Degradation**: Tests should pass even when minor features are unavailable
+7. **Isolation**: Each test file should be able to run independently
 
-- **Logs**: Check `debug-logs/e2e-tests.log` for detailed test logs.
-- **Screenshots**: Check the `screenshots/` directory for page states at key moments.
-- **Run with `--verbose`**: Use the debug script to see more details.
+## Troubleshooting
 
-## Legacy Tests
-
-The legacy tests (`categories.test.js` etc.) are kept for backward compatibility. New tests should follow the modular approach of `category-management.test.js`.
+- **Hydration Timeouts**: Increase timeout values in tests or check component hydration
+- **Selector Not Found**: Check if the selector exists or add fallback selectors
+- **Navigation Issues**: Use more generous timeouts for navigation or check for redirects
+- **Browser Crashes**: Check for memory issues or use headless mode

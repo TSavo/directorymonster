@@ -149,6 +149,41 @@ The E2E testing infrastructure has been improved and is now more resilient. The 
 4. **More resilient content detection** that doesn't rely on specific selectors
 5. **Layered testing approach** with smoketest for basic health and more detailed tests for specific functionality
 
+### E2E Testing Framework Restructure - [2025-03-30]
+
+1. **Implemented Organized E2E Testing Structure**
+   - Restructured E2E tests following a clean and maintainable pattern
+   - Created separate files for different test concerns:
+     - `.selectors.js`: Centralized all data-testid selectors
+     - `.suite.test.js`: Main entry point for all page tests
+     - Individual test files for each feature/behavior
+   - Implemented global setup and teardown functionality
+   - Added detailed README for the E2E testing framework
+
+2. **Homepage Tests Reorganization**
+   - Split the homepage test into separate test files:
+     - homepage.rendering.test.js: Basic rendering tests
+     - homepage.navigation.test.js: Navigation functionality
+     - homepage.responsive.test.js: Mobile responsiveness
+     - homepage.search.test.js: Search functionality
+     - homepage.content.test.js: Content sections and footer
+     - homepage.404.test.js: Error handling
+     - homepage.performance.test.js: Load time performance
+   - Created a centralized selectors file
+   - Tests are more maintainable and follow a consistent pattern
+
+3. **Added Tools for Converting Legacy Tests**
+   - Created a script to convert existing tests to the new structure
+   - Updated package.json with new test commands
+   - Created Jest configuration specifically for E2E tests
+
+4. **Benefits of New Structure**
+   - Improved maintainability with clear organization
+   - Better test isolation and focused test files
+   - Centralized selectors make UI changes easier
+   - Global setup reduces duplicate code
+   - Tests can be run individually or as suites
+
 ### Next Steps
 
 1. **Fix Remaining E2E Test Failures**
