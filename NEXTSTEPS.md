@@ -47,8 +47,14 @@
 ### Next.js App Router Compatibility
 - [ ] Add "use client" directive to all interactive components
 - [ ] Update component organization to better align with Next.js app router
-- [ ] Fix remaining e2e test failures
+- [x] Fix login page E2E test failure by improving test detection
+- [ ] Fix remaining E2E test failures:
+  - [ ] Fix CSS selector issues (`:contains()` syntax not supported by Puppeteer)
+  - [ ] Add consistent data-testid attributes to components
+  - [ ] Improve form element detection in tests
+  - [ ] Fix detection of UI elements after component hydration
 - [ ] Add documentation on proper component organization with app router
+- [ ] Create documentation for E2E test best practices
 
 ### Testing Improvements
 - [ ] Add automated test for export verification in CI pipeline

@@ -92,8 +92,6 @@ export const useDomains = (options: UseDomainsOptions = {}) => {
       }));
     }
     return isValid;
-    }
-    return isValid;
   };
 
   // Handle domain management

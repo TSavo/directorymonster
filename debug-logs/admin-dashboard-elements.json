@@ -1,12 +1,46 @@
 {
   "forms": [],
   "inputs": [],
-  "buttons": [],
+  "buttons": [
+    {
+      "text": "",
+      "type": "submit",
+      "id": "",
+      "className": "md:hidden text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white",
+      "disabled": false,
+      "formId": null
+    },
+    {
+      "text": "",
+      "type": "button",
+      "id": "",
+      "className": "md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500",
+      "disabled": false,
+      "formId": null
+    },
+    {
+      "text": "View notifications",
+      "type": "button",
+      "id": "",
+      "className": "p-1 rounded-full text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+      "disabled": false,
+      "formId": null
+    },
+    {
+      "text": "Open user menu",
+      "type": "button",
+      "id": "user-menu-button",
+      "className": "max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+      "disabled": false,
+      "formId": null
+    }
+  ],
   "tables": [],
   "categoryElements": {
     "categoryTable": false,
     "categoryRows": 0,
     "addCategoryButton": false,
+    "categoryHeading": false,
     "breadcrumbs": false,
     "anyTable": false
   },

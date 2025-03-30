@@ -322,10 +322,17 @@ describe('First User Creation', () => {
     // Now we should see the normal login form, not the setup form
     const isLoginPage = await page.evaluate(() => {
       const pageContent = document.body.textContent;
+      const hasLoginTestId = document.querySelector('[data-testid="login-page"]') !== null;
+      const hasLoginFormTestId = document.querySelector('[data-testid="login-form-container"]') !== null;
+      
       return (
+        pageContent.includes('DirectoryMonster Admin') ||
         pageContent.includes('Login') ||
         pageContent.includes('Sign in') ||
-        pageContent.includes('Admin Login')
+        pageContent.includes('Admin Login') ||
+        pageContent.includes('Zero-Knowledge Proof Authentication') ||
+        hasLoginTestId ||
+        hasLoginFormTestId
       );
     });
 

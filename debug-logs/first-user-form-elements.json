@@ -1,0 +1,152 @@
+{
+  "inputs": [
+    {
+      "type": "text",
+      "id": "username",
+      "name": "",
+      "placeholder": "",
+      "classes": [
+        "mt-1",
+        "block",
+        "w-full",
+        "px-3",
+        "py-2",
+        "border",
+        "border-gray-300",
+        "rounded-md",
+        "shadow-sm",
+        "focus:outline-none",
+        "focus:ring-indigo-500",
+        "focus:border-indigo-500"
+      ]
+    },
+    {
+      "type": "password",
+      "id": "password",
+      "name": "",
+      "placeholder": "",
+      "classes": [
+        "mt-1",
+        "block",
+        "w-full",
+        "px-3",
+        "py-2",
+        "border",
+        "border-gray-300",
+        "rounded-md",
+        "shadow-sm",
+        "focus:outline-none",
+        "focus:ring-indigo-500",
+        "focus:border-indigo-500"
+      ]
+    },
+    {
+      "type": "password",
+      "id": "confirmPassword",
+      "name": "",
+      "placeholder": "",
+      "classes": [
+        "mt-1",
+        "block",
+        "w-full",
+        "px-3",
+        "py-2",
+        "border",
+        "border-gray-300",
+        "rounded-md",
+        "shadow-sm",
+        "focus:outline-none",
+        "focus:ring-indigo-500",
+        "focus:border-indigo-500"
+      ]
+    },
+    {
+      "type": "email",
+      "id": "email",
+      "name": "",
+      "placeholder": "",
+      "classes": [
+        "mt-1",
+        "block",
+        "w-full",
+        "px-3",
+        "py-2",
+        "border",
+        "border-gray-300",
+        "rounded-md",
+        "shadow-sm",
+        "focus:outline-none",
+        "focus:ring-indigo-500",
+        "focus:border-indigo-500"
+      ]
+    },
+    {
+      "type": "text",
+      "id": "siteName",
+      "name": "",
+      "placeholder": "",
+      "classes": [
+        "mt-1",
+        "block",
+        "w-full",
+        "px-3",
+        "py-2",
+        "border",
+        "border-gray-300",
+        "rounded-md",
+        "shadow-sm",
+        "focus:outline-none",
+        "focus:ring-indigo-500",
+        "focus:border-indigo-500"
+      ]
+    }
+  ],
+  "buttons": [
+    {
+      "text": "Setup My Account",
+      "type": "submit",
+      "classes": [
+        "w-full",
+        "flex",
+        "justify-center",
+        "py-2",
+        "px-4",
+        "border",
+        "border-transparent",
+        "rounded-md",
+        "shadow-sm",
+        "text-sm",
+        "font-medium",
+        "text-white",
+        "bg-indigo-600",
+        "hover:bg-indigo-700",
+        "focus:outline-none",
+        "focus:ring-2",
+        "focus:ring-offset-2",
+        "focus:ring-indigo-500"
+      ]
+    }
+  ],
+  "formLabels": [
+    {
+      "text": "Username",
+      "forAttr": "username"
+    },
+    {
+      "text": "Password",
+      "forAttr": "password"
+    },
+    {
+      "text": "Confirm Password",
+      "forAttr": "confirmPassword"
+    },
+    {
+      "text": "Email (Optional)",
+      "forAttr": "email"
+    },
+    {
+      "text": "Site Name",
+      "forAttr": "siteName"
+    }
+  ]
+}
