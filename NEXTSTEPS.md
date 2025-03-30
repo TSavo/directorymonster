@@ -1,17 +1,12 @@
-# DirectoryMonster Implementation Next Steps
+# DirectoryMonster Implementation Next Steps - [2025-03-30]
 
 ## Recently Completed
+- ✅ Fixed E2E tests to handle site hostname properly
+- ✅ Fixed Puppeteer cookie error by using URL query parameters
+- ✅ Created smoketest for verifying basic site functionality
+- ✅ Updated run-e2e-tests.bat to run smoketest first
+- ✅ Added proper error handling and reporting for tests
 - ✅ Standardized export patterns in dashboard and layout modules
-- ✅ Created export verification script (scripts/verify-exports.js)
-- ✅ Fixed dual-export pattern in primary components
-- ✅ Updated barrel files with consistent standardized exports
-- ✅ Reduced warnings in Docker logs related to export issues
-- ✅ Updated auth module components with standardized dual-export pattern
-- ✅ Updated category module components with standardized dual-export pattern
-- ✅ Updated dashboard subcomponents with standardized dual-export pattern
-- ✅ Fixed client component issues by adding "use client" directives
-- ✅ Fixed admin/layout.tsx imports to use direct component imports
-- ✅ Fixed dashboard module barrel file for proper component imports
 
 ## Priority Tasks (Based on Verification Script)
 
@@ -56,6 +51,13 @@
 - [ ] Add documentation on proper component organization with app router
 - [ ] Create documentation for E2E test best practices
 
+### Unit Test Fixes
+- [ ] Install missing @testing-library/dom dependency
+- [ ] Fix React Testing Library configuration in Jest setup
+- [ ] Fix syntax errors in test files
+- [ ] Update SiteForm.validation.test.tsx and other template-based files
+- [ ] Resolve the punycode module deprecation warning
+
 ### E2E Testing Improvements
 - ✅ Add data-testid attributes to homepage components
 - ✅ Implement waiting for component hydration in tests
@@ -73,6 +75,13 @@
 - Create tooling to automatically generate standardized component files
 - Update project documentation with export pattern guidelines
 - Add eslint rules to enforce proper export patterns
+
+### Test Infrastructure Improvements
+- Set up proper CI workflow for running both unit and E2E tests
+- Create a dedicated test environment with seeded test data
+- Add visual regression testing with screenshots comparison
+- Implement test coverage reporting and monitoring
+- Set up test fixtures and factory functions for test data creation
 
 ### Upcoming DirectoryMonster Features
 - Enhance data handling and state management
