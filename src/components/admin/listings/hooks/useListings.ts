@@ -48,6 +48,13 @@ export const useListings = ({
     totalPages: 0
   });
   const [selected, setSelected] = useState<string[]>([]);
+  
+  // Used to track active filters for UI components
+  const [activeFilters, setActiveFilters] = useState<{
+    categoryId?: string | null;
+    siteId?: string | null;
+    status?: ListingStatus[] | null;
+  }>({});
 
   /**
    * Fetch listings from the API
@@ -102,6 +109,10 @@ export const useListings = ({
         queryParams.append('userId', filters.userId);
       }
 
+      if (filters.siteId) {
+        queryParams.append('siteId', filters.siteId);
+      }
+
       const response = await fetch(`/api/sites/${siteSlug}/listings?${queryParams.toString()}`);
       
       if (!response.ok) {
@@ -142,6 +153,7 @@ export const useListings = ({
   const setStatusFilter = useCallback((status: ListingStatus[]) => {
     setFilters(prev => ({ ...prev, status }));
     setPagination(prev => ({ ...prev, page: 1 }));
+    setActiveFilters(prev => ({ ...prev, status: status.length > 0 ? status : null }));
   }, []);
 
   /**
@@ -150,7 +162,97 @@ export const useListings = ({
   const setCategoryFilter = useCallback((categoryIds: string[]) => {
     setFilters(prev => ({ ...prev, categoryIds }));
     setPagination(prev => ({ ...prev, page: 1 }));
+    setActiveFilters(prev => ({ 
+      ...prev, 
+      categoryId: categoryIds.length > 0 ? categoryIds[0] : null 
+    }));
   }, []);
+
+  /**
+   * Filter by a specific category
+   */
+  const filterByCategory = useCallback((categoryId: string) => {
+    setFilters(prev => ({ 
+      ...prev, 
+      categoryIds: categoryId ? [categoryId] : [] 
+    }));
+    setPagination(prev => ({ ...prev, page: 1 }));
+    setActiveFilters(prev => ({ ...prev, categoryId }));
+  }, []);
+
+  /**
+   * Filter by a specific site
+   */
+  const filterBySite = useCallback((siteId: string) => {
+    setFilters(prev => ({ ...prev, siteId }));
+    setPagination(prev => ({ ...prev, page: 1 }));
+    setActiveFilters(prev => ({ ...prev, siteId }));
+  }, []);
+
+  /**
+   * Filter by status
+   */
+  const filterByStatus = useCallback((status: ListingStatus) => {
+    setFilters(prev => ({ 
+      ...prev, 
+      status: status ? [status] : [] 
+    }));
+    setPagination(prev => ({ ...prev, page: 1 }));
+    setActiveFilters(prev => ({ ...prev, status: status ? [status] : null }));
+  }, []);
+
+  /**
+   * Filter by a combination of filters
+   */
+  const filterByCombination = useCallback((filters: ListingFilters) => {
+    setFilters(filters);
+    setPagination(prev => ({ ...prev, page: 1 }));
+    setActiveFilters({
+      categoryId: filters.categoryIds?.length ? filters.categoryIds[0] : null,
+      siteId: filters.siteId || null,
+      status: filters.status || null
+    });
+  }, []);
+
+  /**
+   * Clear category filter
+   */
+  const clearCategoryFilter = useCallback(() => {
+    setFilters(prev => {
+      const { categoryIds, ...rest } = prev;
+      return rest;
+    });
+    setActiveFilters(prev => ({ ...prev, categoryId: null }));
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, []);
+
+  /**
+   * Clear site filter
+   */
+  const clearSiteFilter = useCallback(() => {
+    setFilters(prev => {
+      const { siteId, ...rest } = prev;
+      return rest;
+    });
+    setActiveFilters(prev => ({ ...prev, siteId: null }));
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, []);
+
+  /**
+   * Clear all filters
+   */
+  const clearFilters = useCallback(() => {
+    setFilters({});
+    setActiveFilters({});
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, []);
+
+  /**
+   * Reset all filters (alias for clearFilters)
+   */
+  const resetAllFilters = useCallback(() => {
+    clearFilters();
+  }, [clearFilters]);
 
   /**
    * Set featured filter
@@ -166,6 +268,7 @@ export const useListings = ({
   const resetFilters = useCallback(() => {
     setFilters({});
     setPagination(prev => ({ ...prev, page: 1 }));
+    setActiveFilters({});
   }, []);
 
   /**
@@ -296,6 +399,51 @@ export const useListings = ({
     }
   }, [siteSlug, selected, fetchListings]);
 
+  /**
+   * Save filters to session storage
+   */
+  const saveFiltersToSessionStorage = useCallback(() => {
+    try {
+      sessionStorage.setItem('listingFilters', JSON.stringify(filters));
+      sessionStorage.setItem('listingSorting', JSON.stringify(sort));
+      sessionStorage.setItem('listingPagination', JSON.stringify({
+        page: pagination.page,
+        perPage: pagination.perPage
+      }));
+    } catch (error) {
+      console.error('Error saving filters to session storage:', error);
+    }
+  }, [filters, sort, pagination.page, pagination.perPage]);
+
+  /**
+   * Load filters from session storage
+   */
+  const loadFiltersFromSessionStorage = useCallback(() => {
+    try {
+      const savedFilters = sessionStorage.getItem('listingFilters');
+      const savedSorting = sessionStorage.getItem('listingSorting');
+      const savedPagination = sessionStorage.getItem('listingPagination');
+
+      if (savedFilters) {
+        setFilters(JSON.parse(savedFilters));
+      }
+      
+      if (savedSorting) {
+        setSort(JSON.parse(savedSorting));
+      }
+      
+      if (savedPagination) {
+        const { page, perPage } = JSON.parse(savedPagination);
+        setPagination(prev => ({ ...prev, page, perPage }));
+      }
+
+      return savedFilters ? JSON.parse(savedFilters) : {};
+    } catch (error) {
+      console.error('Error loading filters from session storage:', error);
+      return {};
+    }
+  }, []);
+
   return {
     listings,
     loading,
@@ -304,6 +452,7 @@ export const useListings = ({
     sort,
     pagination,
     selected,
+    activeFilters,
     setSearchTerm,
     setStatusFilter,
     setCategoryFilter,
@@ -317,6 +466,16 @@ export const useListings = ({
     clearSelection,
     deleteListing,
     deleteSelected,
-    fetchListings
+    fetchListings,
+    filterByCategory,
+    filterBySite,
+    filterByStatus,
+    filterByCombination,
+    clearCategoryFilter,
+    clearSiteFilter,
+    clearFilters,
+    resetAllFilters,
+    saveFiltersToSessionStorage,
+    loadFiltersFromSessionStorage
   };
 }

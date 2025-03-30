@@ -1,0 +1,8 @@
+{
+  "title": "[ISSUE] Component Tests Fixes - [2025-03-31 14:35]",
+  "body": "I've made the following fixes to address the issues identified earlier:\n\n1. **Fixed Incomplete Source File**:\n   I've completed the implementation of `src/components/admin/listings/hooks/useListings.ts` by adding the missing functions and completing the partial setSearchTerm function. The file now includes all necessary methods like setStatusFilter, setCategoryFilter, setFeaturedFilter, resetFilters, setSorting, setPage, setPerPage, and various selection and deletion operations.\n\n2. **Fixed Module Path Resolution**:\n   I've modified the AuthorizationBoundaries.test.tsx test to use direct relative imports instead of the '@/' alias. This avoids the path resolution issues with the Jest configuration. Each import now uses the full relative path like `../../../../src/components/...` instead of the alias.\n\n3. **Improved Test Mocking Approach**:\n   I've changed the mocking strategy to use explicit mock functions (mockUseAuth, mockUseListings, mockUseSites, mockUseRouter) instead of casting the imported hooks as jest.Mock. This provides better type safety and makes the mocking more explicit.\n\nThese changes should resolve the main issues preventing the tests from running. The next step would be to run the component tests individually to verify they work properly.",
+  "labels": [
+    "from-checkpoint",
+    "documentation"
+  ]
+}

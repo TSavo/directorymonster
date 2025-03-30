@@ -1,0 +1,9 @@
+{
+  "title": "Create pull request with comprehensive description",
+  "section": "Git Management",
+  "body": "Task from section: Git Management\n\nCreate pull request with comprehensive description",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

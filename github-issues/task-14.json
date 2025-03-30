@@ -1,0 +1,9 @@
+{
+  "title": "Implement better error reporting for test failures",
+  "section": "Testing Infrastructure Enhancement",
+  "body": "Task from section: Testing Infrastructure Enhancement\n\nImplement better error reporting for test failures",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

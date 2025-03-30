@@ -1,0 +1,9 @@
+{
+  "title": "Create a dedicated `tests/mocks/ui` directory for UI component mocks",
+  "section": "UI Component Mock Implementation",
+  "body": "Task from section: UI Component Mock Implementation\n\nCreate a dedicated `tests/mocks/ui` directory for UI component mocks",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

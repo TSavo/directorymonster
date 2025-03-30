@@ -1,28 +1,66 @@
 # DirectoryMonster Development Guide
 
-## Development Setup
+## GitHub Issue Tracking
 
-**IMPORTANT: Always use Docker for development with the dedicated dev configuration.**
+**IMPORTANT: All tasks, bugs, and features are tracked exclusively via GitHub Issues.**
+
+### Issue Management
 
 ```bash
-# Start Docker development environment (recommended)
+# View all issues
+gh issue list --repo TSavo/directorymonster
+
+# View high priority issues
+gh issue list --repo TSavo/directorymonster --label "priority:high"
+
+# View issue details
+gh issue view 9 --repo TSavo/directorymonster
+
+# Create new issue
+gh issue create --repo TSavo/directorymonster
+
+# Close completed issue
+gh issue close 9 --repo TSavo/directorymonster
+```
+
+### Working on Issues
+
+1. **Mark as in-progress**:
+   ```bash
+   gh issue edit 9 --add-label "status:in-progress"
+   ```
+
+2. **Create branch for the issue**:
+   ```bash
+   git checkout -b fix/issue-9-listings-hook
+   ```
+
+3. **Reference issue in commits**:
+   ```bash
+   git commit -m "Fix useListings hook implementation #9"
+   ```
+
+4. **Update issue when making progress**:
+   ```bash
+   gh issue comment 9 --body "Fixed the setSearchTerm function, working on tests"
+   ```
+
+## Development Setup
+
+Always use Docker for development with the dedicated dev configuration:
+
+```bash
+# Start environment
 docker-compose -f docker-compose.dev.yml up -d
 
 # View logs
 docker-compose -f docker-compose.dev.yml logs -f
 
-# Windows convenience scripts (using docker-compose.dev.yml automatically)
+# Windows convenience scripts
 start-dev.bat     # Start environment
 dev-reload.bat    # Fast restart
-rebuild-dev.bat   # Full rebuild with dependencies
+rebuild-dev.bat   # Full rebuild
 ```
-
-The `.dev.yml` configuration provides optimized development features:
-- Enhanced hot reloading with file watching
-- Development-specific volume mappings
-- Additional debugging tools
-- Pre-configured environment variables
-- Memory-optimized services
 
 ## Project Architecture
 
@@ -38,17 +76,9 @@ The `.dev.yml` configuration provides optimized development features:
    - Automated categorization
    - Flexible export via EndpointSaver
 
-### Data Flow
+### Component Structure
 
-```
-[Python Scraper] → [EndpointSaver] → [Next.js API] → [Redis] → [Frontend]
-```
-
-## Component Structure
-
-All components follow modular architecture with clear separation of concerns:
-
-### Example: Category Management
+Follow modular architecture with clear separation of concerns:
 
 ```
 src/components/admin/categories/
@@ -61,12 +91,6 @@ src/components/admin/categories/
     └── ...                     # Additional components
 ```
 
-Use the same pattern for all feature areas:
-- One container component that imports subcomponents
-- Data management through custom hooks
-- Shared types in a dedicated file
-- Small, focused UI components
-
 ## React Guidelines
 
 1. **Server Components**
@@ -75,90 +99,14 @@ Use the same pattern for all feature areas:
    - Pre-process data before passing to child components
 
 2. **CSS With Tailwind**
-   - Use `@import` instead of `@tailwind` directives:
-     ```css
-     @import 'tailwindcss/base';
-     @import 'tailwindcss/components';
-     @import 'tailwindcss/utilities';
-     ```
+   - Use `@import` instead of `@tailwind` directives
    - Follow mobile-first responsive design
    - Use utility classes consistently
 
-3. **Component Structure**
-   - Small, focused components with single responsibility
-   - Props-based data flow
-   - Explicit TypeScript interfaces
-
-## Testing
-
-### Commands
-
-```bash
-# Unit tests
-npm test
-
-# Specific component
-npm test -- -t "ComponentName"
-
-# Integration tests
-npm run test:integration
-
-# Domain resolution tests
-npm run test:domain
-
-# All tests with data seeding
-npm run test:all-with-seed
-
-# Docker environment tests
-npm run test:docker
-```
-
-### Test Organization
-
-Organize tests to mirror component structure:
-
-```
-tests/
-└── admin/
-    ├── categories/
-    │   ├── CategoryTable.test.tsx        # Core tests
-    │   ├── CategoryTable.sorting.test.tsx # Feature tests
-    │   └── components/
-    │       └── CategoryTableRow.test.tsx
-    └── listings/
-        └── ...
-```
-
-### Best Practices
-
-1. **Use data-testid Attributes**
-   ```tsx
-   <button data-testid="save-button">Save</button>
-   ```
-
-2. **Test Behavior, Not Implementation**
-   ```tsx
-   // Good: Tests behavior
-   it('submits form on button click', () => {
-     render(<MyForm onSubmit={mockSubmit} />);
-     fireEvent.click(screen.getByTestId('submit-button'));
-     expect(mockSubmit).toHaveBeenCalled();
-   });
-   ```
-
-3. **Test Accessibility**
-   - Verify ARIA attributes
-   - Test keyboard navigation
-   - Check focus management
-
-4. **Hook Testing**
-   ```tsx
-   it('filters data correctly', () => {
-     const { result } = renderHook(() => useMyHook(mockData));
-     act(() => { result.current.setFilter('test'); });
-     expect(result.current.filteredItems).toHaveLength(1);
-   });
-   ```
+3. **Testing**
+   - Use data-testid attributes
+   - Test behavior, not implementation
+   - Organize tests to mirror component structure
 
 ## Common Issues
 
@@ -177,23 +125,7 @@ tests/
    - Check Redis connection/fallback
    - Use domain mocking or `?hostname=` parameter
 
-4. **Redux Integration**
-   - Use RTK Query for API interactions
-   - Follow the slice pattern for state management
-   - Leverage the custom hooks for component integration
-
-## Git Workflow
-
-1. **Feature Branches**
-   - Create from main: `git checkout -b feature/name`
-   - Descriptive branch names: `feature/category-management`
-
-2. **Pull Requests**
-   - Comprehensive testing before submission
-   - Clear description of changes
-   - Reference issues: `Fixes #123`
-
-3. **CI Pipeline**
-   - Tests run automatically on PR
-   - All tests must pass before merging
-   - Monitor status with GitHub CLI: `gh pr checks 123`
+4. **Git Workflow**
+   - Always reference issues in commits and PRs
+   - Keep PRs focused on single issues when possible
+   - Tests must pass before merging
