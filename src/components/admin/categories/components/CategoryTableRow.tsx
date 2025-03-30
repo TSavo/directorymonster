@@ -1,13 +1,15 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { CategoryTableRowProps, SortField } from '../types';
+import { CategoryTableRowProps } from '../types';
+import { CategoryTableActions } from './CategoryTableActions';
 
 export function CategoryTableRow({
   category,
   showSiteColumn,
   onDeleteClick,
+  onEditClick,
+  onViewClick,
   depth = 0,
   isLastChild = false,
   isDraggable = false,
@@ -24,20 +26,6 @@ export function CategoryTableRow({
     dateStyle: 'medium', 
     timeStyle: 'short'
   }).format(new Date(category.updatedAt));
-  
-  // Determine URL patterns based on siteSlug
-  const viewUrl = category.siteSlug 
-    ? `/admin/sites/${category.siteSlug}/categories/${category.slug}`
-    : `/admin/categories/${category.id}`;
-    
-  const editUrl = category.siteSlug 
-    ? `/admin/sites/${category.siteSlug}/categories/${category.id}/edit`
-    : `/admin/categories/${category.id}/edit`;
-  
-  // Handle delete action
-  const handleDelete = () => {
-    onDeleteClick(category.id, category.name);
-  };
   
   // Determine if cell has active sorting
   const isSortedByName = isSortedBy === 'name';
@@ -56,10 +44,12 @@ export function CategoryTableRow({
         'aria-expanded': 'true',
         'aria-controls': `category-children-${category.id}`
       } : {})}
+      data-testid={`category-row-${category.id}`}
     >
       {/* Order column */}
       <td className={`px-4 py-3 text-sm text-gray-500 ${isSortedByOrder ? 'bg-blue-50' : ''}`}
         aria-sort={isSortedByOrder ? (sortDirection === 'asc' ? 'ascending' : 'descending') : undefined}
+        data-testid={`category-order-${category.id}`}
       >
         {category.order}
       </td>
@@ -67,6 +57,7 @@ export function CategoryTableRow({
       {/* Name column with hierarchical display */}
       <td className={`px-4 py-3 ${indentationClass} ${isSortedByName ? 'bg-blue-50' : ''}`}
         aria-sort={isSortedByName ? (sortDirection === 'asc' ? 'ascending' : 'descending') : undefined}
+        data-testid={`category-name-cell-${category.id}`}
       >
         <div className="flex items-center">
           {/* Tree lines for child categories */}
@@ -82,6 +73,7 @@ export function CategoryTableRow({
             <button 
               className="mr-2 text-gray-400 hover:text-gray-600"
               aria-label="Drag to reorder"
+              data-testid={`drag-handle-${category.id}`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="9" cy="5" r="1" />
@@ -120,7 +112,10 @@ export function CategoryTableRow({
           
           {/* Child count badge */}
           {category.childCount > 0 && (
-            <span className="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+            <span 
+              className="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800"
+              data-testid={`child-count-${category.id}`}
+            >
               {category.childCount}
             </span>
           )}
@@ -129,44 +124,33 @@ export function CategoryTableRow({
       
       {/* Site column (conditional) */}
       {showSiteColumn && (
-        <td className="px-4 py-3 text-sm text-gray-500">
+        <td 
+          className="px-4 py-3 text-sm text-gray-500"
+          data-testid={`category-site-${category.id}`}
+        >
           {category.siteName}
         </td>
       )}
       
       {/* Last updated column */}
-      <td className={`px-4 py-3 text-sm text-gray-500 ${isSortedByUpdatedAt ? 'bg-blue-50' : ''}`}
+      <td 
+        className={`px-4 py-3 text-sm text-gray-500 ${isSortedByUpdatedAt ? 'bg-blue-50' : ''}`}
         aria-sort={isSortedByUpdatedAt ? (sortDirection === 'asc' ? 'ascending' : 'descending') : undefined}
+        data-testid={`category-updated-${category.id}`}
       >
         {formattedDate}
       </td>
       
       {/* Actions column */}
-      <td className="px-4 py-3 text-sm text-right">
-        <div className="flex justify-end space-x-2">
-          <Link
-            href={viewUrl}
-            className="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
-          >
-            View
-          </Link>
-          
-          <Link
-            href={editUrl}
-            className="px-2 py-1 text-xs bg-green-50 text-green-600 rounded hover:bg-green-100 transition-colors"
-          >
-            Edit
-          </Link>
-          
-          <button
-            onClick={handleDelete}
-            className="px-2 py-1 text-xs bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors"
-            aria-label={`Delete ${category.name}`}
-            data-testid={`delete-button-${category.id}`}
-          >
-            Delete
-          </button>
-        </div>
+      <td className="px-4 py-3 text-sm text-right" data-testid={`category-actions-${category.id}`}>
+        <CategoryTableActions
+          id={category.id}
+          name={category.name}
+          siteSlug={category.siteId}
+          onEditClick={onEditClick}
+          onDeleteClick={onDeleteClick}
+          onViewClick={onViewClick}
+        />
       </td>
     </tr>
   );

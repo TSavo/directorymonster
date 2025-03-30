@@ -25,6 +25,9 @@ export interface CategoryTableHeaderProps {
   setSiteFilter: (id: string) => void;
   categories: CategoryWithRelations[];
   sites: SiteConfig[];
+  onCreateClick: () => void;
+  onToggleHierarchy: () => void;
+  showHierarchy: boolean;
 }
 
 export interface CategoryTableSortHeaderProps {
@@ -40,8 +43,13 @@ export interface CategoryTableRowProps {
   siteSlug?: string;
   showSiteColumn: boolean;
   onDeleteClick: (id: string, name: string) => void;
+  onEditClick: (id: string) => void;
+  onViewClick: (id: string) => void;
   depth?: number;
   isLastChild?: boolean;
+  isDraggable?: boolean;
+  isSortedBy?: SortField;
+  sortDirection?: SortOrder;
 }
 
 export interface CategoryTablePaginationProps {
@@ -63,6 +71,7 @@ export interface DeleteConfirmationModalProps {
 
 export interface CategoryTableEmptyStateProps {
   siteSlug?: string;
+  onCreateClick?: () => void;
 }
 
 export interface CategoryTableErrorProps {
@@ -79,9 +88,34 @@ export interface CategoryTableActionsProps {
   onViewClick: (id: string) => void;
 }
 
-export interface ListingsMobileViewProps {
+export interface CategoriesMobileViewProps {
   categories: CategoryWithRelations[];
   showSiteColumn: boolean;
   onDeleteClick: (id: string, name: string) => void;
+  onEditClick: (id: string) => void;
+  onViewClick: (id: string) => void;
   siteSlug?: string;
+}
+
+export interface CategoryHierarchyManagerProps {
+  currentCategories: CategoryWithRelations[];
+  showHierarchy: boolean;
+  showSiteColumn: boolean;
+  sortField: SortField;
+  sortOrder: SortOrder;
+  onDeleteClick: (id: string, name: string) => void;
+  onEditClick: (id: string) => void;
+  onViewClick: (id: string) => void;
+}
+
+export interface CategoryTableContainerProps {
+  children: React.ReactNode;
+  testId?: string;
+}
+
+export interface CategoryTableColumnsProps {
+  showSiteColumn: boolean;
+  sortField: SortField;
+  sortOrder: SortOrder;
+  onSort: (field: SortField) => void;
 }

@@ -1,9 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-import { Search, X, Layers, RefreshCcw } from 'lucide-react';
+import { Search, X, Layers, RefreshCcw, PlusCircle } from 'lucide-react';
 import { CategoryTableHeaderProps } from '../types';
-import { useState } from 'react';
 
 /**
  * Header component with search and filtering controls for the category table
@@ -18,10 +16,11 @@ export function CategoryTableHeader({
   siteFilter,
   setSiteFilter,
   categories,
-  sites
+  sites,
+  onCreateClick,
+  onToggleHierarchy,
+  showHierarchy
 }: CategoryTableHeaderProps) {
-  const [showHierarchy, setShowHierarchy] = useState(false);
-  
   // Get only parent categories for the filter (exclude child categories)
   const parentCategories = categories.filter(category => !category.parentId);
   
@@ -34,11 +33,6 @@ export function CategoryTableHeader({
     setParentFilter('');
     setSiteFilter('');
   };
-  
-  // Toggle hierarchy view
-  const toggleHierarchyView = () => {
-    setShowHierarchy(!showHierarchy);
-  };
 
   return (
     <div className="mb-6" data-testid="category-header">
@@ -48,21 +42,23 @@ export function CategoryTableHeader({
         </h2>
         <div className="flex gap-2" data-testid="header-actions">
           <button
-            onClick={toggleHierarchyView}
-            className="px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-1"
-            aria-label="View Hierarchy"
-            data-testid="view-hierarchy-button"
+            onClick={onToggleHierarchy}
+            className={`px-3 py-2 ${showHierarchy ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'} rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-1`}
+            aria-label={showHierarchy ? "Hide Hierarchy" : "View Hierarchy"}
+            data-testid="toggle-hierarchy-button"
+            aria-pressed={showHierarchy}
           >
             <Layers size={16} />
-            <span>View Hierarchy</span>
+            <span>{showHierarchy ? "Hide Hierarchy" : "View Hierarchy"}</span>
           </button>
-          <Link 
-            href={siteSlug ? `/admin/sites/${siteSlug}/categories/new` : "/admin/categories/new"}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          <button 
+            onClick={onCreateClick}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-1"
             data-testid="add-category-button"
           >
-            Add Category
-          </Link>
+            <PlusCircle size={16} />
+            <span>Add Category</span>
+          </button>
         </div>
       </div>
       
@@ -135,7 +131,7 @@ export function CategoryTableHeader({
           )}
           
           {/* Reset filters button - only show when filters are actually applied */}
-          {(searchTerm !== '' || parentFilter !== '' || siteFilter !== '') && (
+          {hasFilters && (
             <button
               onClick={handleResetFilters}
               className="px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-1"

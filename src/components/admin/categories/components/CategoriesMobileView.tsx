@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { CategoryWithRelations } from '../types';
+import { CategoriesMobileViewProps } from '../types';
 
 /**
  * Mobile-friendly view of categories that replaces the table for smaller screens
@@ -10,13 +9,10 @@ export function CategoriesMobileView({
   categories, 
   showSiteColumn, 
   onDeleteClick,
+  onEditClick,
+  onViewClick,
   siteSlug 
-}: {
-  categories: CategoryWithRelations[];
-  showSiteColumn: boolean;
-  onDeleteClick: (id: string, name: string) => void;
-  siteSlug?: string;
-}) {
+}: CategoriesMobileViewProps) {
   // Format date for display
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
@@ -71,20 +67,20 @@ export function CategoriesMobileView({
           </div>
           
           <div className="flex justify-end space-x-3 pt-2 border-t">
-            <Link 
-              href={siteSlug ? `/admin/sites/${siteSlug}/categories/${category.slug}` : `/admin/categories/${category.id}`}
+            <button 
+              onClick={() => onViewClick(category.id)}
               className="text-blue-600 hover:text-blue-900 text-sm font-medium"
-              data-testid={`view-link-${category.id}`}
+              data-testid={`view-button-${category.id}`}
             >
               View
-            </Link>
-            <Link 
-              href={siteSlug ? `/admin/sites/${siteSlug}/categories/${category.id}/edit` : `/admin/categories/${category.id}/edit`}
+            </button>
+            <button 
+              onClick={() => onEditClick(category.id)}
               className="text-amber-600 hover:text-amber-900 text-sm font-medium"
-              data-testid={`edit-link-${category.id}`}
+              data-testid={`edit-button-${category.id}`}
             >
               Edit
-            </Link>
+            </button>
             <button
               onClick={() => onDeleteClick(category.id, category.name)}
               className="text-red-600 hover:text-red-900 text-sm font-medium"

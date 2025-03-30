@@ -1,43 +1,59 @@
-# DirectoryMonster Implementation Next Steps - [2025-03-30] - Admin Dashboard MVP Completed
+# DirectoryMonster Implementation Next Steps - [2025-03-30] - Category Management MVP Completed
 
 ## Recently Completed
-- ✅ Completed Admin Dashboard MVP components with modular architecture
-- ✅ Improved dashboard with responsive layouts and accessibility features
-- ✅ Added comprehensive data filtering and date range selection
-- ✅ Implemented enhanced loading states and error handling
-- ✅ Added proper data-testid attributes for all dashboard components
-- ✅ Created modular components for better maintainability
+- ✅ Implemented comprehensive Category Management functionality
+- ✅ Created modular form components with validation
+- ✅ Implemented modal-based create/edit functionality
+- ✅ Added hierarchical category display with parent/child relationships
+- ✅ Created responsive design for both desktop and mobile views
+- ✅ Enhanced accessibility with ARIA attributes and keyboard navigation
+- ✅ Implemented comprehensive data-testid attributes for testing
 
-## Priority Tasks (Based on Verification Script)
+## Priority Tasks (Next Sprint)
 
-### ✅ COMPLETED: Auth Module Export Standardization 
-- Updated 7 auth components to add missing default exports:
-  - AuthContainer.tsx, FirstUserSetup.tsx, LogoutButton.tsx
-  - PasswordResetForm.tsx, RoleGuard.tsx, SessionManager.tsx, ZKPLogin.tsx
-- Fixed auth/index.ts barrel file to follow standardized pattern
+### Listing Management Implementation
+- [ ] Create comprehensive Listing Form component
+  - [ ] Implement multi-step listing creation process
+  - [ ] Create media upload functionality for listing images
+  - [ ] Implement category selection with hierarchy
+  - [ ] Add custom fields support based on category
+- [ ] Create ListingTable component
+  - [ ] Implement filtering by category and site
+  - [ ] Add sorting and pagination
+  - [ ] Create responsive design for mobile devices
+- [ ] Implement listing detail view
+  - [ ] Create preview mode for listings
+  - [ ] Implement approval workflow
+  - [ ] Add analytics tracking
 
-### ✅ COMPLETED: Category Components Export Standardization
-- Updated 5 category components to add missing named exports:
-  - CategoryTableEmptyState.tsx, CategoryTableError.tsx
-  - CategoryTablePagination.tsx, CategoryTableRow.tsx
-  - CategoryTableSortHeader.tsx
-- Standardized categories/components/index.ts barrel file
+### Site Management Implementation
+- [ ] Create SiteForm component for creating and editing sites
+  - [ ] Implement domain settings configuration
+  - [ ] Add theme customization options
+  - [ ] Create SEO settings section
+- [ ] Create SiteTable component
+  - [ ] Implement status monitoring
+  - [ ] Add usage statistics
+  - [ ] Create domain verification workflow
 
-### ✅ COMPLETED: Dashboard Subcomponents Export Standardization
-- Added named exports to 2 dashboard subcomponents:
-  - ActivityFeedItem.tsx, StatisticCard.tsx
-- Updated dashboard/components/index.ts barrel file
+## Future Work
 
-### ✅ COMPLETED: Barrel File Standardization
-- Standardized 5 barrel files to follow the standardized export pattern:
-  - admin/index.ts - Added export defaults for subdirectories
-  - layout/icons/index.ts - Fixed circular reference and added proper exports
-  - sites/index.ts - Replaced auto-generated export pattern with standardized pattern
-  - sites/hooks/index.ts - Added standardized export pattern
-  - dashboard/hooks/index.ts - Added missing named exports
-- Verification script confirms all files now follow the standardized pattern
+### Admin Dashboard Improvements
+- [ ] Create documentation for the dashboard component architecture
+- [ ] Implement API integration for real data in all dashboard components
+- [ ] Add analytics and visualization components for insights
+- [ ] Add user management section to the admin dashboard
+- [ ] Implement user role-based access controls for dashboard features
+- [ ] Create a guided tour feature for new admin users
 
-## New Priority Tasks
+### Test Infrastructure Improvements
+- [ ] Set up proper CI workflow for running both unit and E2E tests
+- [ ] Create a dedicated test environment with seeded test data
+- [ ] Add visual regression testing with screenshots comparison
+- [ ] Implement test coverage reporting and monitoring
+- [ ] Set up test fixtures and factory functions for test data creation
+
+## Previous Tasks
 
 ### E2E Testing Standardization
 - [x] Convert all E2E tests to follow the new testing pattern:
@@ -72,49 +88,8 @@
 - [ ] Update SiteForm.validation.test.tsx and other template-based files
 - [ ] Resolve the punycode module deprecation warning
 
-### E2E Testing Improvements
-- ✅ Add data-testid attributes to homepage components
-- ✅ Implement waiting for component hydration in tests
-- ✅ Create test utilities for form element detection with retry mechanisms
-- ✅ Fix title and content detection for homepage tests
-- ✅ Implement new E2E testing structure for homepage tests
-- ✅ Convert login.test.js to new test structure pattern
-- ✅ Create login.selectors.js with centralized selectors
-- ✅ Create shared test setup utilities for login tests
-- ✅ Convert first-user.test.js to new test structure pattern
-- ✅ Create first-user.selectors.js with centralized selectors
-- ✅ Add data-testid attributes to admin components
-- ✅ Create admin-dashboard.selectors.js file
-- ✅ Refactor admin dashboard tests into specialized test files
-- [ ] Create documentation for E2E testing best practices
-
-## Future Work
-
-### Admin Dashboard Improvements
-- Create documentation for the dashboard component architecture
-- Implement API integration for real data in all dashboard components
-- Add analytics and visualization components for insights
-- Add user management section to the admin dashboard
-- Implement user role-based access controls for dashboard features
-- Create a guided tour feature for new admin users
-
 ### Export Standardization Improvements
-- Add export verification to CI pipeline via GitHub Actions
-- Create tooling to automatically generate standardized component files
-- Update project documentation with export pattern guidelines
-- Add eslint rules to enforce proper export patterns
-
-### Test Infrastructure Improvements
-- Set up proper CI workflow for running both unit and E2E tests
-- Create a dedicated test environment with seeded test data
-- Add visual regression testing with screenshots comparison
-- Implement test coverage reporting and monitoring
-- Set up test fixtures and factory functions for test data creation
-
-### Upcoming DirectoryMonster Features
-- Enhance data handling and state management
-- Improve error handling for API requests
-- Optimize loading states and UI feedback
-- Implement caching for performance gains
-- Add data validation on client and server
-- Expand test coverage for recently standardized components
+- [ ] Add export verification to CI pipeline via GitHub Actions
+- [ ] Create tooling to automatically generate standardized component files
+- [ ] Update project documentation with export pattern guidelines
+- [ ] Add eslint rules to enforce proper export patterns

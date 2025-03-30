@@ -1,158 +1,107 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useCategories } from './hooks';
-import { CategoryWithRelations } from './types';
+import React from 'react';
+import { CategoryTableProps } from './types';
+import { useCategoryTable } from './hooks/useCategoryTable';
 import {
   CategoryTableError,
   CategoryTableSkeleton,
   CategoryTableEmptyState,
   CategoryTableHeader,
-  CategoryTableRow,
-  CategoryTableSortHeader,
   CategoryTablePagination,
   CategoriesMobileView,
   DeleteConfirmationModal,
-  CategoryErrorBoundary
+  CategoryErrorBoundary,
+  CategoryFormModal,
+  CategoryTableContainer,
+  CategoryTableColumns,
+  CategoryHierarchyManager
 } from './components';
 
-export interface CategoryTableProps {
-  siteSlug?: string;
-  initialCategories?: CategoryWithRelations[];
-}
-
+/**
+ * Main category management table component
+ */
 export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProps) {
-  const [showHierarchy, setShowHierarchy] = useState(false);
-  
-  // Use the categories hook for state management
+  // Use the hook for table state and logic
   const {
+    // Category data
     categories,
     filteredCategories,
     currentCategories,
+    allCategories,
+    sites,
+    
+    // Loading and error states
     isLoading,
     error,
+    
+    // Filtering
     searchTerm,
     setSearchTerm,
     parentFilter,
     setParentFilter,
     siteFilter,
     setSiteFilter,
+    
+    // Sorting
     sortField,
     sortOrder,
     handleSort,
+    
+    // Pagination
     currentPage,
     totalPages,
     itemsPerPage,
     setItemsPerPage,
     goToPage,
+    
+    // UI state
+    showHierarchy,
+    formModalOpen,
+    selectedCategoryId,
+    showSiteColumn,
+    
+    // Delete handling
     isDeleteModalOpen,
     categoryToDelete,
     confirmDelete,
     handleDelete,
     cancelDelete,
-    fetchCategories,
-    allCategories,
-    sites
-  } = useCategories(siteSlug, initialCategories);
-
-  // Handle showing hierarchy view
-  const toggleHierarchy = () => {
-    setShowHierarchy(!showHierarchy);
-  };
+    
+    // UI actions
+    toggleHierarchy,
+    handleEditCategory,
+    handleCreateCategory,
+    handleCloseFormModal,
+    handleCategorySaved,
+    handleViewCategory,
+    
+    // Data operations
+    fetchCategories
+  } = useCategoryTable(siteSlug, initialCategories);
 
   // Reload categories if there's an error
   const handleRetry = () => {
     fetchCategories();
   };
 
-  // Determine if the site column should be visible (multi-tenant mode)
-  const showSiteColumn = !siteSlug && sites.length > 0;
-
-  // Safe hierarchy construction with memo to prevent recomputation
-  const safeHierarchy = React.useMemo(() => {
-    // Create a map of child categories by parent ID for hierarchy view
-    const childrenMap = new Map<string, CategoryWithRelations[]>();
-    
-    if (showHierarchy) {
-      // First pass: Create the map of child categories by parent ID
-      currentCategories.forEach(category => {
-        if (category.parentId) {
-          if (!childrenMap.has(category.parentId)) {
-            childrenMap.set(category.parentId, []);
-          }
-          // Create a shallow copy to avoid modifying the original
-          childrenMap.get(category.parentId)?.push({...category});
-        }
-      });
-      
-      // Second pass: Validate no circular references exist
-      const validateNoCircularReferences = (categoryId: string, ancestorIds: Set<string> = new Set()): boolean => {
-        if (ancestorIds.has(categoryId)) {
-          console.error(`Circular reference detected for category ${categoryId}`);
-          return false;
-        }
-        
-        const newAncestorIds = new Set(ancestorIds);
-        newAncestorIds.add(categoryId);
-        
-        const children = childrenMap.get(categoryId) || [];
-        return children.every(child => validateNoCircularReferences(child.id, newAncestorIds));
-      };
-      
-      // Get all root categories and validate their hierarchies
-      const rootCategories = currentCategories.filter(c => !c.parentId);
-      rootCategories.forEach(root => validateNoCircularReferences(root.id));
-    }
-    
-    return {
-      // Get only the root categories (no parent ID)
-      rootCategories: currentCategories.filter(c => !c.parentId),
-      childrenMap
-    };
-  }, [currentCategories, showHierarchy]);
-
-  // Improved hierarchy rendering without circular references
-  const renderHierarchicalRows = (parentCategories: CategoryWithRelations[], depth = 0) => {
-    return parentCategories.flatMap((category, index, arr) => {
-      const isLastChild = index === arr.length - 1;
-      const children = safeHierarchy.childrenMap.get(category.id) || [];
-      
-      // Only get direct children, not full subtree to prevent circular references
-      return [
-        <CategoryTableRow 
-          key={category.id}
-          category={category}
-          showSiteColumn={showSiteColumn}
-          onDeleteClick={confirmDelete}
-          depth={depth}
-          isLastChild={isLastChild}
-          isDraggable={true}
-          isSortedBy={sortField}
-          sortDirection={sortOrder}
-        />,
-        // Render children recursively but without circular references
-        ...renderHierarchicalRows(children, depth + 1)
-      ];
-    });
-  };
-
   // Loading state
   if (isLoading) {
-    return <CategoryTableSkeleton />;
+    return <CategoryTableSkeleton data-testid="category-table-loading" />;
   }
 
   // Error state
   if (error) {
-    return <CategoryTableError error={error} onRetry={handleRetry} />;
+    return <CategoryTableError error={error} onRetry={handleRetry} data-testid="category-table-error" />;
   }
 
   // Empty state
   if (categories.length === 0) {
-    return <CategoryTableEmptyState siteSlug={siteSlug} />;
+    return <CategoryTableEmptyState siteSlug={siteSlug} onCreateClick={handleCreateCategory} data-testid="category-table-empty" />;
   }
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden" data-testid="category-table-container">
       {/* Header with search and filters */}
       <CategoryTableHeader
         totalCategories={filteredCategories.length}
@@ -165,78 +114,44 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
         setSiteFilter={setSiteFilter}
         categories={allCategories}
         sites={sites}
+        onCreateClick={handleCreateCategory}
+        onToggleHierarchy={toggleHierarchy}
+        showHierarchy={showHierarchy}
       />
       
       {/* Table for desktop */}
-      <div className="hidden md:block overflow-x-auto shadow rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <CategoryTableSortHeader
-                label="Order"
-                field="order"
-                currentSortField={sortField}
-                currentSortOrder={sortOrder}
-                onSort={handleSort}
-              />
-              <CategoryTableSortHeader
-                label="Name"
-                field="name"
-                currentSortField={sortField}
-                currentSortOrder={sortOrder}
-                onSort={handleSort}
-              />
-              {showSiteColumn && (
-                <th 
-                  scope="col" 
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Site
-                </th>
-              )}
-              <CategoryTableSortHeader
-                label="Last Updated"
-                field="updatedAt"
-                currentSortField={sortField}
-                currentSortOrder={sortOrder}
-                onSort={handleSort}
-              />
-              <th 
-                scope="col" 
-                className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            <CategoryErrorBoundary
-              fallback={
-                <tr>
-                  <td colSpan={showSiteColumn ? 5 : 4} className="px-4 py-3 text-center text-red-500">
-                    Error rendering category hierarchy. Please try disabling hierarchy view or contact support.
-                  </td>
-                </tr>
-              }
-            >
-              {showHierarchy
-                ? renderHierarchicalRows(safeHierarchy.rootCategories)
-                : currentCategories.map(category => (
-                    <CategoryTableRow
-                      key={category.id}
-                      category={category}
-                      showSiteColumn={showSiteColumn}
-                      onDeleteClick={confirmDelete}
-                      isDraggable={true}
-                      isSortedBy={sortField}
-                      sortDirection={sortOrder}
-                    />
-                  ))
-              }
-            </CategoryErrorBoundary>
-          </tbody>
-        </table>
-      </div>
+      <CategoryTableContainer>
+        <thead className="bg-gray-50">
+          <CategoryTableColumns
+            showSiteColumn={showSiteColumn}
+            sortField={sortField}
+            sortOrder={sortOrder}
+            onSort={handleSort}
+          />
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          <CategoryErrorBoundary
+            fallback={
+              <tr>
+                <td colSpan={showSiteColumn ? 5 : 4} className="px-4 py-3 text-center text-red-500">
+                  Error rendering category hierarchy. Please try disabling hierarchy view or contact support.
+                </td>
+              </tr>
+            }
+          >
+            <CategoryHierarchyManager
+              currentCategories={currentCategories}
+              showHierarchy={showHierarchy}
+              showSiteColumn={showSiteColumn}
+              sortField={sortField}
+              sortOrder={sortOrder}
+              onDeleteClick={confirmDelete}
+              onEditClick={handleEditCategory}
+              onViewClick={handleViewCategory}
+            />
+          </CategoryErrorBoundary>
+        </tbody>
+      </CategoryTableContainer>
       
       {/* Mobile view */}
       <CategoriesMobileView
@@ -244,6 +159,9 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
         showSiteColumn={showSiteColumn}
         onDeleteClick={confirmDelete}
         siteSlug={siteSlug}
+        onEditClick={handleEditCategory}
+        onViewClick={handleViewCategory}
+        data-testid="category-table-mobile"
       />
       
       {/* Pagination */}
@@ -254,6 +172,7 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
         itemsPerPage={itemsPerPage}
         setItemsPerPage={setItemsPerPage}
         totalItems={filteredCategories.length}
+        data-testid="category-table-pagination"
       />
       
       {/* Delete confirmation modal */}
@@ -264,8 +183,19 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
           itemName={categoryToDelete.name}
           onConfirm={() => handleDelete(categoryToDelete.id)}
           onCancel={cancelDelete}
+          data-testid="category-delete-modal"
         />
       )}
+
+      {/* Category form modal */}
+      <CategoryFormModal
+        isOpen={formModalOpen}
+        onClose={handleCloseFormModal}
+        siteSlug={siteSlug || ''}
+        categoryId={selectedCategoryId}
+        onSaved={handleCategorySaved}
+        title={selectedCategoryId ? 'Edit Category' : 'Create New Category'}
+      />
     </div>
   );
 }
