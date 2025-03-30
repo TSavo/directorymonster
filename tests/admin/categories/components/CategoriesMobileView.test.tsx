@@ -67,10 +67,14 @@ jest.mock('next/link', () => {
 
 describe('CategoriesMobileView Component', () => {
   const mockOnDeleteClick = jest.fn();
+  const mockOnEditClick = jest.fn();
+  const mockOnViewClick = jest.fn();
   const defaultProps = {
     categories: mockCategories,
     showSiteColumn: false,
-    onDeleteClick: mockOnDeleteClick
+    onDeleteClick: mockOnDeleteClick,
+    onEditClick: mockOnEditClick,
+    onViewClick: mockOnViewClick
   };
   
   beforeEach(() => {
@@ -159,25 +163,45 @@ describe('CategoriesMobileView Component', () => {
   it('uses site-specific URLs when siteSlug is provided', () => {
     render(<CategoriesMobileView {...defaultProps} siteSlug="test-site" />);
     
-    // Check view link URL using test ID
-    const viewLink = screen.getByTestId('view-link-category_1');
-    expect(viewLink).toHaveAttribute('href', '/admin/sites/test-site/categories/test-category-1');
+    // Check view button is rendered with correct test ID
+    const viewButton = screen.getByTestId('view-button-category_1');
+    expect(viewButton).toBeInTheDocument();
+    expect(viewButton).toHaveTextContent('View');
     
-    // Check edit link URL using test ID
-    const editLink = screen.getByTestId('edit-link-category_1');
-    expect(editLink).toHaveAttribute('href', '/admin/sites/test-site/categories/category_1/edit');
+    // Check edit button is rendered with correct test ID
+    const editButton = screen.getByTestId('edit-button-category_1');
+    expect(editButton).toBeInTheDocument();
+    expect(editButton).toHaveTextContent('Edit');
+    
+    // Verify that clicking the view button calls onViewClick with the correct ID
+    fireEvent.click(viewButton);
+    expect(mockOnViewClick).toHaveBeenCalledWith('category_1');
+    
+    // Verify that clicking the edit button calls onEditClick with the correct ID
+    fireEvent.click(editButton);
+    expect(mockOnEditClick).toHaveBeenCalledWith('category_1');
   });
   
   it('uses default URLs when siteSlug is not provided', () => {
     render(<CategoriesMobileView {...defaultProps} />);
     
-    // Check view link URL using test ID
-    const viewLink = screen.getByTestId('view-link-category_1');
-    expect(viewLink).toHaveAttribute('href', '/admin/categories/category_1');
+    // Check view button is rendered with correct test ID
+    const viewButton = screen.getByTestId('view-button-category_1');
+    expect(viewButton).toBeInTheDocument();
+    expect(viewButton).toHaveTextContent('View');
     
-    // Check edit link URL using test ID
-    const editLink = screen.getByTestId('edit-link-category_1');
-    expect(editLink).toHaveAttribute('href', '/admin/categories/category_1/edit');
+    // Check edit button is rendered with correct test ID
+    const editButton = screen.getByTestId('edit-button-category_1');
+    expect(editButton).toBeInTheDocument();
+    expect(editButton).toHaveTextContent('Edit');
+    
+    // Verify that clicking the view button calls onViewClick with the correct ID
+    fireEvent.click(viewButton);
+    expect(mockOnViewClick).toHaveBeenCalledWith('category_1');
+    
+    // Verify that clicking the edit button calls onEditClick with the correct ID
+    fireEvent.click(editButton);
+    expect(mockOnEditClick).toHaveBeenCalledWith('category_1');
   });
   
   it('displays formatted last updated date', () => {

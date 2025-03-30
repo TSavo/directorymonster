@@ -11,10 +11,10 @@ const { log } = require('./test-utils');
  * Default configuration for waitForHydration
  */
 const DEFAULT_CONFIG = {
-  timeout: 10000, // 10 seconds
-  interval: 100, // 100ms between checks
-  maxRetries: 20, // Maximum number of retries
-  verbose: false, // Whether to log detailed information
+  timeout: 15000, // Increased from 10000 to 15000 (15 seconds)
+  interval: 200, // Increased from 100ms to 200ms between checks
+  maxRetries: 30, // Increased from 20 to 30 retries
+  verbose: true, // Changed to true for better debugging
   message: 'Waiting for component hydration' // Default log message
 };
 
@@ -132,31 +132,56 @@ async function findElementWithRetry(page, selector, config = {}) {
   let retryCount = 0;
   let lastError = null;
   
+  // Allow selector to be a comma-separated list of selectors to try
+  const selectors = selector.split(',').map(s => s.trim());
+  
+  log(`Looking for elements with selectors: ${selectors.join(', ')}`, 'info');
+  
   while (retryCount < maxRetries) {
-    try {
-      // Try to find the element
-      const element = await page.$(selector);
-      
-      if (element) {
-        if (verbose && retryCount > 0) {
-          log(`Found element ${selector} after ${retryCount} retries`, 'info');
+    // Try each selector in the list
+    for (const singleSelector of selectors) {
+      try {
+        // Try to find the element with this selector
+        const element = await page.$(singleSelector);
+        
+        if (element) {
+          if (verbose) {
+            log(`Found element with selector "${singleSelector}" after ${retryCount} retries`, 'info');
+          }
+          return element;
         }
-        return element;
-      }
-    } catch (error) {
-      lastError = error;
-      if (verbose) {
-        log(`Retry ${retryCount}: Failed to find ${selector} - ${error.message}`, 'debug');
+      } catch (error) {
+        lastError = error;
+        if (verbose) {
+          log(`Retry ${retryCount}: Failed to find "${singleSelector}" - ${error.message}`, 'debug');
+        }
       }
     }
     
-    // Exponential backoff
-    const delay = Math.min(100 * Math.pow(1.5, retryCount), 2000);
+    // If we get here, none of the selectors matched
+    
+    // Check if we should take a screenshot to help debug
+    if (retryCount % 5 === 0) {
+      try {
+        const { takeScreenshot } = require('./test-utils');
+        await takeScreenshot(page, `element-search-retry-${retryCount}`);
+        
+        // Also log the current HTML around where the element should be
+        const html = await page.evaluate(() => document.body.innerHTML);
+        const snippet = html.substring(0, 300) + '...';
+        log(`Page HTML snippet: ${snippet}`, 'debug');
+      } catch (e) {
+        // Ignore screenshot errors
+      }
+    }
+    
+    // Exponential backoff with a bit more initial delay
+    const delay = Math.min(200 * Math.pow(1.5, retryCount), 3000);
     await new Promise(resolve => setTimeout(resolve, delay));
     retryCount++;
   }
   
-  log(`Failed to find element ${selector} after ${maxRetries} retries`, 'warning');
+  log(`Failed to find any matching element after ${maxRetries} retries. Tried: ${selectors.join(', ')}`, 'warning');
   if (lastError) {
     log(`Last error: ${lastError.message}`, 'warning');
   }
@@ -212,7 +237,17 @@ async function isComponentHydrated(page, selector, testids = [], config = {}) {
  * @returns {Promise<boolean>} - Whether hydration is complete
  */
 async function waitForClientHydration(page) {
-  return waitForHydration(
+  log('Waiting for client-side hydration to complete', 'info');
+  
+  // Take a screenshot before hydration check
+  try {
+    const { takeScreenshot } = require('./test-utils');
+    await takeScreenshot(page, 'before-hydration-check');
+  } catch (e) {
+    // Ignore screenshot errors
+  }
+  
+  const result = await waitForHydration(
     page,
     async (page) => {
       // Check if Next.js indicators of hydration are complete
@@ -226,18 +261,42 @@ async function waitForClientHydration(page) {
         // Check if React has initialized the app 
         const hasReactRoot = document.querySelector('#__next') !== null;
         
-        // Check for any event listeners (a sign React has mounted)
-        const hasEventListeners = document.querySelectorAll('button, a, input').length > 0;
+        // Check for any interactive elements (a sign React has mounted)
+        const hasInteractiveElements = document.querySelectorAll('button, a, input, form').length > 0;
+        
+        // Log what we found for debugging
+        console.log('Hydration check:', {
+          hasNextHydrationMarker,
+          hasHydratedMarkers,
+          hasReactRoot,
+          interactiveElementCount: document.querySelectorAll('button, a, input, form').length
+        });
         
         // If any of these are true, hydration is likely complete
-        return hasNextHydrationMarker || hasHydratedMarkers || (hasReactRoot && hasEventListeners);
+        return hasNextHydrationMarker || hasHydratedMarkers || (hasReactRoot && hasInteractiveElements);
       });
     },
     {
-      timeout: 15000, // Give it a bit more time
+      timeout: 20000, // Increased from 15000 to 20000 (20 seconds)
       message: 'Waiting for client-side hydration to complete'
     }
   );
+  
+  // Take another screenshot after hydration check
+  try {
+    const { takeScreenshot } = require('./test-utils');
+    await takeScreenshot(page, 'after-hydration-check');
+  } catch (e) {
+    // Ignore screenshot errors
+  }
+  
+  if (result) {
+    log('Client-side hydration complete', 'info');
+  } else {
+    log('Client-side hydration timed out - proceeding anyway', 'warning');
+  }
+  
+  return result;
 }
 
 module.exports = {

@@ -10,9 +10,14 @@ let EventEmitter: any = null;
 // Only import in server context
 if (typeof window === 'undefined') {
   // This import style is compatible with Next.js and doesn't break browser builds
-  const ioredis = require('ioredis');
-  Redis = ioredis.Redis;
-  EventEmitter = require('events');
+  try {
+    const ioredis = require('ioredis');
+    Redis = ioredis.Redis;
+    EventEmitter = require('events');
+  } catch (error) {
+    console.warn('[Redis] Failed to load ioredis, using memory implementation:', error);
+    // Don't set Redis, which will trigger the fallback later
+  }
 }
 
 // Redis connection configuration
@@ -197,6 +202,15 @@ export function createRedisClient(): any {
   if (typeof window !== 'undefined') {
     // In browser context, always use memory implementation
     return new MemoryRedis();
+  }
+  
+  // Check for Edge runtime by looking for missing Node.js features
+  const isEdgeRuntime = typeof process === 'undefined' || typeof require === 'undefined' || !Redis;
+  if (isEdgeRuntime) {
+    console.log('[Redis] Detected Edge runtime, using in-memory implementation');
+    const memoryClient = new MemoryRedis();
+    updateConnectionState(ConnectionState.CONNECTED);
+    return memoryClient;
   }
   
   // Use memory implementation if explicitly configured
