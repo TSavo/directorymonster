@@ -1,8 +1,22 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - March 30, 2025 (2:30 PM)
+## Current Status - March 30, 2025 (3:00 PM)
 
-### Completed fix/exclude-e2e-tests branch
+### Executed NPM Tests
+
+- Ran the project's test suite using `npm test` command
+- Tests ran successfully without errors
+- Test output shows coverage information (overall ~38.46% statement coverage)
+- The command is configured to exclude E2E tests as specified in previous work
+- Coverage reports show the following key components have good test coverage:
+  - `src/components/search` module (95.04% statements, 87.27% branches, 90.47% functions)
+  - `src/app/api/search/route.ts` (100% coverage across all metrics)
+  - `src/app/api/site-info/route.ts` (100% statement coverage, 90.9% branch coverage)
+  - Several key API components related to categories and listings
+
+### Previous Status (2:30 PM)
+
+#### Completed fix/exclude-e2e-tests branch
 
 - Updated the main `npm test` command to exclude the e2e tests by adding the `--testPathIgnorePatterns=tests/e2e` flag
 - Added a new `test:with-e2e` command that runs all tests including e2e tests
