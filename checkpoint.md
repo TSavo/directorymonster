@@ -1,5 +1,146 @@
 # DirectoryMonster Project Checkpoint
 
+## Integration Test Execution Plan - [2025-03-30 23:45]
+
+I'm going to select an integration test to run and fix any issues. Based on my review of the project files, I've identified some key things to note:
+
+1. **Test Structure**:
+   - Integration tests are organized by feature area in subdirectories (filtering, site-listing, etc.)
+   - Each test file focuses on a specific integration scenario
+   - Tests use a combination of mock hooks and Redux mock store for state management
+
+2. **Import Patterns**:
+   - Tests originally used `@/` path aliases, but have been updated to use direct relative imports
+   - The path pattern is typically `../../../../src/components/admin/[feature]/...`
+
+3. **Recent Changes**:
+   - According to checkpoint.md, all test files have been updated to use direct relative paths instead of alias patterns
+   - Hook directory structure has been created to match the expected paths in tests
+
+### Selected Test: FilterReset.test.tsx
+
+I've chosen to run the `FilterReset.test.tsx` as my first integration test to verify because:
+
+1. It's a good representative example of the integration tests
+2. It has multiple test cases for different aspects of filtering
+3. It integrates multiple components (ListingTable, ListingFilterBar, CategoryFilterTree, SiteFilterDropdown)
+4. It tests a user-facing feature that would be important to verify
+
+### Expected Behavior
+
+The FilterReset.test.tsx test should verify that:
+- Individual filters can be reset with their specific reset buttons
+- All filters can be reset with a "Reset All" button
+- The URL query parameters are updated when filters are reset
+- Reset buttons are only shown when filters are active
+
+### Plan for Execution
+
+1. Run the FilterReset.test.tsx file in isolation
+2. Observe any errors or issues that occur
+3. Fix any problems identified
+4. Verify the test runs successfully
+5. Document what was fixed and any recommendations
+
+I'll update the checkpoint with the results of running this test and any fixes made.
+
+### Test Execution Results
+
+I ran the `FilterReset.test.tsx` test and encountered an error:
+
+```
+FAIL tests/admin/integration/filtering/FilterReset.test.tsx
+  ● Test suite failed to run
+
+    Cannot find module 'react-redux' from 'tests/admin/integration/filtering/FilterReset.test.tsx'
+```
+
+This error indicates that the test is missing the required `react-redux` dependency. This is a package dependency issue rather than a code structure issue.
+
+### Analysis
+
+1. **Missing Dependency**: The test is importing from `react-redux` (specifically the `Provider` component) but this package doesn't appear to be installed or accessible in the project.
+
+2. **Framework Configuration**: This suggests there might be an issue with the testing framework configuration or missing dependency installation.
+
+### Fix Plan
+
+1. **Install Missing Dependency**: Install react-redux if it's not already in the project
+   ```bash
+   npm install react-redux
+   ```
+
+2. **Check package.json**: Verify that redux-related packages are correctly listed in dependencies
+
+3. **Check Jest Configuration**: Ensure the Jest configuration correctly handles module resolution for packages like react-redux
+
+### Test Execution Results - Update
+
+After installing the `react-redux` package, I ran the test again and encountered another error:
+
+```
+FAIL tests/admin/integration/filtering/FilterReset.test.tsx
+  ● Test suite failed to run
+
+    Cannot find module 'redux-mock-store' from 'tests/admin/integration/filtering/FilterReset.test.tsx'
+```
+
+I'm continuing to find and install missing dependencies. I've now installed:
+
+1. `react-redux` - The Redux bindings for React
+2. `redux-mock-store` - A mock store for testing Redux async actions and middleware
+
+This reveals that the integration tests depend on multiple Redux-related packages that aren't explicitly listed in the main `package.json` dependencies.
+
+### Test Execution Results - Update 2
+
+After installing `redux-mock-store`, I ran the test again and encountered another error:
+
+```
+FAIL tests/admin/integration/filtering/FilterReset.test.tsx
+  ● Test suite failed to run
+
+    Cannot find module 'redux' from 'node_modules/redux-mock-store/dist/index-cjs.js'
+```
+
+I'm continuing to find and install missing dependencies. I've now installed:
+
+1. `react-redux` - The Redux bindings for React
+2. `redux-mock-store` - A mock store for testing Redux async actions and middleware
+3. `redux` - The core Redux library
+
+This continues to highlight the dependency chain required for these integration tests.
+
+### Test Execution Results - Update 3
+
+After installing the required Redux packages, I ran the test again and encountered a different type of error:
+
+```
+FAIL tests/admin/integration/filtering/FilterReset.test.tsx
+  ● Test suite failed to run
+
+    Cannot find module '../../../../ui/button' from 'src/components/admin/listings/components/table/ListingFilterBar.tsx'
+```
+
+This error indicates we have a different issue now, not related to missing dependencies but to component imports. The component is trying to import from a UI component library that's not available in the path it's looking for.
+
+### Analysis of UI Component Dependencies
+
+The project appears to use a UI component library with an `@/ui` import path alias. This alias is likely defined in a webpack, Vite, or Next.js configuration but isn't correctly set up in the Jest testing environment.
+
+There are a few potential solutions:
+
+1. **Mock the UI Components**:
+   - Create mock implementations of the UI components used in tests
+
+2. **Configure Jest Module Mapping**:
+   - Update the Jest configuration to map the `@/ui` path to the actual components
+
+3. **Create UI Component Stub Files**:
+   - Create minimal stub versions of UI components for testing
+
+Given that we've already addressed the dependency issues by installing the missing packages, the next step is to address this component path issue.
+
 ## Import Path Fixes Progress Update - [2025-04-01 11:30]
 
 I've successfully fixed the import paths in seven testing files and committed the changes. This establishes the pattern for fixing the remaining test files.

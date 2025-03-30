@@ -1,5 +1,26 @@
 # DirectoryMonster Next Steps - [2025-04-01 09:15]
 
+## Integration Test Dependencies Fix - [2025-03-30 23:55]
+
+I've fixed an issue with missing dependencies for the integration tests:
+
+1. **Identified Missing Dependency**: The integration tests were failing because `react-redux` was not installed but was being used in the tests.
+
+2. **Installed Missing Package**: 
+   ```bash
+   npm install react-redux
+   ```
+
+3. **Progress**:
+   - ✅ Installed missing Redux-related dependencies (`react-redux`, `redux-mock-store`, `redux`)
+   - ✅ Identified UI component import issues in the tests
+
+4. **Next Steps**:
+   - [ ] Create mock implementations for UI components (button, etc.) that are referenced in tests
+   - [ ] Modify Jest configuration to properly resolve UI component references
+   - [ ] Document dependency requirements in testing framework documentation
+   - [ ] Create a setup script that installs all required testing dependencies
+
 ## Test Framework Improvements: Update
 
 I've made good progress on fixing the import path issues in the integration tests:
