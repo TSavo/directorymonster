@@ -42,13 +42,13 @@
 ### E2E Testing Standardization
 - [ ] Convert all E2E tests to follow the new testing pattern:
   - [x] Homepage tests converted to new structure
-  - [ ] Login tests conversion to new structure
+  - [x] Login tests conversion to new structure
   - [ ] Admin dashboard tests conversion to new structure
   - [ ] First-user test conversion to new structure
-  - [ ] Create shared test setup and teardown
+  - [x] Create shared test setup and teardown
 - [ ] Create a selectors file for each major component area:
   - [x] homepage.selectors.js (completed)
-  - [ ] login.selectors.js
+  - [x] login.selectors.js (completed)
   - [ ] admin.selectors.js
   - [ ] firstuser.selectors.js
 - [ ] Document the new E2E testing pattern
@@ -78,8 +78,9 @@
 - ✅ Create test utilities for form element detection with retry mechanisms
 - ✅ Fix title and content detection for homepage tests
 - ✅ Implement new E2E testing structure for homepage tests
-- [ ] Update login.test.js to use new testing structure pattern
-- [ ] Create login.selectors.js with centralized selectors
+- ✅ Convert login.test.js to new test structure pattern
+- ✅ Create login.selectors.js with centralized selectors
+- ✅ Create shared test setup utilities for login tests
 - [ ] Add data-testid attributes to admin components
 - [ ] Create admin.selectors.js file
 - [ ] Refactor admin dashboard tests into specialized test files

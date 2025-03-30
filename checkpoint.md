@@ -1,8 +1,8 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - [2025-03-30] - Understanding New E2E Testing Structure
+## Current Status - [2025-03-29] - Converting E2E Tests to New Structure
 
-### Completed Work - [2025-03-30]
+### Completed Work - [2025-03-29]
 
 #### 1. Added data-testid attributes to homepage components
 - ✅ Added `data-testid="site-header"` to SiteHeader.tsx main container
@@ -396,6 +396,36 @@ Some tests are still failing due to component rendering and hydration issues:
    - Add retry mechanisms for flaky form element detection
    - Fix page title and content detection for homepage tests
    - Add more data-testid attributes to the homepage components
+
+## Latest Work - [2025-03-29] - Converting E2E Tests to New Structure
+
+### Completed Conversion of Homepage and Login Tests
+
+1. **Removed old test files**:
+   - Deleted `tests/e2e/homepage.test.js` - Old single file test
+   - Deleted `tests/e2e/login.test.js` - Old single file test
+
+2. **Created new directory structure**:
+   - Created `homepage` and `login` directories under `tests/e2e/`
+   - Organized tests into modular, focused test files
+
+3. **Implemented centralized selector strategy**:
+   - Created `homepage.selectors.js` and `login.selectors.js` with all selectors
+   - Added fallback selectors for backward compatibility
+   - Used a consistent naming pattern for selectors across components
+
+4. **Created specialized test files for login**:
+   - `login.rendering.test.js` - Tests basic page rendering
+   - `login.validation.test.js` - Tests form validation
+   - `login.authentication.test.js` - Tests login functionality
+   - `login.password-reset.test.js` - Tests password reset functionality
+   - `login.logout.test.js` - Tests logout functionality
+
+5. **Added shared setup and utilities**:
+   - Created `login.setup.js` with common test setup/teardown
+   - Added helper functions for login page navigation
+   - Implemented credential management and test timeouts
+   - Added screenshot capture at critical test points
 
 ## Analysis of New E2E Testing Structure
 
