@@ -47,11 +47,11 @@
 3. Update documentation with export pattern standards for developers
 4. Continue enhancing the DirectoryMonster features as outlined in NEXTSTEPS.md
 
-## Current Focus - [2025-03-29] - Fixing Compiler Errors and E2E Test Failures
+## Previous Focus - [2025-03-29] - Fixing Compiler Errors and E2E Test Failures
 
 ### E2E Test Results [2025-03-29]
 
-After running the E2E tests, I've identified the following issues:
+After running the E2E tests, I identified the following issues:
 
 1. **First User Test Failure**:
    - The test "Shows normal login form after first user is created" is failing
@@ -186,7 +186,9 @@ After examining the Docker logs in detail, I've identified several critical issu
    - Verified all import paths in app/admin/layout.tsx
    - Added clarifying comment for WithAuth import
 
-### Test Results
+## Current Focus - [2025-03-30] - Fixing E2E Test Failures
+
+### Test Results [2025-03-30]
 
 1. **First-user.test.js**:
    - Successfully fixed the login page detection issue
@@ -199,6 +201,22 @@ After examining the Docker logs in detail, I've identified several critical issu
      - Login page detection still needs fixes in other tests
      - Invalid CSS selectors using `:contains()` syntax which is not supported by Puppeteer
      - Missing UI elements or incorrectly targeted elements
+
+### Implemented Fixes
+
+1. **Fixed Login Page Detection**:
+   - Updated `first-user.test.js` to look for multiple text markers on login page
+   - Added `data-testid` attributes to login page components for more reliable detection
+   - Modified the test to check for data-testid attributes as an alternative detection method
+
+2. **Added Robust Component Identification**:
+   - Added `data-testid="login-page"` to main login container
+   - Added `data-testid="login-heading"` to the page heading
+   - Added `data-testid="login-subheading"` to the subheading
+
+3. **Documented Current State**:
+   - Updated checkpoint.md with test results and analysis
+   - Updated NEXTSTEPS.md with more detailed tasks for fixing remaining tests
 
 ### Next Steps
 
