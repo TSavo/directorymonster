@@ -21,28 +21,28 @@ I've made good progress on fixing the import path issues in the integration test
 I've fixed 9 out of 21 test files and still need to fix these remaining files:
 
 1. **Site-Listing Tests** (6 files):
-   - [ ] Fix ListingCreationWithSite.test.tsx
-   - [ ] Fix ListingSiteAssociation.test.tsx
-   - [ ] Fix SiteListingCounts.test.tsx
-   - [ ] Fix SiteListingDataLoading.test.tsx
-   - [ ] Fix SiteListingLimits.test.tsx
-   - [ ] Fix SiteSpecificValidation.test.tsx
+   - [x] Fix ListingCreationWithSite.test.tsx
+   - [x] Fix ListingSiteAssociation.test.tsx
+   - [x] Fix SiteListingCounts.test.tsx
+   - [x] Fix SiteListingDataLoading.test.tsx
+   - [x] Fix SiteListingLimits.test.tsx
+   - [x] Fix SiteSpecificValidation.test.tsx
 
 2. **Site-Management Tests** (3 files):
-   - [ ] Fix SiteCreationDomains.test.tsx
-   - [ ] Fix SiteCreationSEO.test.tsx
-   - [ ] Fix SiteSubmission.test.tsx
+   - [x] Fix SiteCreationDomains.test.tsx
+   - [x] Fix SiteCreationSEO.test.tsx
+   - [x] Fix SiteSubmission.test.tsx
 
 3. **Cross-Cutting Tests** (3 files):
-   - [ ] Fix AuthorizationBoundaries.test.tsx
-   - [ ] Fix DataPersistence.test.tsx 
-   - [ ] Fix ErrorRecovery.test.tsx
+   - [x] Fix AuthorizationBoundaries.test.tsx
+   - [x] Fix DataPersistence.test.tsx 
+   - [x] Fix ErrorRecovery.test.tsx
 
 ## Priority Tasks
 
 ### Testing Framework Refactoring
 - ✅ Started updating remaining integration tests with correct imports (9/21 done)
-- [ ] Complete remaining test imports (20 files)
+- ✅ Complete remaining test imports (21/21 done)
 - [ ] Create a centralized mock repository for hooks
 - [ ] Run a full test suite to identify any remaining issues
 - [ ] Document the proper test patterns for future development

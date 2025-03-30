@@ -3,15 +3,15 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingForm } from '@/components/admin/listings/ListingForm';
-import { SiteContext } from '@/contexts/SiteContext';
+import { ListingForm } from '../../../../src/components/admin/listings/ListingForm';
+import { SiteContext } from '../../../../src/contexts/SiteContext';
 
 // Mock the hooks
-jest.mock('@/hooks/useListings', () => ({
+jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
   useListings: jest.fn(),
 }));
 
-jest.mock('@/hooks/useSites', () => ({
+jest.mock('../../../../src/components/admin/sites/hooks/useSites', () => ({
   useSites: jest.fn(),
 }));
 
@@ -32,8 +32,8 @@ const mockListing = {
 };
 
 // Mock the hooks implementation
-import { useListings } from '@/hooks/useListings';
-import { useSites } from '@/hooks/useSites';
+import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
+import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
 
 const mockStore = configureStore([]);
 

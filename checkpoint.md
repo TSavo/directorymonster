@@ -14,7 +14,19 @@ I've successfully fixed the import paths in seven testing files and committed th
 ✅ **listing-category/CategorySelectionInListing.test.tsx** - Fixed component and hook imports
 ✅ **cross-cutting/NotificationSystems.test.tsx** - Fixed component and hook imports
 ✅ **site-listing/FilterListingsBySite.test.tsx** - Fixed component and hook imports
+✅ **site-listing/ListingCreationWithSite.test.tsx** - Fixed component and hook imports
+✅ **site-listing/ListingSiteAssociation.test.tsx** - Fixed component and hook imports
+✅ **site-listing/SiteListingCounts.test.tsx** - Fixed component and hook imports
+✅ **site-listing/SiteListingDataLoading.test.tsx** - Fixed component and hook imports
+✅ **site-listing/SiteListingLimits.test.tsx** - Fixed component and hook imports
+✅ **site-listing/SiteSpecificValidation.test.tsx** - Fixed component and hook imports
 ✅ **site-management/SiteCreationBasicInfo.test.tsx** - Fixed component and hook imports
+✅ **site-management/SiteCreationDomains.test.tsx** - Fixed component and hook imports
+✅ **site-management/SiteCreationSEO.test.tsx** - Fixed component and hook imports
+✅ **site-management/SiteSubmission.test.tsx** - Fixed component and hook imports
+✅ **cross-cutting/AuthorizationBoundaries.test.tsx** - Fixed component and hook imports
+✅ **cross-cutting/DataPersistence.test.tsx** - Fixed component and hook imports
+✅ **cross-cutting/ErrorRecovery.test.tsx** - Fixed component and hook imports
 
 Fixes follow this pattern:
 - Component imports: `@/components/admin/X` → `../../../../src/components/admin/X`

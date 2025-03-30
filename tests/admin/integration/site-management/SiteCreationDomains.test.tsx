@@ -3,21 +3,21 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { SiteForm } from '@/components/admin/sites/SiteForm';
-import { DomainStep } from '@/components/admin/sites/components/DomainStep';
+import { SiteForm } from '../../../../src/components/admin/sites/SiteForm';
+import { DomainStep } from '../../../../src/components/admin/sites/components/DomainStep';
 
 // Mock the hooks and API calls
-jest.mock('@/hooks/useSites', () => ({
+jest.mock('../../../../src/components/admin/sites/hooks/useSites', () => ({
   useSites: jest.fn(),
 }));
 
-jest.mock('@/hooks/useDomains', () => ({
+jest.mock('../../../../src/components/admin/sites/hooks/useDomains', () => ({
   useDomains: jest.fn(),
 }));
 
 // Mock hooks implementation
-import { useSites } from '@/hooks/useSites';
-import { useDomains } from '@/hooks/useDomains';
+import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
+import { useDomains } from '../../../../src/components/admin/sites/hooks/useDomains';
 
 const mockStore = configureStore([]);
 

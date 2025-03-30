@@ -3,14 +3,14 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { SiteTable } from '@/components/admin/sites/SiteTable';
+import { SiteTable } from '../../../../src/components/admin/sites/SiteTable';
 
 // Mock the hooks
-jest.mock('@/hooks/useSites', () => ({
+jest.mock('../../../../src/components/admin/sites/hooks/useSites', () => ({
   useSites: jest.fn(),
 }));
 
-jest.mock('@/hooks/useListings', () => ({
+jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
   useListings: jest.fn(),
 }));
 
@@ -43,8 +43,8 @@ const mockListings = [
 ];
 
 // Mock the hooks implementation
-import { useSites } from '@/hooks/useSites';
-import { useListings } from '@/hooks/useListings';
+import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
+import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
 
 const mockStore = configureStore([]);
 
