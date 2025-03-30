@@ -1,4 +1,4 @@
-# DirectoryMonster Next Steps - [2025-03-30 22:15]
+# DirectoryMonster Next Steps - [2025-03-30 22:45]
 
 ## Completed
 - ✅ Category Management functionality
@@ -66,10 +66,15 @@
     - [x] FormActions.interaction.test.tsx
     - [ ] SiteForm.test.tsx (container component)
   - [ ] Form Step Tests
-    - [ ] BasicInfoStep.test.tsx
-    - [ ] DomainStep.test.tsx
-    - [ ] ThemeStep.test.tsx
-    - [ ] SEOStep.test.tsx
+    - [x] BasicInfoStep.test.tsx
+    - [x] BasicInfoStep.interaction.test.tsx
+    - [x] BasicInfoStep.validation.test.tsx
+    - [x] DomainStep.test.tsx
+    - [x] DomainStep.interaction.test.tsx
+    - [x] ThemeStep.test.tsx
+    - [x] ThemeStep.interaction.test.tsx
+    - [x] SEOStep.test.tsx
+    - [x] SEOStep.interaction.test.tsx
   - [ ] Table Component Tests
     - [x] SiteTable.test.tsx (basic rendering)
     - [x] SiteTable.loading.test.tsx
@@ -84,8 +89,8 @@
     - [x] DeleteConfirmationModal.interaction.test.tsx
     - [x] DeleteConfirmationModal.keyboard.test.tsx
   - [ ] Mobile Component Tests
-    - [ ] SiteMobileCard.test.tsx (responsive layout)
-    - [ ] SiteMobileCard.interaction.test.tsx
+    - [x] SiteMobileCard.test.tsx (responsive layout)
+    - [x] SiteMobileCard.interaction.test.tsx
   - [ ] Hook Tests
     - [ ] useSites.test.tsx (data management)
     - [ ] Validation function tests

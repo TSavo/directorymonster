@@ -1,6 +1,6 @@
 # DirectoryMonster Project Checkpoint
 
-## Implementation Status - [2025-03-30 22:15]
+## Implementation Status - [2025-03-30 22:45]
 
 I've completed the implementation of the site management components with a modular, component-based architecture. Here's a summary of what's been accomplished:
 
@@ -35,11 +35,12 @@ I've completed the implementation of the site management components with a modul
       - Following existing test organization pattern with modular approach
       - Completed tests:
         - Core Form Components: StepNavigation, FormActions
+        - Form Step Components: BasicInfoStep, DomainStep, ThemeStep, SEOStep
         - Table Components: SiteTable, SiteTableHeader, SiteTableRow, SiteTablePagination
+        - Mobile Components: SiteMobileCard
         - Modals: DeleteConfirmationModal (with keyboard accessibility tests)
       - Next to implement:
-        - Basic Form Step tests (BasicInfoStep, etc.)
-        - Mobile component tests (SiteMobileCard)
+        - SiteForm container tests
         - Hook tests (useSites)
 
 ### Testing Progress
