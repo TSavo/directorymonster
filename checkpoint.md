@@ -1,6 +1,50 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - March 30, 2025 (2:30 PM)
+## Current Status - March 30, 2025 (5:00 PM)
+
+### Progress on Issue #37: Fix failing tests systematically
+
+I've reviewed the current state of the PRs related to issue #37:
+
+1. PR #39: "Fix NextResponse.json mock for API tests"
+   - Status: Open
+   - Tests: Failing (coverage-tests and docker-tests)
+   - Description: Partially resolves issue #37
+   
+2. PR #40: "Fix CSRF check in auth setup route #37"
+   - Status: Open
+   - Tests: Failing (coverage-tests and docker-tests)
+   - Description: Applied the same selective CSRF check approach to auth setup route
+   - Follows the same pattern established in previous work
+
+#### Current Blockers:
+
+- Both PRs have failing tests in the CI pipeline
+- Tests need to be fixed before merging can proceed
+
+#### Action Plan:
+
+1. **Immediate Actions:**
+   - Debug why CI tests are failing for PR #39 and #40
+   - Focus on implementing the established fix pattern in other auth routes
+   - Create a comprehensive test plan to validate fixes systematically
+
+2. **Medium-term Plan:**
+   - Continue implementing the CSRF check fix pattern across all relevant routes
+   - Group related fixes into logical PRs to make review easier
+   - Address tests in priority order: auth routes → API routes → components
+
+3. **Next Steps:**
+   - Review failing CI logs to understand test failure reasons
+   - Make necessary adjustments to fix patterns
+   - Update both PRs with fixes based on CI feedback
+   - Add explicit test cases for new code paths
+
+The fix pattern using the selective CSRF check with `X-Test-CSRF-Check` header appears to be the correct approach, but needs refinement to pass CI checks.
+
+### Historical Status Updates
+
+## Previous Status - March 30, 2025 (2:30 PM)
 
 ### Completed Work for Issue #37
 
