@@ -2,6 +2,14 @@
 
 ## Current Status - March 30, 2025
 
+### Modified npm test command to exclude e2e tests
+
+- Updated the main `npm test` command to exclude the e2e tests by adding the `--testPathIgnorePatterns=tests/e2e` flag
+- Added a new `test:with-e2e` command that runs all tests including e2e tests
+- This change will speed up the development workflow as e2e tests take a long time to run
+
+### Previous Status
+
 Successfully addressed failing tests in PR #33 related to issue #9:
 
 1. **Issue #9: Complete Implementation of Incomplete useListings Hook**
