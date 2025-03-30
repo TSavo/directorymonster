@@ -6,6 +6,9 @@ import configureStore from 'redux-mock-store';
 import { ListingTable } from '../../../../src/components/admin/listings/ListingTable';
 import { SiteFilterDropdown } from '../../../../src/components/admin/listings/components/SiteFilterDropdown';
 
+// Import the mock creator utility
+import createMockUseListings from '../../../../src/components/admin/listings/hooks/useListings.mock';
+
 // Mock the hooks and API calls
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
   useListings: jest.fn(),
@@ -38,16 +41,16 @@ describe('Integration: Filtering Listings By Site', () => {
   let store;
   
   beforeEach(() => {
-    // Mock the hooks to return test data
-    (useListings as jest.Mock).mockReturnValue({
+    // Create a complete mock of the useListings hook
+    const mockUseListings = createMockUseListings({
       listings: mockListings,
       isLoading: false,
       error: null,
-      filterBySite: jest.fn((siteId) => {
-        return mockListings.filter(listing => listing.siteId === siteId);
-      }),
-      clearFilters: jest.fn(),
+      activeFilters: {}
     });
+    
+    // Mock the hooks to return test data
+    (useListings as jest.Mock).mockReturnValue(mockUseListings);
     
     (useSites as jest.Mock).mockReturnValue({
       sites: mockSites,
@@ -107,13 +110,18 @@ describe('Integration: Filtering Listings By Site', () => {
     expect(filterBySite).toHaveBeenCalledWith('site1');
     
     // Update the mock to simulate filtered results
-    (useListings as jest.Mock).mockReturnValue({
-      listings: mockListings.filter(listing => listing.siteId === 'site1'),
+    const filteredListings = mockListings.filter(listing => listing.siteId === 'site1');
+    const updatedMockUseListings = createMockUseListings({
+      listings: filteredListings,
       isLoading: false,
       error: null,
-      filterBySite,
-      clearFilters: jest.fn(),
+      activeFilters: { siteId: 'site1' }
     });
+    
+    // Make sure we preserve the original mock functions
+    updatedMockUseListings.filterBySite = filterBySite;
+    
+    (useListings as jest.Mock).mockReturnValue(updatedMockUseListings);
     
     // Re-render with updated data
     render(
@@ -150,9 +158,18 @@ describe('Integration: Filtering Listings By Site', () => {
       },
     });
     
+    // Update the mock to show an active site filter
+    (useListings as jest.Mock).mockReturnValue(createMockUseListings({
+      listings: mockListings.filter(listing => listing.siteId === 'site1'),
+      isLoading: false,
+      error: null,
+      activeFilters: { siteId: 'site1' }
+    }));
+    
+    // For the SiteFilterDropdown, we need to mock the selectedSiteId prop
     render(
       <Provider store={store}>
-        <SiteFilterDropdown />
+        <SiteFilterDropdown selectedSiteId="site1" />
       </Provider>
     );
     
@@ -161,7 +178,14 @@ describe('Integration: Filtering Listings By Site', () => {
   });
 
   it('should clear site filter when the clear button is clicked', async () => {
-    const { clearFilters } = useListings();
+    // Create a mock with the clearFilters function
+    const mockUseListings = createMockUseListings({
+      listings: mockListings.filter(listing => listing.siteId === 'site1'),
+      isLoading: false,
+      error: null,
+      activeFilters: { siteId: 'site1' }
+    });
+    const { clearFilters, clearSiteFilter } = mockUseListings;
     
     // Mock the store with an active site filter
     store = mockStore({
@@ -180,26 +204,28 @@ describe('Integration: Filtering Listings By Site', () => {
       },
     });
     
+    // Set up the mock to include the active filter
+    (useListings as jest.Mock).mockReturnValue(mockUseListings);
+    
     render(
       <Provider store={store}>
-        <SiteFilterDropdown />
+        <SiteFilterDropdown selectedSiteId="site1" onSelectSite={() => clearSiteFilter()} />
       </Provider>
     );
     
     // Click the clear filter button
     fireEvent.click(screen.getByTestId('clear-site-filter'));
     
-    // Check that clearFilters was called
-    expect(clearFilters).toHaveBeenCalled();
+    // Check that clearSiteFilter was called
+    expect(clearSiteFilter).toHaveBeenCalled();
     
     // Update the mock to simulate cleared filters
-    (useListings as jest.Mock).mockReturnValue({
+    (useListings as jest.Mock).mockReturnValue(createMockUseListings({
       listings: mockListings,
       isLoading: false,
       error: null,
-      filterBySite: jest.fn(),
-      clearFilters,
-    });
+      activeFilters: {}
+    }));
     
     // Re-render with updated data
     render(
@@ -232,11 +258,19 @@ describe('Integration: Filtering Listings By Site', () => {
       error: null,
     });
     
-    const { filterBySite } = useListings();
+    const mockHook = createMockUseListings({
+      listings: mockListings,
+      isLoading: false,
+      error: null,
+      activeFilters: {}
+    });
+    const { filterBySite } = mockHook;
+    
+    (useListings as jest.Mock).mockReturnValue(mockHook);
     
     render(
       <Provider store={store}>
-        <SiteFilterDropdown />
+        <SiteFilterDropdown data-testid="site-filter-dropdown" />
       </Provider>
     );
     
@@ -250,13 +284,12 @@ describe('Integration: Filtering Listings By Site', () => {
     expect(filterBySite).toHaveBeenCalledWith(noListingsSiteId);
     
     // Update the mock to simulate empty results
-    (useListings as jest.Mock).mockReturnValue({
+    (useListings as jest.Mock).mockReturnValue(createMockUseListings({
       listings: [],
       isLoading: false,
       error: null,
-      filterBySite,
-      clearFilters: jest.fn(),
-    });
+      activeFilters: { siteId: noListingsSiteId }
+    }));
     
     // Re-render with updated data
     render(
