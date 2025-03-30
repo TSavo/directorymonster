@@ -1,8 +1,24 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - March 30, 2025 (3:30 PM)
+## Current Status - March 30, 2025 (4:00 PM)
 
-### Created Failing Tests Reporter
+### Enhanced Failing Tests Reporter
+
+- Improved the custom Jest reporter to save failing test information to a file
+- Created a batch file (`report-failing-tests.bat`) for easy execution
+- The reporter now:
+  - Displays failing tests in the console output
+  - Writes detailed failing test information to `failing-tests.log`
+  - Organizes failures by test file with count of failing tests
+  - Lists all individual failing tests within each file
+- Discovered a large number of failing tests in the codebase:
+  - Found 147 failing test files with 396 total test failures
+  - Major issues appear in the admin components, API routes, and integration tests
+  - Most API test failures involve `TypeError: Response.json is not a function`
+
+### Previous Status (3:30 PM)
+
+#### Created Failing Tests Reporter
 
 - Implemented a custom Jest reporter that shows only failing test files
 - Created two configuration files:
@@ -112,28 +128,17 @@ Successfully addressed failing tests in PR #33 related to issue #9:
      - Fixing test implementations in search-indexer.test.ts and listing-indexer.test.ts
    - Added comments to the PR explaining the changes
 
-2. **Test Status**
-   - Individual test files are now passing:
-     - search-indexer.test.ts: ✅ PASS (9/9 tests)
-     - listing-indexer.test.ts: ✅ PASS (11/11 tests)
-
-3. **Summary of Changes**
-   - The main issue was related to test mocking configurations
-   - The PR had removed important fetch mocking setup which caused the tests to fail
-   - Fixed the test files to properly match the implementation of the indexer classes
-   - All modifications have been committed to the PR branch
-
 ## Next Steps
 
 1. Investigate the NextResponse.json error in API tests
    - The error appears to be related to a mocking issue with the Next.js Response object
    - Most API test failures involve the same error: `TypeError: Response.json is not a function`
-   - This suggests a common issue with the test setup for API route tests
+   - Likely cause is that NextResponse.json is not properly mocked in tests
+   - Create a PR to fix the NextResponse mocking in Jest setup files
 
 2. Complete and merge PR #35 to exclude E2E tests from main test command
 
-3. Return to addressing integration test failures in PR #32
-   - Fix the search API endpoints in the test environment
-   - Update the mock implementations to match expected behavior
-   - Ensure proper test data setup for integration tests
-   - Make sure the response format matches expectations
+3. Organize and prioritize failing tests
+   - Focus first on API tests, as these have a common failure pattern
+   - Create a new test mocking configuration/setup for API tests
+   - Address admin component test failures next
