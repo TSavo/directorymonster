@@ -1,8 +1,8 @@
-# DirectoryMonster Next Steps - [2025-03-31 15:45]
+# DirectoryMonster Next Steps - [2025-04-01 09:15]
 
-## Test Framework Improvements
+## Test Framework Improvements: Update
 
-After analyzing the integration tests, I've identified and addressed several critical issues:
+I've made good progress on fixing the import path issues in the integration tests:
 
 1. **Project Structure Alignment**:
    - ✅ Created missing hook directory structure (`src/components/admin/auth/hooks`)
@@ -13,40 +13,50 @@ After analyzing the integration tests, I've identified and addressed several cri
    - ✅ Updated cross-cutting tests to use direct relative imports
    - ✅ Fixed path references in DataPersistence.test.tsx
    - ✅ Fixed path references in ErrorRecovery.test.tsx
+   - ✅ Fixed path references in FilterReset.test.tsx
+   - ✅ Fixed path references in CategoryFiltering.test.tsx
 
-## Remaining Test Framework Issues
+## Remaining Import Fixes
 
-While progress has been made, there are still several issues that need to be addressed:
+I'm making good progress but still need to fix the imports in these files:
 
-1. **Path Resolution Strategy**:
-   - Create a consistent approach to imports in tests (relative paths vs. aliases)
-   - Consider updating Jest configuration to properly handle module aliases
+1. **Filtering Tests**:
+   - [ ] Fix FilterPersistence.test.tsx
+   - [ ] Fix CombinedFilters.test.tsx
 
-2. **Shared Test Utilities**:
-   - Create a unified mocking approach for common hooks
-   - Implement shared fixtures and test helpers
+2. **Listing-Category Tests**:
+   - [ ] Fix CategoryFilteringNavigation.test.tsx
+   - [ ] Fix CategorySelectionInListing.test.tsx
 
-3. **Test Suite Organization**:
-   - Ensure all tests follow consistent patterns
-   - Refactor remaining tests with fixed imports
+3. **Site-Listing Tests** (7 files):
+   - [ ] Fix all files in site-listing directory
+
+4. **Site-Management Tests** (4 files):
+   - [ ] Fix all files in site-management directory
+
+5. **Cross-Cutting Tests**:
+   - [ ] Fix NotificationSystems.test.tsx
 
 ## Priority Tasks
 
 ### Testing Framework Refactoring
-- [ ] Update remaining integration tests with correct imports
+- ✅ Started updating remaining integration tests with correct imports (2/22 done)
+- [ ] Complete remaining test imports (20 files)
 - [ ] Create a centralized mock repository for hooks
 - [ ] Run a full test suite to identify any remaining issues
 - [ ] Document the proper test patterns for future development
 
 ### Documentation Update
-- [ ] Document the actual project structure to help with test refactoring
+- ✅ Document the approach to fixing import paths in checkpoint.md
 - [ ] Create a comprehensive test setup guide for the team
 - [ ] Update the component documentation to reflect the current architecture
 
 ## Git Management
-- [ ] Commit current changes with descriptive message ("Fix project structure and hook imports")
+- [ ] Commit current changes with descriptive message ("Fix integration test imports")
 - [ ] Create pull request with comprehensive description
 - [ ] Ensure CI pipeline runs all tests successfully
+
+# DirectoryMonster Next Steps - [2025-03-31 15:45]
 
 # DirectoryMonster Next Steps - [2025-03-31 14:50]
 
