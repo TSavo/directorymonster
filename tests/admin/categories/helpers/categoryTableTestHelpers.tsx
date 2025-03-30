@@ -27,28 +27,38 @@ global.fetch = jest.fn().mockImplementation((url) => {
 });
 
 // Mock the useCategories hook
-jest.mock('../../../../src/components/admin/categories/hooks', () => ({
-  useCategories: jest.fn(),
-  useCategoryTable: jest.fn().mockImplementation((siteSlug, initialCategories) => {
-    // Use the mocked useCategories hook to get its return value
-    const categoriesState = require('../../../../src/components/admin/categories/hooks').useCategories();
-    
-    // Add additional UI state values that useCategoryTable would provide
-    return {
-      ...categoriesState,
-      showHierarchy: false,
-      formModalOpen: false,
-      selectedCategoryId: undefined,
-      showSiteColumn: !siteSlug && (categoriesState.sites || []).length > 0,
-      toggleHierarchy: jest.fn(),
-      handleEditCategory: jest.fn(),
-      handleCreateCategory: jest.fn(),
-      handleCloseFormModal: jest.fn(),
-      handleCategorySaved: jest.fn(),
-      handleViewCategory: jest.fn()
-    };
-  }),
-}));
+jest.mock('../../../../src/components/admin/categories/hooks', () => {
+  // Store the mock implementations to reference later
+  const mockImplementations = {
+    setSearchTerm: jest.fn(),
+    setParentFilter: jest.fn(),
+    setSiteFilter: jest.fn()
+  };
+  
+  return {
+    mockImplementations,
+    useCategories: jest.fn(),
+    useCategoryTable: jest.fn().mockImplementation((siteSlug, initialCategories) => {
+      // Use the mocked useCategories hook to get its return value
+      const categoriesState = require('../../../../src/components/admin/categories/hooks').useCategories();
+      
+      // Add additional UI state values that useCategoryTable would provide
+      return {
+        ...categoriesState,
+        showHierarchy: false,
+        formModalOpen: false,
+        selectedCategoryId: undefined,
+        showSiteColumn: !siteSlug && (categoriesState.sites || []).length > 0,
+        toggleHierarchy: jest.fn(),
+        handleEditCategory: jest.fn(),
+        handleCreateCategory: jest.fn(),
+        handleCloseFormModal: jest.fn(),
+        handleCategorySaved: jest.fn(),
+        handleViewCategory: jest.fn()
+      };
+    }),
+  };
+});
 
 // Mock next/link
 jest.mock('next/link', () => {
@@ -178,28 +188,23 @@ export const mockHierarchicalCategories: CategoryWithRelations[] = [
  * Default mock implementation for useCategories hook
  */
 export const createMockCategoriesHook = (overrides = {}) => {
-  // Create a mock setSearchTerm function that actually updates searchTerm
-  const mockSetSearchTerm = jest.fn().mockImplementation((term) => {
-    // When called multiple times in the test, ensure the latest call is used
-    if (overrides.searchTerm !== undefined) {
-      overrides.searchTerm = term;
-    }
-  });
-
-  // Similarly for other setter functions
-  const mockSetParentFilter = jest.fn().mockImplementation((filter) => {
-    if (overrides.parentFilter !== undefined) {
-      overrides.parentFilter = filter;
-    }
-  });
-
-  const mockSetSiteFilter = jest.fn().mockImplementation((filter) => {
-    if (overrides.siteFilter !== undefined) {
-      overrides.siteFilter = filter;
-    }
+  // Get the mock implementation references
+  const { mockImplementations } = require('../../../../src/components/admin/categories/hooks');
+  
+  // Create mock functions that both track calls and update state
+  const mockSetSearchTerm = jest.fn((term) => {
+    mockImplementations.setSearchTerm(term);
   });
   
-  // Create base mock
+  const mockSetParentFilter = jest.fn((filter) => {
+    mockImplementations.setParentFilter(filter);
+  });
+  
+  const mockSetSiteFilter = jest.fn((filter) => {
+    mockImplementations.setSiteFilter(filter);
+  });
+  
+  // Create base mock with connected handlers
   return {
     categories: mockCategories,
     filteredCategories: mockCategories,
@@ -254,6 +259,10 @@ export const resetMocks = () => {
   
   // Reset the fetch mock to ensure clean state between tests
   (global.fetch as jest.Mock).mockClear();
+  
+  // Reset the hook implementation mocks
+  const { mockImplementations } = require('../../../../src/components/admin/categories/hooks');
+  Object.values(mockImplementations).forEach((mock: jest.Mock) => mock.mockClear());
 };
 
 /**
