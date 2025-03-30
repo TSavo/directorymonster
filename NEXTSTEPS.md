@@ -1,4 +1,4 @@
-# DirectoryMonster Next Steps - [2025-03-31 00:30]
+# DirectoryMonster Next Steps - [2025-03-31 01:50]
 
 ## Currently Completed
 - ✅ Category Management functionality
@@ -26,9 +26,41 @@
   - [ ] Add usage guides for all major feature areas
 
 ### Additional Integration Tests
-- [ ] Create integration tests for site-listing data flow
-- [ ] Add tests for filtering systems across tables
-- [ ] Implement end-to-end user flows for site creation and management
+- [x] Create integration tests for site-listing data flow
+  - [x] FilterListingsBySite.test.tsx - Test filtering listings by site
+  - [x] ListingCreationWithSite.test.tsx - Test creating listings with site association
+  - [x] ListingSiteAssociation.test.tsx - Test displaying site info in listing details
+  - [x] SiteListingCounts.test.tsx - Test listing counts in site table
+  - [x] SiteListingDataLoading.test.tsx - Test data loading when switching between sites
+  - [x] SiteListingLimits.test.tsx - Test site listing limit enforcement
+  - [x] SiteSpecificValidation.test.tsx - Test site-specific validation rules
+### Additional Integration Tests
+- [x] Create integration tests for site-listing data flow
+  - [x] FilterListingsBySite.test.tsx - Test filtering listings by site
+  - [x] ListingCreationWithSite.test.tsx - Test creating listings with site association
+  - [x] ListingSiteAssociation.test.tsx - Test displaying site info in listing details
+  - [x] SiteListingCounts.test.tsx - Test listing counts in site table
+  - [x] SiteListingDataLoading.test.tsx - Test data loading when switching between sites
+  - [x] SiteListingLimits.test.tsx - Test site listing limit enforcement
+  - [x] SiteSpecificValidation.test.tsx - Test site-specific validation rules
+- [x] Add tests for filtering systems across tables
+  - [x] CategoryFiltering.test.tsx - Test category filtering on listings
+  - [x] CombinedFilters.test.tsx - Test advanced filter combinations (category + site + status)
+  - [x] FilterPersistence.test.tsx - Test filter persistence between navigation events
+  - [x] FilterReset.test.tsx - Test filter reset functionality
+- [x] Implement end-to-end user flows for site creation and management
+  - [x] SiteCreationBasicInfo.test.tsx - Test basic info step in site creation
+  - [x] SiteCreationDomains.test.tsx - Test domain management within site workflows
+  - [x] SiteCreationSEO.test.tsx - Test SEO settings configuration
+  - [x] SiteSubmission.test.tsx - Test the final submission process
+- [x] Add integration tests for listing-category relationships
+  - [x] CategorySelectionInListing.test.tsx - Test category selection during listing creation
+  - [x] CategoryFilteringNavigation.test.tsx - Test category filtering and navigation
+- [x] Create cross-cutting concerns tests
+  - [x] AuthorizationBoundaries.test.tsx - Test authorization boundaries between components
+  - [x] DataPersistence.test.tsx - Test data persistence across page refreshes
+  - [x] NotificationSystems.test.tsx - Test notification systems for operations
+  - [x] ErrorRecovery.test.tsx - Test error recovery flows
 
 ### Performance Optimization
 - [ ] Audit components for potential performance issues
