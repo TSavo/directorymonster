@@ -57,14 +57,14 @@
 - [ ] Create documentation for E2E test best practices
 
 ### E2E Testing Improvements
-- [x] Fix first-user.test.js by updating text detection and implementing data-testid attributes
-- [x] Remove `:contains()` syntax from tests, replacing with JavaScript-based text detection
-- [x] Add consistent data-testid attributes to login and admin components
-- [ ] Add more data-testid attributes to homepage components
-- [ ] Implement waiting for component hydration in tests
-- [ ] Create test utilities for form element detection with retry mechanisms
-- [ ] Fix title and content detection for homepage tests
-- [ ] Create documentation for E2E testing best practices and component standards
+- ✅ Add data-testid attributes to homepage components
+- ✅ Implement waiting for component hydration in tests
+- ✅ Create test utilities for form element detection with retry mechanisms
+- ✅ Fix title and content detection for homepage tests
+- [ ] Update login.test.js to use hydration utilities
+- [ ] Add data-testid attributes to admin components
+- [ ] Fix admin dashboard tests
+- [ ] Create documentation for E2E testing best practices
 
 ## Future Work
 
