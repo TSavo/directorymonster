@@ -32,12 +32,12 @@
 - Updated all components to follow the same export pattern
 - Verified working solution by successfully loading admin pages
 
-### 🔥 Improve test coverage and reliability
-- Apply the new modular test approach to other functional areas
-- Create similar utility modules for listings, sites, and other features
-- Gradually phase out legacy E2E tests in favor of the new architecture
-- Add integration tests for new category management routes
-- Improve testing for edge cases and error handling
+### 🔥 NEXT PRIORITY: Test component export fixes with Docker deployment
+- Run the application in Docker development environment to verify exports work
+- Test both admin/categories and admin/listings pages
+- Verify that no export errors appear in the Docker logs
+- Test different import scenarios to ensure all components load correctly
+- Document any remaining issues for future fixes
 
 ### 🔥 Enhance data handling and state management
 - Implement more robust error handling for API requests
