@@ -11,7 +11,7 @@ import { StatisticCardProps } from '../types';
  * @param {string} className - Additional CSS classes
  * @param {boolean} isLoading - Whether the component is in loading state
  */
-const StatisticCard: React.FC<StatisticCardProps> = ({
+export function StatisticCard({
   title,
   value,
   change,
@@ -74,6 +74,7 @@ const StatisticCard: React.FC<StatisticCardProps> = ({
       )}
     </div>
   );
-};
+}
 
+// Add default export for dual-export pattern
 export default StatisticCard;

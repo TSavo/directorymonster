@@ -9,7 +9,7 @@ interface ActivityFeedItemProps {
 /**
  * Component for rendering an individual activity feed item
  */
-const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
+export function ActivityFeedItem({
   activity,
   className = '',
 }) => {
@@ -133,6 +133,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
       </div>
     </div>
   );
-};
+}
 
+// Add default export for dual-export pattern
 export default ActivityFeedItem;

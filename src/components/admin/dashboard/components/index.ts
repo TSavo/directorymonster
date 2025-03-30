@@ -1,21 +1,10 @@
-// Auto-generated index file - DO NOT EDIT
-// Generated on: 2025-03-29T21:14:15.454Z
+// Standardized Dashboard Components Barrel File
+// Last updated: 2025-03-29
 
-export { ActivityFeedItem } from './ActivityFeedItem';
-export { StatisticCard } from './StatisticCard';
+// Export all named exports
+export * from './ActivityFeedItem';
+export * from './StatisticCard';
 
-// Default exports as named exports
-import ActivityFeedItemDefault from './ActivityFeedItem';
-import StatisticCardDefault from './StatisticCard';
-
-// Additional named exports
-export {
-  ActivityFeedItemDefault,
-  StatisticCardDefault,
-};
-
-// Default export object
-export default {
-  ActivityFeedItem: ActivityFeedItemDefault,
-  StatisticCard: StatisticCardDefault,
-};
+// Re-export default as named export
+export { default as ActivityFeedItem } from './ActivityFeedItem';
+export { default as StatisticCard } from './StatisticCard';
