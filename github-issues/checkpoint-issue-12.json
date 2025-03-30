@@ -1,0 +1,8 @@
+{
+  "title": "[ISSUE] Expanded Integration Testing Plan - [2025-03-30 14:45]",
+  "body": "I'm expanding our integration test coverage for the DirectoryMonster project. Based on the existing site-listing integration tests, I'll implement four categories of new integration tests:\n\n### 1. Filtering Systems Tests\nI'll create tests for the filtering capabilities across tables, focusing on:\n- Category filtering on listings\n- Advanced filter combinations (category + site + status)\n- Filter persistence between navigation events\n- Filter reset functionality\n\n### 2. Site Creation and Management Tests\nI'll implement end-to-end user flow tests for site management features:\n- Complete site creation workflow from empty form to successful creation\n- Site editing and updating workflows\n- Domain management within site workflows\n- SEO settings configuration flows\n\n### 3. Listing-Category Relationship Tests\nI'll create tests to ensure proper integration between listings and categories:\n- Category selection during listing creation\n- Category filtering and navigation\n- Category counts and statistics\n- Hierarchical category relationships in listings\n\n### 4. Cross-Cutting Concerns Tests\nI'll implement tests for system-wide concerns:\n- Authorization boundaries between components\n- Data persistence across page refreshes\n- Notification systems for operations\n- Error recovery flows\n\nAll tests will follow our established pattern of small, focused test files with one test per file. Each test will be organized in appropriate directories under tests/admin/integration/ to maintain our project structure.",
+  "labels": [
+    "from-checkpoint",
+    "documentation"
+  ]
+}

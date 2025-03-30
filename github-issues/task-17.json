@@ -1,0 +1,9 @@
+{
+  "title": "Modify Jest configuration to properly resolve UI component references",
+  "section": "Integration Test Dependencies Fix - [2025-03-30 23:55]",
+  "body": "Task from section: Integration Test Dependencies Fix - [2025-03-30 23:55]\n\nModify Jest configuration to properly resolve UI component references",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

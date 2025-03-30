@@ -1,0 +1,9 @@
+{
+  "title": "Create a list of all UI components referenced in tests (Button, Input, Select, etc.)",
+  "section": "UI Component Mock Implementation",
+  "body": "Task from section: UI Component Mock Implementation\n\nCreate a list of all UI components referenced in tests (Button, Input, Select, etc.)",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

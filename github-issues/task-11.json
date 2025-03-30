@@ -1,0 +1,9 @@
+{
+  "title": "Implement consistent mock factories for common patterns",
+  "section": "Testing Infrastructure Enhancement",
+  "body": "Task from section: Testing Infrastructure Enhancement\n\nImplement consistent mock factories for common patterns",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

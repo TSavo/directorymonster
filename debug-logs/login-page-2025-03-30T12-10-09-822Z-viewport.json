@@ -1,0 +1,13 @@
+{
+  "viewport": {
+    "width": 1280,
+    "height": 800,
+    "devicePixelRatio": 1.0000000149011612
+  },
+  "screen": {
+    "width": 1536,
+    "height": 864,
+    "orientation": "portrait-primary"
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/134.0.0.0 Safari/537.36"
+}

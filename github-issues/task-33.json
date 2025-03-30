@@ -1,0 +1,9 @@
+{
+  "title": "Implement memo or useCallback for expensive operations",
+  "section": "Next Phase Priorities",
+  "body": "Task from section: Next Phase Priorities\n\nImplement memo or useCallback for expensive operations",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

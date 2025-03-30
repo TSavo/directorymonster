@@ -1,0 +1,8 @@
+{
+  "title": "[ISSUE] Component Tests Execution Results - [2025-03-31 14:20]",
+  "body": "I've attempted to run the component tests and identified several issues that need to be addressed:\n\n### Configuration Issues\n\n1. **Module Path Resolution Error**:\n   ```\n   Could not locate module @/hooks/useAuth mapped as: C:\\Users\\T\\directorymonster\\src\\$1\n   ```\n   The tests are trying to use the '@/' path alias, but it's not properly configured in the Jest setup.\n\n2. **Incomplete Source File**:\n   There's a syntax error in `src/components/admin/listings/hooks/useListings.ts`. The file appears to be incomplete:\n   ```\n   const setSearchTerm = useCallback((search: string) => {\n     setFilters\n   ```\n   This file needs to be completed before tests can run successfully.\n\n3. **Test Mocking Issues**:\n   Some tests rely on objects that aren't properly defined, like `searchIndexer` in the cross-site isolation tests.\n\n### Recommendation\n\nBefore running component tests individually, we should fix these underlying issues:\n\n1. Fix the module path resolution in Jest config\n2. Complete the implementation of useListings.ts\n3. Ensure all required dependencies are properly mocked in the tests\n\nAfter these fixes, we can proceed with running the tests as planned.",
+  "labels": [
+    "from-checkpoint",
+    "documentation"
+  ]
+}

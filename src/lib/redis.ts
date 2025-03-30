@@ -1,5 +1,4 @@
-import { redis } from './redis-client';
-
-export function getRedisClient() {
-  return redis;
-}
+/**
+ * Re-export redis client from the redis module
+ */
+export * from './redis/index';

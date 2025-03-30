@@ -1,0 +1,9 @@
+{
+  "title": "Commit current changes with descriptive message (\"Fix integration test imports\")",
+  "section": "Git Management",
+  "body": "Task from section: Git Management\n\nCommit current changes with descriptive message (\"Fix integration test imports\")",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

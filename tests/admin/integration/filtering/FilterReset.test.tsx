@@ -6,7 +6,7 @@ import configureStore from 'redux-mock-store';
 import { ListingTable } from '../../../../src/components/admin/listings/ListingTable';
 import { ListingFilterBar } from '../../../../src/components/admin/listings/components/table/ListingFilterBar';
 import { CategoryFilterTree } from '../../../../src/components/admin/listings/components/table/CategoryFilterTree';
-import { SiteFilterDropdown } from '../../../../src/components/admin/listings/components/SiteFilterDropdown';
+import SiteFilterDropdown from '../../../../src/components/admin/listings/components/SiteFilterDropdown';
 
 // Mock the hooks and API calls
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({

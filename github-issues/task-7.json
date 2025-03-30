@@ -1,0 +1,9 @@
+{
+  "title": "Update Jest configuration to map UI component imports to our mocks",
+  "section": "UI Component Mock Implementation",
+  "body": "Task from section: UI Component Mock Implementation\n\nUpdate Jest configuration to map UI component imports to our mocks",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

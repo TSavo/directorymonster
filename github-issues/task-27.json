@@ -1,0 +1,9 @@
+{
+  "title": "Ensure CI pipeline runs all tests successfully",
+  "section": "Git Management",
+  "body": "Task from section: Git Management\n\nEnsure CI pipeline runs all tests successfully",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

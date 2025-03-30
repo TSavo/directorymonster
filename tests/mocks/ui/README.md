@@ -10,6 +10,10 @@ This directory contains mock implementations of UI components used in tests. The
 - `badge.tsx` - Mock implementation of the Badge component
 - `checkbox.tsx` - Mock implementation of the Checkbox component
 - `dropdown-menu.tsx` - Mock implementations of DropdownMenu and DropdownMenuItem components
+- `card.tsx` - Mock implementations of Card, CardHeader, CardTitle, CardDescription, CardContent, and CardFooter components
+- `sheet.tsx` - Mock implementations of Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, and SheetClose components
+- `accordion.tsx` - Mock implementations of Accordion, AccordionItem, AccordionTrigger, and AccordionContent components
+- `label.tsx` - Mock implementation of the Label component
 
 ## Usage
 

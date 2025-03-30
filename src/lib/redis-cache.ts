@@ -1,4 +1,4 @@
-import { redis } from './redis-client';
+import { redis } from './redis';
 
 const DEFAULT_CACHE_TTL = 60 * 5; // 5 minutes in seconds
 
@@ -24,7 +24,7 @@ export const redisCache = {
         return JSON.parse(cachedValue) as T;
       } catch (e) {
         // If parsing fails, continue to fetch fresh data
-        console.warn(`Cache parse error for key ${key}:`, e);
+        console.warn(`[Redis Cache] Parse error for key ${key}:`, e);
       }
     }
     

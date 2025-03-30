@@ -1,0 +1,9 @@
+{
+  "title": "Create a Jest setup file that automatically mocks these components",
+  "section": "UI Component Mock Implementation",
+  "body": "Task from section: UI Component Mock Implementation\n\nCreate a Jest setup file that automatically mocks these components",
+  "labels": [
+    "task",
+    "from-nextsteps"
+  ]
+}

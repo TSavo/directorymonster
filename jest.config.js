@@ -11,8 +11,12 @@ const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^../../../../ui/(.*)$': '<rootDir>/src/ui/$1',
-    '^@/ui/(.*)$': '<rootDir>/src/ui/$1',
+    '^../../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^./ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^@/ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
   },
   collectCoverage: true,
   collectCoverageFrom: [
