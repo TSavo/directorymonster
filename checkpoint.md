@@ -1,13 +1,20 @@
 # DirectoryMonster Project Checkpoint
 
-## Import Path Fixes Progress Update - [2025-04-01 09:30]
+## Import Path Fixes Progress Update - [2025-04-01 10:15]
 
-I've successfully fixed the import paths in two testing files and committed the changes. This establishes the pattern for fixing the remaining test files.
+I've successfully fixed the import paths in seven testing files and committed the changes. This establishes the pattern for fixing the remaining test files.
 
 ### Progress Update
 
 ✅ **filtering/FilterReset.test.tsx** - Fixed component and hook imports
 ✅ **filtering/CategoryFiltering.test.tsx** - Fixed component and hook imports
+✅ **filtering/FilterPersistence.test.tsx** - Fixed component and hook imports
+✅ **filtering/CombinedFilters.test.tsx** - Fixed component and hook imports
+✅ **listing-category/CategoryFilteringNavigation.test.tsx** - Fixed component and hook imports
+✅ **listing-category/CategorySelectionInListing.test.tsx** - Fixed component and hook imports
+✅ **cross-cutting/NotificationSystems.test.tsx** - Fixed component and hook imports
+✅ **site-listing/FilterListingsBySite.test.tsx** - Fixed component and hook imports
+✅ **site-management/SiteCreationBasicInfo.test.tsx** - Fixed component and hook imports
 
 Fixes follow this pattern:
 - Component imports: `@/components/admin/X` → `../../../../src/components/admin/X`

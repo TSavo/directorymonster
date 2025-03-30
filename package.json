@@ -64,6 +64,7 @@
     "test:with-server": "bash scripts/run-tests-with-server.sh"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/user-event": "^14.6.1",
     "axios": "^1.8.4",

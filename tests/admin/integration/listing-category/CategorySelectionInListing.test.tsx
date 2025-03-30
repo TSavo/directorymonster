@@ -3,20 +3,20 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { CategorySelectionStep } from '@/components/admin/listings/components/form/CategorySelectionStep';
+import { CategorySelectionStep } from '../../../../src/components/admin/listings/components/form/CategorySelectionStep';
 
 // Mock the hooks and API calls
-jest.mock('@/hooks/useListings', () => ({
+jest.mock('../../../../src/components/admin/listings/components/form/useListingForm', () => ({
   useListingForm: jest.fn(),
 }));
 
-jest.mock('@/hooks/useCategories', () => ({
+jest.mock('../../../../src/components/admin/categories/hooks/useCategories', () => ({
   useCategories: jest.fn(),
 }));
 
 // Mock hooks implementation
-import { useListingForm } from '@/components/admin/listings/components/form/useListingForm';
-import { useCategories } from '@/hooks/useCategories';
+import { useListingForm } from '../../../../src/components/admin/listings/components/form/useListingForm';
+import { useCategories } from '../../../../src/components/admin/categories/hooks/useCategories';
 
 const mockStore = configureStore([]);
 

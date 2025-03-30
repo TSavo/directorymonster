@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
-import { ListingFormData, ListingMedia, MediaType } from '../../../types';
+import { ListingFormData, ListingMedia, MediaType } from '../../types';
 
 interface MediaUploadStepProps {
   formData: ListingFormData;

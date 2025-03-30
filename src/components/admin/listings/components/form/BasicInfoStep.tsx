@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { ListingFormData, ListingStatus } from '../../../types';
+import { ListingFormData, ListingStatus } from '../../types';
 import { TextInput } from './TextInput';
 import { TextArea } from './TextArea';
 import { SelectField } from './SelectField';
