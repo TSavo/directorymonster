@@ -79,7 +79,10 @@ describe('SearchFilters Component', () => {
     fireEvent.change(screen.getByLabelText('Category'), { target: { value: 'cat2' } });
     
     expect(mockFilterChangeHandler).toHaveBeenCalledWith({
-      categoryId: 'cat2'
+      categoryId: 'cat2',
+      featured: false,
+      sortBy: 'relevance',
+      status: ''
     });
   });
 
@@ -94,7 +97,10 @@ describe('SearchFilters Component', () => {
     fireEvent.click(screen.getByLabelText('Featured Items Only'));
     
     expect(mockFilterChangeHandler).toHaveBeenCalledWith({
-      featured: true
+      categoryId: '',
+      featured: true,
+      sortBy: 'relevance',
+      status: ''
     });
   });
 
@@ -102,7 +108,8 @@ describe('SearchFilters Component', () => {
     const initialFilters = {
       categoryId: 'cat2',
       featured: true,
-      sortBy: 'newest'
+      sortBy: 'newest',
+      status: ''
     };
     
     render(
@@ -116,5 +123,42 @@ describe('SearchFilters Component', () => {
     expect(screen.getByLabelText('Category')).toHaveValue('cat2');
     expect(screen.getByLabelText('Featured Items Only')).toBeChecked();
     expect(screen.getByLabelText('Sort By')).toHaveValue('newest');
+  });
+
+  it('changes sort order and calls the filter change handler', () => {
+    render(
+      <SearchFilters 
+        categories={mockCategories} 
+        onFilterChange={mockFilterChangeHandler}
+      />
+    );
+    
+    fireEvent.change(screen.getByLabelText('Sort By'), { target: { value: 'newest' } });
+    
+    expect(mockFilterChangeHandler).toHaveBeenCalledWith({
+      categoryId: '',
+      featured: false,
+      sortBy: 'newest',
+      status: ''
+    });
+  });
+
+  it('changes status and calls the filter change handler when admin', () => {
+    render(
+      <SearchFilters 
+        categories={mockCategories} 
+        onFilterChange={mockFilterChangeHandler}
+        showStatusFilter={true}
+      />
+    );
+    
+    fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'draft' } });
+    
+    expect(mockFilterChangeHandler).toHaveBeenCalledWith({
+      categoryId: '',
+      featured: false,
+      sortBy: 'relevance',
+      status: 'draft'
+    });
   });
 });

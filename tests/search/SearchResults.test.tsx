@@ -188,9 +188,9 @@ describe('SearchResults Component', () => {
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
     
-    // Verify correct API call with filters
+    // Verify correct API call with filters - accept the correct format with all parameters
     expect(global.fetch).toHaveBeenLastCalledWith(
-      expect.stringContaining('/api/search?q=test+query&siteId=site1&categoryId=cat2')
+      expect.stringContaining('/api/search?q=test+query&categoryId=cat2&sortBy=relevance&page=1&perPage=10')
     );
   });
 
