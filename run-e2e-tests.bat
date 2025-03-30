@@ -54,10 +54,24 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Run the remaining E2E tests
+REM Run the smoke test first to verify basic functionality
 echo.
-echo Running E2E tests...
-npx jest "tests/e2e/login.test.js" "tests/e2e/categories.test.js" --testTimeout=60000 --verbose
+echo Running Smoke Tests...
+npx jest "tests/e2e/smoketest.test.js" --testTimeout=60000 --verbose
+
+REM Store the smoke test result
+set SMOKE_TEST_RESULT=%errorlevel%
+
+REM Only run the remaining E2E tests if smoke test passed
+if %SMOKE_TEST_RESULT% equ 0 (
+    echo.
+    echo Smoke tests passed! Running remaining E2E tests...
+    npx jest "tests/e2e/login.test.js" "tests/e2e/categories.test.js" --testTimeout=60000 --verbose
+) else (
+    echo.
+    echo Smoke tests failed. Skipping remaining tests.
+    exit /b 1
+)
 
 REM Store the test result
 set TEST_RESULT=%errorlevel%

@@ -56,13 +56,8 @@ describe('Homepage', () => {
       height: 800,
     });
 
-    // Add hostname parameter for multitenancy testing
-    await page.setCookie({
-      name: 'hostname',
-      value: SITE_DOMAIN,
-      domain: 'localhost',
-      path: '/',
-    });
+    // Add hostname parameter for multitenancy testing by using URL query parameter instead of cookies
+    // Cookies were causing issues with Protocol error (Network.setCookies): Invalid cookie fields
 
     // Enable console logging for debugging
     page.on('console', (message) => {
@@ -80,8 +75,8 @@ describe('Homepage', () => {
   });
 
   test('Homepage renders correctly with essential elements', async () => {
-    // Navigate to the homepage
-    await page.goto(BASE_URL, {
+    // Navigate to the homepage with hostname parameter
+    await page.goto(`${BASE_URL}?hostname=${SITE_DOMAIN}`, {
       waitUntil: 'networkidle2',
     });
 
@@ -120,8 +115,8 @@ describe('Homepage', () => {
   });
 
   test('Navigation menu works correctly', async () => {
-    // Navigate to the homepage
-    await page.goto(BASE_URL, {
+    // Navigate to the homepage with hostname parameter
+    await page.goto(`${BASE_URL}?hostname=${SITE_DOMAIN}`, {
       waitUntil: 'networkidle2',
     });
 
@@ -159,8 +154,8 @@ describe('Homepage', () => {
       // Take screenshot after navigation
       await takeScreenshot(page, 'after-nav-click');
       
-      // Navigate back to the homepage
-      await page.goto(BASE_URL, {
+      // Navigate back to the homepage with hostname parameter
+      await page.goto(`${BASE_URL}?hostname=${SITE_DOMAIN}`, {
         waitUntil: 'networkidle2',
       });
     }
@@ -174,8 +169,8 @@ describe('Homepage', () => {
       isMobile: true,
     });
 
-    // Navigate to the homepage
-    await page.goto(BASE_URL, {
+    // Navigate to the homepage with hostname parameter
+    await page.goto(`${BASE_URL}?hostname=${SITE_DOMAIN}`, {
       waitUntil: 'networkidle2',
     });
 
@@ -212,8 +207,8 @@ describe('Homepage', () => {
   });
 
   test('Search functionality works', async () => {
-    // Navigate to the homepage
-    await page.goto(BASE_URL, {
+    // Navigate to the homepage with hostname parameter
+    await page.goto(`${BASE_URL}?hostname=${SITE_DOMAIN}`, {
       waitUntil: 'networkidle2',
     });
 
@@ -276,8 +271,8 @@ describe('Homepage', () => {
   });
 
   test('Featured content sections are visible', async () => {
-    // Navigate to the homepage
-    await page.goto(BASE_URL, {
+    // Navigate to the homepage with hostname parameter
+    await page.goto(`${BASE_URL}?hostname=${SITE_DOMAIN}`, {
       waitUntil: 'networkidle2',
     });
 
@@ -312,8 +307,8 @@ describe('Homepage', () => {
   });
 
   test('Footer contains expected elements', async () => {
-    // Navigate to the homepage
-    await page.goto(BASE_URL, {
+    // Navigate to the homepage with hostname parameter
+    await page.goto(`${BASE_URL}?hostname=${SITE_DOMAIN}`, {
       waitUntil: 'networkidle2',
     });
 
@@ -398,8 +393,8 @@ describe('Homepage', () => {
   });
 
   test('Accessibility - keyboard navigation works', async () => {
-    // Navigate to the homepage
-    await page.goto(BASE_URL, {
+    // Navigate to the homepage with hostname parameter
+    await page.goto(`${BASE_URL}?hostname=${SITE_DOMAIN}`, {
       waitUntil: 'networkidle2',
     });
 
@@ -438,8 +433,8 @@ describe('Homepage', () => {
   });
 
   test('Error handling - 404 page works correctly', async () => {
-    // Navigate to a non-existent page
-    await page.goto(`${BASE_URL}/this-page-does-not-exist-${Date.now()}`, {
+    // Navigate to a non-existent page with hostname parameter
+    await page.goto(`${BASE_URL}/this-page-does-not-exist-${Date.now()}?hostname=${SITE_DOMAIN}`, {
       waitUntil: 'networkidle2',
     });
 
