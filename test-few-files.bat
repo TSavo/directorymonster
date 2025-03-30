@@ -1,0 +1,3 @@
+@echo off
+echo Running a subset of tests to demonstrate the failures reporter...
+npx jest "tests/Button.test.tsx" "tests/LinkUtilities.test.tsx" --config=jest.simple-failures.config.js
