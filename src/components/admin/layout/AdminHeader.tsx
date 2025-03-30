@@ -139,3 +139,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
     </header>
   );
 };
+
+// Also export as default for backward compatibility
+export default AdminHeader;

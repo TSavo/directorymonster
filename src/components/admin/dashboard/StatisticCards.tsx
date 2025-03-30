@@ -46,7 +46,7 @@ const InteractionIcon = () => (
  * @param {boolean} isLoading - Whether the component is in loading state
  * @param {string} className - Additional CSS classes
  */
-const StatisticCards: React.FC<StatisticCardsProps> = ({
+export const StatisticCards: React.FC<StatisticCardsProps> = ({
   siteSlug,
   metrics: propMetrics,
   showSearchMetrics = true,
@@ -199,4 +199,5 @@ const StatisticCards: React.FC<StatisticCardsProps> = ({
   );
 };
 
+// Also export as default for backward compatibility
 export default StatisticCards;

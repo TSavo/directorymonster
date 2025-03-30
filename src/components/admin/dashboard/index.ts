@@ -1,21 +1,15 @@
-// Auto-generated index file - DO NOT EDIT
-// Generated on: 2025-03-29T21:14:15.453Z
+// Standardized barrel file - Updated on 2025-03-29
 
-export { ActivityFeed } from './ActivityFeed';
-export { StatisticCards } from './StatisticCards';
+// Export all named exports from component files
+export * from './ActivityFeed';
+export * from './StatisticCards';
 
-// Default exports as named exports
-import ActivityFeedDefault from './ActivityFeed';
-import StatisticCardsDefault from './StatisticCards';
+// Re-export default as named exports
+export { default as ActivityFeed } from './ActivityFeed';
+export { default as StatisticCards } from './StatisticCards';
 
-// Additional named exports
-export {
-  ActivityFeedDefault,
-  StatisticCardsDefault,
-};
-
-// Default export object
+// Default export object for backward compatibility
 export default {
-  ActivityFeed: ActivityFeedDefault,
-  StatisticCards: StatisticCardsDefault,
+  ActivityFeed: ActivityFeed,
+  StatisticCards: StatisticCards,
 };

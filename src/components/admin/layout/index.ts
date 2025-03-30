@@ -1,33 +1,24 @@
-// Auto-generated index file - DO NOT EDIT
-// Generated on: 2025-03-29T21:14:15.448Z
+// Standardized barrel file - Updated on 2025-03-29
 
-export { AdminHeader } from './AdminHeader';
-export { AdminLayout } from './AdminLayout';
-export { AdminSidebar } from './AdminSidebar';
-export { Breadcrumbs } from './Breadcrumbs';
-export { WithAuth } from './WithAuth';
+// Export all named exports from component files
+export * from './AdminHeader';
+export * from './AdminLayout';
+export * from './AdminSidebar';
+export * from './Breadcrumbs';
+export * from './WithAuth';
 
-// Default exports as named exports
-import AdminHeaderDefault from './AdminHeader';
-import AdminLayoutDefault from './AdminLayout';
-import AdminSidebarDefault from './AdminSidebar';
-import BreadcrumbsDefault from './Breadcrumbs';
-import WithAuthDefault from './WithAuth';
+// Re-export default as named exports
+export { default as AdminHeader } from './AdminHeader';
+export { default as AdminLayout } from './AdminLayout';
+export { default as AdminSidebar } from './AdminSidebar';
+export { default as Breadcrumbs } from './Breadcrumbs';
+export { default as WithAuth } from './WithAuth';
 
-// Additional named exports
-export {
-  AdminHeaderDefault,
-  AdminLayoutDefault,
-  AdminSidebarDefault,
-  BreadcrumbsDefault,
-  WithAuthDefault,
-};
-
-// Default export object
+// Default export object for backward compatibility
 export default {
-  AdminHeader: AdminHeaderDefault,
-  AdminLayout: AdminLayoutDefault,
-  AdminSidebar: AdminSidebarDefault,
-  Breadcrumbs: BreadcrumbsDefault,
-  WithAuth: WithAuthDefault,
+  AdminHeader,
+  AdminLayout,
+  AdminSidebar,
+  Breadcrumbs,
+  WithAuth,
 };

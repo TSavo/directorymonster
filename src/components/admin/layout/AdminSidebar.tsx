@@ -115,3 +115,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
     </>
   );
 };
+
+// Also export as default for backward compatibility
+export default AdminSidebar;

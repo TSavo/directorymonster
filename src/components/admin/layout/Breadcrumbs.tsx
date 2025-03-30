@@ -62,3 +62,6 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ pathname }) => {
     </nav>
   );
 };
+
+// Also export as default for backward compatibility
+export default Breadcrumbs;

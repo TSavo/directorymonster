@@ -14,7 +14,7 @@ import ActivityFeedItem from './components/ActivityFeedItem';
  * @param {string} className - Additional CSS classes
  * @param {boolean} isLoading - Whether the component is in loading state
  */
-const ActivityFeed: React.FC<ActivityFeedProps> = ({
+export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   siteSlug,
   limit = 10,
   filter,
@@ -282,4 +282,5 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   );
 };
 
+// Also export as default for backward compatibility
 export default ActivityFeed;
