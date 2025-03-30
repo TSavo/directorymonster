@@ -1,4 +1,4 @@
-# DirectoryMonster Next Steps - [2025-03-30 20:30]
+# DirectoryMonster Next Steps - [2025-03-30 21:00]
 
 ## Completed
 - ✅ Category Management functionality
@@ -58,13 +58,39 @@
 
 ### Testing & Documentation
 - [ ] Site Component Tests
-  - [ ] SiteForm.test.tsx (and steps)
-  - [ ] SiteTable.test.tsx
-  - [ ] useSites.test.tsx
-  - [ ] Mobile components tests
-  - [ ] Accessibility tests
+  - [ ] Core Component Tests
+    - [ ] SiteForm.test.tsx (container component)
+    - [ ] StepNavigation.test.tsx (step logic)
+    - [ ] FormActions.test.tsx (buttons and validation)
+  - [ ] Form Step Tests
+    - [ ] BasicInfoStep.test.tsx
+    - [ ] DomainStep.test.tsx
+    - [ ] ThemeStep.test.tsx
+    - [ ] SEOStep.test.tsx
+  - [ ] Table Component Tests
+    - [ ] SiteTable.test.tsx (container)
+    - [ ] SiteTableHeader.test.tsx (search and actions)
+    - [ ] SiteTableRow.test.tsx (individual site)
+    - [ ] SiteTablePagination.test.tsx (navigation)
+    - [ ] DeleteConfirmationModal.test.tsx (deletion flow)
+  - [ ] Mobile Component Tests
+    - [ ] SiteMobileCard.test.tsx (responsive layout)
+    - [ ] Responsive behavior tests for all components
+  - [ ] Hook Tests
+    - [ ] useSites.test.tsx (data management)
+    - [ ] Validation function tests
+    - [ ] API integration tests
+  - [ ] Accessibility Tests
+    - [ ] Keyboard navigation
+    - [ ] Screen reader compatibility
+    - [ ] ARIA attributes verification
 - [ ] Documentation
-  - [ ] sites/README.md (implementation guide)
+  - [x] sites/README.md (implementation guide)
   - [ ] Document the new E2E testing pattern
   - [ ] Update admin MVP documentation
   - [ ] Update export pattern guidelines
+
+### Git Management
+- [ ] Commit current changes with descriptive message
+- [ ] Create pull request with comprehensive description
+- [ ] Ensure CI pipeline runs all tests successfully
