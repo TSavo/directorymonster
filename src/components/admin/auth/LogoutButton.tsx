@@ -42,3 +42,6 @@ export function LogoutButton({
     </button>
   );
 }
+
+// Add default export for dual-export pattern
+export default LogoutButton;

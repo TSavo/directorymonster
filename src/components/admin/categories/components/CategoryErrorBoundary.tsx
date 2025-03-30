@@ -34,3 +34,6 @@ export class CategoryErrorBoundary extends React.Component<ErrorBoundaryProps, E
     return this.props.children;
   }
 }
+
+// Export as default for backward compatibility
+export default CategoryErrorBoundary;

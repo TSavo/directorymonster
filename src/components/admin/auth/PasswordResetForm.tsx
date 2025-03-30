@@ -303,3 +303,6 @@ export function PasswordResetForm({
     </div>
   );
 }
+
+// Add default export for dual-export pattern
+export default PasswordResetForm;

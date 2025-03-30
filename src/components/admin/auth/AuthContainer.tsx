@@ -118,3 +118,6 @@ export function AuthContainer({ redirectPath = '/admin' }: AuthContainerProps) {
     </div>
   );
 }
+
+// Add default export for dual-export pattern
+export default AuthContainer;

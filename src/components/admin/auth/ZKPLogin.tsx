@@ -326,3 +326,6 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
     </div>
   );
 }
+
+// Add default export for dual-export pattern
+export default ZKPLogin;

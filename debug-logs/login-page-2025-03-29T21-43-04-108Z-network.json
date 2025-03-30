@@ -1,0 +1,37 @@
+[
+  {
+    "name": "http://localhost:3000/_next/static/chunks/webpack.js",
+    "type": "link",
+    "duration": 9.099999999627471,
+    "startTime": 993.8000000007451,
+    "size": 10830
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/main-app.js",
+    "type": "script",
+    "duration": 112.70000000018626,
+    "startTime": 993.9000000003725,
+    "size": 1342846
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/app-pages-internals.js",
+    "type": "script",
+    "duration": 10.5,
+    "startTime": 994,
+    "size": 31539
+  },
+  {
+    "name": "http://localhost:3000/_next/static/css/app/layout.css?v=1743284582842",
+    "type": "link",
+    "duration": 8.5,
+    "startTime": 1203.4000000003725,
+    "size": 8095
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/app/%5BcategorySlug%5D/%5BlistingSlug%5D/page.js",
+    "type": "script",
+    "duration": 47.59999999962747,
+    "startTime": 1205.9000000003725,
+    "size": 183241
+  }
+]

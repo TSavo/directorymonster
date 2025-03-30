@@ -1,0 +1,90 @@
+{
+  "errors": [
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js",
+      "lineno": 1849,
+      "colno": 15,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js",
+      "lineno": 57,
+      "colno": 9,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js",
+      "lineno": 57,
+      "colno": 9,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js",
+      "lineno": 57,
+      "colno": 9,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js",
+      "lineno": 1849,
+      "colno": 15,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js",
+      "lineno": 57,
+      "colno": 9,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js",
+      "lineno": 57,
+      "colno": 9,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js",
+      "lineno": 57,
+      "colno": 9,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js",
+      "lineno": 1849,
+      "colno": 15,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js",
+      "lineno": 57,
+      "colno": 9,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js",
+      "lineno": 57,
+      "colno": 9,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    },
+    {
+      "message": "Uncaught Error: NEXT_NOT_FOUND",
+      "filename": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/redirect-boundary.js",
+      "lineno": 57,
+      "colno": 9,
+      "stack": "Error: NEXT_NOT_FOUND\n    at notFound (webpack-internal:///(rsc)/./node_modules/next/dist/client/components/not-found.js:23:19)\n    at Module.generateMetadata (webpack-internal:///(rsc)/./src/app/[categorySlug]/[listingSlug]/page.tsx:60:66)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"
+    }
+  ],
+  "ajaxErrors": [],
+  "resourceErrors": []
+}

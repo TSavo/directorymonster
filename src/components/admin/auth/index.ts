@@ -1,41 +1,20 @@
-// Auto-generated index file - DO NOT EDIT
-// Generated on: 2025-03-29T21:14:15.456Z
+// Standardized Auth Module Exports
+// Last updated: 2025-03-29
 
-export { AuthContainer } from './AuthContainer';
-export { FirstUserSetup } from './FirstUserSetup';
-export { LogoutButton } from './LogoutButton';
-export { PasswordResetForm } from './PasswordResetForm';
-export { RoleGuard } from './RoleGuard';
-export { SessionManager } from './SessionManager';
-export { ZKPLogin } from './ZKPLogin';
+// Export all named exports
+export * from './AuthContainer';
+export * from './FirstUserSetup';
+export * from './LogoutButton';
+export * from './PasswordResetForm';
+export * from './RoleGuard';
+export * from './SessionManager';
+export * from './ZKPLogin';
 
-// Default exports as named exports
-import AuthContainerDefault from './AuthContainer';
-import FirstUserSetupDefault from './FirstUserSetup';
-import LogoutButtonDefault from './LogoutButton';
-import PasswordResetFormDefault from './PasswordResetForm';
-import RoleGuardDefault from './RoleGuard';
-import SessionManagerDefault from './SessionManager';
-import ZKPLoginDefault from './ZKPLogin';
-
-// Additional named exports
-export {
-  AuthContainerDefault,
-  FirstUserSetupDefault,
-  LogoutButtonDefault,
-  PasswordResetFormDefault,
-  RoleGuardDefault,
-  SessionManagerDefault,
-  ZKPLoginDefault,
-};
-
-// Default export object
-export default {
-  AuthContainer: AuthContainerDefault,
-  FirstUserSetup: FirstUserSetupDefault,
-  LogoutButton: LogoutButtonDefault,
-  PasswordResetForm: PasswordResetFormDefault,
-  RoleGuard: RoleGuardDefault,
-  SessionManager: SessionManagerDefault,
-  ZKPLogin: ZKPLoginDefault,
-};
+// Re-export default as named export
+export { default as AuthContainer } from './AuthContainer';
+export { default as FirstUserSetup } from './FirstUserSetup';
+export { default as LogoutButton } from './LogoutButton';
+export { default as PasswordResetForm } from './PasswordResetForm';
+export { default as RoleGuard } from './RoleGuard';
+export { default as SessionManager } from './SessionManager';
+export { default as ZKPLogin } from './ZKPLogin';

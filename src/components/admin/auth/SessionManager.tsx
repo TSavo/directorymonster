@@ -216,3 +216,6 @@ export function SessionManager({
     </AuthContext.Provider>
   );
 }
+
+// Add default export for dual-export pattern
+export default SessionManager;

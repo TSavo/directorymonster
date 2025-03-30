@@ -345,3 +345,6 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
     </div>
   );
 }
+
+// Add default export for dual-export pattern
+export default FirstUserSetup;

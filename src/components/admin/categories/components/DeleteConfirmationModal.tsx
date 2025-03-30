@@ -16,7 +16,7 @@ import { DeleteConfirmationModalProps } from '../types';
  * @param props.onConfirm - Function to call when deletion is confirmed
  * @param props.onCancel - Function to call when deletion is cancelled
  */
-export default function DeleteConfirmationModal({
+export function DeleteConfirmationModal({
   isOpen,
   title,
   itemName,
@@ -156,3 +156,6 @@ export default function DeleteConfirmationModal({
     </div>
   );
 }
+
+// Also export as default for backward compatibility
+export default DeleteConfirmationModal;
