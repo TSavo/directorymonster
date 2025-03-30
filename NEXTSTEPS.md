@@ -9,6 +9,9 @@
 - ✅ Updated auth module components with standardized dual-export pattern
 - ✅ Updated category module components with standardized dual-export pattern
 - ✅ Updated dashboard subcomponents with standardized dual-export pattern
+- ✅ Fixed client component issues by adding "use client" directives
+- ✅ Fixed admin/layout.tsx imports to use direct component imports
+- ✅ Fixed dashboard module barrel file for proper component imports
 
 ## Priority Tasks (Based on Verification Script)
 
@@ -39,12 +42,19 @@
   - dashboard/hooks/index.ts - Added missing named exports
 - Verification script confirms all files now follow the standardized pattern
 
-## Implementation Plan
-1. Fix each component first with dual-export pattern
-2. Update its corresponding barrel file
-3. Test import compatibility (both named and default imports)
-4. Run verification script to check progress
-5. Add export verification to CI pipeline
+## New Priority Tasks
+
+### Next.js App Router Compatibility
+- [ ] Add "use client" directive to all interactive components
+- [ ] Update component organization to better align with Next.js app router
+- [ ] Fix remaining e2e test failures
+- [ ] Add documentation on proper component organization with app router
+
+### Testing Improvements
+- [ ] Add automated test for export verification in CI pipeline
+- [ ] Improve test coverage for dashboard components
+- [ ] Fix flaky e2e tests that fail sporadically
+- [ ] Add more robust error handling in tests
 
 ## Future Work
 

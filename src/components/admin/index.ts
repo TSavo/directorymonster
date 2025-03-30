@@ -1,3 +1,5 @@
+"use client";
+
 // Export all named exports
 export * from './listings';
 export * from './layout';

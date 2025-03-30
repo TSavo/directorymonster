@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from 'react';
 
 /**
@@ -88,6 +90,8 @@ export const useDomains = (options: UseDomainsOptions = {}) => {
         ...prev,
         domainInput: 'Invalid domain format'
       }));
+    }
+    return isValid;
     }
     return isValid;
   };
@@ -238,3 +242,6 @@ export const useDomains = (options: UseDomainsOptions = {}) => {
     }
   };
 };
+
+// Export default for backward compatibility
+export default useDomains;

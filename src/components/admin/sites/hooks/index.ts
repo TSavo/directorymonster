@@ -1,3 +1,5 @@
+"use client";
+
 // Export all named exports from hooks
 export * from './useDomains';
 

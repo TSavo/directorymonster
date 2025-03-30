@@ -25,107 +25,107 @@ Redis is now ready for first user setup testing.
       beforeCount: 0,
       afterCount: 0,
       remainingKeys: [
-        'search:site_1742868616776:term:box',
-        'listing:site:site_1742868616776:antique-rocking-chair-with-paranormal-activity',
-        'search:global:term:smells,',
-        'listing:id:listing_1742869091196',
-        'search:global:term:movement,sounds,electronic-interference',
-        'search:global:term:porcelain',
-        'listing:id:listing_1742868708402',
-        'search:listing:listing_1:terms',
-        'search:global:term:movement,whispers,temperature-changes',
-        'site:domain:hikinggearreviews.com',
-        'search:global:term:65l',
-        'search:global:term:and',
-        'search:site_1742860691651:term:shimano',
-        'category:id:category_1742868638607',
-        'search:site_1742868616776:term:1940s',
-        'search:global:term:1940s',
-        'search:site_1742860691651:term:stradic',
-        'listing:site:site_1742863385593:st-croix-legend-x-casting-rod-review',
-        'search:global:term:legend',
-        'category:site:site_1742860996072:backpacks',
-        'site:f7ca4122-8d83-4777-870f-87be09065a0d',
-        'search:site_1742860996072:term:65l',
-        'search:site_1742868616776:term:reportedly',
-        'search:site_1742868616776:term:antique',
-        'search:site_1742868616776:term:own,',
-        'search:site_1742868616776:term:locket',
-        'search:global:term:hiking',
-        'search:global:term:century',
-        'search:site_1742863385593:term:results',
-        'search:site_1742860996072:term:4.5 lbs',
-        'search:global:term:st.',
-        'search:site_1742863385593:term:casting-rod',
-        'search:global:term:cursed',
-        'search:site_1742860996072:term:analysis',
-        'search:site_1742868616776:term:chair',
-        'search:site_1742868616776:term:testimony',
-        'domain:fishinggearreviews.com',
-        'search:site_1742860691651:term:with',
-        'search:site_1742860996072:term:osprey atmos ag 65',
-        'category:site:site_1742863385593:reels',
-        'search:global:term:evidence',
-        'search:site_1742860691651:term:tests',
-        'search:site_1742868616776:term:witness',
-        'search:global:term:that',
-        'search:site_1742860996072:term:in-depth',
-        'search:site_1742868616776:term:19th',
-        'search:site_1742868616776:term:activity,',
-        'listing:category:category_1742868638607:antique-rocking-chair-with-paranormal-activity',
-        'search:global:term:osprey',
-        'search:site_1742868616776:term:misfortune',
-        'search:global:term:famous',
-        'search:site_1742860691651:term:performance',
-        'search:global:term:analysis',
-        'listing:site:site_1742860691651:st-croix-legend-x-casting-rod-review',
-        'search:site_1742868616776:term:movement,whispers,temperature-changes',
-        'search:global:term:dybbuk',
-        'listing:category:category_1:st-croix-legend-x-casting-rod-review',
-        'site:87a0c526-b23b-4be7-a547-01ba92c77882',
-        'search:site_1742868616776:term:shows',
-        'search:global:term:movements',
-        'search:global:term:durability',
-        'search:site_1742868616776:term:strange',
-        'search:listing:listing_1742861073159:terms',
-        'search:site_1742863385593:term:shimano stradic fl spinning reel',
-        'search:global:term:shows',
-        'search:site_1742860691651:term:casting',
-        'category:id:category_1742868637134',
-        'listing:category:category_1742868637134:cursed-victorian-locket',
+        'search:global:term:field',
         'search:global:term:backpack',
+        'search:site_1742868616776:term:movement',
+        'search:global:term:osprey',
+        'category:site:site_1742860691651:reels',
+        'search:global:term:comfort',
+        'search:site_1742868616776:term:activity,',
+        'site:fa599ec1-49e0-4f5e-8858-a4b4527daf38',
+        'search:global:term:reel',
+        'search:global:term:victorian-era',
+        'search:site_1742868616776:term:jewish',
+        'search:global:term:shimano',
+        'search:site_1742868616776:term:smells,',
+        'search:global:term:cabinet',
+        'search:site_1742860996072:term:comfort',
+        'search:site_1742860996072:term:osprey atmos ag 65',
+        'search:global:term:st. croix legend x casting rod',
+        'search:site_1742860691651:term:spinning-reel',
+        'search:site_1742863385593:term:legend',
+        'search:site_1742868616776:term:the',
+        'search:global:term:mirror',
+        'search:global:term:spinning',
+        'search:site_1742868616776:term:figures',
+        'listing:site:site_1742868616776:annabelle-replica-documented-paranormal-activity',
+        'search:global:term:authentic',
+        'search:global:term:1880s',
+        'search:site_1742860691651:term:review',
+        'listing:category:category_1742868637134:cursed-victorian-locket',
+        'search:site_1742868616776:term:its',
+        'category:site:site_1742863385593:rods',
+        'search:site_1742860691651:term:casting-rod',
+        'category:site:site_1742860691651:rods',
+        'listing:site:site_1742868616776:cursed-victorian-locket',
+        'listing:site:site_1742860691651:shimano-stradic-fl-spinning-reel-review',
+        'search:site_1742863385593:term:testing',
+        'search:global:term:durability',
+        'search:global:term:legend',
+        'category:id:category_2',
+        'site:id:site_1742860691651',
+        'search:site_1742868616776:term:nightmares,smells,shadow-figures,electrical-disturbances',
+        'search:site_1742860996072:term:analysis',
+        'domains:localhost',
+        'listing:site:site_1742863385593:shimano-stradic-fl-spinning-reel-review',
+        'search:listing:listing_1742868722034:terms',
+        'listing:site:site_1742868616776:haunted-victorian-porcelain-doll-paranormal-activity-documented',
+        'search:global:term:shimano stradic fl spinning reel',
+        'search:site_1742868616776:term:movements',
         'search:global:term:used',
-        'search:site_1742868616776:term:dybbuk',
-        'search:site_1742868616776:term:annabelle',
-        'category:id:category_1742861016907',
-        'search:global:term:chair',
-        'search:global:term:wine',
-        'category:id:category_3',
-        'search:site_1742863385593:term:casting',
-        'search:site_1742868616776:term:2015',
-        'search:global:term:figures',
-        'search:listing:listing_2:terms',
-        'search:site_1742860996072:term:review',
-        'search:site_1742860691651:term:st.',
-        'search:global:term:misfortune',
-        'search:site_1742868616776:term:wine',
-        'listing:category:category_1742868640377:victorian-haunted-mirror',
+        'search:global:term:capacity',
+        'search:listing:listing_1742869091196:terms',
+        'search:global:term:night',
+        'listing:category:category_1:st-croix-legend-x-casting-rod-review',
+        'search:global:term:paranormal',
+        'search:site_1742868616776:term:famous',
+        'site:f7ca4122-8d83-4777-870f-87be09065a0d',
+        'search:global:term:shadowy',
+        'search:site_1742868616776:term:documented',
+        'search:listing:listing_1742861073159:terms',
+        'search:site_1742863385593:term:shimano',
+        'search:site_1742860691651:term:and',
+        'search:site_1742860691651:term:tests',
+        'site:b57717ba-99d4-4b6c-a712-e6f354f4a40f',
+        'search:global:term:in-depth',
+        'listing:id:listing_1742868656326',
         'search:global:term:comprehensive',
+        'search:site_1742868616776:term:including',
+        'domain:hikinggearreviews.com',
+        'search:site_1742860691651:term:field',
+        'search:site_1742868616776:term:haunted',
+        'listing:category:category_1742868627446:annabelle-replica-documented-paranormal-activity',
+        'category:id:category_1742868637134',
+        'search:global:term:65l',
+        'search:global:term:witness',
+        'search:site_1742860996072:term:backpack',
+        'search:global:term:testimony',
+        'search:site_1742863385593:term:reel',
+        'search:site_1742860691651:term:stradic',
+        'search:global:term:and',
+        'search:site_1742863385593:term:results',
+        'listing:category:category_1742868640377:victorian-haunted-mirror',
+        'search:global:term:century',
+        'search:site_1742860996072:term:65l',
+        'listing:site:site_1742860691651:st-croix-legend-x-casting-rod-review',
+        'search:global:term:victorian',
+        'search:global:term:hiking',
+        'search:global:term:casting-rod',
+        'search:site_1742860691651:term:in-depth',
+        'search:site_1742863385593:term:comprehensive',
+        'search:site_1742868616776:term:own,',
+        'search:site_1742868616776:term:antique',
+        'search:global:term:antique dybbuk box',
+        'search:site_1742860691651:term:analysis',
+        'listing:site:site_1742868616776:haunted-dybbuk-box-jewish-wine-cabinet',
+        'search:site_1742868616776:term:movement,sounds,electronic-interference',
+        'search:global:term:own,',
+        'search:site_1742860996072:term:in-depth',
+        'listing:site:site_1742860996072:osprey-atmos-ag-65-backpack-review',
         'search:global:term:results',
-        'search:global:term:including',
-        'search:site_1742863385593:term:and',
-        'search:global:term:the',
-        'search:site_1742863385593:term:field',
-        'category:site:site_1742868616776:possessed-furniture',
-        'search:global:term:reportedly',
-        'category:site:site_1742868616776:cursed-jewelry',
-        'search:global:term:replica',
-        'search:site_1742863385593:term:croix',
-        'search:global:term:4.5 lbs',
-        'listing:category:category_1742861016907:osprey-atmos-ag-65-backpack-review',
-        'search:global:term:stradic',
-        'site:slug:haunted-objects',
-        ... 212 more items
+        'search:global:term:movements',
+        'search:site_1742868616776:term:sounds',
+        ... 213 more items
       ]
     }
 
@@ -157,16 +157,16 @@ Redis is now ready for first user setup testing.
       at Object.log (tests/e2e/first-user.test.js:295:13)
 
   console.log
-    Saved screenshot to admin-dashboard-1743298666411.png
+    Saved screenshot to admin-dashboard-1743298902104.png
 
       at Object.log (tests/e2e/first-user.test.js:310:13)
 
-FAIL tests/e2e/first-user.test.js (17.583 s)
+FAIL tests/e2e/first-user.test.js (17.306 s)
   First User Creation
-    √ Redirects to first user setup when set to first-user mode (7852 ms)
-    √ Shows validation errors for invalid first user form submission (997 ms)
-    √ Successfully creates first admin user and redirects to dashboard (5802 ms)
-    × Shows normal login form after first user is created (925 ms)
+    √ Redirects to first user setup when set to first-user mode (8023 ms)
+    √ Shows validation errors for invalid first user form submission (915 ms)
+    √ Successfully creates first admin user and redirects to dashboard (5589 ms)
+    × Shows normal login form after first user is created (909 ms)
 
   ● First User Creation › Shows normal login form after first user is created
 
@@ -185,84 +185,6 @@ FAIL tests/e2e/first-user.test.js (17.583 s)
 
       at Object.toBe (tests/e2e/first-user.test.js:343:25)
 
-Failed to collect coverage from C:\Users\T\directorymonster\src\components\admin\dashboard\components\ActivityFeedItem.tsx
-ERROR: 
-  [31mx[0m Expected '{', got '=>'
-    ,-[[36;1;4mC:\Users\T\directorymonster\src\components\admin\dashboard\components\ActivityFeedItem.tsx[0m:12:1]
- [2m12[0m | export function ActivityFeedItem({
- [2m13[0m |   activity,
- [2m14[0m |   className = '',
- [2m15[0m | }) => {
-    : [31;1m   ^^[0m
- [2m16[0m |   // Format the timestamp to a relative time (e.g., "2 hours ago")
- [2m17[0m |   const formatRelativeTime = (timestamp: string): string => {
- [2m18[0m |     const date = new Date(timestamp);
-    `----
-
-
-Caused by:
-    Syntax Error
-STACK: Error: 
-  [31mx[0m Expected '{', got '=>'
-    ,-[[36;1;4mC:\Users\T\directorymonster\src\components\admin\dashboard\components\ActivityFeedItem.tsx[0m:12:1]
- [2m12[0m | export function ActivityFeedItem({
- [2m13[0m |   activity,
- [2m14[0m |   className = '',
- [2m15[0m | }) => {
-    : [31;1m   ^^[0m
- [2m16[0m |   // Format the timestamp to a relative time (e.g., "2 hours ago")
- [2m17[0m |   const formatRelativeTime = (timestamp: string): string => {
- [2m18[0m |     const date = new Date(timestamp);
-    `----
-
-
-Caused by:
-    Syntax Error
-    at Object.transformSync (C:\Users\T\directorymonster\node_modules\next\dist\build\swc\index.js:821:33)
-    at transformSync (C:\Users\T\directorymonster\node_modules\next\dist\build\swc\index.js:897:21)
-    at process (C:\Users\T\directorymonster\node_modules\next\dist\build\swc\jest-transformer.js:64:45)
-    at ScriptTransformer.transformSourceAsync (C:\Users\T\directorymonster\node_modules\@jest\transform\build\ScriptTransformer.js:599:25)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async generateEmptyCoverage (C:\Users\T\directorymonster\node_modules\@jest\reporters\build\generateEmptyCoverage.js:127:20)
-Failed to collect coverage from C:\Users\T\directorymonster\src\components\admin\dashboard\components\StatisticCard.tsx
-ERROR: 
-  [31mx[0m Expected '{', got '=>'
-    ,-[[36;1;4mC:\Users\T\directorymonster\src\components\admin\dashboard\components\StatisticCard.tsx[0m:18:1]
- [2m18[0m |   icon,
- [2m19[0m |   className = '',
- [2m20[0m |   isLoading = false,
- [2m21[0m | }) => {
-    : [31;1m   ^^[0m
- [2m22[0m |   return (
- [2m23[0m |     <div
- [2m24[0m |       data-testid="statistic-card"
-    `----
-
-
-Caused by:
-    Syntax Error
-STACK: Error: 
-  [31mx[0m Expected '{', got '=>'
-    ,-[[36;1;4mC:\Users\T\directorymonster\src\components\admin\dashboard\components\StatisticCard.tsx[0m:18:1]
- [2m18[0m |   icon,
- [2m19[0m |   className = '',
- [2m20[0m |   isLoading = false,
- [2m21[0m | }) => {
-    : [31;1m   ^^[0m
- [2m22[0m |   return (
- [2m23[0m |     <div
- [2m24[0m |       data-testid="statistic-card"
-    `----
-
-
-Caused by:
-    Syntax Error
-    at Object.transformSync (C:\Users\T\directorymonster\node_modules\next\dist\build\swc\index.js:821:33)
-    at transformSync (C:\Users\T\directorymonster\node_modules\next\dist\build\swc\index.js:897:21)
-    at process (C:\Users\T\directorymonster\node_modules\next\dist\build\swc\jest-transformer.js:64:45)
-    at ScriptTransformer.transformSourceAsync (C:\Users\T\directorymonster\node_modules\@jest\transform\build\ScriptTransformer.js:599:25)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async generateEmptyCoverage (C:\Users\T\directorymonster\node_modules\@jest\reporters\build\generateEmptyCoverage.js:127:20)
 -------------------------------------------------------------|---------|----------|---------|---------|-------------------
 File                                                         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
 -------------------------------------------------------------|---------|----------|---------|---------|-------------------
@@ -399,7 +321,9 @@ All files                                                    |       0 |        
   ActivityFeed.tsx                                           |       0 |        0 |       0 |       0 | 3-286             
   StatisticCards.tsx                                         |       0 |        0 |       0 |       0 | 3-203             
   index.ts                                                   |       0 |      100 |     100 |       0 | 4-12              
- src/components/admin/dashboard/components                   |       0 |      100 |     100 |       0 |                   
+ src/components/admin/dashboard/components                   |       0 |        0 |       0 |       0 |                   
+  ActivityFeedItem.tsx                                       |       0 |        0 |       0 |       0 | 1-139             
+  StatisticCard.tsx                                          |       0 |        0 |       0 |       0 | 1-80              
   index.ts                                                   |       0 |      100 |     100 |       0 | 5-10              
  src/components/admin/dashboard/hooks                        |       0 |        0 |       0 |       0 |                   
   index.ts                                                   |       0 |      100 |     100 |       0 | 2-7               
@@ -447,7 +371,7 @@ All files                                                    |       0 |        
   SearchForm.tsx                                             |       0 |        0 |       0 |       0 | 3-99              
   SearchIcon.tsx                                             |       0 |        0 |       0 |       0 | 1-35              
   SearchResults.tsx                                          |       0 |        0 |       0 |       0 | 3-189             
-  index.ts                                                   |       0 |      100 |     100 |       0 | 4-24              
+  index.ts                                                   |       0 |      100 |     100 |       0 | 2-11              
  src/lib                                                     |       0 |        0 |       0 |       0 |                   
   redis-cache.ts                                             |       0 |        0 |       0 |       0 | 1-54              
   redis-client.ts                                            |       0 |        0 |       0 |       0 | 2-303             
@@ -474,5 +398,5 @@ All files                                                    |       0 |        
 Test Suites: 1 failed, 1 total
 Tests:       1 failed, 3 passed, 4 total
 Snapshots:   0 total
-Time:        19.652 s
+Time:        19.056 s
 Ran all test suites matching /tests\\e2e\\first-user.test.js/i.

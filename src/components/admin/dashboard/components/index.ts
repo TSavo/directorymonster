@@ -1,3 +1,5 @@
+"use client";
+
 // Standardized Dashboard Components Barrel File
 // Last updated: 2025-03-29
 

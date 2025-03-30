@@ -1,3 +1,5 @@
+"use client";
+
 // Standardized barrel file - Updated on 2025-03-29
 
 // Export all named exports from component files

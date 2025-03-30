@@ -1,5 +1,8 @@
+"use client";
+
 import { ReactNode } from 'react';
-import { AdminLayout, WithAuth } from '@/components/admin';
+import { AdminLayout } from '@/components/admin/layout';
+import { WithAuth } from '@/components/admin/auth';
 
 interface AdminRootLayoutProps {
   children: ReactNode;
