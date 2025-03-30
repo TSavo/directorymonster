@@ -1,6 +1,6 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - [2025-03-30] - E2E Testing & Docker Environment Debugging
+## Current Status - [2025-03-30] - Understanding New E2E Testing Structure
 
 ### Completed Work - [2025-03-30]
 
@@ -397,21 +397,84 @@ Some tests are still failing due to component rendering and hydration issues:
    - Fix page title and content detection for homepage tests
    - Add more data-testid attributes to the homepage components
 
+## Analysis of New E2E Testing Structure
+
+After examining the code, I can see that the E2E tests have been restructured to follow a more organized pattern:
+
+### 1. Test Organization Pattern
+
+The new structure organizes tests into a clear hierarchy with specialized files:
+
+1. **Selectors File** (`homepage.selectors.js`):
+   - Central repository for all data-testid selectors
+   - Includes fallback selectors when data-testid isn't available
+   - Organized by component/section type
+
+2. **Suite File** (`homepage.suite.test.js`):
+   - Main entry point that imports and runs all test files
+   - Acts as a test orchestrator
+   - Makes it easy to run all related tests at once
+
+3. **Specialized Test Files**:
+   - Each test file focused on one aspect of functionality:
+     - `homepage.rendering.test.js`: Basic page rendering
+     - `homepage.navigation.test.js`: Navigation functionality
+     - `homepage.responsive.test.js`: Mobile responsiveness
+     - `homepage.search.test.js`: Search functionality
+     - `homepage.content.test.js`: Content sections
+     - `homepage.404.test.js`: Error handling
+     - `homepage.performance.test.js`: Load time performance
+
+4. **Utility Files**:
+   - Shared `hydration-utils.js` with enhanced component detection
+   - Functions for handling Next.js hydration issues
+
+### 2. Selector Strategy
+
+The selectors follow a robust pattern with multiple fallbacks:
+
+- Primary selectors use `data-testid` attributes
+- Fallback selectors use common CSS patterns
+- Organized by functional area (header, footer, search, etc.)
+- Mobile-specific selectors separated for clarity
+
+### 3. Hydration Handling
+
+The hydration utilities include sophisticated features:
+
+- `waitForClientHydration`: Waits for Next.js to complete hydration
+- `waitForHydration`: Generic function with customizable conditions
+- `waitForFormElement`: Specialized for form interactions
+- `findElementWithRetry`: Exponential backoff for flaky elements
+- `isComponentHydrated`: Tests if a component is fully interactive
+
+### 4. Test Resilience
+
+The tests are designed to be more resilient by:
+
+- Using multiple selector strategies with fallbacks
+- Waiting properly for component hydration
+- Taking screenshots at key points for debugging
+- Using more flexible assertions that don't rely on exact DOM structure
+- Providing detailed logging for troubleshooting
+
 ### Next Steps
 
-1. **Fix CSS Selector Issues**:
-   - Remove `:contains()` syntax from all tests and replace with data-testid attributes
-   - Update selector logic to properly handle Next.js hydration
-   - Add missing data-testid attributes to components
+1. **Adopt the New Structure for All Tests**:
+   - Convert remaining test files to follow the new pattern
+   - Create selector files for other major components
+   - Refactor existing tests to use the hydration utilities
 
-2. **Fix Form Detection Issues**:
-   - Add more robust form element detection in tests
-   - Ensure tests properly wait for hydration before checking elements
+2. **Extend Data-TestID Coverage**:
+   - Add data-testid attributes to all major components
+   - Focus on authentication, admin, and site management components
+   - Update existing components to include proper test attributes
 
-3. **Update Remaining Tests**:
-   - Apply the same fixes from first-user.test.js to other tests
-   - Add better error handling and debugging to tests
+3. **Create Documentation on the New Pattern**:
+   - Document the new E2E testing structure
+   - Create guide for adding new tests following this pattern
+   - Add examples for common testing scenarios
 
-4. **Document Test Fixes**:
-   - Create documentation for E2E test best practices
-   - Add notes about common testing issues and solutions
+4. **Automate Test Structure Generation**:
+   - Create tooling to scaffold new test files in this structure
+   - Ensure consistent naming and organization

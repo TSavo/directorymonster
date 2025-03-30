@@ -39,17 +39,31 @@
 
 ## New Priority Tasks
 
+### E2E Testing Standardization
+- [ ] Convert all E2E tests to follow the new testing pattern:
+  - [x] Homepage tests converted to new structure
+  - [ ] Login tests conversion to new structure
+  - [ ] Admin dashboard tests conversion to new structure
+  - [ ] First-user test conversion to new structure
+  - [ ] Create shared test setup and teardown
+- [ ] Create a selectors file for each major component area:
+  - [x] homepage.selectors.js (completed)
+  - [ ] login.selectors.js
+  - [ ] admin.selectors.js
+  - [ ] firstuser.selectors.js
+- [ ] Document the new E2E testing pattern
+- [ ] Create script to automate test file generation
+
 ### Next.js App Router Compatibility
 - [ ] Add "use client" directive to all interactive components
 - [ ] Update component organization to better align with Next.js app router
 - [x] Fix login page E2E test failure by improving test detection
-- [ ] Fix remaining E2E test failures:
+- [x] Fix remaining E2E test failures:
   - [x] Fix CSS selector issues (`:contains()` syntax not supported by Puppeteer)
   - [x] Add consistent data-testid attributes to components
-  - [ ] Improve form element detection in tests
-  - [ ] Fix detection of UI elements after component hydration
+  - [x] Improve form element detection in tests
+  - [x] Fix detection of UI elements after component hydration
 - [ ] Add documentation on proper component organization with app router
-- [ ] Create documentation for E2E test best practices
 
 ### Unit Test Fixes
 - [ ] Install missing @testing-library/dom dependency
@@ -63,9 +77,12 @@
 - ✅ Implement waiting for component hydration in tests
 - ✅ Create test utilities for form element detection with retry mechanisms
 - ✅ Fix title and content detection for homepage tests
-- [ ] Update login.test.js to use hydration utilities
+- ✅ Implement new E2E testing structure for homepage tests
+- [ ] Update login.test.js to use new testing structure pattern
+- [ ] Create login.selectors.js with centralized selectors
 - [ ] Add data-testid attributes to admin components
-- [ ] Fix admin dashboard tests
+- [ ] Create admin.selectors.js file
+- [ ] Refactor admin dashboard tests into specialized test files
 - [ ] Create documentation for E2E testing best practices
 
 ## Future Work
