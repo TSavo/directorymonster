@@ -64,6 +64,7 @@
     "test:with-server": "bash scripts/run-tests-with-server.sh"
   },
   "dependencies": {
+    "@testing-library/dom": "^10.4.0",
     "@testing-library/user-event": "^14.6.1",
     "axios": "^1.8.4",
     "ioredis": "^5.3.2",

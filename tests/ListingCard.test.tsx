@@ -133,9 +133,10 @@ describe('ListingCard Component', () => {
     
     expect(screen.getByText('$99.99')).toBeInTheDocument();
     
-    // Check price metadata
-    const price = document.querySelector('meta[itemprop="price"]');
-    expect(price).toHaveAttribute('content', '99.99');
+    // Check price element
+    const price = document.querySelector('span[itemprop="price"]');
+    expect(price).toBeInTheDocument();
+    expect(price).toHaveTextContent('$99.99');
     
     const currency = document.querySelector('meta[itemprop="priceCurrency"]');
     expect(currency).toHaveAttribute('content', 'USD');

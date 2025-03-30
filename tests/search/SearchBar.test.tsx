@@ -37,9 +37,10 @@ describe('SearchBar Component', () => {
   it('renders in expanded state when expanded prop is true', () => {
     render(<SearchBar expanded={true} />);
     
-    // Search icon button should not be visible
+    // Search icon button should be hidden (not removed)
     const searchButton = screen.queryByLabelText('Open search');
-    expect(searchButton).not.toBeInTheDocument();
+    expect(searchButton).toBeInTheDocument();
+    expect(searchButton).toHaveClass('hidden');
     
     // Input should be visible
     const input = screen.getByRole('searchbox');

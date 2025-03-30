@@ -1,12 +1,15 @@
-Categories Debug Test Started: 2025-03-30T02:12:02.998Z
+Categories Debug Test Started: 2025-03-30T09:24:36.337Z
 
-[2025-03-30T02:12:02.999Z] Starting admin categories E2E tests
-[2025-03-30T02:12:03.011Z] Starting browser for debug test...
-[2025-03-30T02:12:03.569Z] Browser setup complete
-[2025-03-30T02:12:03.570Z] Starting login process...
-[2025-03-30T02:12:08.040Z] Request failed: http://localhost:3000/admin/login
-[2025-03-30T02:12:08.123Z] Completed admin categories E2E tests
-[2025-03-30T02:12:08.159Z] Login error: Navigating frame was detached
-[2025-03-30T02:12:08.174Z] 
+[2025-03-30T09:24:36.339Z] Starting admin categories E2E tests
+[2025-03-30T09:24:36.351Z] Starting browser for debug test...
+[2025-03-30T09:24:39.835Z] Browser setup complete
+[2025-03-30T09:24:39.836Z] Starting login process...
+[2025-03-30T09:24:41.203Z] Console error: Failed to load resource: the server responded with a status of 404 (Not Found)
+[2025-03-30T09:24:41.431Z] 
+----- COMPREHENSIVE ANALYSIS: login-page -----
+[2025-03-30T09:24:41.434Z] Saved URL to: C:\Users\T\directorymonster\html-dumps\login-page-2025-03-30T09-24-41-433Z-url.txt
+[2025-03-30T09:24:41.637Z] Login error: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-03-30T09:24:41.637Z] 
 ----- COMPREHENSIVE ANALYSIS: login-error -----
-[2025-03-30T02:12:08.176Z] Saved URL to: C:\Users\T\directorymonster\html-dumps\login-error-2025-03-30T02-12-08-176Z-url.txt
+[2025-03-30T09:24:41.640Z] Saved URL to: C:\Users\T\directorymonster\html-dumps\login-error-2025-03-30T09-24-41-639Z-url.txt
+[2025-03-30T09:24:42.744Z] Completed admin categories E2E tests

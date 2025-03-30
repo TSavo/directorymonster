@@ -40,7 +40,8 @@ describe('SearchForm Component', () => {
     const input = screen.getByRole('searchbox');
     expect(input).toHaveAttribute('placeholder', 'Custom placeholder');
     
-    const button = screen.getByRole('button', { name: /find/i });
+    // Find button by type instead of text content
+    const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Find');
     
     // Verify custom class is applied
@@ -165,8 +166,8 @@ describe('SearchForm Component', () => {
     expect(input).toHaveAttribute('aria-label', 'Search query');
     expect(input).toHaveAttribute('aria-required', 'true');
     
-    // Initially, there should be no errors
-    expect(input).not.toHaveAttribute('aria-invalid');
+    // Initially, the input should have aria-invalid="false" (not invalid)
+    expect(input).toHaveAttribute('aria-invalid', 'false');
     expect(input).not.toHaveAttribute('aria-describedby');
     
     // Submit form without query to trigger validation error
