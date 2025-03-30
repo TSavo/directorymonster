@@ -18,7 +18,7 @@ export function StatisticCard({
   icon,
   className = '',
   isLoading = false,
-}) => {
+}: StatisticCardProps) {
   return (
     <div
       data-testid="statistic-card"

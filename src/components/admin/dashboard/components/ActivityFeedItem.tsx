@@ -12,7 +12,7 @@ interface ActivityFeedItemProps {
 export function ActivityFeedItem({
   activity,
   className = '',
-}) => {
+}: ActivityFeedItemProps) {
   // Format the timestamp to a relative time (e.g., "2 hours ago")
   const formatRelativeTime = (timestamp: string): string => {
     const date = new Date(timestamp);
