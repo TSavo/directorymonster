@@ -2,28 +2,38 @@
 
 ## Current Status - March 30, 2025
 
-Completed investigation of issue #9:
+Investigating failing tests in PR #33 related to issue #9:
 
 1. **Issue #9: Complete Implementation of Incomplete useListings Hook**
-   - Discovered that the `setSearchTerm` function in `useListings.ts` is already properly implemented
-   - The function now correctly updates the filters and resets the pagination
-   - Added a comment to the GitHub issue noting that the issue has been fixed
-   - Changed issue status from `status:in-progress` to `status:needs-review`
+   - Confirmed that the `setSearchTerm` function in `useListings.ts` is properly implemented
+   - PR #33 was created to update documentation about this finding
+   - PR tests are failing (both coverage-tests and docker-tests)
+   - PR makes significant changes to test files that may be causing failures
 
-2. **Next Task: PR #32 - Search Functionality**
-   - Need to address integration test failures in PR #32
-   - Component tests (SearchFilters.test.tsx and SearchResults.test.tsx) are passing
-   - Integration tests still failing with 404 and 400 status code errors
-   - Will need to properly configure the API endpoints in the test environment
+2. **PR #33 Analysis**
+   - The PR significantly modifies test files:
+     - Removes Jest fetch mock configuration in jest.setup.js
+     - Updates test expectations and implementations in several test files
+     - Changes mocking approach in search-indexer.test.ts
+   - These changes are likely causing the test failures
 
-## Next Steps
+## Action Plan
 
-1. Return to addressing the integration test failures in PR #32:
-   - Fix the search API endpoints in the test environment
-   - Update the mock implementations to match expected behavior
-   - Ensure proper test data setup for integration tests
-   - Make sure the response format matches expectations
+1. Address failing tests in PR #33:
+   - Restore the fetch mocking configuration in jest.setup.js
+   - Review and fix changed test expectations
+   - Keep documentation updates related to issue #9
+   - Avoid making unrelated test changes for this PR
 
-2. Once tests are passing:
-   - Update PR #32 with a comment about the fixes
-   - Request review
+2. Steps to complete:
+   - Checkout PR branch and review failing tests in detail
+   - Run tests locally to identify specific failures
+   - Make minimal changes to fix test failures
+   - Commit and push updates to the PR branch
+   - Request review once tests are passing
+
+3. Future work:
+   - Return to addressing integration test failures in PR #32 as noted in previous checkpoint
+   - Separate test refactoring into a dedicated PR if needed
+
+This is a focused plan to address the immediate issue with PR #33 while maintaining clean separation of concerns.
