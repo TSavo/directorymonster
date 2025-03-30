@@ -1,3 +1,36 @@
+# DirectoryMonster Next Steps - [2025-03-31 17:30]
+
+## UI Component Mock Implementation
+
+Based on the test execution attempts, we need to create mock UI components to make the integration tests pass:
+
+1. **Identify Required UI Components**:
+   - [ ] Create a list of all UI components referenced in tests (Button, Input, Select, etc.)
+   - [ ] Document the expected props and behavior of each component
+   - [ ] Determine which components are most critical for test execution
+
+2. **Implementation Strategy**:
+   - [ ] Create a dedicated `tests/mocks/ui` directory for UI component mocks
+   - [ ] Implement minimal versions of each component that satisfy test requirements
+   - [ ] Create a Jest setup file that automatically mocks these components
+
+3. **Jest Configuration**:
+   - [ ] Update Jest configuration to map UI component imports to our mocks
+   - [ ] Add module name mappers for common import patterns
+   - [ ] Create a standardized mock approach for UI components
+
+## Testing Infrastructure Enhancement
+
+1. **Centralized Mock Repository**:
+   - [ ] Create a unified approach to mocking hooks and components
+   - [ ] Implement consistent mock factories for common patterns
+   - [ ] Document the mock usage patterns for the team
+
+2. **Test Execution Workflow**:
+   - [ ] Create a script for running specific test categories
+   - [ ] Implement better error reporting for test failures
+   - [ ] Add test debugging utilities
+
 # DirectoryMonster Next Steps - [2025-04-01 09:15]
 
 ## Integration Test Dependencies Fix - [2025-03-30 23:55]
