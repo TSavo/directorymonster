@@ -2,14 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-
-// Define types for the auth hook
-export interface User {
-  id: string;
-  name?: string;
-  email?: string;
-  role: string;
-}
+import { User } from '../../users/hooks/useUsers';
+import { ResourceType, Permission, hasPermission as checkPermission } from '../utils/accessControl';
 
 export interface AuthState {
   user: User | null;
@@ -19,8 +13,7 @@ export interface AuthState {
 }
 
 /**
- * Custom hook for authentication functionality
- * This hook provides authentication state and methods for the application
+ * Enhanced authentication hook with ACL support
  */
 export const useAuth = () => {
   const router = useRouter();
@@ -141,7 +134,7 @@ export const useAuth = () => {
       });
       
       // Redirect to login page
-      router.push('/admin/login');
+      router.push('/login');
       
       return true;
     } catch (error) {
@@ -158,37 +151,21 @@ export const useAuth = () => {
   }, [router]);
 
   /**
-   * Check if the user has permission for a specific action
+   * Check if user has permission for a specific resource
    */
-  const hasPermission = useCallback((action: string, resourceId?: string, ownerId?: string) => {
+  const hasPermission = useCallback((
+    resourceType: ResourceType,
+    permission: Permission,
+    resourceId?: string,
+    siteId?: string
+  ): boolean => {
     const { user, isAuthenticated } = authState;
     
-    if (!isAuthenticated || !user) {
+    if (!isAuthenticated || !user || !user.acl) {
       return false;
     }
     
-    // Admin has all permissions
-    if (user.role === 'admin') {
-      return true;
-    }
-    
-    // Editor can view everything and edit their own content
-    if (user.role === 'editor') {
-      if (action === 'view') {
-        return true;
-      }
-      
-      if (action === 'edit' && ownerId === user.id) {
-        return true;
-      }
-    }
-    
-    // Viewer can only view content
-    if (user.role === 'viewer') {
-      return action === 'view';
-    }
-    
-    return false;
+    return checkPermission(user.acl, resourceType, permission, resourceId, siteId);
   }, [authState]);
 
   // Return the auth state and methods
