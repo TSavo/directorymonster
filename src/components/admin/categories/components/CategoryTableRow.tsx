@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { CategoryTableRowProps, SortField } from '../types';
 
-export default function CategoryTableRow({
+export function CategoryTableRow({
   category,
   showSiteColumn,
   onDeleteClick,
@@ -171,3 +171,6 @@ export default function CategoryTableRow({
     </tr>
   );
 }
+
+// Add default export for dual-export pattern
+export default CategoryTableRow;

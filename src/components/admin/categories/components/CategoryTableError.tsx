@@ -2,7 +2,7 @@
 
 import { CategoryTableErrorProps } from '../types';
 
-export default function CategoryTableError({ error, onRetry }: CategoryTableErrorProps) {
+export function CategoryTableError({ error, onRetry }: CategoryTableErrorProps) {
   const handleRetry = () => {
     if (onRetry) {
       onRetry();
@@ -33,3 +33,6 @@ export default function CategoryTableError({ error, onRetry }: CategoryTableErro
     </div>
   );
 }
+
+// Add default export for dual-export pattern
+export default CategoryTableError;

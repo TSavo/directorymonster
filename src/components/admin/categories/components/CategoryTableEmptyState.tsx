@@ -6,7 +6,7 @@ import { CategoryTableEmptyStateProps } from '../types';
 /**
  * Empty state display when no categories are found
  */
-export default function CategoryTableEmptyState({ siteSlug }: CategoryTableEmptyStateProps) {
+export function CategoryTableEmptyState({ siteSlug }: CategoryTableEmptyStateProps) {
   const createUrl = siteSlug ? `/admin/sites/${siteSlug}/categories/new` : "/admin/categories/new";
   
   return (
@@ -22,3 +22,6 @@ export default function CategoryTableEmptyState({ siteSlug }: CategoryTableEmpty
     </div>
   );
 }
+
+// Add default export for dual-export pattern
+export default CategoryTableEmptyState;

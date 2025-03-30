@@ -6,7 +6,7 @@ import { CategoryTablePaginationProps } from '../types';
 /**
  * Pagination controls for the category table
  */
-export default function CategoryTablePagination({
+export function CategoryTablePagination({
   currentPage,
   totalPages,
   goToPage,
@@ -75,3 +75,6 @@ export default function CategoryTablePagination({
     </div>
   );
 }
+
+// Add default export for dual-export pattern
+export default CategoryTablePagination;

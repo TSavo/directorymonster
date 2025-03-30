@@ -6,7 +6,7 @@ import { CategoryTableSortHeaderProps } from '../types';
 /**
  * Sortable column header component for categories table
  */
-export default function CategoryTableSortHeader({ 
+export function CategoryTableSortHeader({ 
   label, 
   field, 
   currentSortField, 
@@ -39,3 +39,6 @@ export default function CategoryTableSortHeader({
     </th>
   );
 }
+
+// Add default export for dual-export pattern
+export default CategoryTableSortHeader;
