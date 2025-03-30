@@ -132,4 +132,191 @@ export const useListings = ({
    * Set search filter
    */
   const setSearchTerm = useCallback((search: string) => {
-    setFilters
+    setFilters(prev => ({ ...prev, search }));
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page when search changes
+  }, []);
+
+  /**
+   * Set status filter
+   */
+  const setStatusFilter = useCallback((status: ListingStatus[]) => {
+    setFilters(prev => ({ ...prev, status }));
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, []);
+
+  /**
+   * Set category filter
+   */
+  const setCategoryFilter = useCallback((categoryIds: string[]) => {
+    setFilters(prev => ({ ...prev, categoryIds }));
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, []);
+
+  /**
+   * Set featured filter
+   */
+  const setFeaturedFilter = useCallback((featured: boolean | undefined) => {
+    setFilters(prev => ({ ...prev, featured }));
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, []);
+
+  /**
+   * Reset all filters
+   */
+  const resetFilters = useCallback(() => {
+    setFilters({});
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, []);
+
+  /**
+   * Set sort field and direction
+   */
+  const setSorting = useCallback((field: ListingSortField, direction?: SortDirection) => {
+    setSort(prev => {
+      // If same field, toggle direction unless a specific direction is provided
+      if (prev.field === field && !direction) {
+        return {
+          field,
+          direction: prev.direction === 'asc' ? 'desc' : 'asc'
+        };
+      }
+      
+      // Otherwise, set the new field and direction (default to 'asc')
+      return {
+        field,
+        direction: direction || 'asc'
+      };
+    });
+  }, []);
+
+  /**
+   * Set page number
+   */
+  const setPage = useCallback((page: number) => {
+    setPagination(prev => ({ ...prev, page }));
+  }, []);
+
+  /**
+   * Set number of items per page
+   */
+  const setPerPage = useCallback((perPage: number) => {
+    setPagination(prev => ({ ...prev, perPage, page: 1 }));
+  }, []);
+
+  /**
+   * Toggle selection of a listing
+   */
+  const toggleSelection = useCallback((id: string) => {
+    setSelected(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(item => item !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  }, []);
+
+  /**
+   * Select all listings
+   */
+  const selectAll = useCallback(() => {
+    if (selected.length === listings.length) {
+      setSelected([]);
+    } else {
+      setSelected(listings.map(listing => listing.id));
+    }
+  }, [listings, selected.length]);
+
+  /**
+   * Clear all selections
+   */
+  const clearSelection = useCallback(() => {
+    setSelected([]);
+  }, []);
+
+  /**
+   * Delete a listing
+   */
+  const deleteListing = useCallback(async (id: string) => {
+    if (!siteSlug) return false;
+    
+    try {
+      const response = await fetch(`/api/sites/${siteSlug}/listings/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to delete listing: ${response.statusText}`);
+      }
+      
+      // Remove from selected list if it was selected
+      setSelected(prev => prev.filter(item => item !== id));
+      
+      // Refresh listings
+      await fetchListings();
+      
+      return true;
+    } catch (err) {
+      console.error('Error deleting listing:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete listing');
+      return false;
+    }
+  }, [siteSlug, fetchListings]);
+
+  /**
+   * Delete multiple listings
+   */
+  const deleteSelected = useCallback(async () => {
+    if (!siteSlug || selected.length === 0) return false;
+    
+    try {
+      let success = true;
+      
+      for (const id of selected) {
+        const response = await fetch(`/api/sites/${siteSlug}/listings/${id}`, {
+          method: 'DELETE',
+        });
+        
+        if (!response.ok) {
+          success = false;
+        }
+      }
+      
+      // Clear selected list
+      setSelected([]);
+      
+      // Refresh listings
+      await fetchListings();
+      
+      return success;
+    } catch (err) {
+      console.error('Error deleting listings:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete listings');
+      return false;
+    }
+  }, [siteSlug, selected, fetchListings]);
+
+  return {
+    listings,
+    loading,
+    error,
+    filters,
+    sort,
+    pagination,
+    selected,
+    setSearchTerm,
+    setStatusFilter,
+    setCategoryFilter,
+    setFeaturedFilter,
+    resetFilters,
+    setSorting,
+    setPage,
+    setPerPage,
+    toggleSelection,
+    selectAll,
+    clearSelection,
+    deleteListing,
+    deleteSelected,
+    fetchListings
+  };
+}

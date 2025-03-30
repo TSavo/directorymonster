@@ -1,3 +1,41 @@
+# DirectoryMonster Next Steps - [2025-03-31 14:50]
+
+## Test Framework Issues
+
+After attempting to run the integration tests, I've identified several critical issues that need to be addressed:
+
+1. **Project Structure Issues**:
+   - The component tests expect a structure that doesn't match the actual codebase
+   - Missing hook files in expected locations (e.g., `components/admin/auth/hooks/useAuth`)
+   - Path resolution problems with the '@/' alias in Jest configuration
+
+2. **Incomplete Source Files**:
+   - The `useListings.ts` hook had incomplete implementation (now fixed)
+   - Other hooks may have similar issues that need to be fixed
+
+3. **Mocking Infrastructure Problems**:
+   - Tests rely on mocking objects that don't exist in the current structure
+   - The test suite needs a more robust mocking approach
+
+## Priority Tasks
+
+### Testing Framework Refactoring
+- [ ] Audit and map the actual project structure to understand component relationships
+- [ ] Create missing hook utility modules that tests depend on
+- [ ] Update Jest configuration to properly handle module aliases
+- [ ] Implement a standardized mocking strategy for tests
+
+### Documentation Update
+- [ ] Document the actual project structure to help with test refactoring
+- [ ] Create a comprehensive test setup guide for the team
+- [ ] Update the component documentation to reflect the current architecture
+
+### Integration Tests Refactoring
+- [ ] Refactor cross-cutting tests to match the actual project structure
+- [ ] Update filtering tests to use proper component imports
+- [ ] Revise listing-category tests with the correct mocks
+- [ ] Refactor site-listing and site-management tests
+
 # DirectoryMonster Next Steps - [2025-03-31 01:50]
 
 ## Currently Completed

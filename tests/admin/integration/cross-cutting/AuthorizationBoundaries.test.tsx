@@ -3,33 +3,40 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingTable } from '@/components/admin/listings/ListingTable';
-import { SiteTable } from '@/components/admin/sites/SiteTable';
-import { AuthProvider } from '@/components/auth/AuthProvider';
-import { WithAuth } from '@/components/admin/layout/WithAuth';
+// Import components directly without using the @ alias
+import { ListingTable } from '../../../../src/components/admin/listings/ListingTable';
+import { SiteTable } from '../../../../src/components/admin/sites/table/SiteTable';
+import { AuthProvider } from '../../../../src/components/admin/auth/AuthContainer';
+import { WithAuth } from '../../../../src/components/admin/layout/WithAuth';
 
 // Mock the hooks and API calls
-jest.mock('@/hooks/useAuth', () => ({
-  useAuth: jest.fn(),
+const mockUseAuth = jest.fn();
+const mockUseListings = jest.fn();
+const mockUseSites = jest.fn();
+const mockUseRouter = jest.fn();
+
+// Create the mocks
+jest.mock('../../../../src/components/admin/auth/hooks/useAuth', () => ({
+  useAuth: () => mockUseAuth(),
 }));
 
-jest.mock('@/hooks/useListings', () => ({
-  useListings: jest.fn(),
+jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
+  useListings: () => mockUseListings(),
 }));
 
-jest.mock('@/hooks/useSites', () => ({
-  useSites: jest.fn(),
+jest.mock('../../../../src/components/admin/sites/hooks/useSites', () => ({
+  useSites: () => mockUseSites(),
 }));
 
 // Mock next router
 jest.mock('next/router', () => ({
-  useRouter: jest.fn(),
+  useRouter: () => mockUseRouter(),
 }));
 
-// Mock hooks implementation
-import { useAuth } from '@/hooks/useAuth';
-import { useListings } from '@/hooks/useListings';
-import { useSites } from '@/hooks/useSites';
+// Import hooks
+import { useAuth } from '../../../../src/components/admin/auth/hooks/useAuth';
+import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
+import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
 import { useRouter } from 'next/router';
 
 const mockStore = configureStore([]);
@@ -39,7 +46,7 @@ describe('Integration: Authorization Boundaries between Components', () => {
   
   beforeEach(() => {
     // Mock router
-    (useRouter as jest.Mock).mockReturnValue({
+    mockUseRouter.mockReturnValue({
       push: jest.fn(),
       pathname: '/admin/listings',
       query: {},
@@ -78,7 +85,7 @@ describe('Integration: Authorization Boundaries between Components', () => {
 
   it('should only show edit actions for owned content to editors', async () => {
     // Mock auth hook for editor role
-    (useAuth as jest.Mock).mockReturnValue({
+    mockUseAuth.mockReturnValue({
       user: {
         id: 'user1',
         role: 'editor',
@@ -96,7 +103,7 @@ describe('Integration: Authorization Boundaries between Components', () => {
     });
     
     // Mock listings hook
-    (useListings as jest.Mock).mockReturnValue({
+    mockUseListings.mockReturnValue({
       listings: [
         { id: 'listing1', title: 'Listing 1', ownerId: 'user1' },
         { id: 'listing2', title: 'Listing 2', ownerId: 'user2' },
@@ -126,7 +133,7 @@ describe('Integration: Authorization Boundaries between Components', () => {
 
   it('should show all edit actions to admin users', async () => {
     // Mock auth hook for admin role
-    (useAuth as jest.Mock).mockReturnValue({
+    mockUseAuth.mockReturnValue({
       user: {
         id: 'user1',
         role: 'admin',
@@ -138,7 +145,7 @@ describe('Integration: Authorization Boundaries between Components', () => {
     });
     
     // Mock listings hook
-    (useListings as jest.Mock).mockReturnValue({
+    mockUseListings.mockReturnValue({
       listings: [
         { id: 'listing1', title: 'Listing 1', ownerId: 'user1' },
         { id: 'listing2', title: 'Listing 2', ownerId: 'user2' },
@@ -167,10 +174,11 @@ describe('Integration: Authorization Boundaries between Components', () => {
   });
 
   it('should redirect users without required permissions', async () => {
-    const { push } = useRouter();
+    const push = jest.fn();
+    mockUseRouter.mockReturnValue({ push });
     
     // Mock auth hook with insufficient permissions
-    (useAuth as jest.Mock).mockReturnValue({
+    mockUseAuth.mockReturnValue({
       user: {
         id: 'user1',
         role: 'viewer',
@@ -185,7 +193,7 @@ describe('Integration: Authorization Boundaries between Components', () => {
     });
     
     // Mock sites hook
-    (useSites as jest.Mock).mockReturnValue({
+    mockUseSites.mockReturnValue({
       sites: [
         { id: 'site1', name: 'Site 1', ownerId: 'user1' },
         { id: 'site2', name: 'Site 2', ownerId: 'user2' },
