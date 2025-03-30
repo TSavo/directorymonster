@@ -1,6 +1,6 @@
 'use client';
 
-export default function CategoryTableSkeleton() {
+export function CategoryTableSkeleton() {
   return (
     <div className="w-full p-4" data-testid="category-table-skeleton">
       <div className="h-8 bg-gray-200 rounded animate-pulse mb-4 w-40"></div>
@@ -27,3 +27,6 @@ export default function CategoryTableSkeleton() {
     </div>
   );
 }
+
+// Also export as default for backward compatibility
+export default CategoryTableSkeleton;

@@ -6,7 +6,7 @@ import { CategoryWithRelations } from '../types';
 /**
  * Mobile-friendly view of categories that replaces the table for smaller screens
  */
-export default function CategoriesMobileView({ 
+export function CategoriesMobileView({ 
   categories, 
   showSiteColumn, 
   onDeleteClick,
@@ -98,3 +98,6 @@ export default function CategoriesMobileView({
     </div>
   );
 }
+
+// Also export as default for backward compatibility
+export default CategoriesMobileView;
