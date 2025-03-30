@@ -1,6 +1,19 @@
 # DirectoryMonster Project Checkpoint
 
-## Current Status - March 30, 2025 (4:00 PM)
+## Current Status - March 30, 2025 (4:15 PM)
+
+### Created Critical Issue for Test Failure Tracking
+
+- Created GitHub issue #37: "[CRITICAL] Fix failing tests systematically"
+- Set priority as critical and assigned to project owner
+- Established a systematic workflow for addressing failures:
+  1. Run failing tests reporter
+  2. Select a group of related failing tests
+  3. Fix the underlying issue
+  4. Verify tests pass
+  5. Commit and create PR
+  6. Repeat until all tests pass
+- Prioritized API tests first due to common failure pattern
 
 ### Enhanced Failing Tests Reporter
 
@@ -117,28 +130,16 @@ Completed work on issue #11: [BUG] fetch API not available in Jest test environm
    - Test failures due to "fetch is not defined" should be resolved
    - Created PR #34 with the solution
 
-### Earlier Work
-
-Successfully addressed failing tests in PR #33 related to issue #9:
-
-1. **Issue #9: Complete Implementation of Incomplete useListings Hook**
-   - Confirmed that the `setSearchTerm` function in `useListings.ts` is properly implemented
-   - Fixed failing tests in PR #33 by:
-     - Restoring fetch mocking configuration in jest.setup.js
-     - Fixing test implementations in search-indexer.test.ts and listing-indexer.test.ts
-   - Added comments to the PR explaining the changes
-
 ## Next Steps
 
-1. Investigate the NextResponse.json error in API tests
-   - The error appears to be related to a mocking issue with the Next.js Response object
-   - Most API test failures involve the same error: `TypeError: Response.json is not a function`
-   - Likely cause is that NextResponse.json is not properly mocked in tests
-   - Create a PR to fix the NextResponse mocking in Jest setup files
+1. Begin working on issue #37 to systematically fix test failures
+   - Start with the NextResponse.json error in API tests
+   - Create a dedicated mock for NextResponse in the Jest setup
+   - Fix tests in groups of related functionality
 
 2. Complete and merge PR #35 to exclude E2E tests from main test command
 
-3. Organize and prioritize failing tests
-   - Focus first on API tests, as these have a common failure pattern
-   - Create a new test mocking configuration/setup for API tests
-   - Address admin component test failures next
+3. Create smaller, focused PRs for each group of test fixes
+   - Keep PRs small and focused on specific test groups or common issues
+   - Document fixes thoroughly for future reference
+   - Update testing documentation with proper mocking examples
