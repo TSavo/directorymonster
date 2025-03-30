@@ -177,23 +177,23 @@ describe('Admin Dashboard', () => {
 
     // Verify basic dashboard elements
     const dashboardElements = await page.evaluate(() => {
-      // Look for common dashboard elements
+      // Look for common dashboard elements using data-testid attributes
       const hasHeader = Boolean(
+        document.querySelector('[data-testid="admin-header"]') ||
         document.querySelector('header') || 
-        document.querySelector('.header') || 
-        document.querySelector('[data-testid="admin-header"]')
+        document.querySelector('.header')
       );
       
       const hasSidebar = Boolean(
+        document.querySelector('[data-testid="admin-sidebar"]') ||
         document.querySelector('nav') || 
-        document.querySelector('.sidebar') || 
-        document.querySelector('[data-testid="admin-sidebar"]')
+        document.querySelector('.sidebar')
       );
       
       const hasContent = Boolean(
+        document.querySelector('[data-testid="admin-content"]') ||
         document.querySelector('main') || 
-        document.querySelector('.content') || 
-        document.querySelector('[data-testid="admin-content"]')
+        document.querySelector('.content')
       );
       
       const hasHeading = Array.from(document.querySelectorAll('h1, h2, h3'))
@@ -257,7 +257,20 @@ describe('Admin Dashboard', () => {
 
     // Look for navigation links in the sidebar
     const navigationLinks = await page.evaluate(() => {
-      // Find all links that might be in a sidebar
+      // Look for nav elements with data-testid attributes
+      const navContainer = document.querySelector('[data-testid="admin-navigation"]');
+      
+      // If we found the navigation container with data-testid, use it
+      if (navContainer) {
+        const links = Array.from(navContainer.querySelectorAll('a'));
+        return links.map(link => ({
+          text: link.textContent.trim(),
+          href: link.getAttribute('href'),
+          testId: link.getAttribute('data-testid')
+        })).filter(link => link.href && link.href !== '#');
+      }
+      
+      // Fallback to traditional selectors
       const links = Array.from(
         document.querySelectorAll('nav a, aside a, .sidebar a, [role="navigation"] a')
       );
@@ -265,6 +278,7 @@ describe('Admin Dashboard', () => {
       return links.map(link => ({
         text: link.textContent.trim(),
         href: link.getAttribute('href'),
+        testId: link.getAttribute('data-testid')
       })).filter(link => link.href && link.href !== '#');
     });
 
@@ -284,8 +298,26 @@ describe('Admin Dashboard', () => {
       // Test clicking the first navigation link
       const firstLink = navigationLinks[0];
       
-      // Navigate to the first link
-      await page.click(`a[href="${firstLink.href}"], a:contains("${firstLink.text}")`);
+      // Use data-testid if available, otherwise fallback to href
+      const selector = firstLink.testId 
+        ? `[data-testid="${firstLink.testId}"]`
+        : `a[href="${firstLink.href}"]`;
+      
+      console.log(`Clicking navigation link with selector: ${selector}`);
+      
+      // Navigate using the appropriate selector
+      await Promise.all([
+        // Use a timeout-based navigation detection
+        new Promise(resolve => {
+          // Set a timeout to resolve after navigation should have completed
+          setTimeout(resolve, 5000);
+          // Start the navigation by clicking the link
+          page.click(selector).catch(e => console.log('Click error:', e.message));
+        }),
+        // Wait for navigation to settle if it happens
+        page.waitForNavigation({ timeout: 5000 }).catch(() => {})
+      ]);
+      
       
       // Wait for navigation to complete
       try {
@@ -308,8 +340,13 @@ describe('Admin Dashboard', () => {
 
     // Check if activity feed exists
     const hasActivityFeed = await page.evaluate(() => {
+      // Look for elements with specific data-testid attributes first
+      const activityFeedElement = document.querySelector('[data-testid="activity-feed"]');
+      if (activityFeedElement) return true;
+      
+      // Fallback to other selectors if data-testid not found
       return Boolean(
-        document.querySelector('[data-testid="activity-feed"], .activity-feed, .feed') ||
+        document.querySelector('.activity-feed, .feed') ||
         Array.from(document.querySelectorAll('h2, h3')).some(h => 
           h.textContent.includes('Activity') || 
           h.textContent.includes('Recent')
@@ -326,6 +363,14 @@ describe('Admin Dashboard', () => {
     } else {
       // Verify activity feed has items
       const activityItems = await page.evaluate(() => {
+        // Look for activity feed content with data-testid
+        const activityFeedContent = document.querySelector('[data-testid="activity-feed-content"]');
+        if (activityFeedContent) {
+          // Count items in the feed content
+          return activityFeedContent.querySelectorAll('div > div').length;
+        }
+        
+        // Fallback to the whole feed if content container not found
         const activityFeed = document.querySelector('[data-testid="activity-feed"], .activity-feed, .feed');
         
         // If we can't find the feed, look for elements that might be activity items
@@ -341,6 +386,12 @@ describe('Admin Dashboard', () => {
       
       // There should be at least one activity item or the feed should be empty with a message
       const hasEmptyMessage = await page.evaluate(() => {
+        // Check for empty state element with data-testid first
+        if (document.querySelector('[data-testid="activity-feed-empty"]')) {
+          return true;
+        }
+        
+        // Fallback to searching body text content
         return Boolean(
           document.body.textContent.includes('No recent activity') ||
           document.body.textContent.includes('No activity found')

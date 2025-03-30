@@ -237,7 +237,14 @@ describe('Homepage', () => {
     });
 
     // Check for common footer elements
-    const copyrightExists = await page.$('[data-testid="copyright"], .copyright, footer *:contains("©")') !== null;
+    const copyrightExists = await page.evaluate(() => {
+      // Look for elements that might contain copyright information
+      const footerText = document.querySelector('footer')?.textContent || '';
+      return footerText.includes('©') || 
+             footerText.includes('Copyright') || 
+             document.querySelector('[data-testid="copyright"]') !== null || 
+             document.querySelector('.copyright') !== null;
+    });
     const footerLinksExist = await page.$('footer a, [data-testid="footer-links"], .footer-links, .footer-nav') !== null;
     
     expect(footerLinksExist).toBe(true);
@@ -355,7 +362,18 @@ describe('Homepage', () => {
     expect(notFoundTextExists).toBe(true);
     
     // Check that there's a way to navigate back to the homepage
-    const homeNavExists = await page.$('a[href="/"], a[href="./"], a:contains("Home"), a:contains("homepage")') !== null;
+    const homeNavExists = await page.evaluate(() => {
+      // Look for links that might navigate to the homepage
+      const links = document.querySelectorAll('a');
+      return Array.from(links).some(link => {
+        const href = link.getAttribute('href');
+        const text = link.textContent.toLowerCase();
+        return (href === '/' || href === './') ||
+               text.includes('home') ||
+               text.includes('homepage') ||
+               link.querySelector('img[alt*="logo"]') !== null;
+      });
+    });
     expect(homeNavExists).toBe(true);
   });
 });

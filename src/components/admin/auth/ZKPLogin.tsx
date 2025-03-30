@@ -204,6 +204,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
             } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
             disabled={isLoading || isDisabled}
             data-testid="username-input"
+            name="username"
           />
           {validationErrors.username && (
             <p className="mt-1 text-sm text-red-600" data-testid="username-error">{validationErrors.username}</p>
@@ -224,6 +225,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
             } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
             disabled={isLoading || isDisabled}
             data-testid="password-input"
+            name="password"
           />
           {validationErrors.password && (
             <p className="mt-1 text-sm text-red-600" data-testid="password-error">{validationErrors.password}</p>

@@ -23,7 +23,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
   };
 
   return (
-    <header className="bg-white shadow-sm z-10">
+    <header className="bg-white shadow-sm z-10" data-testid="admin-header">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">

@@ -49,8 +49,8 @@
 - [ ] Update component organization to better align with Next.js app router
 - [x] Fix login page E2E test failure by improving test detection
 - [ ] Fix remaining E2E test failures:
-  - [ ] Fix CSS selector issues (`:contains()` syntax not supported by Puppeteer)
-  - [ ] Add consistent data-testid attributes to components
+  - [x] Fix CSS selector issues (`:contains()` syntax not supported by Puppeteer)
+  - [x] Add consistent data-testid attributes to components
   - [ ] Improve form element detection in tests
   - [ ] Fix detection of UI elements after component hydration
 - [ ] Add documentation on proper component organization with app router

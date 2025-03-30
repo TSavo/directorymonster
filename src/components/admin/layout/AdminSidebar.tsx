@@ -58,7 +58,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
       />
       
       {/* Sidebar */}
-      <div className={sidebarClasses}>
+      <div className={sidebarClasses} data-testid="admin-sidebar">
         <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 bg-gray-900">
           <Link href="/admin" className="text-white font-bold text-xl">
             DirectoryMonster
@@ -73,7 +73,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
         </div>
         
         <div className="flex-1 flex flex-col overflow-y-auto">
-          <nav className="mt-5 flex-1 px-2 space-y-1">
+          <nav className="mt-5 flex-1 px-2 space-y-1" data-testid="admin-navigation">
             {navigation.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
               
@@ -89,6 +89,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
                   `}
                   aria-current={isActive ? 'page' : undefined}
                   onClick={isOpen ? closeSidebar : undefined}
+                  data-testid={`nav-${item.name.toLowerCase()}`}
                 >
                   <item.icon 
                     className={`

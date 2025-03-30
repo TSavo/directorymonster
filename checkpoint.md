@@ -186,37 +186,56 @@ After examining the Docker logs in detail, I've identified several critical issu
    - Verified all import paths in app/admin/layout.tsx
    - Added clarifying comment for WithAuth import
 
-## Current Focus - [2025-03-30] - Fixing E2E Test Failures
-
-### Test Results [2025-03-30]
-
-1. **First-user.test.js**:
-   - Successfully fixed the login page detection issue
-   - Still failing on the "Shows validation errors for invalid first user form submission" test
-   - Also failing on checking `hasSetupElements` in the "Shows normal login form after first user is created" test
-
-2. **Other E2E Tests**:
-   - Several tests are failing in login.test.js, admin-dashboard.test.js, and homepage.test.js
-   - Common issues across tests:
-     - Login page detection still needs fixes in other tests
-     - Invalid CSS selectors using `:contains()` syntax which is not supported by Puppeteer
-     - Missing UI elements or incorrectly targeted elements
+## Current Focus - [2025-03-30] - Fixing E2E Test CSS Selectors
 
 ### Implemented Fixes
 
-1. **Fixed Login Page Detection**:
-   - Updated `first-user.test.js` to look for multiple text markers on login page
-   - Added `data-testid` attributes to login page components for more reliable detection
-   - Modified the test to check for data-testid attributes as an alternative detection method
+1. **Enhanced Login Page Tests**:
+   - Added proper data-testid attributes to the login page components
+   - Updated tests to use data-testid attributes for more reliable detection
+   - Fixed error where `:contains()` syntax was used (not supported by Puppeteer)
 
-2. **Added Robust Component Identification**:
-   - Added `data-testid="login-page"` to main login container
-   - Added `data-testid="login-heading"` to the page heading
-   - Added `data-testid="login-subheading"` to the subheading
+2. **Improved Admin Components**:
+   - Added data-testid attributes to AdminHeader, AdminSidebar, and AdminLayout components
+   - Added data-testid attributes to navigation items for easier test targeting
+   - Added data-testid attribute to the main content area
 
-3. **Documented Current State**:
-   - Updated checkpoint.md with test results and analysis
-   - Updated NEXTSTEPS.md with more detailed tasks for fixing remaining tests
+3. **Fixed Activity Feed Tests**:
+   - Leveraged existing data-testid attributes in ActivityFeed component
+   - Updated tests to use specific data-testid selectors first, with fallbacks to generic selectors
+   - Fixed empty state detection to use data-testid attributes
+
+4. **Fixed Homepage Tests**:
+   - Updated faulty CSS selectors that used `:contains()` syntax
+   - Replaced with proper DOM traversal using JavaScript
+   - Added more resilient checks for elements like links and headers
+
+### Remaining Issues
+
+Some tests are still failing due to component rendering and hydration issues:
+
+1. **First User Test**: The validation errors test is still failing because form elements can't be found consistently
+
+2. **Admin Dashboard Test**: The dashboard test fails on checking elements because proper hydration hasn't completed
+
+3. **Homepage Test**: Several homepage tests fail because the expected elements aren't yet available during test execution
+
+### Next Steps
+
+1. **Improve Test Reliability**:
+   - Add waiting mechanisms for component hydration in tests
+   - Fix remaining selector issues in all test files
+   - Create utility functions for common test operations
+
+2. **Add More Data-testid Attributes**:
+   - Add data-testid attributes to remaining components
+   - Standardize data-testid naming conventions
+   - Create documentation for testing best practices
+
+3. **Update Test Scripts**:
+   - Update test scripts to include proper timeout settings
+   - Add better error reporting for failing tests
+   - Implement retry mechanisms for flaky tests
 
 ### Next Steps
 
