@@ -8,6 +8,29 @@ import { withTenantAccess } from './withTenantAccess';
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
 
 /**
+ * Helper function to extract user ID from a request's authorization header
+ * Centralizes token parsing and verification logic
+ * 
+ * @param req NextRequest object containing the authorization header
+ * @param secret JWT secret for token verification
+ * @returns User ID from the token or null if invalid/missing
+ */
+function extractUserIdFromRequest(req: NextRequest, secret: string): string | null {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) {
+    return null;
+  }
+  try {
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = verify(token, secret) as JwtPayload;
+    return decoded.userId || null;
+  } catch (error) {
+    console.error('Token verification error:', error);
+    return null;
+  }
+}
+
+/**
  * Enhanced middleware to check if user has the required permission in tenant context
  * Implements section 3.2 of the MULTI_TENANT_ACL_SPEC.md
  * 
@@ -30,14 +53,22 @@ export async function withPermission(
     const tenantAccessResult = await withTenantAccess(req, async (validatedReq) => {
       // Get necessary information from the request
       const tenantId = validatedReq.headers.get('x-tenant-id') as string;
-      const authHeader = validatedReq.headers.get('authorization') as string;
+      const userId = extractUserIdFromRequest(validatedReq, JWT_SECRET);
       
-      // Extract token
-      const token = authHeader.replace('Bearer ', '');
-      
-      // Decode token
-      const decoded = verify(token, JWT_SECRET) as JwtPayload;
-      const userId = decoded.userId;
+      if (!userId) {
+        return NextResponse.json(
+          { 
+            error: 'Permission denied', 
+            message: 'User ID not found in token',
+            details: {
+              resourceType,
+              permission,
+              resourceId
+            }
+          },
+          { status: 403 }
+        );
+      }
       
       // Check if user has the required permission
       const hasPermission = await RoleService.hasPermission(
@@ -108,12 +139,22 @@ export async function withAnyPermission(
     // First validate tenant access
     const tenantAccessResult = await withTenantAccess(req, async (validatedReq) => {
       const tenantId = validatedReq.headers.get('x-tenant-id') as string;
-      const authHeader = validatedReq.headers.get('authorization') as string;
+      const userId = extractUserIdFromRequest(validatedReq, JWT_SECRET);
       
-      // Extract token and user ID
-      const token = authHeader.replace('Bearer ', '');
-      const decoded = verify(token, JWT_SECRET) as JwtPayload;
-      const userId = decoded.userId;
+      if (!userId) {
+        return NextResponse.json(
+          { 
+            error: 'Permission denied', 
+            message: 'User ID not found in token',
+            details: {
+              resourceType,
+              permissions,
+              resourceId
+            }
+          },
+          { status: 403 }
+        );
+      }
       
       // Check each permission
       for (const permission of permissions) {
@@ -187,12 +228,22 @@ export async function withAllPermissions(
     // First validate tenant access
     const tenantAccessResult = await withTenantAccess(req, async (validatedReq) => {
       const tenantId = validatedReq.headers.get('x-tenant-id') as string;
-      const authHeader = validatedReq.headers.get('authorization') as string;
+      const userId = extractUserIdFromRequest(validatedReq, JWT_SECRET);
       
-      // Extract token and user ID
-      const token = authHeader.replace('Bearer ', '');
-      const decoded = verify(token, JWT_SECRET) as JwtPayload;
-      const userId = decoded.userId;
+      if (!userId) {
+        return NextResponse.json(
+          { 
+            error: 'Permission denied', 
+            message: 'User ID not found in token',
+            details: {
+              resourceType,
+              permissions,
+              resourceId
+            }
+          },
+          { status: 403 }
+        );
+      }
       
       // Check each permission
       for (const permission of permissions) {
@@ -330,10 +381,13 @@ export async function withAuditedPermission(
     try {
       // Permission check passed, log the successful access
       const tenantId = validatedReq.headers.get('x-tenant-id') as string;
-      const authHeader = validatedReq.headers.get('authorization') as string;
-      const token = authHeader.replace('Bearer ', '');
-      const decoded = verify(token, JWT_SECRET) as JwtPayload;
-      const userId = decoded.userId;
+      const userId = extractUserIdFromRequest(validatedReq, JWT_SECRET);
+      
+      if (!userId) {
+        console.error('Failed to extract user ID for audit logging');
+        // Still proceed with the handler even if audit logging fails
+        return await handler(validatedReq);
+      }
       
       // Log successful permission access
       await logAuditEvent({
@@ -363,27 +417,22 @@ export async function withAuditedPermission(
     try {
       // Get user and tenant info
       const tenantId = req.headers.get('x-tenant-id');
-      const authHeader = req.headers.get('authorization');
+      const userId = extractUserIdFromRequest(req, JWT_SECRET);
       
-      if (tenantId && authHeader) {
-        const token = authHeader.replace('Bearer ', '');
-        const decoded = verify(token, JWT_SECRET) as JwtPayload;
-        
-        if (decoded?.userId) {
-          // Log permission denied event
-          await logAuditEvent({
-            userId: decoded.userId,
-            tenantId,
-            action: 'denied',
-            resourceType,
-            resourceId,
-            details: {
-              permission,
-              method: req.method,
-              path: new URL(req.url).pathname
-            }
-          });
-        }
+      if (tenantId && userId) {
+        // Log permission denied event
+        await logAuditEvent({
+          userId,
+          tenantId,
+          action: 'denied',
+          resourceType,
+          resourceId,
+          details: {
+            permission,
+            method: req.method,
+            path: new URL(req.url).pathname
+          }
+        });
       }
     } catch (error) {
       console.error('Error logging permission denial:', error);
