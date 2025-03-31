@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { decode, JwtPayload } from 'jsonwebtoken';
+import { verify, JwtPayload } from 'jsonwebtoken';
 import RoleService from '@/lib/role-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 import { withTenantAccess } from './withTenantAccess';
 import AuditService from '@/lib/audit/audit-service';
 import { AuditAction } from '@/lib/audit/types';
+
+// JWT secret should be stored in environment variables
+const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
 
 /**
  * Enhanced middleware to check if user has the required permission in tenant context
@@ -35,7 +38,7 @@ export async function withPermission(
       const token = authHeader.replace('Bearer ', '');
       
       // Decode token
-      const decoded = decode(token) as JwtPayload;
+      const decoded = verify(token, JWT_SECRET) as JwtPayload;
       const userId = decoded.userId;
       
       // Check if user has the required permission
@@ -111,7 +114,7 @@ export async function withAnyPermission(
       
       // Extract token and user ID
       const token = authHeader.replace('Bearer ', '');
-      const decoded = decode(token) as JwtPayload;
+      const decoded = verify(token, JWT_SECRET) as JwtPayload;
       const userId = decoded.userId;
       
       // Check each permission
@@ -190,7 +193,7 @@ export async function withAllPermissions(
       
       // Extract token and user ID
       const token = authHeader.replace('Bearer ', '');
-      const decoded = decode(token) as JwtPayload;
+      const decoded = verify(token, JWT_SECRET) as JwtPayload;
       const userId = decoded.userId;
       
       // Check each permission
@@ -331,7 +334,7 @@ export async function withAuditedPermission(
       const tenantId = validatedReq.headers.get('x-tenant-id') as string;
       const authHeader = validatedReq.headers.get('authorization') as string;
       const token = authHeader.replace('Bearer ', '');
-      const decoded = decode(token) as JwtPayload;
+      const decoded = verify(token, JWT_SECRET) as JwtPayload;
       const userId = decoded.userId;
       
       // Log successful permission access
@@ -366,7 +369,7 @@ export async function withAuditedPermission(
       
       if (tenantId && authHeader) {
         const token = authHeader.replace('Bearer ', '');
-        const decoded = decode(token) as JwtPayload;
+        const decoded = verify(token, JWT_SECRET) as JwtPayload;
         
         if (decoded?.userId) {
           // Log permission denied event
