@@ -8,9 +8,15 @@
 import { RoleService } from '../role-service';
 
 /**
- * Check if a user has any global role across all tenants
- * @param userId User ID to check
- * @returns true if user has any global role
+ * Checks whether the specified user has any global roles across all tenants.
+ *
+ * This asynchronous function scans the tenant-specific role keys associated with the user, retrieves the
+ * roles for each tenant, and checks if any role is marked as global. It returns `true` immediately upon 
+ * finding a global role. If no global roles are found or if an error occurs during the process, the function
+ * returns `false` while logging the error.
+ *
+ * @param userId - The unique identifier of the user to check.
+ * @returns A promise that resolves to `true` if the user has any global role; otherwise, `false`.
  */
 export async function hasGlobalRole(userId: string): Promise<boolean> {
   try {
