@@ -6,6 +6,63 @@ import { useGlobalRoles } from './useGlobalRoles';
 import { UserAssignmentProps } from './types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+// TenantSelector Modal component for role removal
+const TenantSelector = ({ 
+  userId, 
+  onCancel, 
+  onConfirm,
+  isLoading
+}: { 
+  userId: string; 
+  onCancel: () => void; 
+  onConfirm: (tenantId: string) => void;
+  isLoading: boolean;
+}) => {
+  const [selectedTenantId, setSelectedTenantId] = useState('');
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-md max-w-md w-full">
+        <h3 className="text-lg font-medium mb-4">Select Tenant Context</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Please specify which tenant context to remove this role from user <span className="font-medium">{userId}</span>.
+        </p>
+        
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Tenant ID
+          </label>
+          <input
+            type="text"
+            value={selectedTenantId}
+            onChange={(e) => setSelectedTenantId(e.target.value)}
+            placeholder="Enter tenant ID"
+            className="w-full p-2 border border-gray-300 rounded"
+            disabled={isLoading}
+          />
+        </div>
+        
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50"
+            disabled={isLoading}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(selectedTenantId)}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+            disabled={isLoading || !selectedTenantId}
+          >
+            {isLoading ? 'Removing...' : 'Remove Role'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClose }) => {
   const { getUsersWithRole, assignRole, removeRole } = useGlobalRoles();
   const [users, setUsers] = useState<string[]>([]);
@@ -14,6 +71,8 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
   const [newUserId, setNewUserId] = useState('');
   const [tenantId, setTenantId] = useState('');
   const [isAssigning, setIsAssigning] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [userToRemove, setUserToRemove] = useState<string | null>(null);
   
   // Load users with this role
   useEffect(() => {
@@ -64,20 +123,41 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
     }
   };
   
-  // Remove role from a user
-  const handleRemoveRole = async (userId: string) => {
+  // Initiate role removal process
+  const initiateRemoveRole = (userId: string) => {
+    setUserToRemove(userId);
+    setError(null);
+  };
+  
+  // Cancel role removal
+  const cancelRemoveRole = () => {
+    setUserToRemove(null);
+    setIsRemoving(false);
+  };
+  
+  // Complete role removal with specific tenant context
+  const completeRemoveRole = async (tenantId: string) => {
+    if (!userToRemove || !tenantId) {
+      setError('User ID and Tenant ID are required for role removal');
+      return;
+    }
+    
+    setIsRemoving(true);
+    setError(null);
+    
     try {
-      // For the UI, we'll need to specify a tenant context
-      // In a real app, you might need to select which tenant to remove the role from
-      const success = await removeRole(userId, 'system', roleId);
+      const success = await removeRole(userToRemove, tenantId, roleId);
       if (success) {
-        setUsers(users.filter((id) => id !== userId));
+        setUsers(users.filter((id) => id !== userToRemove));
+        setUserToRemove(null);
       } else {
         setError('Failed to remove role');
       }
     } catch (err) {
       setError('Error removing role');
       console.error('Error removing role:', err);
+    } finally {
+      setIsRemoving(false);
     }
   };
   
@@ -122,7 +202,7 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
                     <li key={userId} className="p-3 flex justify-between items-center hover:bg-gray-50">
                       <span className="text-sm font-medium">{userId}</span>
                       <button
-                        onClick={() => handleRemoveRole(userId)}
+                        onClick={() => initiateRemoveRole(userId)}
                         className="text-red-500 hover:text-red-700 text-sm flex items-center"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -178,6 +258,16 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
             </button>
           </div>
         </>
+      )}
+      
+      {/* Tenant Selector Modal for Role Removal */}
+      {userToRemove && (
+        <TenantSelector
+          userId={userToRemove}
+          onCancel={cancelRemoveRole}
+          onConfirm={completeRemoveRole}
+          isLoading={isRemoving}
+        />
       )}
     </div>
   );
