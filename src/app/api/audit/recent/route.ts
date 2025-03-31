@@ -4,12 +4,15 @@ import AuditService from '@/lib/audit/audit-service';
 import { ResourceType } from '@/components/admin/auth/utils/accessControl';
 
 /**
- * GET handler for retrieving recent audit events
- * Requires 'read' permission on 'audit' resource type
- * 
- * Query parameters:
- * - limit: Maximum number of events to return
- * - offset: Offset for pagination
+ * Handles GET requests to retrieve recent audit events.
+ *
+ * This endpoint enforces that the requester has 'read' permission on the 'audit' resource via middleware.
+ * It extracts the tenant identifier from the 'x-tenant-id' header and parses the 'limit' and 'offset' query
+ * parameters from the URL for pagination. The 'limit' defaults to 50 and is capped at 1000 to prevent overly
+ * large queries, while 'offset' defaults to 0 and is constrained to non-negative values.
+ *
+ * On success, it returns a JSON response containing the retrieved audit events. If an error occurs during
+ * processing, the error is logged and a JSON response with a 500 status code is returned.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withPermission(

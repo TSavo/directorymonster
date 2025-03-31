@@ -318,18 +318,19 @@ export async function withAllPermissions(
 }
 
 /**
- * Extracts a resource ID from the request and verifies that the user has the required permission for that resource.
+ * Extracts the resource ID from the request and verifies that the user has the required permission for the associated resource.
  *
- * This middleware attempts to locate the resource ID in the URL query parameters, the request body (for POST/PUT requests),
- * or the URL path. It then delegates the permission check to the standard permission middleware using the extracted ID.
- * If any error occurs during extraction or permission verification, it logs the error and returns a JSON error response with a 500 status.
+ * This middleware looks for the resource ID in the URL query parameters, the JSON body (for POST/PUT requests), and the URL path. If the
+ * header 'x-require-resource-id' is set to true and no resource ID is found, it returns a 400 response. When a resource ID is successfully
+ * extracted, the middleware delegates to the standard permission middleware to perform the permission check. Any unexpected error during
+ * extraction or validation results in a 500 response.
  *
  * @param req - The Next.js request object.
  * @param resourceType - The type of resource being accessed.
- * @param permission - The permission required to perform the operation.
- * @param handler - The function to handle the request if the permission check succeeds.
- * @param idParam - The name of the parameter that holds the resource ID (default is 'id').
- * @returns The response from the permission check or an error response if validation fails.
+ * @param permission - The permission required to access the resource.
+ * @param handler - The asynchronous handler invoked if the permission check succeeds.
+ * @param idParam - The name of the parameter used to extract the resource ID.
+ * @returns A NextResponse from the permission check or an error response if extraction or validation fails.
  */
 export async function withResourcePermission(
   req: NextRequest,
@@ -489,19 +490,20 @@ export async function withAuditedPermission(
 }
 
 /**
- * Helper function to log audit events using the AuditService
+ * Logs a permission audit event using AuditService.
  *
- * This function uses the AuditService to log permission-related actions.
- * It maps simple action strings to AuditAction enum values and calls the
- * appropriate AuditService method to record the event.
+ * This function maps the provided action descriptor from the event to the corresponding
+ * {@link AuditAction} enum value and records the audit event via AuditService. If an error
+ * occurs during logging, it is caught and logged without interrupting the application flow.
  *
- * @param event - Object containing audit event properties:
- *   - userId: Identifier of the user performing the action.
- *   - tenantId: Identifier of the tenant.
- *   - action: Description of the action taken ('access' or 'denied').
+ * @param event - The audit event details:
+ *   - userId: The identifier of the user performing the action.
+ *   - tenantId: The tenant identifier.
+ *   - action: Descriptor of the action, expected to be either 'access' (for granted)
+ *     or 'denied' (for denied access). Defaults to granted if unrecognized.
  *   - resourceType: The type of resource involved.
- *   - resourceId (optional): Identifier of the specific resource, when relevant.
- *   - details: Additional contextual information for the audit.
+ *   - resourceId (optional): The identifier of the specific resource, if applicable.
+ *   - details: Additional contextual information for the audit event, including the permission detail.
  */
 async function logAuditEvent(event: {
   userId: string;
