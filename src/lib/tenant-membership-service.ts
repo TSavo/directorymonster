@@ -12,6 +12,35 @@ import { User } from '@/components/admin/users/hooks/useUsers';
 
 export class TenantMembershipService {
   /**
+   * Check if a user has permission for a resource in a tenant
+   * Convenience method that uses the hasPermissionInTenant function
+   * 
+   * @param userId User ID to check
+   * @param tenantId Tenant ID to check in
+   * @param resourceType Type of resource
+   * @param permission Permission to check
+   * @param resourceId Optional specific resource ID
+   * @returns true if user has permission, false otherwise
+   */
+  static async checkPermission(
+    userId: string,
+    tenantId: string,
+    resourceType: string,
+    permission: string,
+    resourceId?: string
+  ): Promise<boolean> {
+    // Import here to avoid circular dependency
+    const { hasPermissionInTenant } = await import('@/components/admin/auth/utils/tenantAccessControl');
+    
+    return hasPermissionInTenant(
+      userId,
+      tenantId,
+      resourceType as any, // Type conversion since we can't import the exact types here
+      permission as any,
+      resourceId
+    );
+  }
+  /**
    * Check if a user is a member of a tenant
    * @param userId User ID
    * @param tenantId Tenant ID
