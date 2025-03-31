@@ -32,12 +32,30 @@ const customJestConfig = {
     '^./ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
     '^@/ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
   },
-  collectCoverage: true,
+  // Disable coverage collection by default
+  collectCoverage: false,
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!**/node_modules/**',
     '!**/.next/**',
+  ],
+  // Reduce verbosity in test output
+  verbose: false,
+  silent: true,  // Suppress console output completely
+  maxWorkers: '50%',
+  errorOnDeprecated: false,
+  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  // Use silent reporter with extreme minimization options
+  reporters: [
+    ['jest-silent-reporter', {
+      useDots: true,
+      showPaths: false,
+      showWarnings: false,
+      height: 1,  // Minimize console height usage
+      suppressErrors: false, // Still show errors but we'll reduce their verbosity
+      showSummary: false // Don't show the test summary at the end
+    }]
   ],
 };
 
