@@ -1,4 +1,6 @@
 import { redis, kv } from '@/lib/redis-client';
+import { KeyNamespaceService } from '@/lib/key-namespace-service';
+import crypto from 'crypto';
 
 // Define tenant configuration type
 export interface TenantConfig {
@@ -59,6 +61,12 @@ export class TenantService {
    */
   static async getTenantById(id: string): Promise<TenantConfig | null> {
     try {
+      // Validate tenant ID format for security (part of Tenant ID Protection)
+      if (!KeyNamespaceService.isValidTenantId(id) && id !== 'default') {
+        console.warn(`Invalid tenant ID format: ${id}`);
+        return null;
+      }
+      
       return await kv.get<TenantConfig>(`${TENANT_PREFIX}${id}`);
     } catch (error) {
       console.error(`Error getting tenant with ID ${id}:`, error);
@@ -100,8 +108,8 @@ export class TenantService {
     config: Omit<TenantConfig, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<TenantConfig> {
     try {
-      // Generate a new ID
-      const id = crypto.randomUUID();
+      // Generate a secure UUID for tenant ID
+      const id = KeyNamespaceService.generateSecureTenantId();
       
       // Normalize hostnames
       const normalizedHostnames = config.hostnames.map(h => 

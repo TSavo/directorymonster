@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach, afterEach } from '@jest/globals';
 import { TenantService, TenantConfig } from '@/lib/tenant';
 import { redis, clearUsers } from '@/lib/redis-client';
+import { KeyNamespaceService } from '@/lib/key-namespace-service';
 
 describe('TenantService', () => {
   // Clear Redis before each test
@@ -35,6 +36,8 @@ describe('TenantService', () => {
     
     expect(tenant).toBeDefined();
     expect(tenant.id).toBeDefined();
+    // Verify the ID is a valid UUID
+    expect(KeyNamespaceService.isValidTenantId(tenant.id)).toBe(true);
     expect(tenant.slug).toBe('test-tenant');
     expect(tenant.name).toBe('Test Tenant');
     expect(tenant.hostnames).toContain('test.example.com');
@@ -189,5 +192,34 @@ describe('TenantService', () => {
     };
     
     await expect(createDuplicate()).rejects.toThrow();
+  });
+
+  it('should validate tenant ID format', async () => {
+    const tenant = await createTestTenant();
+    
+    // Verify valid UUID passes validation
+    expect(KeyNamespaceService.isValidTenantId(tenant.id)).toBe(true);
+    
+    // Test invalid formats
+    expect(KeyNamespaceService.isValidTenantId('invalid-id')).toBe(false);
+    expect(KeyNamespaceService.isValidTenantId('123456')).toBe(false);
+    expect(KeyNamespaceService.isValidTenantId('')).toBe(false);
+    
+    // Test with malicious input
+    expect(KeyNamespaceService.isValidTenantId('../../etc/passwd')).toBe(false);
+    expect(KeyNamespaceService.isValidTenantId('tenant:123;drop table users;')).toBe(false);
+  });
+
+  it('should reject lookups with invalid tenant IDs', async () => {
+    // Try to retrieve a tenant with an invalid ID format
+    const invalidIdResult = await TenantService.getTenantById('invalid-id-format');
+    expect(invalidIdResult).toBeNull();
+    
+    // Special case: 'default' should be allowed despite not being a UUID
+    const defaultTenant = await TenantService.createDefaultTenant();
+    if (defaultTenant.id === 'default') {
+      const retrievedDefault = await TenantService.getTenantById('default');
+      expect(retrievedDefault).not.toBeNull();
+    }
   });
 });

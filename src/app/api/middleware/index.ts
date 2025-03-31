@@ -10,3 +10,8 @@ export {
   withResourcePermission,
   withAuditedPermission
 } from './withPermission';
+export {
+  withSecureTenantContext,
+  withSecureTenantPermission,
+  TenantContext
+} from './secureTenantContext';

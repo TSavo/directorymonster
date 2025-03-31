@@ -167,13 +167,21 @@ Or use the `?hostname=` query parameter during development.
 
 ## Documentation
 
+The project documentation is organized into implementation guides and specifications:
+
+### Documentation Index
+- [Documentation Index](DOCUMENTATION_INDEX.md) - Complete index of all documentation
+
+### Implementation Guides
 - [Docker Development](DOCKER-DEV.md)
-- [Component Guidelines](docs/components.md)
 - [Testing Guide](docs/TESTING_GUIDE.md)
-- [Mocking Specification](docs/MOCKING_SPECIFICATION.md)
-- [URL Utilities](docs/url-utilities.md)
-- [Data Seeding](docs/seeding.md)
+- [Mocking Guide](docs/MOCKING_GUIDE.md)
 - [Tenant Security Guide](docs/TENANT_SECURITY_GUIDE.md)
+
+### Specifications
+- [Testing Specification](specs/TESTING_SPEC.md)
+- [Cross-Tenant Security Specification](specs/CROSS_TENANT_SECURITY_SPEC.md)
+- [Multi-Tenant ACL Specification](specs/MULTI_TENANT_ACL_SPEC.md)
 
 ## Troubleshooting
 
