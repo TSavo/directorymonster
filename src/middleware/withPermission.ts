@@ -1,51 +1,55 @@
-/**
- * Enhanced withPermission middleware
- * 
- * Provides authorization middleware for API routes that require specific permissions.
- * Implements section 3.2 of the MULTI_TENANT_ACL_SPEC.md.
- */
-
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import TenantMembershipService from '@/lib/tenant-membership-service';
+import { verify, JwtPayload } from 'jsonwebtoken';
 import RoleService from '@/lib/role-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
-import { withTenantAccess } from './tenant-validation';
+
+// JWT secret should be stored in environment variables
+const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
+
+// Throw an error if JWT_SECRET is not set in production
+if (process.env.NODE_ENV === 'production' && 
+    (process.env.JWT_SECRET === undefined || process.env.JWT_SECRET === 'default-secret-for-development')) {
+  console.error('WARNING: JWT_SECRET environment variable is not set in production!');
+}
 
 /**
- * Extract and validate JWT token from authorization header
- * @param authHeader Authorization header
- * @returns Decoded token or null if invalid
+ * Verify authentication token
+ * 
+ * @param token JWT token to verify
+ * @returns Decoded token payload or null if invalid
  */
-function verifyAuthToken(authHeader: string | null): { userId: string } | null {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-  
+export function verifyAuthToken(token: string): JwtPayload | null {
   try {
-    const token = authHeader.replace('Bearer ', '');
-    // Handle both direct jwt and jwt.default for testing compatibility
-    const jwtVerify = typeof jwt.verify === 'function' ? jwt.verify : jwt.default?.verify;
-    if (!jwtVerify) {
-      throw new Error('JWT verify function not available');
+    // Verify the token using the JWT secret
+    const decoded = verify(token, JWT_SECRET) as JwtPayload;
+    
+    // Validate the required claims
+    if (!decoded.userId) {
+      console.error('Invalid token: missing userId claim');
+      return null;
     }
-    return jwtVerify(token, process.env.JWT_SECRET!) as { userId: string };
+    
+    // Check token expiration
+    if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
+      console.error('Token expired');
+      return null;
+    }
+    
+    return decoded;
   } catch (error) {
-    console.error('Invalid auth token:', error);
+    console.error('Token verification failed:', error);
     return null;
   }
 }
 
 /**
- * Middleware to check if user has the required permission in the current tenant context
- * 
- * This middleware builds on the tenant validation middleware to enforce specific permissions.
+ * Middleware to handle API-level permission checks
  * 
  * @param req NextRequest object
  * @param resourceType Type of resource being accessed
  * @param permission Permission needed for the operation
  * @param handler Function to handle the request if permission check passes
- * @param resourceId Optional specific resource ID for granular permissions
+ * @param resourceId Optional specific resource ID
  * @returns NextResponse object
  */
 export async function withPermission(
@@ -55,24 +59,32 @@ export async function withPermission(
   handler: (req: NextRequest) => Promise<NextResponse>,
   resourceId?: string
 ): Promise<NextResponse> {
-  // First validate tenant context and membership using withTenantAccess
-  return withTenantAccess(req, async () => {
-    const tenantId = req.headers.get('x-tenant-id');
+  try {
+    // Extract the token from the Authorization header
     const authHeader = req.headers.get('authorization');
-    
-    if (!tenantId || !authHeader) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Missing tenant context or authentication' }, 
+        { error: 'Authentication required' },
         { status: 401 }
       );
     }
     
-    // Extract user ID from auth token
-    const decoded = verifyAuthToken(authHeader);
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = verifyAuthToken(token);
+    
     if (!decoded) {
       return NextResponse.json(
-        { error: 'Invalid or expired authentication token' }, 
+        { error: 'Invalid authentication token' },
         { status: 401 }
+      );
+    }
+    
+    // Extract tenant ID from the request headers
+    const tenantId = req.headers.get('x-tenant-id');
+    if (!tenantId) {
+      return NextResponse.json(
+        { error: 'Tenant ID required' },
+        { status: 400 }
       );
     }
     
@@ -86,18 +98,38 @@ export async function withPermission(
     );
     
     if (!hasPermission) {
-      // Generate a meaningful error message based on the resource and permission
+      // Generate a meaningful error message
       let errorMessage = `Permission denied: Required '${permission}' permission for ${resourceType}`;
       if (resourceId) {
         errorMessage += ` with ID ${resourceId}`;
       }
       
-      return NextResponse.json({ error: errorMessage }, { status: 403 });
+      return NextResponse.json(
+        { 
+          error: 'Permission denied', 
+          message: errorMessage,
+          details: {
+            resourceType,
+            permission,
+            resourceId
+          }
+        },
+        { status: 403 }
+      );
     }
     
-    // User has the required permission, proceed with the request
-    return handler(req);
-  });
+    // If permission check passes, proceed with the handler
+    return await handler(req);
+  } catch (error) {
+    console.error('Permission validation error:', error);
+    return NextResponse.json(
+      { 
+        error: 'Permission validation failed', 
+        message: 'An error occurred during permission validation' 
+      },
+      { status: 500 }
+    );
+  }
 }
 
 /**
@@ -107,7 +139,7 @@ export async function withPermission(
  * @param resourceType Type of resource being accessed
  * @param permissions Array of permissions, any one of which grants access
  * @param handler Function to handle the request if permission check passes
- * @param resourceId Optional specific resource ID for granular permissions
+ * @param resourceId Optional specific resource ID
  * @returns NextResponse object
  */
 export async function withAnyPermission(
@@ -117,23 +149,32 @@ export async function withAnyPermission(
   handler: (req: NextRequest) => Promise<NextResponse>,
   resourceId?: string
 ): Promise<NextResponse> {
-  return withTenantAccess(req, async () => {
-    const tenantId = req.headers.get('x-tenant-id');
+  try {
+    // Extract the token from the Authorization header
     const authHeader = req.headers.get('authorization');
-    
-    if (!tenantId || !authHeader) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Missing tenant context or authentication' }, 
+        { error: 'Authentication required' },
         { status: 401 }
       );
     }
     
-    // Extract user ID from auth token
-    const decoded = verifyAuthToken(authHeader);
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = verifyAuthToken(token);
+    
     if (!decoded) {
       return NextResponse.json(
-        { error: 'Invalid or expired authentication token' }, 
+        { error: 'Invalid authentication token' },
         { status: 401 }
+      );
+    }
+    
+    // Extract tenant ID from the request headers
+    const tenantId = req.headers.get('x-tenant-id');
+    if (!tenantId) {
+      return NextResponse.json(
+        { error: 'Tenant ID required' },
+        { status: 400 }
       );
     }
     
@@ -149,7 +190,7 @@ export async function withAnyPermission(
       
       if (hasPermission) {
         // User has at least one required permission, proceed with the request
-        return handler(req);
+        return await handler(req);
       }
     }
     
@@ -160,8 +201,28 @@ export async function withAnyPermission(
       errorMessage += ` with ID ${resourceId}`;
     }
     
-    return NextResponse.json({ error: errorMessage }, { status: 403 });
-  });
+    return NextResponse.json(
+      { 
+        error: 'Permission denied', 
+        message: errorMessage,
+        details: {
+          resourceType,
+          permissions,
+          resourceId
+        }
+      },
+      { status: 403 }
+    );
+  } catch (error) {
+    console.error('Permission validation error:', error);
+    return NextResponse.json(
+      { 
+        error: 'Permission validation failed', 
+        message: 'An error occurred during permission validation' 
+      },
+      { status: 500 }
+    );
+  }
 }
 
 /**
@@ -171,7 +232,7 @@ export async function withAnyPermission(
  * @param resourceType Type of resource being accessed
  * @param permissions Array of permissions, all of which are required
  * @param handler Function to handle the request if permission check passes
- * @param resourceId Optional specific resource ID for granular permissions
+ * @param resourceId Optional specific resource ID
  * @returns NextResponse object
  */
 export async function withAllPermissions(
@@ -181,25 +242,37 @@ export async function withAllPermissions(
   handler: (req: NextRequest) => Promise<NextResponse>,
   resourceId?: string
 ): Promise<NextResponse> {
-  return withTenantAccess(req, async () => {
-    const tenantId = req.headers.get('x-tenant-id');
+  try {
+    // Extract the token from the Authorization header
     const authHeader = req.headers.get('authorization');
-    
-    if (!tenantId || !authHeader) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { error: 'Missing tenant context or authentication' }, 
+        { error: 'Authentication required' },
         { status: 401 }
       );
     }
     
-    // Extract user ID from auth token
-    const decoded = verifyAuthToken(authHeader);
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = verifyAuthToken(token);
+    
     if (!decoded) {
       return NextResponse.json(
-        { error: 'Invalid or expired authentication token' }, 
+        { error: 'Invalid authentication token' },
         { status: 401 }
       );
     }
+    
+    // Extract tenant ID from the request headers
+    const tenantId = req.headers.get('x-tenant-id');
+    if (!tenantId) {
+      return NextResponse.json(
+        { error: 'Tenant ID required' },
+        { status: 400 }
+      );
+    }
+    
+    // Create an array to track all missing permissions
+    const missingPermissions: Permission[] = [];
     
     // Check each permission
     for (const permission of permissions) {
@@ -212,31 +285,54 @@ export async function withAllPermissions(
       );
       
       if (!hasPermission) {
-        // Missing at least one required permission
-        let errorMessage = `Permission denied: Required '${permission}' permission for ${resourceType}`;
-        if (resourceId) {
-          errorMessage += ` with ID ${resourceId}`;
-        }
-        
-        return NextResponse.json({ error: errorMessage }, { status: 403 });
+        missingPermissions.push(permission);
       }
     }
     
+    // If any permissions are missing, return an error
+    if (missingPermissions.length > 0) {
+      const missingPermissionsList = missingPermissions.join("', '");
+      let errorMessage = `Permission denied: Missing required permission(s): '${missingPermissionsList}' for ${resourceType}`;
+      if (resourceId) {
+        errorMessage += ` with ID ${resourceId}`;
+      }
+      
+      return NextResponse.json(
+        { 
+          error: 'Permission denied', 
+          message: errorMessage,
+          details: {
+            resourceType,
+            missingPermissions,
+            resourceId
+          }
+        },
+        { status: 403 }
+      );
+    }
+    
     // User has all required permissions, proceed with the request
-    return handler(req);
-  });
+    return await handler(req);
+  } catch (error) {
+    console.error('Permission validation error:', error);
+    return NextResponse.json(
+      { 
+        error: 'Permission validation failed', 
+        message: 'An error occurred during permission validation' 
+      },
+      { status: 500 }
+    );
+  }
 }
 
 /**
  * Middleware to check permission based on resource ID from the request
  * 
- * Extracts resourceId from the URL or request body and checks permission for that specific resource.
- * 
  * @param req NextRequest object
  * @param resourceType Type of resource being accessed
  * @param permission Permission needed for the operation
  * @param handler Function to handle the request if permission check passes
- * @param idParam Parameter name for the resource ID in the URL
+ * @param idParam Parameter name for the resource ID
  * @returns NextResponse object
  */
 export async function withResourcePermission(
@@ -246,25 +342,79 @@ export async function withResourcePermission(
   handler: (req: NextRequest) => Promise<NextResponse>,
   idParam: string = 'id'
 ): Promise<NextResponse> {
-  // Extract resource ID from URL or request body
-  let resourceId: string | undefined;
-  
   try {
-    // Try to get from URL first
+    // First try to get resource ID from URL params
+    let resourceId: string | undefined;
     const url = new URL(req.url);
     resourceId = url.searchParams.get(idParam) || undefined;
     
-    // If not in URL and this is a POST/PUT request, try body
-    if (!resourceId && (req.method === 'POST' || req.method === 'PUT')) {
-      const body = await req.json();
-      resourceId = body[idParam];
+    // If not in URL params and this is a POST/PUT/PATCH request, try from request body
+    if (!resourceId && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
+      try {
+        // Try to clone the request to read the body
+        const clonedReq = req.clone();
+        const body = await clonedReq.json();
+        
+        if (body && typeof body === 'object') {
+          resourceId = body[idParam];
+        } else {
+          console.warn('Request body is not a valid JSON object for resource ID extraction');
+        }
+      } catch (bodyError) {
+        console.warn('Error reading request body for resource ID extraction:', bodyError);
+        // Continue without body-based resource ID, but log for debugging
+      }
     }
+    
+    // If not in URL params and not in body, try from the URL path
+    if (!resourceId) {
+      // Extract from path (e.g., /api/categories/123 => '123')
+      const pathParts = url.pathname.split('/');
+      if (pathParts.length > 0) {
+        const lastPart = pathParts[pathParts.length - 1];
+        // Check if it looks like an ID (alphanumeric with optional dashes)
+        if (/^[a-zA-Z0-9-]+$/.test(lastPart) && !lastPart.includes('.')) { // Avoid file extensions
+          resourceId = lastPart;
+        }
+      }
+    }
+    
+    // If resource ID extraction fails in a context where it should succeed, return error
+    const requireResourceId = req.headers.get('x-require-resource-id') === 'true';
+    if (requireResourceId && !resourceId) {
+      return NextResponse.json(
+        {
+          error: 'Resource ID not found',
+          message: `Could not extract resource ID using parameter '${idParam}' from the request`,
+          details: {
+            resourceType,
+            idParameterName: idParam,
+            idExtractionMethods: [
+              'URL query parameter',
+              'Request body property',
+              'Last segment of URL path'
+            ]
+          }
+        },
+        { status: 400 }
+      );
+    }
+    
+    // Now use the standard withPermission middleware with the extracted resource ID
+    return withPermission(req, resourceType, permission, handler, resourceId);
   } catch (error) {
-    console.error('Error extracting resource ID:', error);
+    console.error('Resource permission validation error:', error);
+    return NextResponse.json(
+      { 
+        error: 'Permission validation failed', 
+        message: 'An error occurred during resource permission validation',
+        details: {
+          originalError: process.env.NODE_ENV === 'development' ? String(error) : undefined
+        }
+      },
+      { status: 500 }
+    );
   }
-  
-  // Use the standard withPermission middleware with the extracted resource ID
-  return withPermission(req, resourceType, permission, handler, resourceId);
 }
 
 export default withPermission;

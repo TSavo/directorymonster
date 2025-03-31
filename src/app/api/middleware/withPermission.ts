@@ -37,7 +37,7 @@ export async function withPermission(
       // Extract token
       const token = authHeader.replace('Bearer ', '');
       
-      // Decode token
+      // Verify token
       const decoded = verify(token, JWT_SECRET) as JwtPayload;
       const userId = decoded.userId;
       
@@ -279,7 +279,8 @@ export async function withResourcePermission(
         const body = await clonedReq.json();
         resourceId = body[idParam];
       } catch (bodyError) {
-        console.error('Error reading request body:', bodyError);
+        console.warn('Error reading request body for resource ID extraction:', bodyError);
+        // Continue without body-based resource ID
       }
     }
     
@@ -294,6 +295,22 @@ export async function withResourcePermission(
           resourceId = lastPart;
         }
       }
+    }
+    
+    // If resource ID extraction fails in a context where it should succeed, return error
+    // This check helps distinguish between "no resource ID specified" vs. "resource ID extraction failed"
+    if (!resourceId && req.headers.get('x-require-resource-id') === 'true') {
+      return NextResponse.json(
+        {
+          error: 'Resource ID not found',
+          message: `Could not extract resource ID using parameter '${idParam}' from the request`,
+          details: {
+            resourceType,
+            idParameterName: idParam
+          }
+        },
+        { status: 400 }
+      );
     }
     
     // Now use the standard withPermission middleware with the extracted resource ID
@@ -420,7 +437,7 @@ async function logAuditEvent(event: {
     await AuditService.logPermissionEvent(
       event.userId,
       event.tenantId,
-      event.resourceType as any, // Cast to ResourceType
+      event.resourceType as ResourceType,
       event.details.permission,
       success,
       event.resourceId,

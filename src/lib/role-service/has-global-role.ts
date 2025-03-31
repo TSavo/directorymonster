@@ -1,33 +1,42 @@
-import RoleService from '../role-service';
+/**
+ * Check if a user has any global role
+ * Global roles can perform cross-tenant operations
+ * 
+ * This is extracted from RoleService for better modularity
+ */
+
+import { RoleService } from '../role-service';
 
 /**
- * Checks if a user has any global role
- * Global roles are roles with isGlobal=true property
- * 
+ * Check if a user has any global role across all tenants
  * @param userId User ID to check
- * @returns Promise<boolean> True if user has any global role
+ * @returns true if user has any global role
  */
 export async function hasGlobalRole(userId: string): Promise<boolean> {
   try {
-    // We need to check all tenants since global roles can exist in any tenant
-    // This is a simple implementation - in production, you might want to
-    // have a separate index for global roles to avoid this scan
+    // Look for any tenant where the user has roles
+    const allRolesPattern = `user:roles:${userId}:*`;
+    const roleKeys = await RoleService.scanKeys(allRolesPattern);
     
-    // For now, we'll check the 'global' special tenant (if it exists)
-    const globalTenantRoles = await RoleService.getUserRoles(userId, 'global');
-    
-    // Check if any role is a global role
-    for (const role of globalTenantRoles) {
-      if (role.isGlobal) {
+    // Check each tenant for the user's roles
+    for (const key of roleKeys) {
+      // Extract tenant ID from the key (format: user:roles:{userId}:{tenantId})
+      const tenantId = key.split(':')[3];
+      
+      // Get roles for this user in this tenant
+      const roles = await RoleService.getUserRoles(userId, tenantId);
+      
+      // Check if any role is global
+      if (roles.some(role => role.isGlobal)) {
         return true;
       }
     }
     
     return false;
   } catch (error) {
-    console.error(`Error checking if user ${userId} has global role:`, error);
+    console.error(`Error checking global roles for user ${userId}:`, error);
     return false;
   }
 }
 
-export default hasGlobalRole;
+// Only export as named export, avoiding default export for consistency

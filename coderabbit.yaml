@@ -40,9 +40,6 @@ review:
   # Path filters
   path_filters:
     - include: "src/**"
-    - exclude: "**/*.test.{ts,tsx,js,jsx}" # Exclude test files
-    - exclude: "**/__tests__/**" # Exclude test directories
-    - exclude: "**/__mocks__/**" # Exclude mock directories
     - exclude: "src/stories/**" # Exclude Storybook stories
     - exclude: "**/*.d.ts" # Exclude TypeScript declaration files
     - exclude: "node_modules/**" # Exclude node_modules

@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { decode, JwtPayload } from 'jsonwebtoken';
+import { verify, JwtPayload } from 'jsonwebtoken';
 import { withPermission } from '../middleware/withPermission';
 import AuditService from '@/lib/audit/audit-service';
 import { AuditAction, AuditSeverity } from '@/lib/audit/types';
 import RoleService from '@/lib/role-service';
+import { ResourceType } from '@/components/admin/auth/utils/accessControl';
+
+// JWT secret should be stored in environment variables
+const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
 
 /**
  * GET handler for retrieving audit logs
@@ -24,7 +28,7 @@ import RoleService from '@/lib/role-service';
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withPermission(
     req,
-    'audit' as any, // 'audit' is not in ResourceType, but we use it for permission checking
+    'audit', // Now properly defined in ResourceType
     'read',
     async (validatedReq) => {
       try {
@@ -32,7 +36,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const tenantId = validatedReq.headers.get('x-tenant-id') as string;
         const authHeader = validatedReq.headers.get('authorization') as string;
         const token = authHeader.replace('Bearer ', '');
-        const decoded = decode(token) as JwtPayload;
+        const decoded = verify(token, JWT_SECRET) as JwtPayload;
         const userId = decoded.userId;
         
         // Parse query parameters
@@ -68,18 +72,25 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           successParam === 'true' : 
           undefined;
         
+        // Validate and apply limits for pagination to prevent unbounded queries
+        const parsedLimit = limitParam ? parseInt(limitParam, 10) : 50;
+        const limit = isNaN(parsedLimit) ? 50 : Math.min(parsedLimit, 1000); // Maximum 1000 results
+        
+        const parsedOffset = offsetParam ? parseInt(offsetParam, 10) : 0;
+        const offset = isNaN(parsedOffset) ? 0 : Math.max(parsedOffset, 0); // Non-negative offset
+        
         // Build query object
         const query = {
           tenantId: isGlobalAdmin ? undefined : tenantId, // Global admins can see all tenants
           userId: userIdParam || undefined,
           action,
           severity,
-          resourceType: resourceTypeParam as any || undefined,
+          resourceType: resourceTypeParam as ResourceType || undefined,
           resourceId: resourceIdParam || undefined,
           startDate: startDateParam || undefined,
           endDate: endDateParam || undefined,
-          limit: limitParam ? parseInt(limitParam) : 50,
-          offset: offsetParam ? parseInt(offsetParam) : 0,
+          limit,
+          offset,
           success
         };
         
@@ -109,7 +120,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 export async function POST(req: NextRequest): Promise<NextResponse> {
   return withPermission(
     req,
-    'audit' as any,
+    'audit',
     'create',
     async (validatedReq) => {
       try {
@@ -117,11 +128,27 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const tenantId = validatedReq.headers.get('x-tenant-id') as string;
         const authHeader = validatedReq.headers.get('authorization') as string;
         const token = authHeader.replace('Bearer ', '');
-        const decoded = decode(token) as JwtPayload;
+        const decoded = verify(token, JWT_SECRET) as JwtPayload;
         const userId = decoded.userId;
         
         // Parse request body
-        const body = await validatedReq.json();
+        let body;
+        try {
+          body = await validatedReq.json();
+        } catch (error) {
+          return NextResponse.json(
+            { error: 'Invalid JSON in request body' },
+            { status: 400 }
+          );
+        }
+        
+        // Validate required fields
+        if (!body.action) {
+          return NextResponse.json(
+            { error: 'Missing required field: action' },
+            { status: 400 }
+          );
+        }
         
         // Check if user is a global admin (can create cross-tenant events)
         const isGlobalAdmin = await RoleService.hasGlobalRole(userId);

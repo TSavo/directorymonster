@@ -1,42 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { decode, JwtPayload } from 'jsonwebtoken';
 import { withPermission } from '../../middleware/withPermission';
 import AuditService from '@/lib/audit/audit-service';
-import RoleService from '@/lib/role-service';
+import { ResourceType } from '@/components/admin/auth/utils/accessControl';
 
 /**
- * GET handler for retrieving recent audit logs for the current tenant
- * Simplified endpoint that returns the most recent events, useful for dashboards
+ * GET handler for retrieving recent audit events
  * Requires 'read' permission on 'audit' resource type
  * 
  * Query parameters:
- * - limit: Maximum number of results to return (default: 20)
- * - offset: Offset for pagination (default: 0)
+ * - limit: Maximum number of events to return
+ * - offset: Offset for pagination
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withPermission(
     req,
-    'audit' as any,
+    'audit',
     'read',
     async (validatedReq) => {
       try {
-        // Get tenant context and user info
+        // Get tenant ID from request
         const tenantId = validatedReq.headers.get('x-tenant-id') as string;
-        const authHeader = validatedReq.headers.get('authorization') as string;
-        const token = authHeader.replace('Bearer ', '');
-        const decoded = decode(token) as JwtPayload;
-        const userId = decoded.userId;
         
-        // Parse query parameters
+        // Parse query parameters for pagination
         const url = new URL(validatedReq.url);
         const limitParam = url.searchParams.get('limit');
         const offsetParam = url.searchParams.get('offset');
         
-        const limit = limitParam ? parseInt(limitParam) : 20;
-        const offset = offsetParam ? parseInt(offsetParam) : 0;
+        // Validate and apply limits for pagination to prevent unbounded queries
+        const parsedLimit = limitParam ? parseInt(limitParam, 10) : 50;
+        const limit = isNaN(parsedLimit) ? 50 : Math.min(parsedLimit, 1000); // Maximum 1000 results
         
-        // Check if user is a global admin
-        const isGlobalAdmin = await RoleService.hasGlobalRole(userId);
+        const parsedOffset = offsetParam ? parseInt(offsetParam, 10) : 0;
+        const offset = isNaN(parsedOffset) ? 0 : Math.max(parsedOffset, 0); // Non-negative offset
         
         // Get recent events
         const events = await AuditService.getRecentEvents(
@@ -47,9 +42,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         
         return NextResponse.json({ events });
       } catch (error) {
-        console.error('Error retrieving recent audit logs:', error);
+        console.error('Error retrieving recent audit events:', error);
         return NextResponse.json(
-          { error: 'Error retrieving recent audit logs' },
+          { error: 'Error retrieving recent audit events' },
           { status: 500 }
         );
       }
