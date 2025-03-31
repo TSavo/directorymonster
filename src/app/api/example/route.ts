@@ -48,10 +48,7 @@ export async function POST(req: NextRequest) {
  * Example API route with specific resource permission check
  * PUT /api/example/:id
  */
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: NextRequest) {
   // Extract resource ID from URL params or request path
   const resourceId = req.url.split('/').pop();
   
@@ -81,10 +78,7 @@ export async function PUT(
  * Example API route with delete permission check
  * DELETE /api/example/:id
  */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest) {
   // Extract resource ID from URL params or request path
   const resourceId = req.url.split('/').pop();
   
