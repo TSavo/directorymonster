@@ -250,8 +250,3 @@ export async function hasGlobalPermissionInTenant(
     return false;
   }
 }
-
-/**
- * Export from roles.ts to maintain API compatibility
- */
-export { hasPermissionInTenant as hasPermissionInTenant };
