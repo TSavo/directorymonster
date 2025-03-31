@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { decode } from 'jsonwebtoken';
+import { verify } from 'jsonwebtoken';
 import RoleService from '@/lib/role-service';
 import TenantMembershipService from '@/lib/tenant-membership-service';
 import { 
@@ -13,7 +13,7 @@ import { withTenantAccess } from './withTenantAccess';
 
 // Mock dependencies
 jest.mock('jsonwebtoken', () => ({
-  decode: jest.fn(),
+  verify: jest.fn(),
 }));
 
 jest.mock('@/lib/role-service', () => ({
@@ -57,8 +57,8 @@ describe('Permission middleware', () => {
     // Setup mock tenant access middleware
     (withTenantAccess as jest.Mock).mockImplementation((req, handler) => handler(req));
     
-    // Setup mock jwt decode
-    (decode as jest.Mock).mockReturnValue({ userId: 'test-user-id' });
+    // Setup mock jwt verify
+    (verify as jest.Mock).mockReturnValue({ userId: 'test-user-id' });
     
     // Setup mock role service
     (RoleService.hasPermission as jest.Mock).mockResolvedValue(true);
@@ -75,7 +75,7 @@ describe('Permission middleware', () => {
       );
       
       expect(withTenantAccess).toHaveBeenCalled();
-      expect(decode).toHaveBeenCalledWith('test-token');
+      expect(verify).toHaveBeenCalledWith('test-token', expect.any(String));
       expect(RoleService.hasPermission).toHaveBeenCalledWith(
         'test-user-id',
         'test-tenant-id',
@@ -108,9 +108,6 @@ describe('Permission middleware', () => {
     
     it('should return 403 when permission is denied', async () => {
       (RoleService.hasPermission as jest.Mock).mockResolvedValue(false);
-      
-      const mockResponse = { status: 403, body: { error: 'Permission denied' } };
-      mockHandler.mockResolvedValue(mockResponse);
       
       const response = await withPermission(
         mockRequest,
@@ -296,7 +293,7 @@ describe('Permission middleware', () => {
       );
       
       expect(withTenantAccess).toHaveBeenCalled();
-      expect(decode).toHaveBeenCalledWith('test-token');
+      expect(verify).toHaveBeenCalledWith('test-token', expect.any(String));
       expect(RoleService.hasPermission).toHaveBeenCalledWith(
         'test-user-id',
         'test-tenant-id',
