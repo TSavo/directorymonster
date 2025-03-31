@@ -188,6 +188,51 @@ export const searchKeys = {
 };
 
 /**
+ * Generate a Redis key for role and ACL related data
+ */
+export const roleKeys = {
+  /**
+   * Key for a role by its ID within a tenant
+   */
+  byId: (tenantId: string, roleId: string) => `role:${tenantId}:${roleId}`,
+  
+  /**
+   * Key for a role by its name within a tenant
+   */
+  byName: (tenantId: string, name: string) => `role:${tenantId}:name:${name}`,
+  
+  /**
+   * Pattern for all roles in a tenant
+   */
+  allForTenant: (tenantId: string) => `role:${tenantId}:*`,
+  
+  /**
+   * Key for global roles (across all tenants)
+   */
+  global: () => `role:global`,
+  
+  /**
+   * Key for a user's roles in a specific tenant
+   */
+  userRoles: (userId: string, tenantId: string) => `user:roles:${userId}:${tenantId}`,
+  
+  /**
+   * Pattern for all roles a user has across all tenants
+   */
+  allUserRoles: (userId: string) => `user:roles:${userId}:*`,
+  
+  /**
+   * Key for users in a tenant
+   */
+  tenantUsers: (tenantId: string) => `tenant:users:${tenantId}`,
+  
+  /**
+   * Key for users with a specific role in a tenant
+   */
+  roleUsers: (tenantId: string, roleId: string) => `role:${tenantId}:${roleId}:users`,
+};
+
+/**
  * Generate a Redis key for rate limiting
  */
 export const rateLimitKeys = {
