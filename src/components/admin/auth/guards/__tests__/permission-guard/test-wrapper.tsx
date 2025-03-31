@@ -1,31 +1,9 @@
 import React, { ReactNode } from 'react';
 
-// Mock the useRouter hook
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
-    pathname: '/',
-    route: '/',
-    query: {},
-    asPath: '/',
-    events: {
-      on: jest.fn(),
-      off: jest.fn(),
-      emit: jest.fn(),
-    },
-  }),
-  usePathname: () => '/',
-  useSearchParams: () => ({ get: jest.fn() }),
-}));
+// No need to mock hooks here - we'll do it directly in the test files
+// just like the TenantGuard tests do
 
-// Create a wrapper component that provides all necessary context
+// Create a simple wrapper for tests
 export function TestWrapper({ children }: { children: ReactNode }) {
-  return (
-    <>{children}</>
-  );
+  return <>{children}</>;
 }

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { ReactNode, useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { useTenant } from '@/lib/tenant/use-tenant';
+import { useAuth as defaultUseAuth } from '../hooks/useAuth';
+import { useTenant as defaultUseTenant } from '@/lib/tenant/use-tenant';
 import { ResourceType, Permission } from '../utils/accessControl';
 import { 
   hasPermissionInTenant, 
@@ -20,6 +20,9 @@ interface PermissionGuardProps {
   fallback?: ReactNode;
   showLoading?: boolean; // Whether to show loading indicator
   silent?: boolean; // When true, won't show fallback on permission failure
+  // These props are for testing and should not be used in production
+  useAuthHook?: typeof defaultUseAuth;
+  useTenantHook?: typeof defaultUseTenant;
 }
 
 /**
@@ -36,9 +39,12 @@ export function PermissionGuard({
   fallback = null,
   showLoading = false,
   silent = false,
+  // Allow hook injection for testing
+  useAuthHook = defaultUseAuth,
+  useTenantHook = defaultUseTenant,
 }: PermissionGuardProps) {
-  const { user } = useAuth();
-  const { tenant } = useTenant();
+  const { user } = useAuthHook();
+  const { tenant } = useTenantHook();
   const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   

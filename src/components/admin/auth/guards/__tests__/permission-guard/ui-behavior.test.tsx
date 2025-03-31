@@ -1,25 +1,55 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { PermissionGuard } from '../../PermissionGuard';
-import { 
-  setupMocks, 
-  mockHasPermissionInTenant 
-} from './setup';
+import { useAuth } from '../../../hooks/useAuth';
+import { useTenant } from '@/lib/tenant/use-tenant';
+import { hasPermissionInTenant } from '../../../utils/tenantAccessControl';
+import { TestWrapper } from './test-wrapper';
+
+// Mock the hooks directly
+jest.mock('../../../hooks/useAuth');
+jest.mock('@/lib/tenant/use-tenant');
+jest.mock('../../../utils/tenantAccessControl');
+
+// Mock data for consistent testing
+const mockUser = { id: 'user-123', name: 'Test User' };
+const mockTenant = { id: 'tenant-456', name: 'Test Tenant' };
 
 describe('PermissionGuard - UI Behavior', () => {
-  beforeEach(setupMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    
+    // Set up the mocks for each test
+    (useAuth as jest.Mock).mockReturnValue({
+      user: mockUser,
+      isAuthenticated: true,
+      loading: false,
+      error: null
+    });
+    
+    (useTenant as jest.Mock).mockReturnValue({
+      tenant: mockTenant,
+      loading: false,
+      error: null
+    });
+    
+    // Default behavior for permission checks
+    (hasPermissionInTenant as jest.Mock).mockResolvedValue(true);
+  });
 
   it('should render fallback content when user lacks permission', async () => {
-    mockHasPermissionInTenant.mockResolvedValue(false);
+    (hasPermissionInTenant as jest.Mock).mockResolvedValue(false);
     
     render(
-      <PermissionGuard 
-        resourceType="category" 
-        permission="update"
-        fallback={<div data-testid="fallback-content">Access Denied</div>}
-      >
-        <div data-testid="protected-content">Protected Content</div>
-      </PermissionGuard>
+      <TestWrapper>
+        <PermissionGuard 
+          resourceType="category" 
+          permission="update"
+          fallback={<div data-testid="fallback-content">Access Denied</div>}
+        >
+          <div data-testid="protected-content">Protected Content</div>
+        </PermissionGuard>
+      </TestWrapper>
     );
     
     // Should render fallback content
@@ -35,17 +65,19 @@ describe('PermissionGuard - UI Behavior', () => {
       // Resolve after some time to keep the component in loading state
       setTimeout(() => resolve(true), 100);
     });
-    mockHasPermissionInTenant.mockReturnValue(permissionPromise);
+    (hasPermissionInTenant as jest.Mock).mockReturnValue(permissionPromise);
     
     render(
-      <PermissionGuard resourceType="category" permission="read" showLoading={true}>
-        <div data-testid="protected-content">Protected Content</div>
-      </PermissionGuard>
+      <TestWrapper>
+        <PermissionGuard resourceType="category" permission="read" showLoading={true}>
+          <div data-testid="protected-content">Protected Content</div>
+        </PermissionGuard>
+      </TestWrapper>
     );
     
-    // Should show loading indicator
-    const loadingElement = screen.getByRole('status', { hidden: true });
-    expect(loadingElement).toBeInTheDocument();
+    // Should show loading indicator - the spinner doesn't have a role, 
+    // so we need to check for the spinner class instead
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
     
     // Wait for permission check to resolve
     await waitFor(() => {
@@ -54,17 +86,19 @@ describe('PermissionGuard - UI Behavior', () => {
   });
 
   it('should render nothing when silent is true and permission is denied', async () => {
-    mockHasPermissionInTenant.mockResolvedValue(false);
+    (hasPermissionInTenant as jest.Mock).mockResolvedValue(false);
     
     render(
-      <PermissionGuard 
-        resourceType="category" 
-        permission="update"
-        fallback={<div data-testid="fallback-content">Access Denied</div>}
-        silent={true}
-      >
-        <div data-testid="protected-content">Protected Content</div>
-      </PermissionGuard>
+      <TestWrapper>
+        <PermissionGuard 
+          resourceType="category" 
+          permission="update"
+          fallback={<div data-testid="fallback-content">Access Denied</div>}
+          silent={true}
+        >
+          <div data-testid="protected-content">Protected Content</div>
+        </PermissionGuard>
+      </TestWrapper>
     );
     
     // Should render neither children nor fallback
@@ -80,16 +114,18 @@ describe('PermissionGuard - UI Behavior', () => {
       // Resolve after some time to keep the component in loading state
       setTimeout(() => resolve(true), 100);
     });
-    mockHasPermissionInTenant.mockReturnValue(permissionPromise);
+    (hasPermissionInTenant as jest.Mock).mockReturnValue(permissionPromise);
     
     render(
-      <PermissionGuard resourceType="category" permission="read" showLoading={false}>
-        <div data-testid="protected-content">Protected Content</div>
-      </PermissionGuard>
+      <TestWrapper>
+        <PermissionGuard resourceType="category" permission="read" showLoading={false}>
+          <div data-testid="protected-content">Protected Content</div>
+        </PermissionGuard>
+      </TestWrapper>
     );
     
     // Should not show loading indicator
-    expect(screen.queryByRole('status', { hidden: true })).not.toBeInTheDocument();
+    expect(document.querySelector('.animate-spin')).not.toBeInTheDocument();
     
     // Should show nothing initially
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();

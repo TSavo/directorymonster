@@ -1,0 +1,3 @@
+@echo off
+echo Running PermissionGuard tests with extremely minimal output...
+node minimal-test.js src/components/admin/auth/guards/__tests__/PermissionGuard.test.tsx

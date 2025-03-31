@@ -1,15 +1,14 @@
-import { useAuth } from '../../../hooks/useAuth';
-import { useTenant } from '@/lib/tenant/use-tenant';
+// Import the mocked modules directly to mock their exports
 import * as tenantAccessControl from '../../../utils/tenantAccessControl';
 
-// Mock the hooks and utility functions
-jest.mock('../../../hooks/useAuth');
-jest.mock('@/lib/tenant/use-tenant');
+// Mock tenantAccessControl directly
 jest.mock('../../../utils/tenantAccessControl');
 
-// Setup mocks
-export const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-export const mockUseTenant = useTenant as jest.MockedFunction<typeof useTenant>;
+// Define mock data
+export const mockUser = { id: 'user-123', name: 'Test User' };
+export const mockTenant = { id: 'tenant-456', name: 'Test Tenant' };
+
+// Export mocked functions for test manipulation
 export const mockHasPermissionInTenant = jest.spyOn(tenantAccessControl, 'hasPermissionInTenant');
 export const mockHasAnyPermissionInTenant = jest.spyOn(tenantAccessControl, 'hasAnyPermissionInTenant');
 export const mockHasAllPermissionsInTenant = jest.spyOn(tenantAccessControl, 'hasAllPermissionsInTenant');
@@ -18,22 +17,28 @@ export const setupMocks = () => {
   // Reset mocks
   jest.clearAllMocks();
   
-  // Default mock values
-  mockUseAuth.mockReturnValue({
-    user: { id: 'user-123', name: 'Test User' },
+  // Import the useAuth mock and configure it
+  const useAuthMock = require('../../../hooks/__mocks__/useAuth').useAuth;
+  useAuthMock.mockReturnValue({
+    user: mockUser,
     isAuthenticated: true,
     login: jest.fn(),
     logout: jest.fn(),
     loading: false,
-    error: null
+    error: null,
+    hasPermission: jest.fn().mockReturnValue(true)
   });
   
-  mockUseTenant.mockReturnValue({
-    tenant: { id: 'tenant-456', name: 'Test Tenant' },
+  // Import the useTenant mock and configure it
+  const useTenantMock = require('@/lib/tenant/__mocks__/use-tenant').useTenant;
+  useTenantMock.mockReturnValue({
+    tenant: mockTenant,
     loading: false,
-    error: null
+    error: null,
+    setTenant: jest.fn()
   });
   
+  // Default to successful permission checks
   mockHasPermissionInTenant.mockResolvedValue(true);
   mockHasAnyPermissionInTenant.mockResolvedValue(true);
   mockHasAllPermissionsInTenant.mockResolvedValue(true);

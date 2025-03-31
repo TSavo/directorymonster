@@ -1,0 +1,3 @@
+@echo off
+echo Running tests with extremely minimal output...
+node minimal-test.js %*

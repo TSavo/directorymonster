@@ -1,88 +1,71 @@
-# Checkpoint: Implementing PermissionGuard Component for ACL System
+# Checkpoint: Implementing PermissionGuard Component for ACL System - Update
 
 ## Current Status
-I'm working on Issue #57: Implement PermissionGuard Component. This is part of the ongoing ACL system enhancement for DirectoryMonster.
+I'm continuing work on Issue #57: Implement PermissionGuard Component. The component implementation is complete, but the tests are failing due to Next.js router context issues.
 
-Previous work completed:
-- TenantGuard Component implementation (PR #54)
-- hasPermissionInTenant function implementation (PR #53)
-- Multi-tenant ACL system foundation (PR #47)
+After analyzing the code and test files in detail, I've identified the key differences between the passing TenantGuard tests and the failing PermissionGuard tests:
+
+1. The TenantGuard tests use direct Jest mocks for all dependencies (`jest.mock('../../hooks/useAuth')`) while PermissionGuard tests use a different approach with a TestWrapper and module mocks in that wrapper.
+
+2. The key issue appears to be in how the Next.js router is mocked. The error message "invariant expected app router to be mounted" indicates the Next.js router context is not properly initialized.
+
+3. The current approach in `test-wrapper.tsx` uses `jest.mock('next/navigation', ...)` but this doesn't create a proper React context for the router that components can access.
 
 ## Implementation Progress
 
-I've completed the implementation of:
+Current progress:
+1. ✅ PermissionGuard component implementation is complete
+2. ✅ Test files structure is set up correctly
+3. ❌ Tests are failing due to router context issues
+4. ✅ Identified that TenantGuard tests and PermissionGuard tests use different testing approaches
 
-1. ✅ PermissionGuard component with the following features:
-   - Single permission checks
-   - Multiple permission checks (any/all logic)
-   - Resource-specific permission checks
-   - Custom fallback content
-   - Silent mode option
-   - Loading state handling
+## Current Focus
 
-2. ✅ usePermission hook with the following features:
-   - Current permission state
-   - Permission check for specific resources
-   - Get accessible resources function
-   - Check global permission function
-   - Error handling
+I'm now working on aligning the PermissionGuard tests with the successful approach used in TenantGuard tests. Looking at both implementations:
 
-3. ✅ Comprehensive test structure organized by functionality:
-   - Basic permission tests
-   - Multiple permissions tests
-   - UI behavior tests
-   - Error handling and edge cases
+1. TenantGuard tests:
+   - Use direct Jest mocks with `jest.mock()`
+   - Mock each hook individually
+   - Don't use a TestWrapper component with context
 
-4. ✅ Example component demonstrating usage patterns
+2. PermissionGuard tests:
+   - Use a TestWrapper component
+   - Mock hooks inside the TestWrapper via imports
+   - Use a different mocking strategy
 
-## Current Challenges
-
-I'm facing issues with the test suite for the PermissionGuard component. The tests are failing with the error:
-
-```
-Error: invariant expected app router to be mounted
-```
-
-This is happening because:
-1. The PermissionGuard component depends on Next.js hooks like useRouter (via useAuth)
-2. These hooks expect to be used within a Next.js application context
-3. In the test environment, this context is not available
-
-I've started implementing a solution by:
-1. Creating a test wrapper component that mocks the Next.js app router
-2. Refactoring the tests to use this wrapper
-3. Ensuring all necessary context is provided to the component under test
-
-This approach is similar to how the TenantGuard tests are set up, but needs additional configuration to properly mock the Next.js app router context.
+The solution is to adapt the PermissionGuard tests to follow the same pattern as the TenantGuard tests, which are already working.
 
 ## Next Steps
 
-1. Complete the test environment setup for PermissionGuard tests
-   - Properly mock Next.js app router
-   - Create a comprehensive test wrapper with all required contexts
-   - Validate test isolation to prevent cross-test interference
+1. Refactor the PermissionGuard tests to use the same approach as TenantGuard tests:
+   - Move the mocks outside the TestWrapper
+   - Use direct Jest mocks with `jest.mock()` at the module level
+   - Simplify the TestWrapper or remove it if not needed
 
-2. Run the complete test suite and verify all tests pass
+2. Specifically update:
+   - Move the `jest.mock()` calls from test-wrapper.tsx to the test files
+   - Update the mock implementations to match the TenantGuard approach
+   - Ensure consistent setup across all test files
 
-3. Create a PR for issue #57 with:
-   - PermissionGuard component
-   - usePermission hook
-   - Comprehensive tests
-   - Example documentation
+3. Run the tests to verify the fix works
 
-4. Begin work on issue #56: Implement withPermission middleware (server-side counterpart)
+4. Complete the PR for issue #57 with:
+   - Working PermissionGuard component
+   - Passing tests
+   - Documentation on how to use the component
+
+## Implementation Plan
+
+1. Update test-wrapper.tsx to follow the TenantGuard pattern
+2. Fix the multiple-permissions.test.tsx first (one of the failing tests)
+3. Apply the same fix to error-handling.test.tsx
+4. Run tests to verify fix
+5. Complete documentation and PR
 
 ## Implementation Benefits
-The new PermissionGuard component:
+The completed PermissionGuard component:
 1. Provides a clean, reusable way to handle UI permission checks
 2. Integrates seamlessly with the existing multi-tenant ACL system
 3. Follows the separation of concerns principle with a focused API
 4. Complements the TenantGuard component for layered security
 5. Offers flexible configuration options for various UI scenarios
-6. Includes clear example documentation for developers
-
-## Time Allocation
-- Component implementation: Completed
-- Hook implementation: Completed
-- Documentation and examples: Completed
-- Test suite: In progress (resolving Next.js context issues)
