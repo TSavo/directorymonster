@@ -34,6 +34,10 @@ jest.mock('@/lib/audit/audit-service', () => ({
   logPermissionEvent: jest.fn(),
 }));
 
+// Mock the console.log for audit tests
+const originalConsoleLog = console.log;
+let consoleLogMock: jest.SpyInstance;
+
 describe('Permission middleware', () => {
   let mockRequest: NextRequest;
   let mockHandler: jest.Mock;
@@ -158,6 +162,27 @@ describe('Permission middleware', () => {
       expect(mockHandler).not.toHaveBeenCalled();
       expect(response.status).toBe(403);
     });
+    
+    it('should deny access when an empty permissions array is provided', async () => {
+      const response = await withAnyPermission(
+        mockRequest,
+        'category',
+        [],
+        mockHandler
+      );
+      
+      // No permission checks should be performed
+      expect(RoleService.hasPermission).not.toHaveBeenCalled();
+      expect(mockHandler).not.toHaveBeenCalled();
+      expect(response.status).toBe(403);
+      
+      // Verify the response contains appropriate error details
+      const responseBody = await response.json();
+      expect(responseBody).toHaveProperty('error', 'Permission denied');
+      expect(responseBody).toHaveProperty('message', expect.stringContaining('Required one of'));
+      expect(responseBody.details).toHaveProperty('permissions');
+      expect(responseBody.details.permissions).toEqual([]);
+    });
   });
   
   describe('withAllPermissions', () => {
@@ -191,6 +216,21 @@ describe('Permission middleware', () => {
       expect(RoleService.hasPermission).toHaveBeenCalledTimes(2);
       expect(mockHandler).not.toHaveBeenCalled();
       expect(response.status).toBe(403);
+    });
+    
+    it('should grant access for an empty permissions array', async () => {
+      const response = await withAllPermissions(
+        mockRequest,
+        'category',
+        [],
+        mockHandler
+      );
+      
+      // No permission checks should be needed for an empty array
+      expect(RoleService.hasPermission).not.toHaveBeenCalled();
+      // Handler should be called since all (zero) permissions are satisfied
+      expect(mockHandler).toHaveBeenCalled();
+      expect(response.status).toBe(200);
     });
   });
   
@@ -286,6 +326,16 @@ describe('Permission middleware', () => {
   });
   
   describe('withAuditedPermission', () => {
+    beforeEach(() => {
+      // Setup console.log mock for audit tests
+      consoleLogMock = jest.spyOn(console, 'log').mockImplementation();
+    });
+    
+    afterEach(() => {
+      // Restore console.log
+      consoleLogMock.mockRestore();
+    });
+    
     it('should log successful permission access', async () => {
       const response = await withAuditedPermission(
         mockRequest,
@@ -330,7 +380,8 @@ describe('Permission middleware', () => {
         mockRequest,
         'category',
         'update',
-        mockHandler
+        mockHandler,
+        'specific-resource-id'
       );
       
       // Verify denial was logged using AuditService
@@ -340,7 +391,7 @@ describe('Permission middleware', () => {
         'category',
         'update',
         false,
-        undefined,
+        'specific-resource-id',
         expect.objectContaining({
           method: 'GET',
           path: '/api/test'
@@ -348,6 +399,33 @@ describe('Permission middleware', () => {
       );
       
       expect(response.status).toBe(403);
+    });
+    
+    it('should include the correct request context in audit logs', async () => {
+      // Setup a different request method and URL
+      mockRequest.method = 'POST';
+      mockRequest.url = 'https://example.com/api/categories/create';
+      
+      await withAuditedPermission(
+        mockRequest,
+        'category',
+        'create',
+        mockHandler
+      );
+      
+      // Verify request details are correctly included in the audit log
+      expect(AuditService.logPermissionEvent).toHaveBeenCalledWith(
+        'test-user-id',
+        'test-tenant-id',
+        'category',
+        'create',
+        true,
+        undefined,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/api/categories/create'
+        })
+      );
     });
   });
 });
