@@ -55,7 +55,25 @@ describe('RoleService global roles tests', () => {
     
     // Assert
     // Verify Redis client was called with correct parameters
+    const redisClient = require('@/lib/redis-client').getClient();
+    expect(redisClient.set).toHaveBeenCalledWith(
+      expect.stringContaining(roleId),
+      expect.stringContaining(roleName)
+    );
+    expect(redisClient.sadd).toHaveBeenCalledWith(
+      'global:roles',
+      roleId
+    );
+    
     // Verify audit log was created
+    const { AuditService } = require('@/lib/audit-service');
+    expect(AuditService.logEvent).toHaveBeenCalledWith(
+      expect.stringContaining('created'),
+      expect.objectContaining({ 
+        roleId,
+        tenantId
+      })
+    );
   });
 
   it('should reject creating a global role without explicit tenant context', async () => {
