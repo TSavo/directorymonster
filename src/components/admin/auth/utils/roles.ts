@@ -119,7 +119,7 @@ export function hasPermissionInTenant(
       entry.resource.type === resourceType &&
       entry.permission === permission &&
       entry.resource.id === resourceId &&
-      entry.resource.tenantId === tenantId
+      (role.isGlobal || entry.resource.tenantId === tenantId)
     );
     
     if (hasExactPermission) return true;
@@ -129,7 +129,7 @@ export function hasPermissionInTenant(
       entry.resource.type === resourceType &&
       entry.permission === permission &&
       !entry.resource.id &&
-      entry.resource.tenantId === tenantId
+      (role.isGlobal || entry.resource.tenantId === tenantId)
     );
     
     return hasTenantTypePermission;

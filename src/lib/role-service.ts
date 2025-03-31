@@ -14,6 +14,21 @@ import {
 } from '@/components/admin/auth/utils/roles';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 
+// Helper function to generate UUID that works in both Node.js and browser environments
+function generateUUID(): string {
+  // Use crypto.randomUUID if available (Node.js 14.17.0+ and modern browsers)
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  
+  // Fallback implementation for testing environments
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 export class RoleService {
   /**
    * Create a new role in a tenant
@@ -25,7 +40,7 @@ export class RoleService {
   ): Promise<Role> {
     try {
       // Generate a new role ID
-      const id = crypto.randomUUID();
+      const id = generateUUID();
       
       // Add timestamps
       const now = new Date().toISOString();
@@ -285,6 +300,48 @@ export class RoleService {
       );
     } catch (error) {
       console.error(`Error checking permission for user ${userId}:`, error);
+      return false;
+    }
+  }
+  
+  /**
+   * Check if a user has any role in a tenant
+   * @param userId User ID
+   * @param tenantId Tenant ID
+   * @returns true if user has any role
+   */
+  static async hasRoleInTenant(
+    userId: string,
+    tenantId: string
+  ): Promise<boolean> {
+    try {
+      const userRolesKey = getUserRolesKey(userId, tenantId);
+      const roleIds = await redis.smembers(userRolesKey);
+      return roleIds.length > 0;
+    } catch (error) {
+      console.error(`Error checking roles for user ${userId} in tenant ${tenantId}:`, error);
+      return false;
+    }
+  }
+  
+  /**
+   * Check if a user has a specific role in a tenant
+   * @param userId User ID
+   * @param tenantId Tenant ID
+   * @param roleId Role ID to check
+   * @returns true if user has the role
+   */
+  static async hasSpecificRole(
+    userId: string,
+    tenantId: string,
+    roleId: string
+  ): Promise<boolean> {
+    try {
+      const userRolesKey = getUserRolesKey(userId, tenantId);
+      const roleIds = await redis.smembers(userRolesKey);
+      return roleIds.includes(roleId);
+    } catch (error) {
+      console.error(`Error checking specific role for user ${userId} in tenant ${tenantId}:`, error);
       return false;
     }
   }

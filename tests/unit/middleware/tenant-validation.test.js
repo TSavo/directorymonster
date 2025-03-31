@@ -2,34 +2,36 @@
  * Unit tests for tenant validation middleware
  */
 
-import { jest } from '@jest/globals';
-import { NextRequest, NextResponse } from 'next/server';
-import { withTenantAccess, withPermission, withTenantContext } from '@/middleware/tenant-validation';
+const { NextRequest, NextResponse } = require('next/server');
+const { withTenantAccess, withPermission, withTenantContext } = require('@/middleware/tenant-validation');
+const TenantMembershipService = require('@/lib/tenant-membership-service').default;
+const RoleService = require('@/lib/role-service').default;
+const jwt = require('jsonwebtoken');
 
-// Create mock functions
-const mockJwtVerify = jest.fn(() => ({ userId: 'user-789' }));
-const mockIsTenantMember = jest.fn().mockResolvedValue(true);
-const mockHasPermission = jest.fn().mockResolvedValue(true);
-const mockGetTenantByHostname = jest.fn().mockResolvedValue({ 
-  id: 'tenant-123', 
-  name: 'Test Tenant'
-});
-
-// Mock modules
+// Mock jwt
 jest.mock('jsonwebtoken', () => ({
-  verify: (...args) => mockJwtVerify(...args)
+  verify: jest.fn()
 }));
 
+// Mock TenantMembershipService
 jest.mock('@/lib/tenant-membership-service', () => ({
-  isTenantMember: (...args) => mockIsTenantMember(...args)
+  default: {
+    isTenantMember: jest.fn()
+  }
 }));
 
+// Mock RoleService
 jest.mock('@/lib/role-service', () => ({
-  hasPermission: (...args) => mockHasPermission(...args)
+  default: {
+    hasPermission: jest.fn()
+  }
 }));
 
+// Mock TenantService (used in withTenantContext)
 jest.mock('@/lib/tenant/tenant-service', () => ({
-  getTenantByHostname: (...args) => mockGetTenantByHostname(...args)
+  default: {
+    getTenantByHostname: jest.fn()
+  }
 }));
 
 describe('Tenant Validation Middleware', () => {
@@ -38,8 +40,8 @@ describe('Tenant Validation Middleware', () => {
   const testUserId = 'user-789';
   const testToken = 'valid-token';
   
-  let mockRequest: NextRequest;
-  let mockHandler: jest.Mock;
+  let mockRequest;
+  let mockHandler;
   
   beforeEach(() => {
     jest.clearAllMocks();
@@ -55,22 +57,27 @@ describe('Tenant Validation Middleware', () => {
         'x-tenant-id': testTenantId,
       }),
       method: 'GET',
-      nextUrl: { hostname: 'example.com' } as any,
-    } as unknown as NextRequest;
+    };
     
     // Create mock handler that returns a success response
     mockHandler = jest.fn().mockResolvedValue(
       NextResponse.json({ success: true })
     );
+    
+    // Mock jwt.verify to return a valid token
+    jwt.verify.mockReturnValue({ userId: testUserId });
   });
   
   describe('withTenantAccess', () => {
     it('should call the handler if user has tenant access', async () => {
+      // Arrange
+      TenantMembershipService.isTenantMember.mockResolvedValueOnce(true);
+      
       // Act
       const response = await withTenantAccess(mockRequest, mockHandler);
       
       // Assert
-      expect(mockIsTenantMember).toHaveBeenCalledWith(testUserId, testTenantId);
+      expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(testUserId, testTenantId);
       expect(mockHandler).toHaveBeenCalledWith(mockRequest);
       expect(response.status).toBe(200);
       expect(await response.json()).toEqual({ success: true });
@@ -86,7 +93,7 @@ describe('Tenant Validation Middleware', () => {
       const response = await withTenantAccess(mockRequest, mockHandler);
       
       // Assert
-      expect(mockIsTenantMember).not.toHaveBeenCalled();
+      expect(TenantMembershipService.isTenantMember).not.toHaveBeenCalled();
       expect(mockHandler).not.toHaveBeenCalled();
       expect(response.status).toBe(401);
       expect(await response.json()).toEqual({ 
@@ -112,7 +119,7 @@ describe('Tenant Validation Middleware', () => {
     
     it('should return 401 if token is invalid', async () => {
       // Arrange
-      mockJwtVerify.mockImplementationOnce(() => {
+      jwt.verify.mockImplementationOnce(() => {
         throw new Error('Invalid token');
       });
       
@@ -128,13 +135,13 @@ describe('Tenant Validation Middleware', () => {
     
     it('should return 403 if user is not a tenant member', async () => {
       // Arrange
-      mockIsTenantMember.mockResolvedValueOnce(false);
+      TenantMembershipService.isTenantMember.mockResolvedValueOnce(false);
       
       // Act
       const response = await withTenantAccess(mockRequest, mockHandler);
       
       // Assert
-      expect(mockIsTenantMember).toHaveBeenCalledWith(testUserId, testTenantId);
+      expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(testUserId, testTenantId);
       expect(mockHandler).not.toHaveBeenCalled();
       expect(response.status).toBe(403);
       expect(await response.json()).toEqual({ 
@@ -146,8 +153,8 @@ describe('Tenant Validation Middleware', () => {
   describe('withPermission', () => {
     it('should call the handler if user has required permission', async () => {
       // Arrange
-      mockIsTenantMember.mockResolvedValueOnce(true);
-      mockHasPermission.mockResolvedValueOnce(true);
+      TenantMembershipService.isTenantMember.mockResolvedValueOnce(true);
+      RoleService.hasPermission.mockResolvedValueOnce(true);
       
       // Act
       const response = await withPermission(
@@ -159,8 +166,8 @@ describe('Tenant Validation Middleware', () => {
       );
       
       // Assert
-      expect(mockIsTenantMember).toHaveBeenCalledWith(testUserId, testTenantId);
-      expect(mockHasPermission).toHaveBeenCalledWith(
+      expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(testUserId, testTenantId);
+      expect(RoleService.hasPermission).toHaveBeenCalledWith(
         testUserId,
         testTenantId,
         'category',
@@ -173,8 +180,8 @@ describe('Tenant Validation Middleware', () => {
     
     it('should return 403 if user does not have required permission', async () => {
       // Arrange
-      mockIsTenantMember.mockResolvedValueOnce(true);
-      mockHasPermission.mockResolvedValueOnce(false);
+      TenantMembershipService.isTenantMember.mockResolvedValueOnce(true);
+      RoleService.hasPermission.mockResolvedValueOnce(false);
       
       // Act
       const response = await withPermission(
@@ -186,8 +193,8 @@ describe('Tenant Validation Middleware', () => {
       );
       
       // Assert
-      expect(mockIsTenantMember).toHaveBeenCalledWith(testUserId, testTenantId);
-      expect(mockHasPermission).toHaveBeenCalledWith(
+      expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(testUserId, testTenantId);
+      expect(RoleService.hasPermission).toHaveBeenCalledWith(
         testUserId,
         testTenantId,
         'category',
@@ -204,8 +211,8 @@ describe('Tenant Validation Middleware', () => {
     it('should check specific resource ID when provided', async () => {
       // Arrange
       const resourceId = 'category-123';
-      mockIsTenantMember.mockResolvedValueOnce(true);
-      mockHasPermission.mockResolvedValueOnce(true);
+      TenantMembershipService.isTenantMember.mockResolvedValueOnce(true);
+      RoleService.hasPermission.mockResolvedValueOnce(true);
       
       // Act
       const response = await withPermission(
@@ -217,7 +224,7 @@ describe('Tenant Validation Middleware', () => {
       );
       
       // Assert
-      expect(mockHasPermission).toHaveBeenCalledWith(
+      expect(RoleService.hasPermission).toHaveBeenCalledWith(
         testUserId,
         testTenantId,
         'category',
@@ -232,13 +239,29 @@ describe('Tenant Validation Middleware', () => {
     it('should add tenant ID header based on hostname', async () => {
       // Arrange
       const hostname = 'example.com';
+      const TenantService = require('@/lib/tenant/tenant-service').default;
+      
+      mockRequest = {
+        url: `https://${hostname}/api/test`,
+        headers: new Headers({
+          'host': hostname,
+        }),
+        method: 'GET',
+      };
+      
+      TenantService.getTenantByHostname.mockResolvedValueOnce({
+        id: testTenantId,
+        name: 'Example Tenant',
+      });
+      
+      // Create a spy on Headers.set
       const headersSpy = jest.spyOn(Headers.prototype, 'set');
       
       // Act
       await withTenantContext(mockRequest, mockHandler);
       
       // Assert
-      expect(mockGetTenantByHostname).toHaveBeenCalledWith(hostname);
+      expect(TenantService.getTenantByHostname).toHaveBeenCalledWith(hostname);
       expect(headersSpy).toHaveBeenCalledWith('x-tenant-id', testTenantId);
       expect(mockHandler).toHaveBeenCalled();
     });
@@ -246,14 +269,23 @@ describe('Tenant Validation Middleware', () => {
     it('should return 404 if hostname does not resolve to a tenant', async () => {
       // Arrange
       const hostname = 'invalid-domain.com';
-      mockRequest.nextUrl.hostname = hostname;
-      mockGetTenantByHostname.mockResolvedValueOnce(null);
+      const TenantService = require('@/lib/tenant/tenant-service').default;
+      
+      mockRequest = {
+        url: `https://${hostname}/api/test`,
+        headers: new Headers({
+          'host': hostname,
+        }),
+        method: 'GET',
+      };
+      
+      TenantService.getTenantByHostname.mockResolvedValueOnce(null);
       
       // Act
       const response = await withTenantContext(mockRequest, mockHandler);
       
       // Assert
-      expect(mockGetTenantByHostname).toHaveBeenCalledWith(hostname);
+      expect(TenantService.getTenantByHostname).toHaveBeenCalledWith(hostname);
       expect(mockHandler).not.toHaveBeenCalled();
       expect(response.status).toBe(404);
       expect(await response.json()).toEqual({ 
@@ -265,17 +297,27 @@ describe('Tenant Validation Middleware', () => {
       // Arrange
       const forwardedHost = 'forwarded.example.com';
       const actualHost = 'origin.example.com';
-      mockRequest.headers = new Headers({
-        'host': actualHost,
-        'x-forwarded-host': forwardedHost,
+      const TenantService = require('@/lib/tenant/tenant-service').default;
+      
+      mockRequest = {
+        url: `https://${actualHost}/api/test`,
+        headers: new Headers({
+          'host': actualHost,
+          'x-forwarded-host': forwardedHost,
+        }),
+        method: 'GET',
+      };
+      
+      TenantService.getTenantByHostname.mockResolvedValueOnce({
+        id: testTenantId,
+        name: 'Example Tenant',
       });
-      mockRequest.nextUrl.hostname = actualHost;
       
       // Act
       await withTenantContext(mockRequest, mockHandler);
       
       // Assert
-      expect(mockGetTenantByHostname).toHaveBeenCalledWith(forwardedHost);
+      expect(TenantService.getTenantByHostname).toHaveBeenCalledWith(forwardedHost);
     });
   });
 });

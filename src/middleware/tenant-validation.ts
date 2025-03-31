@@ -21,7 +21,12 @@ function verifyAuthToken(authHeader: string | null): { userId: string } | null {
   
   try {
     const token = authHeader.replace('Bearer ', '');
-    return jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+    // Handle both direct jwt and jwt.default for testing compatibility
+    const jwtVerify = typeof jwt.verify === 'function' ? jwt.verify : jwt.default?.verify;
+    if (!jwtVerify) {
+      throw new Error('JWT verify function not available');
+    }
+    return jwtVerify(token, process.env.JWT_SECRET!) as { userId: string };
   } catch (error) {
     console.error('Invalid auth token:', error);
     return null;

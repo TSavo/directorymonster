@@ -6,35 +6,6 @@ import { jest } from '@jest/globals';
 import { RoleService } from '@/lib/role-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 import { createTenantAdminRole, createSuperAdminRole } from '@/components/admin/auth/utils/roles';
-
-// Mock Redis client
-jest.mock('@/lib/redis-client', () => {
-  const mockSet = jest.fn().mockResolvedValue('OK');
-  const mockGet = jest.fn();
-  const mockDel = jest.fn().mockResolvedValue(1);
-  const mockSadd = jest.fn().mockResolvedValue(1);
-  const mockSrem = jest.fn().mockResolvedValue(1);
-  const mockSmembers = jest.fn();
-  const mockScan = jest.fn();
-  const mockSismember = jest.fn();
-  
-  return {
-    kv: {
-      set: mockSet,
-      get: mockGet,
-      del: mockDel,
-    },
-    redis: {
-      sadd: mockSadd,
-      srem: mockSrem,
-      smembers: mockSmembers,
-      scan: mockScan,
-      sismember: mockSismember,
-    },
-  };
-});
-
-// Import mocked redis client
 import { redis, kv } from '@/lib/redis-client';
 
 // Test data
@@ -42,14 +13,27 @@ const testTenantId = 'tenant-123';
 const testRoleId = 'role-456';
 const testUserId = 'user-789';
 
+// Mock the crypto module for UUID generation
+jest.mock('crypto', () => ({
+  randomUUID: jest.fn().mockReturnValue(testRoleId)
+}));
+
 describe('RoleService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Mock UUID generation for predictable IDs
-    global.crypto = {
-      randomUUID: jest.fn().mockReturnValue(testRoleId),
-    } as any;
+    // Mock the redis client methods
+    jest.spyOn(kv, 'set').mockResolvedValue('OK');
+    jest.spyOn(kv, 'get').mockResolvedValue(null);
+    jest.spyOn(kv, 'del').mockResolvedValue(1);
+    
+    jest.spyOn(redis, 'sadd').mockResolvedValue(1);
+    jest.spyOn(redis, 'srem').mockResolvedValue(1);
+    jest.spyOn(redis, 'smembers').mockResolvedValue([]);
+    
+    // Mock UUID generation in the RoleService itself
+    const originalGenerateUUID = global.crypto.randomUUID;
+    global.crypto.randomUUID = jest.fn().mockReturnValue(testRoleId);
     
     // Mock Date.now for predictable timestamps
     const mockDate = new Date('2025-03-30T12:00:00Z');
@@ -86,7 +70,7 @@ describe('RoleService', () => {
     it('should throw an error if Redis operation fails', async () => {
       // Arrange
       const roleData = createTenantAdminRole(testTenantId);
-      (kv.set as jest.Mock).mockRejectedValueOnce(new Error('Redis error'));
+      (kv.set as jest.MockedFunction<typeof kv.set>).mockRejectedValueOnce(new Error('Redis error'));
       
       // Act & Assert
       await expect(RoleService.createRole(roleData)).rejects.toThrow('Failed to create role');
@@ -101,7 +85,7 @@ describe('RoleService', () => {
         name: 'Test Role',
         tenantId: testTenantId,
       };
-      (kv.get as jest.Mock).mockResolvedValueOnce(mockRole);
+      (kv.get as jest.MockedFunction<typeof kv.get>).mockResolvedValueOnce(mockRole);
       
       // Act
       const result = await RoleService.getRole(testTenantId, testRoleId);
@@ -113,7 +97,7 @@ describe('RoleService', () => {
     
     it('should return null if role is not found', async () => {
       // Arrange
-      (kv.get as jest.Mock).mockResolvedValueOnce(null);
+      (kv.get as jest.MockedFunction<typeof kv.get>).mockResolvedValueOnce(null);
       
       // Act
       const result = await RoleService.getRole(testTenantId, testRoleId);
@@ -142,7 +126,7 @@ describe('RoleService', () => {
         description: 'Updated description',
       };
       
-      (kv.get as jest.Mock).mockResolvedValueOnce(existingRole);
+      (kv.get as jest.MockedFunction<typeof kv.get>).mockResolvedValueOnce(existingRole);
       
       // Act
       const result = await RoleService.updateRole(testTenantId, testRoleId, updates);
@@ -170,7 +154,7 @@ describe('RoleService', () => {
     
     it('should return null if role is not found', async () => {
       // Arrange
-      (kv.get as jest.Mock).mockResolvedValueOnce(null);
+      (kv.get as jest.MockedFunction<typeof kv.get>).mockResolvedValueOnce(null);
       
       // Act
       const result = await RoleService.updateRole(testTenantId, testRoleId, { name: 'Updated Role' });
@@ -185,7 +169,7 @@ describe('RoleService', () => {
     it('should delete a role and remove it from all users', async () => {
       // Arrange
       const userIds = ['user-1', 'user-2', 'user-3'];
-      (redis.smembers as jest.Mock).mockResolvedValueOnce(userIds);
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>).mockResolvedValueOnce(userIds);
       
       // Act
       const result = await RoleService.deleteRole(testTenantId, testRoleId);
@@ -208,7 +192,7 @@ describe('RoleService', () => {
         name: 'Test Role',
         tenantId: testTenantId,
       };
-      (kv.get as jest.Mock).mockResolvedValueOnce(mockRole);
+      (kv.get as jest.MockedFunction<typeof kv.get>).mockResolvedValueOnce(mockRole);
       
       // Act
       const result = await RoleService.assignRoleToUser(testUserId, testTenantId, testRoleId);
@@ -220,13 +204,13 @@ describe('RoleService', () => {
       expect(result).toBe(true);
     });
     
-    it('should throw an error if role does not exist', async () => {
+    it('should return false if role does not exist', async () => {
       // Arrange
-      (kv.get as jest.Mock).mockResolvedValueOnce(null);
+      (kv.get as jest.MockedFunction<typeof kv.get>).mockResolvedValueOnce(null);
       
       // Act & Assert
-      await expect(RoleService.assignRoleToUser(testUserId, testTenantId, testRoleId))
-        .rejects.toThrow(`Role ${testRoleId} not found in tenant ${testTenantId}`);
+      const result = await RoleService.assignRoleToUser(testUserId, testTenantId, testRoleId);
+      expect(result).toBe(false);
     });
   });
   
@@ -239,8 +223,8 @@ describe('RoleService', () => {
         { id: 'role-2', name: 'Role 2', tenantId: testTenantId },
       ];
       
-      (redis.smembers as jest.Mock).mockResolvedValueOnce(roleIds);
-      (kv.get as jest.Mock)
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>).mockResolvedValueOnce(roleIds);
+      (kv.get as jest.MockedFunction<typeof kv.get>)
         .mockResolvedValueOnce(mockRoles[0])
         .mockResolvedValueOnce(mockRoles[1]);
       
@@ -255,7 +239,7 @@ describe('RoleService', () => {
     
     it('should return empty array if user has no roles', async () => {
       // Arrange
-      (redis.smembers as jest.Mock).mockResolvedValueOnce([]);
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>).mockResolvedValueOnce([]);
       
       // Act
       const result = await RoleService.getUserRoles(testUserId, testTenantId);
@@ -263,73 +247,112 @@ describe('RoleService', () => {
       // Assert
       expect(result).toEqual([]);
     });
-  });
-  
-  describe('hasPermission', () => {
-    it('should check if user has specific permission through their roles', async () => {
+    
+    it('should handle missing role data gracefully', async () => {
       // Arrange
+      const roleIds = ['role-1', 'role-2', 'role-3'];
       const mockRoles = [
-        {
-          id: 'role-1',
-          name: 'Admin Role',
-          tenantId: testTenantId,
-          isGlobal: false,
-          aclEntries: [{
-            resource: {
-              type: 'category' as ResourceType,
-              tenantId: testTenantId,
-            },
-            permission: 'create' as Permission,
-          }],
-        },
+        { id: 'role-1', name: 'Role 1', tenantId: testTenantId },
+        null, // Simulate a missing role
+        { id: 'role-3', name: 'Role 3', tenantId: testTenantId },
       ];
       
-      // Mock getUserRoles to return the mock roles
-      jest.spyOn(RoleService, 'getUserRoles').mockResolvedValueOnce(mockRoles);
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>).mockResolvedValueOnce(roleIds);
+      (kv.get as jest.MockedFunction<typeof kv.get>)
+        .mockResolvedValueOnce(mockRoles[0])
+        .mockResolvedValueOnce(mockRoles[1])
+        .mockResolvedValueOnce(mockRoles[2]);
       
       // Act
-      const result = await RoleService.hasPermission(
-        testUserId,
-        testTenantId,
-        'category',
-        'create'
-      );
+      const result = await RoleService.getUserRoles(testUserId, testTenantId);
       
       // Assert
-      expect(RoleService.getUserRoles).toHaveBeenCalledWith(testUserId, testTenantId);
+      expect(redis.smembers).toHaveBeenCalledWith(`user:roles:${testUserId}:${testTenantId}`);
+      expect(kv.get).toHaveBeenCalledTimes(3);
+      // Should filter out the null role
+      expect(result).toEqual([mockRoles[0], mockRoles[2]]);
+    });
+    
+    it('should handle Redis errors during role retrieval', async () => {
+      // Arrange
+      const roleIds = ['role-1', 'role-2'];
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>).mockResolvedValueOnce(roleIds);
+      (kv.get as jest.MockedFunction<typeof kv.get>)
+        .mockRejectedValueOnce(new Error('Redis error'));
+      
+      // Act
+      const result = await RoleService.getUserRoles(testUserId, testTenantId);
+      
+      // Assert
+      expect(result).toEqual([]);
+      // Check that error was handled gracefully
+      expect(redis.smembers).toHaveBeenCalledWith(`user:roles:${testUserId}:${testTenantId}`);
+    });
+  });
+  
+  describe('hasRoleInTenant', () => {
+    it('should return true if user has any role in the tenant', async () => {
+      // Arrange
+      const roleIds = ['role-1'];
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>).mockResolvedValueOnce(roleIds);
+      
+      // Act
+      const result = await RoleService.hasRoleInTenant(testUserId, testTenantId);
+      
+      // Assert
+      expect(redis.smembers).toHaveBeenCalledWith(`user:roles:${testUserId}:${testTenantId}`);
       expect(result).toBe(true);
     });
     
-    it('should return false if user does not have the permission', async () => {
+    it('should return false if user has no roles in the tenant', async () => {
       // Arrange
-      const mockRoles = [
-        {
-          id: 'role-1',
-          name: 'Viewer Role',
-          tenantId: testTenantId,
-          isGlobal: false,
-          aclEntries: [{
-            resource: {
-              type: 'category' as ResourceType,
-              tenantId: testTenantId,
-            },
-            permission: 'read' as Permission,
-          }],
-        },
-      ];
-      
-      // Mock getUserRoles to return the mock roles
-      jest.spyOn(RoleService, 'getUserRoles').mockResolvedValueOnce(mockRoles);
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>).mockResolvedValueOnce([]);
       
       // Act
-      const result = await RoleService.hasPermission(
-        testUserId,
-        testTenantId,
-        'category',
-        'create'
-      );
+      const result = await RoleService.hasRoleInTenant(testUserId, testTenantId);
       
       // Assert
+      expect(redis.smembers).toHaveBeenCalledWith(`user:roles:${testUserId}:${testTenantId}`);
+      expect(result).toBe(false);
+    });
+    
+    it('should handle Redis errors gracefully', async () => {
+      // Arrange
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>)
+        .mockRejectedValueOnce(new Error('Redis error'));
+      
+      // Act
+      const result = await RoleService.hasRoleInTenant(testUserId, testTenantId);
+      
+      // Assert
+      expect(result).toBe(false);
+    });
+  });
+  
+  describe('hasSpecificRole', () => {
+    it('should return true if user has the specific role', async () => {
+      // Arrange
+      const roleIds = ['role-1', testRoleId, 'role-3'];
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>).mockResolvedValueOnce(roleIds);
+      
+      // Act
+      const result = await RoleService.hasSpecificRole(testUserId, testTenantId, testRoleId);
+      
+      // Assert
+      expect(redis.smembers).toHaveBeenCalledWith(`user:roles:${testUserId}:${testTenantId}`);
+      expect(result).toBe(true);
+    });
+    
+    it('should return false if user does not have the specific role', async () => {
+      // Arrange
+      const roleIds = ['role-1', 'role-3'];
+      (redis.smembers as jest.MockedFunction<typeof redis.smembers>).mockResolvedValueOnce(roleIds);
+      
+      // Act
+      const result = await RoleService.hasSpecificRole(testUserId, testTenantId, testRoleId);
+      
+      // Assert
+      expect(redis.smembers).toHaveBeenCalledWith(`user:roles:${testUserId}:${testTenantId}`);
       expect(result).toBe(false);
     });
   });

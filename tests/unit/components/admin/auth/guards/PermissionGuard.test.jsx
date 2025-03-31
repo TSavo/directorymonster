@@ -2,14 +2,14 @@
  * Unit tests for PermissionGuard component
  */
 
-import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { PermissionGuard } from '@/components/admin/auth/guards/PermissionGuard';
-import { useAuth } from '@/components/admin/auth/hooks/useAuth';
-import { useTenant } from '@/lib/tenant/use-tenant';
-import RoleService from '@/lib/role-service';
-import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
+const React = require('react');
+const { render, screen, waitFor } = require('@testing-library/react');
+require('@testing-library/jest-dom');
+const { PermissionGuard } = require('@/components/admin/auth/guards/PermissionGuard');
+const { useAuth } = require('@/components/admin/auth/hooks/useAuth');
+const { useTenant } = require('@/lib/tenant/use-tenant');
+const RoleService = require('@/lib/role-service').default;
+const { ResourceType, Permission } = require('@/components/admin/auth/utils/accessControl');
 
 // Mock the hooks properly
 jest.mock('@/components/admin/auth/hooks/useAuth', () => ({
@@ -31,8 +31,8 @@ describe('PermissionGuard', () => {
   // Test data
   const testUser = { id: 'user-123', name: 'Test User' };
   const testTenant = { id: 'tenant-456', name: 'Test Tenant' };
-  const testResourceType: ResourceType = 'category';
-  const testPermission: Permission = 'create';
+  const testResourceType = 'category';
+  const testPermission = 'create';
   
   beforeEach(() => {
     jest.clearAllMocks();
