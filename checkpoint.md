@@ -18,6 +18,7 @@ Created `tenantAccessControl.ts` with the following functions:
 Each function includes proper error handling and tenant membership verification.
 
 ## Next Steps
-1. Create unit tests for new functions
-2. Expose functions through appropriate service layers
-3. Continue with remaining issues (#50-52)
+1. ✅ Created unit tests for new functions 
+2. ✅ Exposed functions through appropriate service layers
+3. ✅ Created PR #53 for review and merge
+4. Continue with remaining issues (#50-52)
