@@ -13,7 +13,8 @@ jest.mock('@/lib/audit/audit-service', () => ({
 jest.mock('../../middleware/withPermission');
 jest.mock('@/lib/role-service');
 jest.mock('jsonwebtoken', () => ({
-  decode: jest.fn()
+  decode: jest.fn(),
+  verify: jest.fn() // Add verify mock since we now use it
 }));
 
 describe('Audit API Routes', () => {
@@ -24,6 +25,9 @@ describe('Audit API Routes', () => {
     (withPermission as jest.Mock).mockImplementation(
       (req, resourceType, permission, handler) => handler(req)
     );
+    
+    // Mock verify to return the same as decode for test compatibility
+    jwt.verify = jwt.decode;
   });
   
   describe('GET /api/audit', () => {
@@ -39,7 +43,7 @@ describe('Audit API Routes', () => {
         }
       );
       
-      // Mock JWT decode
+      // Mock JWT decode/verify
       jwt.decode.mockReturnValue({ userId: 'user-123' });
       
       // Mock RoleService
@@ -66,7 +70,8 @@ describe('Audit API Routes', () => {
         expect.objectContaining({
           tenantId: 'tenant-123',
           action: 'access_granted',
-          startDate: '2023-01-01'
+          startDate: '2023-01-01',
+          limit: 50 // Add this to match implementation
         }),
         'tenant-123',
         false
@@ -89,7 +94,7 @@ describe('Audit API Routes', () => {
         }
       );
       
-      // Mock JWT decode
+      // Mock JWT decode/verify
       jwt.decode.mockReturnValue({ userId: 'admin-user' });
       
       // Mock RoleService - user is global admin
@@ -103,7 +108,9 @@ describe('Audit API Routes', () => {
       
       // Check that AuditService.queryEvents was called with isGlobalAdmin=true
       expect(AuditService.queryEvents).toHaveBeenCalledWith(
-        expect.anything(),
+        expect.objectContaining({ 
+          limit: 50 // Add this to match implementation
+        }),
         'tenant-123',
         true
       );
@@ -131,7 +138,7 @@ describe('Audit API Routes', () => {
         }
       );
       
-      // Mock JWT decode
+      // Mock JWT decode/verify
       jwt.decode.mockReturnValue({ userId: 'admin-user' });
       
       // Mock RoleService
@@ -189,7 +196,7 @@ describe('Audit API Routes', () => {
         }
       );
       
-      // Mock JWT decode
+      // Mock JWT decode/verify
       jwt.decode.mockReturnValue({ userId: 'user-123' });
       
       // Mock RoleService - not a global admin
@@ -198,8 +205,81 @@ describe('Audit API Routes', () => {
       // Call the handler
       const response = await POST(req);
       
-      // Check response is forbidden
+      // Check response is forbidden (should be 403)
       expect(response.status).toBe(403);
+    });
+    
+    it('should handle missing required fields', async () => {
+      // Mock request with body missing required action field
+      const req = new NextRequest(
+        new URL('https://example.com/api/audit'),
+        {
+          headers: {
+            'x-tenant-id': 'tenant-123',
+            'authorization': 'Bearer mock-token',
+            'content-type': 'application/json'
+          },
+          method: 'POST',
+          body: JSON.stringify({
+            resourceType: 'user',
+            resourceId: 'new-user'
+            // Missing action field
+          })
+        }
+      );
+      
+      // Mock JWT decode/verify
+      jwt.decode.mockReturnValue({ userId: 'user-123' });
+      
+      // Mock RoleService
+      (RoleService.hasGlobalRole as jest.Mock).mockResolvedValue(false);
+      
+      // Call the handler
+      const response = await POST(req);
+      
+      // Check response is bad request (400)
+      expect(response.status).toBe(400);
+      
+      // Check response body mentions the missing field
+      const data = await response.json();
+      expect(data.error).toBe('Missing required field: action');
+    });
+    
+    it('should handle invalid JSON in request body', async () => {
+      // Mock request with invalid JSON
+      const req = new NextRequest(
+        new URL('https://example.com/api/audit'),
+        {
+          headers: {
+            'x-tenant-id': 'tenant-123',
+            'authorization': 'Bearer mock-token',
+            'content-type': 'application/json'
+          },
+          method: 'POST',
+          // This is a mocked way to simulate JSON parsing error
+          // by making the json() method throw an error
+          body: null
+        }
+      );
+      
+      // Make the json() method throw an error
+      req.json = jest.fn().mockRejectedValue(new Error('Invalid JSON'));
+      
+      // Mock JWT decode/verify
+      jwt.decode.mockReturnValue({ userId: 'user-123' });
+      
+      // Mock RoleService
+      (RoleService.hasGlobalRole as jest.Mock).mockResolvedValue(false);
+      
+      // Call the handler
+      const response = await POST(req);
+      
+      // Check response is bad request (400)
+      expect(response.status).toBe(400);
+      
+      // Check response body
+      const data = await response.json();
+      expect(data.error).toBe('Invalid JSON in request body');
     });
   });
 });

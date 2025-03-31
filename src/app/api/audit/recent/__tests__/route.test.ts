@@ -10,7 +10,8 @@ jest.mock('@/lib/audit/audit-service', () => ({
 }));
 jest.mock('../../../middleware/withPermission');
 jest.mock('jsonwebtoken', () => ({
-  decode: jest.fn()
+  decode: jest.fn(),
+  verify: jest.fn() // Add verify mock since we now use it
 }));
 
 describe('Recent Audit API', () => {
@@ -21,6 +22,9 @@ describe('Recent Audit API', () => {
     (withPermission as jest.Mock).mockImplementation(
       (req, resourceType, permission, handler) => handler(req)
     );
+    
+    // Mock verify to return the same as decode for test compatibility
+    jwt.verify = jwt.decode;
   });
   
   it('should return recent audit events for tenant', async () => {
@@ -35,7 +39,7 @@ describe('Recent Audit API', () => {
       }
     );
     
-    // Mock JWT decode
+    // Mock JWT decode/verify
     jest.requireMock('jsonwebtoken').decode.mockReturnValue({ userId: 'user-123' });
     
     // Mock AuditService
@@ -78,7 +82,7 @@ describe('Recent Audit API', () => {
       }
     );
     
-    // Mock JWT decode
+    // Mock JWT decode/verify
     jest.requireMock('jsonwebtoken').decode.mockReturnValue({ userId: 'user-123' });
     
     // Mock AuditService
@@ -88,9 +92,10 @@ describe('Recent Audit API', () => {
     await GET(req);
     
     // Check that AuditService.getRecentEvents was called with default parameters
+    // Updated to match our new default of 50 instead of 20
     expect(AuditService.getRecentEvents).toHaveBeenCalledWith(
       'tenant-123',
-      20, // default limit
+      50, // Updated default limit
       0   // default offset
     );
   });
@@ -107,7 +112,7 @@ describe('Recent Audit API', () => {
       }
     );
     
-    // Mock JWT decode
+    // Mock JWT decode/verify
     jest.requireMock('jsonwebtoken').decode.mockReturnValue({ userId: 'user-123' });
     
     // Mock AuditService to throw error
