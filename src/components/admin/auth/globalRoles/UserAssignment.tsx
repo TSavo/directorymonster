@@ -273,4 +273,9 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
   );
 };
 
+// Export TenantSelector for testing
+UserAssignment.__TEST_ONLY__ = {
+  TenantSelector
+};
+
 export default UserAssignment;
