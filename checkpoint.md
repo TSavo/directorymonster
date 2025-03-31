@@ -107,14 +107,21 @@ Each migrated file will be:
      - Implemented standardized NextRequest/NextResponse mocks
      - Created new JWT mock implementation in `/tests/mocks/lib/auth/jwt.ts`
      - Restored previously skipped tests with standardized mocks
+   - Successfully standardized `tests/unit/middleware/secure-tenant-context.test.ts`:
+     - Replaced custom NextResponse mock with standardized mockNextResponseJson
+     - Replaced manual NextRequest creation with createMockNextRequest
+     - Properly handled response body assertions
+     - All tests passing with standardized mocks
    - Will continue with remaining migrations based on this established pattern
 
 2. **Focused Migration Plan - Updated**:
    - Completed manual, targeted migrations of key test files:
      - ✅ `tests/middleware/withRedis.test.ts` - 3 NextResponse.json usages
      - ✅ `tests/api/middleware/withTenantAccess.test.ts` - Complex NextResponse patterns
-   - Next file to migrate:
-     - `tests/unit/middleware/secure-tenant-context.test.ts` - Security middleware mocks
+     - ✅ `tests/unit/middleware/secure-tenant-context.test.ts` - Security middleware mocks
+   - Next files to migrate:
+     - `tests/api/middleware/tenant-validation.test.ts` - More security middleware patterns
+     - `tests/admin/roles/RoleManagement.test.tsx` - Complex UI components with security context
    - Create small, focused PRs to demonstrate the migration pattern
    - Document before/after changes and test results for each migration
    - Use these examples to refine migration patterns before scaling
