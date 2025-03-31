@@ -119,17 +119,27 @@ Each migrated file will be:
      - ✅ `tests/middleware/withRedis.test.ts` - 3 NextResponse.json usages
      - ✅ `tests/api/middleware/withTenantAccess.test.ts` - Complex NextResponse patterns
      - ✅ `tests/unit/middleware/secure-tenant-context.test.ts` - Security middleware mocks
+   - Completed (with issues to resolve):
+     - `tests/unit/middleware/tenant-validation.standardized.test.ts` - Security middleware patterns
    - Next file to migrate:
-     - `tests/api/middleware/tenant-validation.test.ts` - More security middleware patterns
+     - `tests/api/middleware/authentication.test.ts` - Auth middleware patterns
    - Will include all standardized mock implementations in a single PR to demonstrate the comprehensive standardization approach
    - Following this pattern to ensure consistent mock usage across the entire codebase
 
-3. **Update Documentation**:
+3. **Current Work**:
+   - ✅ Created standardized implementation of `tests/unit/middleware/tenant-validation.standardized.test.ts`:
+     - Replaced NextResponse.json calls with mockNextResponseJson
+     - Implemented createMockNextRequest for request creation
+     - Updated Headers usage to match standardized mock patterns
+     - Fixed cloning of Headers objects to use proper approach
+   - Encountered issues with Jest test discovery - need to investigate test running patterns
+
+4. **Update Documentation**:
    - Add detailed examples to MOCKING_GUIDE.md showing before/after migration
    - Create toolkit usage documentation in MIGRATION.md
    - Document standard mock interfaces and behaviors
 
-4. **Implement Quality Controls**:
+5. **Implement Quality Controls**:
    - Add Jest tests for the migration toolkit itself
    - Create ESLint rules to prevent new non-standard mocks
    - Add pre-commit hooks to enforce mocking standards
