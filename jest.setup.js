@@ -1,6 +1,6 @@
 // Learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom';
-import { enableFetchMocks } from 'jest-fetch-mock';
+require('@testing-library/jest-dom');
+const { enableFetchMocks } = require('jest-fetch-mock');
 
 // Make sure fetch is defined globally before enabling mocks
 if (typeof global.fetch !== 'function') {
@@ -168,7 +168,13 @@ afterAll(() => {
 // Additional UI component mocks might be needed
 // If a component is referenced but not found, add it here
 jest.mock('@/ui/button', () => {
-  const Button = ({ children, ...props }) => <button data-testid="mocked-button" {...props}>{children}</button>;
+  const React = require('react');
+  const Button = function Button(props) {
+    return React.createElement('button', 
+      { 'data-testid': 'mocked-button', ...props }, 
+      props.children
+    );
+  };
   Button.displayName = 'MockedButton';
   return {
     __esModule: true,
