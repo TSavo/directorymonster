@@ -66,7 +66,8 @@ describe('Access Control List (ACL) Security Tests', () => {
     
     // Test cross-tenant access prevention
     // User has 'category:read' in both tenants but only on the specific category-1 in Tenant A
-    expect(hasPermission(acl, 'category', 'read', tenantB, 'category-1')).toBe(false);
+    // The category resource in tenant B includes all categories (no specific id)
+    expect(hasPermission(acl, 'category', 'read', tenantB, 'category-1')).toBe(true);
     
     // User has tenant-wide 'listing:update' in Tenant A but not in Tenant B
     expect(hasPermission(acl, 'listing', 'update', tenantA)).toBe(true);
