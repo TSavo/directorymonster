@@ -1,16 +1,15 @@
 /**
  * @jest-environment node
  */
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { mockNextResponseJson } from '@/tests/mocks/next/response';
 import { withRedis } from '../../src/middleware/withRedis';
-import { redis } from '../../src/lib/redis-client';
+import { redis } from '@/tests/mocks/lib/redis-client';
 
-// Mock the redis client
-jest.mock('../../src/lib/redis-client', () => ({
-  redis: {
-    ping: jest.fn(),
-  },
-}));
+// Use standardized Redis mock
+jest.mock('../../src/lib/redis-client', () => {
+  return require('@/tests/mocks/lib/redis-client');
+});
 
 describe('withRedis Middleware', () => {
   beforeEach(() => {
@@ -23,7 +22,7 @@ describe('withRedis Middleware', () => {
     
     // Create a mock handler
     const mockHandler = jest.fn().mockResolvedValue(
-      NextResponse.json({ success: true })
+      mockNextResponseJson({ success: true })
     );
     
     // Create a mock request
@@ -51,7 +50,7 @@ describe('withRedis Middleware', () => {
     
     // Create a mock handler that should not be called
     const mockHandler = jest.fn().mockResolvedValue(
-      NextResponse.json({ success: true })
+      mockNextResponseJson({ success: true })
     );
     
     // Create a mock request
@@ -137,7 +136,7 @@ describe('withRedis Middleware', () => {
     // Create a mock handler that uses multiple arguments
     const mockHandler = jest.fn((...args) => {
       // Return the number of arguments
-      return NextResponse.json({ argCount: args.length });
+      return mockNextResponseJson({ argCount: args.length });
     });
     
     // Create a mock request
