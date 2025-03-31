@@ -29,7 +29,14 @@ function getGlobalRoleKey(roleId: string): string {
   return `${GLOBAL_ROLE_KEY_PREFIX}${roleId}`;
 }
 
-// Helper function to generate UUID that works in both Node.js and browser environments
+/**
+ * Generates a universally unique identifier (UUID) string.
+ *
+ * This function first attempts to use `crypto.randomUUID` (available in Node.js v14.17.0+ and modern browsers).
+ * If that is not available, it falls back to a manual implementation that produces a UUID compliant with version 4.
+ *
+ * @returns A UUID string.
+ */
 function generateUUID(): string {
   // Use crypto.randomUUID if available (Node.js 14.17.0+ and modern browsers)
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
