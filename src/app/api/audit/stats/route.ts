@@ -9,13 +9,17 @@ import { ResourceType } from '@/components/admin/auth/utils/accessControl';
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
 
 /**
- * GET handler for retrieving audit event statistics
- * Requires 'read' permission on 'audit' resource type
- * 
- * Query parameters:
- * - startDate: Start date for stats calculation (ISO string)
- * - endDate: End date for stats calculation (ISO string)
- * - days: Number of days to include (default: 30)
+ * Retrieves aggregated audit event statistics within a specified date range.
+ *
+ * This endpoint requires the caller to have 'read' permission on the 'audit' resource.
+ * It verifies the request's JWT token to extract the user ID and tenant details, then determines
+ * the date range based on query parameters. If both `startDate` and `endDate` are provided, they are used;
+ * otherwise, the range is calculated using the `days` parameter (defaulting to 30 days and constrained between 1 and 365).
+ * Up to 5000 events are queried, and statistics are aggregated by action, severity, resource type, user, and day,
+ * with an overall success rate computed.
+ *
+ * @param req - The incoming GET request.
+ * @returns A JSON response containing an object with the aggregated audit statistics.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withPermission(
@@ -37,6 +41,22 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const endDateParam = url.searchParams.get('endDate');
         const daysParam = url.searchParams.get('days');
         
+
+        // Validate date parameters if provided
+        if (startDateParam && !isValidISOString(startDateParam)) {
+          return NextResponse.json(
+            { error: 'Invalid startDate format. Use ISO date string.' },
+            { status: 400 }
+          );
+        }
+        
+        if (endDateParam && !isValidISOString(endDateParam)) {
+          return NextResponse.json(
+            { error: 'Invalid endDate format. Use ISO date string.' },
+            { status: 400 }
+          );
+        }
+
         // Calculate date range
         let startDate: string;
         let endDate: string;
@@ -126,3 +146,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     }
   );
 }
+
+
+function isValidISOString(dateString: string): boolean {
+  const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/;
+  return regex.test(dateString);
+}
+

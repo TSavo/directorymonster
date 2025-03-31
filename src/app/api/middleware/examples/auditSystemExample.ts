@@ -31,10 +31,14 @@ export async function exampleWithAuditedPermission(req: NextRequest): Promise<Ne
 }
 
 /**
- * Example 2: Manual audit logging for custom events
- * 
- * Use this approach for non-permission events like user login/logout,
- * settings changes, or other security-relevant actions.
+ * Manually updates a user's notification settings and logs an audit event.
+ *
+ * This function extracts the tenant ID and user information from request headers, decodes the JWT token to retrieve
+ * the user ID, and then attempts to update the user's settings (enabling notifications). It logs an audit event with
+ * INFO severity on a successful update, including client details such as IP address and user agent. If an error occurs,
+ * it logs an audit event with ERROR severity containing the error message and request URL, and returns a 500 error response.
+ *
+ * @returns A JSON response with the updated user settings on success or an error message on failure.
  */
 export async function exampleManualAuditLogging(req: NextRequest): Promise<NextResponse> {
   try {
@@ -104,16 +108,29 @@ export async function exampleManualAuditLogging(req: NextRequest): Promise<NextR
   }
 }
 
-// Simulated business logic
+/**
+ * Simulates updating a user's settings.
+ *
+ * This function mimics updating a user's settings in a database by returning a new object that merges the provided settings with a current timestamp.
+ *
+ * @param userId - The unique identifier of the user whose settings are being updated.
+ * @param settings - An object containing the settings to update.
+ * @returns A Promise that resolves to the updated settings object with an added "updatedAt" timestamp in ISO format.
+ */
 async function updateUserSettings(userId: string, settings: any): Promise<any> {
   // In a real application, this would update user settings in the database
   return { ...settings, updatedAt: new Date().toISOString() };
 }
 
 /**
- * Example 3: Audit logging for role management
- * 
- * Use the specialized helper methods for common operations
+ * Creates a new role for a tenant and logs the audit event for the role creation.
+ *
+ * This function checks the user's permission to create roles, extracts the tenant and user context from request headers and a JWT token,
+ * and processes the provided role data to create a new role. After successfully creating the role, it logs an audit event with key details
+ * such as the role name, whether the role is global, and the count of permissions. If any error occurs, it logs the error and returns a 500 response.
+ *
+ * @param req - The incoming HTTP request containing tenant and user authentication headers.
+ * @returns A JSON response with the newly created role data or an error message if creation fails.
  */
 export async function exampleRoleManagement(req: NextRequest): Promise<NextResponse> {
   return withPermission(
@@ -164,7 +181,16 @@ export async function exampleRoleManagement(req: NextRequest): Promise<NextRespo
   );
 }
 
-// Simulated role creation
+/**
+ * Simulates creating a role.
+ *
+ * This function generates a new role object by augmenting the provided role data with a unique identifier and a creation timestamp.
+ * In a real application, this function would insert the new role into a database.
+ *
+ * @param roleData - An object containing the properties of the role.
+ * @returns A role object containing the provided properties, a unique id, and the creation timestamp.
+ */
+
 async function createRole(roleData: any): Promise<any> {
   // In a real application, this would create a role in the database
   return {
@@ -175,7 +201,18 @@ async function createRole(roleData: any): Promise<any> {
 }
 
 /**
- * Example 4: Audit logging for tenant membership changes
+
+ * Processes a tenant membership change by adding a user to a tenant and logging the event.
+ *
+ * This function validates that the requester has permission to manage tenant actions. It extracts the tenant ID
+ * and admin user ID from the request headers and JWT token, parses the target user's ID and role from the request body,
+ * adds the user to the tenant, and logs the membership event with details such as the initial role and inviter.
+ * On success, it returns a JSON response indicating the operation succeeded; on failure, it logs the error and returns
+ * a JSON response with a 500 status code.
+ *
+ * @param req - The incoming HTTP request with tenant context, authorization header, and membership details in the JSON body.
+ * @returns A response object containing a JSON message indicating success or failure of the tenant membership update.
+
  */
 export async function exampleTenantMembership(req: NextRequest): Promise<NextResponse> {
   return withPermission(
@@ -222,14 +259,27 @@ export async function exampleTenantMembership(req: NextRequest): Promise<NextRes
   );
 }
 
-// Simulated user tenant addition
+/**
+ * Simulates adding a user to a tenant by logging the addition.
+ *
+ * In a production environment, this function would perform a database operation to add the user to the specified tenant with the designated role.
+ *
+ * @param userId - The unique identifier of the user to be added.
+ * @param tenantId - The unique identifier of the tenant.
+ * @param roleId - The unique identifier of the role assigned to the user within the tenant.
+ */
+
 async function addUserToTenant(userId: string, tenantId: string, roleId: string): Promise<void> {
   // In a real application, this would add the user to the tenant
   console.log(`Added user ${userId} to tenant ${tenantId} with role ${roleId}`);
 }
 
 /**
- * Example 5: Retrieving audit logs for admin dashboard
+ * Retrieves audit logs for the admin dashboard with optional filtering.
+ *
+ * This function enforces audit read permissions and extracts tenant and user context from the request headers. It decodes the JWT token to obtain the user ID and checks if the user is a global admin, which determines whether logs from all tenants can be accessed. The function supports optional query parameters for filtering by startDate, endDate, action, and resourceType, and allows pagination using limit and offset. After querying the audit events via the audit service, it logs the audit access event and returns a JSON response containing the retrieved logs. In case of an error, it logs the error details and returns a JSON response with a 500 status code.
+ *
+ * @returns A JSON response containing the audit events on success, or an error message with a 500 status on failure.
  */
 export async function exampleRetrieveAuditLogs(req: NextRequest): Promise<NextResponse> {
   return withPermission(
@@ -304,14 +354,26 @@ export async function exampleRetrieveAuditLogs(req: NextRequest): Promise<NextRe
   );
 }
 
-// Simulated global admin check
+
+/**
+ * Simulated global admin check.
+ *
+ * Determines whether the specified user ID corresponds to a global administrator.
+ * This simulation returns true only if the user ID is exactly 'admin-user-id'.
+ *
+ * @param userId - The identifier of the user to check.
+ * @returns A promise that resolves to true if the user is a global admin, false otherwise.
+ */
+
 async function isUserGlobalAdmin(userId: string): Promise<boolean> {
   // In a real application, this would check if the user has global admin roles
   return userId === 'admin-user-id';
 }
 
 /**
- * Example 6: Cross-tenant access attempt detection
+ * Detects and handles cross-tenant access requests.
+ *
+ * This function extracts tenant identifiers from both the request headers and URL query parameters to determine if a user is attempting to access a resource from a tenant different than their own. It then verifies whether the user has cross-tenant access permissions. Unauthorized attempts are logged via the audit service and result in a 403 JSON response. If the tenant IDs match or the user is authorized, the function returns a success response. In the event of an error during processing, the function logs the error and responds with a 500 JSON error.
  */
 export async function exampleCrossTenantAttempt(req: NextRequest): Promise<NextResponse> {
   try {
@@ -362,7 +424,17 @@ export async function exampleCrossTenantAttempt(req: NextRequest): Promise<NextR
   }
 }
 
-// Simulated cross-tenant access check
+
+/**
+ * Simulates verifying whether a user has permissions for cross-tenant access.
+ *
+ * This function is a simulated check that always returns false, indicating that no user
+ * has cross-tenant access in this example.
+ *
+ * @param userId - The identifier of the user to check.
+ * @returns A promise that resolves to false.
+ */
+
 async function userHasCrossTenantAccess(userId: string): Promise<boolean> {
   // In a real application, this would check if user has cross-tenant permissions
   return false;

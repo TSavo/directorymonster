@@ -9,14 +9,18 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
 // Throw an error if JWT_SECRET is not set in production
 if (process.env.NODE_ENV === 'production' && 
     (process.env.JWT_SECRET === undefined || process.env.JWT_SECRET === 'default-secret-for-development')) {
-  console.error('WARNING: JWT_SECRET environment variable is not set in production!');
+  throw new Error('FATAL: JWT_SECRET environment variable must be set in production.');
 }
 
 /**
- * Verify authentication token
- * 
- * @param token JWT token to verify
- * @returns Decoded token payload or null if invalid
+ * Verifies a JWT token and returns its decoded payload.
+ *
+ * The function validates the provided token using the configured secret by ensuring that it contains a mandatory
+ * `userId` claim and has not expired. If the token is invalid, missing required claims, or expired, an error is logged
+ * and the function returns null.
+ *
+ * @param token - The JWT token to verify.
+ * @returns The decoded token payload if valid, otherwise null.
  */
 export function verifyAuthToken(token: string): JwtPayload | null {
   try {
@@ -43,6 +47,60 @@ export function verifyAuthToken(token: string): JwtPayload | null {
 }
 
 /**
+ * Helper function to handle common permission validation logic
+ * 
+ * @param req NextRequest object
+ * @returns Object containing validation results or error response
+ */
+async function validatePermissionRequest(req: NextRequest): Promise<
+  | { success: true; userId: string; tenantId: string }
+  | { success: false; response: NextResponse }
+> {
+  // Extract the token from the Authorization header
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    };
+  }
+  
+  const token = authHeader.replace('Bearer ', '');
+  const decoded = verifyAuthToken(token);
+  
+  if (!decoded) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: 'Invalid authentication token' },
+        { status: 401 }
+      )
+    };
+  }
+  
+  // Extract tenant ID from the request headers
+  const tenantId = req.headers.get('x-tenant-id');
+  if (!tenantId) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: 'Tenant ID required' },
+        { status: 400 }
+      )
+    };
+  }
+  
+  return {
+    success: true,
+    userId: decoded.userId,
+    tenantId
+  };
+}
+
+/**
  * Middleware to handle API-level permission checks
  * 
  * @param req NextRequest object
@@ -60,37 +118,19 @@ export async function withPermission(
   resourceId?: string
 ): Promise<NextResponse> {
   try {
-    // Extract the token from the Authorization header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+
+    // Use the shared validation helper
+    const validation = await validatePermissionRequest(req);
+    if (!validation.success) {
+      return validation.response;
     }
     
-    const token = authHeader.replace('Bearer ', '');
-    const decoded = verifyAuthToken(token);
-    
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid authentication token' },
-        { status: 401 }
-      );
-    }
-    
-    // Extract tenant ID from the request headers
-    const tenantId = req.headers.get('x-tenant-id');
-    if (!tenantId) {
-      return NextResponse.json(
-        { error: 'Tenant ID required' },
-        { status: 400 }
-      );
-    }
+    const { userId, tenantId } = validation;
     
     // Check if user has the required permission
     const hasPermission = await RoleService.hasPermission(
-      decoded.userId,
+      userId,
+
       tenantId,
       resourceType,
       permission,
@@ -133,14 +173,20 @@ export async function withPermission(
 }
 
 /**
- * Middleware to check if user has any of the specified permissions
- * 
- * @param req NextRequest object
- * @param resourceType Type of resource being accessed
- * @param permissions Array of permissions, any one of which grants access
- * @param handler Function to handle the request if permission check passes
- * @param resourceId Optional specific resource ID
- * @returns NextResponse object
+ * Checks if the authenticated user has at least one of the specified permissions.
+ *
+ * The middleware extracts a JWT from the 'Authorization' header and validates it,
+ * then ensures a tenant ID is provided in the request headers. It iterates over the given
+ * permissions and, if the user has any matching permission, proceeds by invoking the handler.
+ * If the token is missing or invalid, the tenant ID is absent, or none of the permissions are granted,
+ * an appropriate JSON error response is returned.
+ *
+ * @param req - The incoming request that must include an authorization token and tenant ID.
+ * @param resourceType - The type of resource the user is attempting to access.
+ * @param permissions - An array of permissions, any of which grants access.
+ * @param handler - Asynchronous function to handle the request if permission validation passes.
+ * @param resourceId - Optional specific identifier for the resource.
+ * @returns A response from the handler if permission is granted, or an error response otherwise.
  */
 export async function withAnyPermission(
   req: NextRequest,
@@ -150,33 +196,15 @@ export async function withAnyPermission(
   resourceId?: string
 ): Promise<NextResponse> {
   try {
-    // Extract the token from the Authorization header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+
+    // Use the shared validation helper
+    const validation = await validatePermissionRequest(req);
+    if (!validation.success) {
+      return validation.response;
     }
     
-    const token = authHeader.replace('Bearer ', '');
-    const decoded = verifyAuthToken(token);
-    
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid authentication token' },
-        { status: 401 }
-      );
-    }
-    
-    // Extract tenant ID from the request headers
-    const tenantId = req.headers.get('x-tenant-id');
-    if (!tenantId) {
-      return NextResponse.json(
-        { error: 'Tenant ID required' },
-        { status: 400 }
-      );
-    }
+    const { userId, tenantId } = validation;
+
     
     // Check each permission
     for (const permission of permissions) {
@@ -226,14 +254,21 @@ export async function withAnyPermission(
 }
 
 /**
- * Middleware to check if user has all specified permissions
- * 
- * @param req NextRequest object
- * @param resourceType Type of resource being accessed
- * @param permissions Array of permissions, all of which are required
- * @param handler Function to handle the request if permission check passes
- * @param resourceId Optional specific resource ID
- * @returns NextResponse object
+ * Ensures that the authenticated user possesses all required permissions for a resource.
+ *
+ * This middleware extracts a JWT from the request's Authorization header, verifies the token,
+ * and retrieves the tenant ID from the request headers. It then checks that the user has every
+ * permission listed in the provided array. If any permission is missing, a 403 error response is returned
+ * with details about the missing permissions. Additionally, it returns a 401 error for missing or invalid
+ * authentication tokens and a 400 error if the tenant ID is not provided. In case of unexpected errors,
+ * it returns a 500 error response.
+ *
+ * @param req - The incoming request.
+ * @param resourceType - The type of resource being accessed.
+ * @param permissions - An array of permissions that the user must have.
+ * @param handler - A callback function to process the request if permission checks pass.
+ * @param resourceId - An optional identifier for a specific resource.
+ * @returns A response generated by the handler or an error response.
  */
 export async function withAllPermissions(
   req: NextRequest,
@@ -243,33 +278,15 @@ export async function withAllPermissions(
   resourceId?: string
 ): Promise<NextResponse> {
   try {
-    // Extract the token from the Authorization header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+
+    // Use the shared validation helper
+    const validation = await validatePermissionRequest(req);
+    if (!validation.success) {
+      return validation.response;
     }
     
-    const token = authHeader.replace('Bearer ', '');
-    const decoded = verifyAuthToken(token);
-    
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid authentication token' },
-        { status: 401 }
-      );
-    }
-    
-    // Extract tenant ID from the request headers
-    const tenantId = req.headers.get('x-tenant-id');
-    if (!tenantId) {
-      return NextResponse.json(
-        { error: 'Tenant ID required' },
-        { status: 400 }
-      );
-    }
+    const { userId, tenantId } = validation;
+
     
     // Create an array to track all missing permissions
     const missingPermissions: Permission[] = [];
@@ -326,14 +343,27 @@ export async function withAllPermissions(
 }
 
 /**
- * Middleware to check permission based on resource ID from the request
- * 
- * @param req NextRequest object
- * @param resourceType Type of resource being accessed
- * @param permission Permission needed for the operation
- * @param handler Function to handle the request if permission check passes
- * @param idParam Parameter name for the resource ID
- * @returns NextResponse object
+ * Extracts a resource ID from the request and verifies the user's permission for that resource.
+ *
+ * This middleware attempts to retrieve the resource identifier by checking, in order:
+ * - The query parameter specified by `idParam` in the URL.
+ * - The request body for `POST`, `PUT`, or `PATCH` methods.
+ * - The last segment of the URL path if it resembles an identifier.
+ *
+ * If the request includes the header `x-require-resource-id` set to 'true' and no resource ID is extracted,
+ * it returns a JSON error response with a 400 status. Otherwise, it delegates to the standard permission middleware
+ * by invoking `withPermission` with the extracted resource ID.
+ *
+ * @param req - The incoming request from which the resource ID is extracted.
+ * @param resourceType - The type of resource being accessed.
+ * @param permission - The permission required to perform the requested operation.
+ * @param handler - The async function to handle the request if the permission check succeeds.
+ * @param idParam - The key used to extract the resource ID from the request (default is 'id').
+ * @returns A NextResponse from the handler if permission is granted, or a JSON error response otherwise.
+ *
+ * @remarks
+ * Resource ID extraction prioritizes URL query parameters, then the request body (for applicable methods),
+ * and finally the URL path. Any issues encountered during extraction are logged for debugging purposes.
  */
 export async function withResourcePermission(
   req: NextRequest,
@@ -399,9 +429,47 @@ export async function withResourcePermission(
         { status: 400 }
       );
     }
+
+    // Use the shared validation helper
+    const validation = await validatePermissionRequest(req);
+    if (!validation.success) {
+      return validation.response;
+    }
     
-    // Now use the standard withPermission middleware with the extracted resource ID
-    return withPermission(req, resourceType, permission, handler, resourceId);
+    const { userId, tenantId } = validation;
+    
+    // Check permission with the extracted resource ID
+    const hasPermission = await RoleService.hasPermission(
+      userId,
+      tenantId,
+      resourceType,
+      permission,
+      resourceId
+    );
+    
+    if (!hasPermission) {
+      // Generate a meaningful error message
+      let errorMessage = `Permission denied: Required '${permission}' permission for ${resourceType}`;
+      if (resourceId) {
+        errorMessage += ` with ID ${resourceId}`;
+      }
+      
+      return NextResponse.json(
+        { 
+          error: 'Permission denied', 
+          message: errorMessage,
+          details: {
+            resourceType,
+            permission,
+            resourceId
+          }
+        },
+        { status: 403 }
+      );
+    }
+    
+    // If permission check passes, proceed with the handler
+    return await handler(req);
   } catch (error) {
     console.error('Resource permission validation error:', error);
     return NextResponse.json(

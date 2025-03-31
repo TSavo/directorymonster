@@ -40,23 +40,14 @@ const customJestConfig = {
     '!**/node_modules/**',
     '!**/.next/**',
   ],
-  // Reduce verbosity in test output
+  // Configuration for JSON output
   verbose: false,
-  silent: true,  // Suppress console output completely
+  silent: false,
   maxWorkers: '50%',
   errorOnDeprecated: false,
   testPathIgnorePatterns: ['/node_modules/', '/.next/'],
-  // Use silent reporter with extreme minimization options
-  reporters: [
-    ['jest-silent-reporter', {
-      useDots: true,
-      showPaths: false,
-      showWarnings: false,
-      height: 1,  // Minimize console height usage
-      suppressErrors: false, // Still show errors but we'll reduce their verbosity
-      showSummary: false // Don't show the test summary at the end
-    }]
-  ],
+  // Use JSON output by default
+  json: true,
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
