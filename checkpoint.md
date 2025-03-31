@@ -1,27 +1,34 @@
-# Checkpoint: ACL System Enhancement
+# Checkpoint: ACL System Enhancement with Focus on TenantGuard Component
 
-## Status Summary
-Created four GitHub issues to address gaps in ACL implementation for multi-tenant architecture:
-- #49: Implement hasPermissionInTenant Function (High Priority)
-- #50: Enhance Role Service Integration with ACL (Medium)
-- #51: Implement ACL Storage and Retrieval (Medium)
-- #52: Complete Tenant Membership Service ACL Integration (Medium)
+## Current Status
+After analyzing the GitHub issues and project status, I'll be focusing on high-priority ACL-related issues:
+- #43: Create TenantGuard Component for UI Access Control (High Priority)
+- #42: Enhance ACL System with Tenant Context (High Priority)
 
-## Implementation Progress
-Created `tenantAccessControl.ts` with the following functions:
-- `hasPermissionInTenant`: Core function to check permissions in tenant context
-- `hasAnyPermissionInTenant`: Check if user has any of a list of permissions
-- `hasAllPermissionsInTenant`: Check if user has all specified permissions
-- `getAccessibleResourcesInTenant`: Get resources user can access in a tenant
-- `hasGlobalPermissionInTenant`: Check for tenant-wide permissions
+Previous work on ACL implementation:
+- PR #53 implements the hasPermissionInTenant Function (resolving issue #49)
+- Issues #50-52 address other aspects of the ACL system
 
-Each function includes proper error handling and tenant membership verification.
+## Implementation Plan
+
+### For Issue #43: Create TenantGuard Component for UI Access Control
+1. Create a React component to handle UI-level access control
+2. Implement client-side permission checking that integrates with the backend ACL
+3. Add support for conditional rendering based on permissions
+4. Write comprehensive tests for the component
+5. Document usage patterns for developers
+
+### For Issue #42: Enhance ACL System with Tenant Context
+1. Extend existing ACL functions to incorporate tenant context
+2. Ensure proper isolation between tenants
+3. Optimize permission checking for performance
+4. Update relevant middleware and services
+5. Implement tests for tenant context functionality
 
 ## Current Task Progress
-1. ✅ Created unit tests for new functions 
-2. ✅ Exposed functions through appropriate service layers
-3. ✅ Created PR #53 for review and merge
-4. Continue with remaining issues (#50-52)
+1. Reviewing existing ACL code structure to understand integration points
+2. Planning implementation approach for TenantGuard component
+3. Will mark issue #43 as in-progress and create a dedicated branch
 
 ## Previous Work: PR Merge and Multi-Tenant Architecture Integration
 
@@ -50,13 +57,7 @@ The multi-tenant ACL implementation includes three main components:
 
 ## Next Steps
 
-After completing the remaining issues (#50-52), we'll have a robust ACL system with:
-1. Proper multi-tenant isolation
-2. Efficient permission checks
-3. Role-based access control
-4. Integration with middleware components
-
-Subsequent work should focus on:
-- UI components for role and permission management
-- Performance optimization
-- Documentation for developers
+1. Mark issue #43 as in-progress
+2. Create branch for implementation
+3. Begin TenantGuard component implementation
+4. Regular updates to this checkpoint as work progresses
