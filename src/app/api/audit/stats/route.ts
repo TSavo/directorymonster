@@ -41,6 +41,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const endDateParam = url.searchParams.get('endDate');
         const daysParam = url.searchParams.get('days');
         
+
         // Validate date parameters if provided
         if (startDateParam && !isValidISOString(startDateParam)) {
           return NextResponse.json(
@@ -55,7 +56,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             { status: 400 }
           );
         }
-        
+
         // Calculate date range
         let startDate: string;
         let endDate: string;
@@ -146,7 +147,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   );
 }
 
+
 function isValidISOString(dateString: string): boolean {
   const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/;
   return regex.test(dateString);
 }
+

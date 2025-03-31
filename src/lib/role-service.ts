@@ -411,7 +411,9 @@ export class RoleService {
     try {
       // Look for any tenant where the user has roles
       const allRolesPattern = `user:roles:${userId}:*`;
+
       const roleKeys = await RoleService.scanKeys(allRolesPattern);
+
       
       // Check each tenant for the user's roles
       for (const key of roleKeys) {
@@ -419,7 +421,9 @@ export class RoleService {
         const tenantId = key.split(':')[3];
         
         // Get roles for this user in this tenant
+
         const roles = await RoleService.getUserRoles(userId, tenantId);
+
         
         // Check if any role is global
         if (roles.some(role => role.isGlobal)) {

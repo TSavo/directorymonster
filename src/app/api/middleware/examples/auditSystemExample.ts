@@ -190,6 +190,7 @@ export async function exampleRoleManagement(req: NextRequest): Promise<NextRespo
  * @param roleData - An object containing the properties of the role.
  * @returns A role object containing the provided properties, a unique id, and the creation timestamp.
  */
+
 async function createRole(roleData: any): Promise<any> {
   // In a real application, this would create a role in the database
   return {
@@ -200,6 +201,7 @@ async function createRole(roleData: any): Promise<any> {
 }
 
 /**
+
  * Processes a tenant membership change by adding a user to a tenant and logging the event.
  *
  * This function validates that the requester has permission to manage tenant actions. It extracts the tenant ID
@@ -210,6 +212,7 @@ async function createRole(roleData: any): Promise<any> {
  *
  * @param req - The incoming HTTP request with tenant context, authorization header, and membership details in the JSON body.
  * @returns A response object containing a JSON message indicating success or failure of the tenant membership update.
+
  */
 export async function exampleTenantMembership(req: NextRequest): Promise<NextResponse> {
   return withPermission(
@@ -265,6 +268,7 @@ export async function exampleTenantMembership(req: NextRequest): Promise<NextRes
  * @param tenantId - The unique identifier of the tenant.
  * @param roleId - The unique identifier of the role assigned to the user within the tenant.
  */
+
 async function addUserToTenant(userId: string, tenantId: string, roleId: string): Promise<void> {
   // In a real application, this would add the user to the tenant
   console.log(`Added user ${userId} to tenant ${tenantId} with role ${roleId}`);
@@ -350,6 +354,7 @@ export async function exampleRetrieveAuditLogs(req: NextRequest): Promise<NextRe
   );
 }
 
+
 /**
  * Simulated global admin check.
  *
@@ -359,6 +364,7 @@ export async function exampleRetrieveAuditLogs(req: NextRequest): Promise<NextRe
  * @param userId - The identifier of the user to check.
  * @returns A promise that resolves to true if the user is a global admin, false otherwise.
  */
+
 async function isUserGlobalAdmin(userId: string): Promise<boolean> {
   // In a real application, this would check if the user has global admin roles
   return userId === 'admin-user-id';
@@ -418,6 +424,7 @@ export async function exampleCrossTenantAttempt(req: NextRequest): Promise<NextR
   }
 }
 
+
 /**
  * Simulates verifying whether a user has permissions for cross-tenant access.
  *
@@ -427,6 +434,7 @@ export async function exampleCrossTenantAttempt(req: NextRequest): Promise<NextR
  * @param userId - The identifier of the user to check.
  * @returns A promise that resolves to false.
  */
+
 async function userHasCrossTenantAccess(userId: string): Promise<boolean> {
   // In a real application, this would check if user has cross-tenant permissions
   return false;

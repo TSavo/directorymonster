@@ -118,6 +118,7 @@ export async function withPermission(
   resourceId?: string
 ): Promise<NextResponse> {
   try {
+
     // Use the shared validation helper
     const validation = await validatePermissionRequest(req);
     if (!validation.success) {
@@ -129,6 +130,7 @@ export async function withPermission(
     // Check if user has the required permission
     const hasPermission = await RoleService.hasPermission(
       userId,
+
       tenantId,
       resourceType,
       permission,
@@ -194,6 +196,7 @@ export async function withAnyPermission(
   resourceId?: string
 ): Promise<NextResponse> {
   try {
+
     // Use the shared validation helper
     const validation = await validatePermissionRequest(req);
     if (!validation.success) {
@@ -201,11 +204,12 @@ export async function withAnyPermission(
     }
     
     const { userId, tenantId } = validation;
+
     
     // Check each permission
     for (const permission of permissions) {
       const hasPermission = await RoleService.hasPermission(
-        userId,
+        decoded.userId,
         tenantId,
         resourceType,
         permission,
@@ -274,6 +278,7 @@ export async function withAllPermissions(
   resourceId?: string
 ): Promise<NextResponse> {
   try {
+
     // Use the shared validation helper
     const validation = await validatePermissionRequest(req);
     if (!validation.success) {
@@ -281,6 +286,7 @@ export async function withAllPermissions(
     }
     
     const { userId, tenantId } = validation;
+
     
     // Create an array to track all missing permissions
     const missingPermissions: Permission[] = [];
@@ -288,7 +294,7 @@ export async function withAllPermissions(
     // Check each permission
     for (const permission of permissions) {
       const hasPermission = await RoleService.hasPermission(
-        userId,
+        decoded.userId,
         tenantId,
         resourceType,
         permission,
@@ -423,7 +429,7 @@ export async function withResourcePermission(
         { status: 400 }
       );
     }
-    
+
     // Use the shared validation helper
     const validation = await validatePermissionRequest(req);
     if (!validation.success) {

@@ -59,6 +59,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const offsetParam = url.searchParams.get('offset');
         const successParam = url.searchParams.get('success');
         
+
         // Validate date parameters
         if (startDateParam && !isValidISOString(startDateParam)) {
           return NextResponse.json(
@@ -74,6 +75,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           );
         }
         
+
         // Check if user is a global admin (can see cross-tenant events)
         const isGlobalAdmin = await RoleService.hasGlobalRole(userId);
         
@@ -182,6 +184,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           );
         }
         
+
         // Validate resourceType if provided
         if (body.resourceType && !Object.values(ResourceType).includes(body.resourceType)) {
           return NextResponse.json(
@@ -198,6 +201,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           );
         }
         
+
         // Check if user is a global admin (can create cross-tenant events)
         const isGlobalAdmin = await RoleService.hasGlobalRole(userId);
         
@@ -232,6 +236,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
   );
 }
+
 
 function isValidISOString(dateString: string): boolean {
   const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/;
