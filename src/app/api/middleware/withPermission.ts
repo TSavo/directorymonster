@@ -3,6 +3,8 @@ import { decode, JwtPayload } from 'jsonwebtoken';
 import RoleService from '@/lib/role-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 import { withTenantAccess } from './withTenantAccess';
+import AuditService from '@/lib/audit/audit-service';
+import { AuditAction } from '@/lib/audit/types';
 
 /**
  * Enhanced middleware to check if user has the required permission in tenant context
@@ -391,8 +393,7 @@ export async function withAuditedPermission(
 }
 
 /**
- * Helper function to log audit events
- * Placeholder implementation - will be replaced with actual audit logger
+ * Helper function to log audit events using the AuditService
  */
 async function logAuditEvent(event: {
   userId: string;
@@ -402,9 +403,30 @@ async function logAuditEvent(event: {
   resourceId?: string;
   details: Record<string, any>;
 }): Promise<void> {
-  // This is a placeholder for the actual audit logging implementation
-  // It will be implemented as part of Issue #55: Implement ACL Audit Trail System
-  console.log('Audit event:', JSON.stringify(event));
+  try {
+    // Map the old action strings to new AuditAction enum
+    const actionMap: Record<string, AuditAction> = {
+      'access': AuditAction.ACCESS_GRANTED,
+      'denied': AuditAction.ACCESS_DENIED
+    };
+    
+    const auditAction = actionMap[event.action] || AuditAction.ACCESS_GRANTED;
+    const success = event.action === 'access';
+    
+    // Use the AuditService to log the permission event
+    await AuditService.logPermissionEvent(
+      event.userId,
+      event.tenantId,
+      event.resourceType as any, // Cast to ResourceType
+      event.details.permission,
+      success,
+      event.resourceId,
+      event.details
+    );
+  } catch (error) {
+    // Log error but don't block the request flow
+    console.error('Error logging audit event:', error);
+  }
 }
 
 export default withPermission;
