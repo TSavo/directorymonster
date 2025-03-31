@@ -18,7 +18,23 @@ interface GlobalRoleAPI {
 }
 
 /**
- * Hook for managing global roles
+ * A React hook for managing global roles within the application.
+ *
+ * This hook initializes and maintains state for global roles, a loading indicator, and error messages.
+ * It automatically fetches the list of global roles on initial render and provides methods to refresh
+ * the list, create new roles, update or delete existing roles, and manage user-role assignments.
+ *
+ * @returns An object containing:
+ *  - globalRoles: The current list of global roles.
+ *  - isLoading: A boolean indicating whether the roles are currently being loaded.
+ *  - error: A string with an error message if an error occurred, or null otherwise.
+ *  - refresh: A function to refresh the list of global roles.
+ *  - createRole: A function to create a new global role.
+ *  - updateRole: A function to update an existing global role.
+ *  - deleteRole: A function to delete a global role.
+ *  - getUsersWithRole: A function to fetch users associated with a specific global role.
+ *  - assignRole: A function to assign a global role to a user within a tenant.
+ *  - removeRole: A function to remove a global role from a user within a tenant.
  */
 export function useGlobalRoles(): {
   globalRoles: Role[];
