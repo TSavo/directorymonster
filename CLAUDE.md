@@ -108,6 +108,26 @@ src/components/admin/categories/
    - Test behavior, not implementation
    - Organize tests to mirror component structure
 
+## Security Guidelines
+
+1. **Tenant Isolation**
+   - Always use security middleware for tenant validation
+   - Use `withSecureTenantContext` for basic tenant validation
+   - Use `withSecureTenantPermission` when permissions are needed
+   - Refer to [Tenant Security Guide](docs/TENANT_SECURITY_GUIDE.md) for details
+
+2. **Security Best Practices**
+   - Always include tenant context in service calls
+   - Check for cross-tenant access in request content
+   - Use `detectCrossTenantAccess` utility for content validation
+   - Never expose tenant IDs in URLs or client-side code
+
+3. **Security Testing**
+   - Verify tenant isolation in test cases
+   - Mock context validation in unit tests
+   - Test cross-tenant access prevention
+   - Consult [Testing Strategy](docs/testing.md) for more details
+
 ## Common Issues
 
 1. **CSS Processing**
@@ -125,7 +145,13 @@ src/components/admin/categories/
    - Check Redis connection/fallback
    - Use domain mocking or `?hostname=` parameter
 
-4. **Git Workflow**
+4. **Security Issues**
+   - Verify tenant context validation in middleware
+   - Ensure all resources include tenant checks
+   - Fix cross-tenant detection in requests and responses
+   - Follow security patterns in [Tenant Security Guide](docs/TENANT_SECURITY_GUIDE.md)
+
+5. **Git Workflow**
    - Always reference issues in commits and PRs
    - Keep PRs focused on single issues when possible
    - Tests must pass before merging

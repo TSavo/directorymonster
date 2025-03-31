@@ -2,6 +2,8 @@
 
 An SEO-focused multitenancy directory platform with AI-powered data collection.
 
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/TSavo/directorymonster?utm_source=oss&utm_medium=github&utm_campaign=TSavo%2Fdirectorymonster&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+
 ## Overview
 
 DirectoryMonster is a comprehensive platform combining:
@@ -170,6 +172,7 @@ Or use the `?hostname=` query parameter during development.
 - [Testing Strategy](docs/testing.md)
 - [URL Utilities](docs/url-utilities.md)
 - [Data Seeding](docs/seeding.md)
+- [Tenant Security Guide](docs/TENANT_SECURITY_GUIDE.md)
 
 ## Troubleshooting
 
