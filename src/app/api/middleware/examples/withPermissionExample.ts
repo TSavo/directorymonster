@@ -13,6 +13,8 @@ import {
 } from '@/app/api/middleware';
 
 /**
+ * Example 1: Basic permission checking for route handler
+ * 
  * Handles GET requests by validating 'read' permission for the 'category' resource.
  *
  * This function uses the withPermission middleware to ensure the requester is authorized to 
@@ -41,6 +43,8 @@ export async function GET(req: NextRequest) {
 }
 
 /**
+ * Example 2: Checking permission for a specific resource
+ * 
  * Handles a PUT request to update a specific category.
  *
  * This function uses the withPermission middleware to verify that the user has the 'update' permission for
@@ -71,6 +75,8 @@ export async function PUT(req: NextRequest) {
 }
 
 /**
+ * Example 3: Checking for any of multiple permissions
+ * 
  * Processes a POST request to create a category when the requester has either 'create' or 'update' permission.
  *
  * This function employs the `withAnyPermission` middleware to validate that the user is authorized to access the 'category' resource
@@ -99,6 +105,8 @@ export async function POST(req: NextRequest) {
 }
 
 /**
+ * Example 4: Checking for multiple required permissions
+ * 
  * Deletes a category resource if the user has both 'delete' and 'manage' permissions.
  *
  * This function applies a permission middleware to ensure that the requester is authorized to delete a category.
@@ -131,6 +139,8 @@ export async function DELETE(req: NextRequest) {
 }
 
 /**
+ * Example 5: Dynamic resource ID extraction
+ * 
  * Updates a listing resource by validating 'update' permission and dynamically extracting its ID.
  *
  * This function uses a resource permission middleware to verify that the request has the required permission
@@ -160,6 +170,8 @@ export async function handleDynamicResource(req: NextRequest) {
 }
 
 /**
+ * Example 6: Audited permission check with logging
+ * 
  * Handles a settings update request with audited permission checking.
  *
  * This function applies a permission middleware that validates whether the caller has the "update" permission
@@ -188,6 +200,8 @@ export async function handleAuditedAccess(req: NextRequest) {
 }
 
 /**
+ * Example 7: Combining with other middleware
+ * 
  * Composes multiple permission middleware functions to retrieve site settings.
  *
  * This function first validates that the request has 'read' permission on the 'site' resource.
@@ -222,6 +236,8 @@ export async function handleComposedMiddleware(req: NextRequest) {
 }
 
 /**
+ * Example 8: Error handling with permission middleware
+ * 
  * Handles user management requests with permission validation and error handling.
  *
  * This function uses a permission middleware to verify that the request has 'manage' permission

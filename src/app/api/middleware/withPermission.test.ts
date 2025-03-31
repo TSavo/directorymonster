@@ -10,6 +10,7 @@ import {
   withAuditedPermission
 } from './withPermission';
 import { withTenantAccess } from './withTenantAccess';
+import AuditService from '@/lib/audit/audit-service';
 
 // Mock dependencies
 jest.mock('jsonwebtoken', () => ({
@@ -27,6 +28,10 @@ jest.mock('@/lib/tenant-membership-service', () => ({
 
 jest.mock('./withTenantAccess', () => ({
   withTenantAccess: jest.fn(),
+}));
+
+jest.mock('@/lib/audit/audit-service', () => ({
+  logPermissionEvent: jest.fn(),
 }));
 
 // Mock the console.log for audit tests
@@ -331,7 +336,7 @@ describe('Permission middleware', () => {
       consoleLogMock.mockRestore();
     });
     
-    it('should log successful permission access with correct details', async () => {
+    it('should log successful permission access', async () => {
       const response = await withAuditedPermission(
         mockRequest,
         'category',
@@ -350,34 +355,24 @@ describe('Permission middleware', () => {
       );
       expect(mockHandler).toHaveBeenCalled();
       
-      // Verify audit logging occurred with correct details
-      expect(consoleLogMock).toHaveBeenCalledWith(
-        expect.stringContaining('Audit event:'),
-        expect.stringContaining('"action":"access"')
-      );
-      
-      // Check that all required details are included in the JSON string
-      const logCall = consoleLogMock.mock.calls[0];
-      const loggedJson = logCall[1]; // The second argument to console.log
-      
-      // Parse the JSON string to verify its contents
-      const logData = JSON.parse(loggedJson);
-      expect(logData).toEqual(expect.objectContaining({
-        userId: 'test-user-id',
-        tenantId: 'test-tenant-id',
-        resourceType: 'category',
-        action: 'access',
-        details: expect.objectContaining({
-          permission: 'read',
+      // Verify audit logging occurred using AuditService
+      expect(AuditService.logPermissionEvent).toHaveBeenCalledWith(
+        'test-user-id',
+        'test-tenant-id',
+        'category',
+        'read',
+        true,
+        undefined,
+        expect.objectContaining({
           method: 'GET',
           path: '/api/test'
         })
-      }));
+      );
       
       expect(response.status).toBe(200);
     });
     
-    it('should log permission denied events with correct details', async () => {
+    it('should log permission denied events', async () => {
       // Make permission check fail
       (RoleService.hasPermission as jest.Mock).mockResolvedValue(false);
       
@@ -389,30 +384,19 @@ describe('Permission middleware', () => {
         'specific-resource-id'
       );
       
-      // Verify denial was logged with correct details
-      expect(consoleLogMock).toHaveBeenCalledWith(
-        expect.stringContaining('Audit event:'),
-        expect.stringContaining('"action":"denied"')
-      );
-      
-      // Check that all required details are included in the JSON string
-      const logCall = consoleLogMock.mock.calls[0];
-      const loggedJson = logCall[1]; // The second argument to console.log
-      
-      // Parse the JSON string to verify its contents
-      const logData = JSON.parse(loggedJson);
-      expect(logData).toEqual(expect.objectContaining({
-        userId: 'test-user-id',
-        tenantId: 'test-tenant-id',
-        resourceType: 'category',
-        action: 'denied',
-        resourceId: 'specific-resource-id',
-        details: expect.objectContaining({
-          permission: 'update',
+      // Verify denial was logged using AuditService
+      expect(AuditService.logPermissionEvent).toHaveBeenCalledWith(
+        'test-user-id',
+        'test-tenant-id',
+        'category',
+        'update',
+        false,
+        'specific-resource-id',
+        expect.objectContaining({
           method: 'GET',
           path: '/api/test'
         })
-      }));
+      );
       
       expect(response.status).toBe(403);
     });
@@ -429,16 +413,19 @@ describe('Permission middleware', () => {
         mockHandler
       );
       
-      // Get and parse the logged JSON
-      const logCall = consoleLogMock.mock.calls[0];
-      const loggedJson = logCall[1];
-      const logData = JSON.parse(loggedJson);
-      
       // Verify request details are correctly included in the audit log
-      expect(logData.details).toEqual(expect.objectContaining({
-        method: 'POST',
-        path: '/api/categories/create'
-      }));
+      expect(AuditService.logPermissionEvent).toHaveBeenCalledWith(
+        'test-user-id',
+        'test-tenant-id',
+        'category',
+        'create',
+        true,
+        undefined,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/api/categories/create'
+        })
+      );
     });
   });
 });

@@ -3,6 +3,8 @@ import { verify, JwtPayload } from 'jsonwebtoken';
 import RoleService from '@/lib/role-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 import { withTenantAccess } from './withTenantAccess';
+import AuditService from '@/lib/audit/audit-service';
+import { AuditAction } from '@/lib/audit/types';
 
 // JWT secret should be stored in environment variables
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
@@ -34,8 +36,9 @@ function extractUserIdFromRequest(req: NextRequest, secret: string): string | nu
 }
 
 /**
- * Middleware to enforce that a user has a specific permission in a multi-tenant context.
- *
+ * Enhanced middleware to check if user has the required permission in tenant context
+ * Implements section 3.2 of the MULTI_TENANT_ACL_SPEC.md
+ * 
  * This function verifies tenant access and extracts the user ID from the request's JWT token.
  * If the user ID is missing or the user does not hold the required permission for the given
  * resource type (and optional resource ID), it returns a 403 response with an informative error message.
@@ -349,7 +352,8 @@ export async function withResourcePermission(
         const body = await clonedReq.json();
         resourceId = body[idParam];
       } catch (bodyError) {
-        console.error('Error reading request body:', bodyError);
+        console.warn('Error reading request body for resource ID extraction:', bodyError);
+        // Continue without body-based resource ID
       }
     }
     
@@ -364,6 +368,22 @@ export async function withResourcePermission(
           resourceId = lastPart;
         }
       }
+    }
+    
+    // If resource ID extraction fails in a context where it should succeed, return error
+    // This check helps distinguish between "no resource ID specified" vs. "resource ID extraction failed"
+    if (!resourceId && req.headers.get('x-require-resource-id') === 'true') {
+      return NextResponse.json(
+        {
+          error: 'Resource ID not found',
+          message: `Could not extract resource ID using parameter '${idParam}' from the request`,
+          details: {
+            resourceType,
+            idParameterName: idParam
+          }
+        },
+        { status: 400 }
+      );
     }
     
     // Now use the standard withPermission middleware with the extracted resource ID
@@ -469,16 +489,16 @@ export async function withAuditedPermission(
 }
 
 /**
- * Logs an audit event for permission-related actions.
+ * Helper function to log audit events using the AuditService
  *
- * This function logs the provided audit event details to the console as a JSON string.
- * It serves as a placeholder implementation and will be replaced with an actual audit logging
- * system as part of the ACL Audit Trail improvement (refer to Issue #55).
+ * This function uses the AuditService to log permission-related actions.
+ * It maps simple action strings to AuditAction enum values and calls the
+ * appropriate AuditService method to record the event.
  *
  * @param event - Object containing audit event properties:
  *   - userId: Identifier of the user performing the action.
  *   - tenantId: Identifier of the tenant.
- *   - action: Description of the action taken.
+ *   - action: Description of the action taken ('access' or 'denied').
  *   - resourceType: The type of resource involved.
  *   - resourceId (optional): Identifier of the specific resource, when relevant.
  *   - details: Additional contextual information for the audit.
@@ -491,9 +511,30 @@ async function logAuditEvent(event: {
   resourceId?: string;
   details: Record<string, any>;
 }): Promise<void> {
-  // This is a placeholder for the actual audit logging implementation
-  // It will be implemented as part of Issue #55: Implement ACL Audit Trail System
-  console.log('Audit event:', JSON.stringify(event));
+  try {
+    // Map the old action strings to new AuditAction enum
+    const actionMap: Record<string, AuditAction> = {
+      'access': AuditAction.ACCESS_GRANTED,
+      'denied': AuditAction.ACCESS_DENIED
+    };
+    
+    const auditAction = actionMap[event.action] || AuditAction.ACCESS_GRANTED;
+    const success = event.action === 'access';
+    
+    // Use the AuditService to log the permission event
+    await AuditService.logPermissionEvent(
+      event.userId,
+      event.tenantId,
+      event.resourceType as ResourceType,
+      event.details.permission,
+      success,
+      event.resourceId,
+      event.details
+    );
+  } catch (error) {
+    // Log error but don't block the request flow
+    console.error('Error logging audit event:', error);
+  }
 }
 
 export default withPermission;

@@ -3,7 +3,7 @@
  */
 
 // Resource types in the system
-export type ResourceType = 'user' | 'site' | 'category' | 'listing' | 'setting';
+export type ResourceType = 'user' | 'site' | 'category' | 'listing' | 'setting' | 'audit' | 'role';
 
 // Available permissions
 export type Permission = 'create' | 'read' | 'update' | 'delete' | 'manage';
@@ -201,7 +201,7 @@ export function createSuperAdminACL(userId: string): ACL {
   const acl: ACL = { userId, entries: [] };
   
   // Global permissions for all resource types
-  const resourceTypes: ResourceType[] = ['user', 'site', 'category', 'listing', 'setting'];
+  const resourceTypes: ResourceType[] = ['user', 'site', 'category', 'listing', 'setting', 'audit', 'role'];
   const permissions: Permission[] = ['create', 'read', 'update', 'delete', 'manage'];
   
   resourceTypes.forEach(type => {
