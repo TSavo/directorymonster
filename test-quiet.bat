@@ -1,0 +1,3 @@
+@echo off
+echo Running tests with minimal console output...
+npx jest %* --silent --no-verbose --colors

@@ -1,0 +1,3 @@
+@echo off
+echo Running PermissionGuard tests with minimal output...
+npx jest src/components/admin/auth/guards/__tests__/PermissionGuard.test.tsx --silent --no-verbose --no-watchman --colors

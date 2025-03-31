@@ -39,6 +39,16 @@ const customJestConfig = {
     '!**/node_modules/**',
     '!**/.next/**',
   ],
+  // Reduce verbosity in test output
+  verbose: false,
+  silent: false,  // Set to true to suppress console output completely
+  maxWorkers: '50%',
+  errorOnDeprecated: false,
+  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  // Customize reporters for less verbose output
+  reporters: [
+    ['default', { summaryThreshold: 20 }]
+  ],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
