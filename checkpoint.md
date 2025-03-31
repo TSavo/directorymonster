@@ -95,19 +95,25 @@ Each migrated file will be:
 
 ### Next Steps
 
-1. **Streamlined Analysis-First Approach**:
+1. **Progress On Migration Implementation**:
    - Created simplified `analyze-mocks.js` script focused solely on detection
    - Successfully analyzed multiple complex test files to identify patterns:
      - Found NextResponse.json usage that should use mockNextResponseJson
      - Identified NextRequest casting that should use createMockNextRequest
      - Located non-standard Redis mock implementations
      - Detected security middleware and JWT mocking patterns
-   - Will proceed with targeted manual migrations first before scaling to automation
+   - Successfully completed standardization of `tests/middleware/withRedis.test.ts`
+   - Created standardized implementation of `tests/api/middleware/withTenantAccess.test.ts`:
+     - Implemented standardized NextRequest/NextResponse mocks
+     - Created new JWT mock implementation in `/tests/mocks/lib/auth/jwt.ts`
+     - Restored previously skipped tests with standardized mocks
+   - Will continue with remaining migrations based on this established pattern
 
-2. **Focused Migration Plan**:
-   - Start with manual, targeted migrations of key test files:
-     - `tests/middleware/withRedis.test.ts` - 3 NextResponse.json usages
-     - `tests/api/middleware/withTenantAccess.test.ts` - Complex NextResponse patterns
+2. **Focused Migration Plan - Updated**:
+   - Completed manual, targeted migrations of key test files:
+     - ✅ `tests/middleware/withRedis.test.ts` - 3 NextResponse.json usages
+     - ✅ `tests/api/middleware/withTenantAccess.test.ts` - Complex NextResponse patterns
+   - Next file to migrate:
      - `tests/unit/middleware/secure-tenant-context.test.ts` - Security middleware mocks
    - Create small, focused PRs to demonstrate the migration pattern
    - Document before/after changes and test results for each migration
