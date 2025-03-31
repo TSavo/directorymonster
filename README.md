@@ -169,7 +169,7 @@ Or use the `?hostname=` query parameter during development.
 
 - [Docker Development](DOCKER-DEV.md)
 - [Component Guidelines](docs/components.md)
-- [Testing Strategy](docs/testing.md)
+- [Testing Guide](docs/TESTING_GUIDE.md)
 - [URL Utilities](docs/url-utilities.md)
 - [Data Seeding](docs/seeding.md)
 - [Tenant Security Guide](docs/TENANT_SECURITY_GUIDE.md)
