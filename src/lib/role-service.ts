@@ -226,7 +226,7 @@ export class RoleService {
     userId: string,
     tenantId: string,
     roleId: string
-  ): Promise<boolean> {
+   ): Promise<boolean> {
     try {
       // Remove role from user's roles in this tenant
       const userRolesKey = getUserRolesKey(userId, tenantId);
@@ -411,7 +411,7 @@ export class RoleService {
     try {
       // Look for any tenant where the user has roles
       const allRolesPattern = `user:roles:${userId}:*`;
-      const roleKeys = await this.scanKeys(allRolesPattern);
+      const roleKeys = await RoleService.scanKeys(allRolesPattern);
       
       // Check each tenant for the user's roles
       for (const key of roleKeys) {
@@ -419,7 +419,7 @@ export class RoleService {
         const tenantId = key.split(':')[3];
         
         // Get roles for this user in this tenant
-        const roles = await this.getUserRoles(userId, tenantId);
+        const roles = await RoleService.getUserRoles(userId, tenantId);
         
         // Check if any role is global
         if (roles.some(role => role.isGlobal)) {

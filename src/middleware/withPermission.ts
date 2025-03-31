@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
 // Throw an error if JWT_SECRET is not set in production
 if (process.env.NODE_ENV === 'production' && 
     (process.env.JWT_SECRET === undefined || process.env.JWT_SECRET === 'default-secret-for-development')) {
-  console.error('WARNING: JWT_SECRET environment variable is not set in production!');
+  throw new Error('FATAL: JWT_SECRET environment variable must be set in production.');
 }
 
 /**
@@ -43,6 +43,60 @@ export function verifyAuthToken(token: string): JwtPayload | null {
 }
 
 /**
+ * Helper function to handle common permission validation logic
+ * 
+ * @param req NextRequest object
+ * @returns Object containing validation results or error response
+ */
+async function validatePermissionRequest(req: NextRequest): Promise<
+  | { success: true; userId: string; tenantId: string }
+  | { success: false; response: NextResponse }
+> {
+  // Extract the token from the Authorization header
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    };
+  }
+  
+  const token = authHeader.replace('Bearer ', '');
+  const decoded = verifyAuthToken(token);
+  
+  if (!decoded) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: 'Invalid authentication token' },
+        { status: 401 }
+      )
+    };
+  }
+  
+  // Extract tenant ID from the request headers
+  const tenantId = req.headers.get('x-tenant-id');
+  if (!tenantId) {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: 'Tenant ID required' },
+        { status: 400 }
+      )
+    };
+  }
+  
+  return {
+    success: true,
+    userId: decoded.userId,
+    tenantId
+  };
+}
+
+/**
  * Middleware to handle API-level permission checks
  * 
  * @param req NextRequest object
@@ -60,37 +114,17 @@ export async function withPermission(
   resourceId?: string
 ): Promise<NextResponse> {
   try {
-    // Extract the token from the Authorization header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    // Use the shared validation helper
+    const validation = await validatePermissionRequest(req);
+    if (!validation.success) {
+      return validation.response;
     }
     
-    const token = authHeader.replace('Bearer ', '');
-    const decoded = verifyAuthToken(token);
-    
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid authentication token' },
-        { status: 401 }
-      );
-    }
-    
-    // Extract tenant ID from the request headers
-    const tenantId = req.headers.get('x-tenant-id');
-    if (!tenantId) {
-      return NextResponse.json(
-        { error: 'Tenant ID required' },
-        { status: 400 }
-      );
-    }
+    const { userId, tenantId } = validation;
     
     // Check if user has the required permission
     const hasPermission = await RoleService.hasPermission(
-      decoded.userId,
+      userId,
       tenantId,
       resourceType,
       permission,
@@ -150,38 +184,18 @@ export async function withAnyPermission(
   resourceId?: string
 ): Promise<NextResponse> {
   try {
-    // Extract the token from the Authorization header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    // Use the shared validation helper
+    const validation = await validatePermissionRequest(req);
+    if (!validation.success) {
+      return validation.response;
     }
     
-    const token = authHeader.replace('Bearer ', '');
-    const decoded = verifyAuthToken(token);
-    
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid authentication token' },
-        { status: 401 }
-      );
-    }
-    
-    // Extract tenant ID from the request headers
-    const tenantId = req.headers.get('x-tenant-id');
-    if (!tenantId) {
-      return NextResponse.json(
-        { error: 'Tenant ID required' },
-        { status: 400 }
-      );
-    }
+    const { userId, tenantId } = validation;
     
     // Check each permission
     for (const permission of permissions) {
       const hasPermission = await RoleService.hasPermission(
-        decoded.userId,
+        userId,
         tenantId,
         resourceType,
         permission,
@@ -243,33 +257,13 @@ export async function withAllPermissions(
   resourceId?: string
 ): Promise<NextResponse> {
   try {
-    // Extract the token from the Authorization header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    // Use the shared validation helper
+    const validation = await validatePermissionRequest(req);
+    if (!validation.success) {
+      return validation.response;
     }
     
-    const token = authHeader.replace('Bearer ', '');
-    const decoded = verifyAuthToken(token);
-    
-    if (!decoded) {
-      return NextResponse.json(
-        { error: 'Invalid authentication token' },
-        { status: 401 }
-      );
-    }
-    
-    // Extract tenant ID from the request headers
-    const tenantId = req.headers.get('x-tenant-id');
-    if (!tenantId) {
-      return NextResponse.json(
-        { error: 'Tenant ID required' },
-        { status: 400 }
-      );
-    }
+    const { userId, tenantId } = validation;
     
     // Create an array to track all missing permissions
     const missingPermissions: Permission[] = [];
@@ -277,7 +271,7 @@ export async function withAllPermissions(
     // Check each permission
     for (const permission of permissions) {
       const hasPermission = await RoleService.hasPermission(
-        decoded.userId,
+        userId,
         tenantId,
         resourceType,
         permission,
@@ -400,8 +394,46 @@ export async function withResourcePermission(
       );
     }
     
-    // Now use the standard withPermission middleware with the extracted resource ID
-    return withPermission(req, resourceType, permission, handler, resourceId);
+    // Use the shared validation helper
+    const validation = await validatePermissionRequest(req);
+    if (!validation.success) {
+      return validation.response;
+    }
+    
+    const { userId, tenantId } = validation;
+    
+    // Check permission with the extracted resource ID
+    const hasPermission = await RoleService.hasPermission(
+      userId,
+      tenantId,
+      resourceType,
+      permission,
+      resourceId
+    );
+    
+    if (!hasPermission) {
+      // Generate a meaningful error message
+      let errorMessage = `Permission denied: Required '${permission}' permission for ${resourceType}`;
+      if (resourceId) {
+        errorMessage += ` with ID ${resourceId}`;
+      }
+      
+      return NextResponse.json(
+        { 
+          error: 'Permission denied', 
+          message: errorMessage,
+          details: {
+            resourceType,
+            permission,
+            resourceId
+          }
+        },
+        { status: 403 }
+      );
+    }
+    
+    // If permission check passes, proceed with the handler
+    return await handler(req);
   } catch (error) {
     console.error('Resource permission validation error:', error);
     return NextResponse.json(

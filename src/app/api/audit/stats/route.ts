@@ -37,6 +37,21 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const endDateParam = url.searchParams.get('endDate');
         const daysParam = url.searchParams.get('days');
         
+        // Validate date parameters if provided
+        if (startDateParam && !isValidISOString(startDateParam)) {
+          return NextResponse.json(
+            { error: 'Invalid startDate format. Use ISO date string.' },
+            { status: 400 }
+          );
+        }
+        
+        if (endDateParam && !isValidISOString(endDateParam)) {
+          return NextResponse.json(
+            { error: 'Invalid endDate format. Use ISO date string.' },
+            { status: 400 }
+          );
+        }
+        
         // Calculate date range
         let startDate: string;
         let endDate: string;
@@ -125,4 +140,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       }
     }
   );
+}
+
+function isValidISOString(dateString: string): boolean {
+  const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/;
+  return regex.test(dateString);
 }
