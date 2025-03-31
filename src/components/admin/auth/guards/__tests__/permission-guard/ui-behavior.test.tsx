@@ -67,7 +67,7 @@ describe('PermissionGuard - UI Behavior', () => {
     });
     (hasPermissionInTenant as jest.Mock).mockReturnValue(permissionPromise);
     
-    render(
+    const { container } = render(
       <TestWrapper>
         <PermissionGuard resourceType="category" permission="read" showLoading={true}>
           <div data-testid="protected-content">Protected Content</div>
@@ -75,9 +75,10 @@ describe('PermissionGuard - UI Behavior', () => {
       </TestWrapper>
     );
     
-    // Should show loading indicator - the spinner doesn't have a role, 
-    // so we need to check for the spinner class instead
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    // Should show loading indicator - the spinner doesn't have a role
+    // Use container query to find the spinner
+    const spinner = container.querySelector('.animate-spin');
+    expect(spinner).toBeTruthy();
     
     // Wait for permission check to resolve
     await waitFor(() => {
@@ -116,7 +117,7 @@ describe('PermissionGuard - UI Behavior', () => {
     });
     (hasPermissionInTenant as jest.Mock).mockReturnValue(permissionPromise);
     
-    render(
+    const { container } = render(
       <TestWrapper>
         <PermissionGuard resourceType="category" permission="read" showLoading={false}>
           <div data-testid="protected-content">Protected Content</div>
@@ -125,7 +126,8 @@ describe('PermissionGuard - UI Behavior', () => {
     );
     
     // Should not show loading indicator
-    expect(document.querySelector('.animate-spin')).not.toBeInTheDocument();
+    const spinner = container.querySelector('.animate-spin');
+    expect(spinner).toBeNull();
     
     // Should show nothing initially
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
