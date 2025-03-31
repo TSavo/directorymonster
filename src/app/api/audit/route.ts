@@ -10,20 +10,27 @@ import { ResourceType } from '@/components/admin/auth/utils/accessControl';
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
 
 /**
- * GET handler for retrieving audit logs
- * Requires 'read' permission on 'audit' resource type
- * 
- * Query parameters:
- * - action: Filter by specific action
- * - severity: Filter by severity level
- * - userId: Filter by user ID
- * - resourceType: Filter by resource type
- * - resourceId: Filter by resource ID
- * - startDate: Filter by start date (ISO string)
- * - endDate: Filter by end date (ISO string)
- * - limit: Maximum number of results to return
- * - offset: Offset for pagination
- * - success: Filter by success status (true/false)
+ * Handles GET requests for retrieving audit logs.
+ *
+ * This endpoint enforces 'read' permission on the 'audit' resource and processes query parameters to filter audit events.
+ * It extracts tenant information and verifies JWT authentication to determine the requesting user's identity and global admin status.
+ * Supported query parameters include:
+ * - action: One or multiple audit actions to filter by (comma-separated for multiple values).
+ * - severity: One or multiple severity levels to filter by (comma-separated for multiple values).
+ * - userId: Filters events by the specified user ID.
+ * - resourceType: Filters events by the type of resource.
+ * - resourceId: Filters events by the specific resource identifier.
+ * - startDate: ISO-formatted start date for filtering events.
+ * - endDate: ISO-formatted end date for filtering events.
+ * - limit: Maximum number of results to return (default is 50, maximum allowed is 1000).
+ * - offset: Pagination offset (default is 0).
+ * - success: Boolean flag to filter events by their success status.
+ *
+ * Global administrators can retrieve events across all tenants.
+ * On success, returns a JSON response with an `events` property containing the audit logs.
+ * In case of an error, returns a JSON error message with a 500 status code.
+ *
+ * @returns A {@link NextResponse} object with a JSON payload containing the queried audit events.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withPermission(
@@ -114,8 +121,18 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 }
 
 /**
- * POST handler for manually creating audit events
- * Requires 'create' permission on 'audit' resource type
+ * Handles POST requests to create a new audit event.
+ *
+ * This handler verifies that the request has the required "create" permission on the audit resource,
+ * extracts tenant and user information from the request headers and JWT token, and processes the JSON payload
+ * to log an audit event. It ensures that the required "action" field is present and, for non-global-admin users,
+ * enforces tenant isolation by preventing the creation of events for tenants other than the current tenant.
+ *
+ * Returns a 400 response if the JSON payload is invalid or the "action" field is missing, a 403 response if tenant isolation is violated,
+ * and a 500 response if an unexpected error occurs.
+ *
+ * @param req - The incoming HTTP request.
+ * @returns A NextResponse containing the created audit event or an error message.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   return withPermission(
