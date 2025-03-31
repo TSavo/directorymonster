@@ -17,7 +17,7 @@ I'm working on implementing the changes specified in this document to address co
    - Added getTenantKeyPrefix method to KeyNamespaceService
 
 ### Remaining Tasks:
-5. ✅ Expand request method coverage in SecureTenantContext
+5. ✅ Expand request method coverage in SecureTenantContext - Completed but tests failing
 6. Improve error handling in SecureRedisClient
 7. Fix documentation in SecureRedisClient
 8. Refactor KeyNamespaceService class
