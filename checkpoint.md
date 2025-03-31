@@ -119,12 +119,10 @@ Each migrated file will be:
      - ✅ `tests/middleware/withRedis.test.ts` - 3 NextResponse.json usages
      - ✅ `tests/api/middleware/withTenantAccess.test.ts` - Complex NextResponse patterns
      - ✅ `tests/unit/middleware/secure-tenant-context.test.ts` - Security middleware mocks
-   - Next files to migrate:
+   - Next file to migrate:
      - `tests/api/middleware/tenant-validation.test.ts` - More security middleware patterns
-     - `tests/admin/roles/RoleManagement.test.tsx` - Complex UI components with security context
-   - Create small, focused PRs to demonstrate the migration pattern
-   - Document before/after changes and test results for each migration
-   - Use these examples to refine migration patterns before scaling
+   - Will include all standardized mock implementations in a single PR to demonstrate the comprehensive standardization approach
+   - Following this pattern to ensure consistent mock usage across the entire codebase
 
 3. **Update Documentation**:
    - Add detailed examples to MOCKING_GUIDE.md showing before/after migration
