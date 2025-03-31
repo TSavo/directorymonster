@@ -1,0 +1,44 @@
+[
+  {
+    "name": "http://localhost:3000/_next/static/chunks/webpack.js",
+    "type": "link",
+    "duration": 85,
+    "startTime": 442.5,
+    "size": 10829
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/main-app.js",
+    "type": "script",
+    "duration": 210,
+    "startTime": 442.80000001192093,
+    "size": 1342846
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/app-pages-internals.js",
+    "type": "script",
+    "duration": 204.7000000178814,
+    "startTime": 442.90000000596046,
+    "size": 31539
+  },
+  {
+    "name": "http://localhost:3000/_next/static/css/app/layout.css?v=1743459828323",
+    "type": "link",
+    "duration": 9.199999988079071,
+    "startTime": 793.6000000238419,
+    "size": 9567
+  },
+  {
+    "name": "http://localhost:3000/_next/static/chunks/app/%5BcategorySlug%5D/%5BlistingSlug%5D/page.js",
+    "type": "script",
+    "duration": 43.69999998807907,
+    "startTime": 798.3000000119209,
+    "size": 195048
+  },
+  {
+    "name": "http://localhost:3000/favicon.ico",
+    "type": "other",
+    "duration": 277.2000000178814,
+    "startTime": 2487.5,
+    "size": 3789
+  }
+]

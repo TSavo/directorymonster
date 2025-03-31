@@ -1,0 +1,545 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Mock Patterns Analysis</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.5; }
+        h1, h2, h3 { color: #333; }
+        .summary { margin-bottom: 20px; padding: 10px; background-color: #f5f5f5; border-radius: 5px; }
+        .pattern { margin-bottom: 30px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .file { margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 3px; }
+        .lines { margin-left: 20px; }
+        .line { display: flex; margin: 5px 0; font-family: monospace; }
+        .line-number { min-width: 40px; color: #666; }
+        code { white-space: pre-wrap; }
+        .timestamp { font-style: italic; color: #666; }
+      </style>
+    </head>
+    <body>
+      <h1>Non-Standard Mock Patterns Analysis</h1>
+      <p class="timestamp">Generated on 3/31/2025, 12:18:10 PM</p>
+      
+      <div class="summary">
+        <h2>Summary</h2>
+        <p>Scanned 309 files, found 65 files with non-standard mocking patterns.</p>
+        <ul>
+          <li>nextRequestMock: 19 occurrences</li><li>nextResponseMock: 81 occurrences</li><li>redisMock: 38 occurrences</li><li>securityMiddlewareMock: 4 occurrences</li><li>tenantContextMock: 43 occurrences</li><li>jwtMock: 23 occurrences</li><li>roleMock: 7 occurrences</li>
+        </ul>
+      </div>
+      
+      <h2>Detailed Results</h2>
+      
+        <div class="pattern">
+          <h3>nextRequestMock (19 total occurrences)</h3>
+          <div class="files">
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\admin\users\id.route.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">23</span> <code>} as unknown as NextRequest &amp; { params: { id: string } };</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\admin\users\reset-password.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">19</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\admin\users\route.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">17</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\example\example.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">36</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\example\id.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">33</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withAuthentication.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">67</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withTenantAccess.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">78</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\multitenancy\middleware.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">37</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-context.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">219</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-context.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">269</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-validation.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">150</span> <code>} as unknown as NextRequest;</code></div><div class="line"><span class="line-number">369</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\admin\users\id.route.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">23</span> <code>} as unknown as NextRequest &amp; { params: { id: string } };</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\admin\users\reset-password.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">19</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\admin\users\route.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">17</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\example\example.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">36</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\example\id.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">33</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withAuthentication.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">67</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withTenantAccess.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">78</span> <code>} as unknown as NextRequest;</code></div></div>
+          </div>
+        </div>
+        </div>
+      
+        <div class="pattern">
+          <h3>nextResponseMock (81 total occurrences)</h3>
+          <div class="files">
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withAuthentication.test.ts (7 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">73</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">77</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">86</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">90</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">99</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">109</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">149</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withTenantAccess.test.ts (23 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">84</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">88</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">97</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">101</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">113</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">119</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">131</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">140</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">153</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">163</span> <code>expect(result).toEqual(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">171</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">178</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">193</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">209</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">223</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">240</span> <code>expect(result).toEqual(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">249</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">258</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">270</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">274</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">287</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">297</span> <code>expect(result).toEqual(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">312</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\middleware\withRedis.test.ts (3 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">26</span> <code>NextResponse.json({ success: true })</code></div><div class="line"><span class="line-number">54</span> <code>NextResponse.json({ success: true })</code></div><div class="line"><span class="line-number">140</span> <code>return NextResponse.json({ argCount: args.length });</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-context.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">224</span> <code>return NextResponse.json({</code></div><div class="line"><span class="line-number">327</span> <code>return NextResponse.json({ success: true, tenantId: context.tenantId });</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-permission-middleware.test.ts (4 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">47</span> <code>return NextResponse.json(</code></div><div class="line"><span class="line-number">68</span> <code>return NextResponse.json(</code></div><div class="line"><span class="line-number">86</span> <code>return NextResponse.json(</code></div><div class="line"><span class="line-number">385</span> <code>return NextResponse.json(</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-validation.test.js (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">64</span> <code>NextResponse.json({ success: true })</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-validation.test.ts (8 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">18</span> <code>return NextResponse.json(</code></div><div class="line"><span class="line-number">26</span> <code>return NextResponse.json(</code></div><div class="line"><span class="line-number">37</span> <code>return NextResponse.json(</code></div><div class="line"><span class="line-number">55</span> <code>return NextResponse.json(</code></div><div class="line"><span class="line-number">71</span> <code>return NextResponse.json(</code></div><div class="line"><span class="line-number">89</span> <code>return NextResponse.json(</code></div><div class="line"><span class="line-number">154</span> <code>NextResponse.json({ success: true })</code></div><div class="line"><span class="line-number">381</span> <code>return NextResponse.json(</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withAuthentication.test.ts (7 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">73</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">77</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">86</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">90</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">99</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">109</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">149</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withTenantAccess.test.ts (23 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">84</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">88</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">97</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">101</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">113</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">119</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">131</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">140</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">153</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">163</span> <code>expect(result).toEqual(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">171</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">178</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">193</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">209</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">223</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">240</span> <code>expect(result).toEqual(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">249</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">258</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">270</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));</code></div><div class="line"><span class="line-number">274</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div><div class="line"><span class="line-number">287</span> <code>const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">297</span> <code>expect(result).toEqual(NextResponse.json(handlerResult));</code></div><div class="line"><span class="line-number">312</span> <code>expect(NextResponse.json).toHaveBeenCalledWith(</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\middleware\withRedis.test.ts (3 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">26</span> <code>NextResponse.json({ success: true })</code></div><div class="line"><span class="line-number">54</span> <code>NextResponse.json({ success: true })</code></div><div class="line"><span class="line-number">140</span> <code>return NextResponse.json({ argCount: args.length });</code></div></div>
+          </div>
+        </div>
+        </div>
+      
+        <div class="pattern">
+          <h3>redisMock (38 total occurrences)</h3>
+          <div class="files">
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\auth\verify.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">10</span> <code>jest.mock(&#039;@/lib/redis-client&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\categories\get.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\categories\post.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\healthcheck.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;../../src/lib/redis-health&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\listings.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\site\get.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\site-info\get.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\app\search\page.test.tsx (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">39</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\integration\user-flows\auth.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">9</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\integration\user-flows\error-handling.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">9</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\lib\search\category-indexer.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">10</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\lib\search\listing-indexer.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">11</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\lib\search\utils.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">9</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\middleware\withRedis.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">9</span> <code>jest.mock(&#039;../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\multitenancy-integration.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;@/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\page-flow-integration.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;@/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\page-rendering.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;@/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\redis\client.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">12</span> <code>jest.mock(&#039;../../src/lib/redis/connection-manager&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\redis\connection-manager.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">12</span> <code>jest.mock(&#039;../../src/lib/redis/connection-manager&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\redis\redis-cache.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">4</span> <code>jest.mock(&#039;../../src/lib/redis&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\redis\redis-health.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">4</span> <code>jest.mock(&#039;../../src/lib/redis&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\redis-health.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\role\role-service.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\site-utils.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;@/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\auth\verify.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">10</span> <code>jest.mock(&#039;@/lib/redis-client&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\categories\get.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\categories\post.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\healthcheck.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;../../src/lib/redis-health&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\listings.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\site\get.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\site-info\get.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">8</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\middleware\withRedis.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">9</span> <code>jest.mock(&#039;../../src/lib/redis-client&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\redis\client.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">12</span> <code>jest.mock(&#039;../../src/lib/redis/connection-manager&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\redis\connection-manager.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">12</span> <code>jest.mock(&#039;../../src/lib/redis/connection-manager&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\redis\redis-cache.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">4</span> <code>jest.mock(&#039;../../src/lib/redis&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\redis\redis-health.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">4</span> <code>jest.mock(&#039;../../src/lib/redis&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\integration\user-flows\auth.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">9</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\integration\user-flows\error-handling.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">9</span> <code>jest.mock(&#039;../../../src/lib/redis-client&#039;, () =&gt; {</code></div></div>
+          </div>
+        </div>
+        </div>
+      
+        <div class="pattern">
+          <h3>securityMiddlewareMock (4 total occurrences)</h3>
+          <div class="files">
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\permissionguard.test.js (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;@/app/api/middleware/secureTenantContext&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-context.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">112</span> <code>jest.mock(&#039;@/app/api/middleware/secureTenantContext&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-permission-middleware.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">21</span> <code>jest.mock(&#039;@/app/api/middleware/secureTenantContext&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-context.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">38</span> <code>jest.mock(&#039;@/app/api/middleware/secureTenantContext&#039;, () =&gt; {</code></div></div>
+          </div>
+        </div>
+        </div>
+      
+        <div class="pattern">
+          <h3>tenantContextMock (43 total occurrences)</h3>
+          <div class="files">
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-context-middleware.test.ts (10 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">40</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div><div class="line"><span class="line-number">61</span> <code>// Mock TenantContext.fromRequest to return null</code></div><div class="line"><span class="line-number">81</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div><div class="line"><span class="line-number">119</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div><div class="line"><span class="line-number">165</span> <code>// Mock TenantContext.fromRequest to throw an error</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-context.test.ts (6 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">136</span> <code>const context = await MockTenantContext.fromRequest(req);</code></div><div class="line"><span class="line-number">160</span> <code>const context = await MockTenantContext.fromRequest(req);</code></div><div class="line"><span class="line-number">251</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div><div class="line"><span class="line-number">283</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-permission-middleware.test.ts (11 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">162</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div><div class="line"><span class="line-number">195</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div><div class="line"><span class="line-number">228</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div><div class="line"><span class="line-number">267</span> <code>// Skip this test since we can&#039;t properly mock TenantContext.fromRequest with our current setup</code></div><div class="line"><span class="line-number">278</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div><div class="line"><span class="line-number">332</span> <code>// Mock TenantContext.fromRequest to return a valid context</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-context.test.ts (16 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">104</span> <code>jest.spyOn(TenantContext, &#039;fromRequest&#039;).mockResolvedValueOnce(</code></div><div class="line"><span class="line-number">109</span> <code>const context = await TenantContext.fromRequest(mockReq);</code></div><div class="line"><span class="line-number">128</span> <code>jest.spyOn(TenantContext, &#039;fromRequest&#039;).mockResolvedValueOnce(null);</code></div><div class="line"><span class="line-number">131</span> <code>const context = await TenantContext.fromRequest(mockReq);</code></div><div class="line"><span class="line-number">148</span> <code>jest.spyOn(TenantContext, &#039;fromRequest&#039;).mockResolvedValueOnce(null);</code></div><div class="line"><span class="line-number">151</span> <code>const context = await TenantContext.fromRequest(mockReq);</code></div><div class="line"><span class="line-number">162</span> <code>jest.spyOn(TenantContext, &#039;fromRequest&#039;).mockResolvedValueOnce(null);</code></div><div class="line"><span class="line-number">165</span> <code>const context = await TenantContext.fromRequest(mockReq);</code></div><div class="line"><span class="line-number">179</span> <code>jest.spyOn(TenantContext, &#039;fromRequest&#039;).mockResolvedValueOnce(null);</code></div><div class="line"><span class="line-number">182</span> <code>const context = await TenantContext.fromRequest(mockReq);</code></div><div class="line"><span class="line-number">198</span> <code>jest.spyOn(TenantContext, &#039;fromRequest&#039;).mockResolvedValueOnce(null);</code></div><div class="line"><span class="line-number">201</span> <code>const context = await TenantContext.fromRequest(mockReq);</code></div><div class="line"><span class="line-number">215</span> <code>jest.spyOn(TenantContext, &#039;fromRequest&#039;).mockResolvedValueOnce(null);</code></div><div class="line"><span class="line-number">218</span> <code>const context = await TenantContext.fromRequest(mockReq);</code></div><div class="line"><span class="line-number">232</span> <code>jest.spyOn(TenantContext, &#039;fromRequest&#039;).mockImplementationOnce(async () =&gt; {</code></div><div class="line"><span class="line-number">244</span> <code>const context = await TenantContext.fromRequest(mockReq);</code></div></div>
+          </div>
+        </div>
+        </div>
+      
+        <div class="pattern">
+          <h3>jwtMock (23 total occurrences)</h3>
+          <div class="files">
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\admin\auth\Logout.test.tsx (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\admin\auth\RoleAuthorization.test.tsx (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">6</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\admin\auth\SessionManager.test.tsx (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\admin\auth\TokenRefresh.test.tsx (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">6</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\auth\verify.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">44</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div><div class="line"><span class="line-number">46</span> <code>verify: jest.fn().mockImplementation((token) =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withAuthentication.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">42</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; {</code></div><div class="line"><span class="line-number">44</span> <code>verify: jest.fn().mockImplementation((token, secret) =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withTenantAccess.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">44</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; {</code></div><div class="line"><span class="line-number">55</span> <code>verify: jest.fn().mockImplementation((token, secret) =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-context.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">54</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-context.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">18</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-validation.test.js (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">12</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-validation.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">119</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\auth\verify.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">44</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; ({</code></div><div class="line"><span class="line-number">46</span> <code>verify: jest.fn().mockImplementation((token) =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withAuthentication.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">42</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; {</code></div><div class="line"><span class="line-number">44</span> <code>verify: jest.fn().mockImplementation((token, secret) =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withTenantAccess.test.ts (2 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">44</span> <code>jest.mock(&#039;jsonwebtoken&#039;, () =&gt; {</code></div><div class="line"><span class="line-number">55</span> <code>verify: jest.fn().mockImplementation((token, secret) =&gt; {</code></div></div>
+          </div>
+        </div>
+        </div>
+      
+        <div class="pattern">
+          <h3>roleMock (7 total occurrences)</h3>
+          <div class="files">
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withTenantAccess.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;@/lib/role-service&#039;);</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\components\admin\auth\guards\PermissionGuard.test.tsx (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">23</span> <code>jest.mock(&#039;@/lib/role-service&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\permissionguard.test.js (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">45</span> <code>jest.mock(&#039;@/lib/role-service&#039;, () =&gt; {</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-context.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">81</span> <code>jest.mock(&#039;@/lib/role-service&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\secure-tenant-permission-middleware.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">106</span> <code>jest.mock(&#039;@/lib/role-service&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\unit\middleware\tenant-validation.test.js (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">24</span> <code>jest.mock(&#039;@/lib/role-service&#039;, () =&gt; ({</code></div></div>
+          </div>
+        
+          <div class="file">
+            <h4>c:\Users\T\directorymonster\tests\api\middleware\withTenantAccess.test.ts (1 occurrences)</h4>
+            <div class="lines"><div class="line"><span class="line-number">7</span> <code>jest.mock(&#039;@/lib/role-service&#039;);</code></div></div>
+          </div>
+        </div>
+        </div>
+      
+    </body>
+    </html>
+  

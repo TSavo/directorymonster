@@ -1,12 +1,5 @@
-Categories Debug Test Started: 2025-03-31T08:48:20.965Z
+Categories Debug Test Started: 2025-03-31T22:27:16.828Z
 
-[2025-03-31T08:48:20.965Z] Starting admin categories E2E tests
-[2025-03-31T08:48:20.968Z] Starting browser for debug test...
-[2025-03-31T08:48:22.501Z] Browser setup complete
-[2025-03-31T08:48:22.502Z] Starting login process...
-[2025-03-31T08:48:26.010Z] Request failed: http://localhost:3000/admin/login
-[2025-03-31T08:48:26.140Z] Login error: Navigating frame was detached
-[2025-03-31T08:48:26.141Z] 
------ COMPREHENSIVE ANALYSIS: login-error -----
-[2025-03-31T08:48:26.144Z] Saved URL to: C:\Users\T\directorymonster\html-dumps\login-error-2025-03-31T08-48-26-144Z-url.txt
-[2025-03-31T08:48:26.302Z] Completed admin categories E2E tests
+[2025-03-31T22:27:16.829Z] Starting admin categories E2E tests
+[2025-03-31T22:27:16.835Z] Starting browser for debug test...
+[2025-03-31T22:27:21.852Z] Completed admin categories E2E tests

@@ -1,363 +1,198 @@
 /**
- * Integration test for Secure Tenant Context middleware
- * This test brings together all components of the tenant security implementation
+ * Tenant Context Middleware Tests
+ * 
+ * These tests verify the core functionality of the secure tenant context middleware.
+ * The tests are structured to isolate dependencies and focus on specific behaviors.
  */
 
-import { NextRequest } from 'next/server';
-import { AuditAction } from '@/lib/audit/types';
+// Mock dependencies first, before any imports
+jest.mock('next/server', () => {
+  const json = jest.fn().mockImplementation((body, options = {}) => {
+    return {
+      status: options.status || 200,
+      body,
+      json: async () => body
+    };
+  });
+  
+  return {
+    NextResponse: {
+      json
+    },
+    NextRequest: jest.fn()
+  };
+});
+
+// Mock jsonwebtoken
+jest.mock('jsonwebtoken', () => {
+  return {
+    verify: jest.fn(),
+    JwtPayload: {}
+  };
+});
+
+// Silence console errors during tests
+const originalConsoleError = console.error;
+beforeAll(() => {
+  console.error = jest.fn();
+});
+
+afterAll(() => {
+  console.error = originalConsoleError;
+});
+
+// Now import the modules after all mocks are set up
+import { NextRequest, NextResponse } from 'next/server';
+import { withSecureTenantContext } from '../../../src/app/api/middleware/secureTenantContext';
+import { verify } from 'jsonwebtoken';
 
 // Define constants
 const VALID_TENANT_ID = '550e8400-e29b-41d4-a716-446655440000';
-const DIFFERENT_TENANT_ID = '650e8400-e29b-41d4-a716-446655440001';
-const USER_ID = 'user-123';
-const TEST_REQUEST_ID = '750e8400-e29b-41d4-a716-446655440002';
 
-// Define ResourceType and Permission enums directly
-const ResourceType = {
-  USER: 'user',
-  DOCUMENT: 'document',
-  TENANT: 'tenant'
-};
-
-const Permission = {
-  READ: 'read',
-  WRITE: 'write',
-  DELETE: 'delete',
-  ADMIN: 'admin'
-};
-
-// Define mock functions
-const mockValidateUuid = jest.fn(() => true);
-const mockUuidV4 = jest.fn(() => TEST_REQUEST_ID);
-const mockVerify = jest.fn(() => ({ userId: USER_ID }));
-const mockDetectCrossTenantAccess = jest.fn(() => false);
-const mockHasPermission = jest.fn(() => Promise.resolve(true));
-const mockIsTenantMember = jest.fn(() => Promise.resolve(true));
-const mockLogSecurityEvent = jest.fn(() => Promise.resolve());
-
-// Define NextResponse mock first
-// Create a simple wrapper since we can't reference mockNextResponseJson yet
-const mockJsonResponse = (body, options = {}) => {
-  return {
-    status: options.status || 200,
-    body,
-    json: async () => body
-  };
-};
-
-// Mock modules
-jest.mock('uuid', () => ({
-  validate: mockValidateUuid,
-  v4: mockUuidV4
-}));
-
-jest.mock('jsonwebtoken', () => ({
-  verify: mockVerify,
-  JwtPayload: {}
-}));
-
-jest.mock('@/components/admin/auth/utils/accessControl', () => ({
-  ResourceType: {
-    USER: 'user',
-    DOCUMENT: 'document',
-    TENANT: 'tenant'
-  },
-  Permission: {
-    READ: 'read',
-    WRITE: 'write',
-    DELETE: 'delete',
-    ADMIN: 'admin'
-  },
-  detectCrossTenantAccess: mockDetectCrossTenantAccess
-}));
-
-jest.mock('@/lib/tenant-membership-service', () => ({
-  __esModule: true, 
-  default: {
-    isTenantMember: mockIsTenantMember
-  }
-}));
-
-jest.mock('@/lib/role-service', () => ({
-  __esModule: true,
-  default: {
-    hasPermission: mockHasPermission
-  }
-}));
-
-jest.mock('@/lib/audit/audit-service', () => ({
-  __esModule: true,
-  default: {
-    logSecurityEvent: mockLogSecurityEvent
-  }
-}));
-
-// Mock response handlers to control test flows
-let mockResponseStatus = 200;
-let mockResponseBody = { success: true };
-
-// Override global NextResponse
-jest.mock('next/server', () => {
-  const originalModule = jest.requireActual('next/server');
-  return {
-    ...originalModule,
-    NextResponse: {
-      ...originalModule.NextResponse,
-      json: (body, options) => mockJsonResponse(body, options)
-    }
-  };
-});
-
-// Mock the TenantContext class and middleware functions
-jest.mock('@/app/api/middleware/secureTenantContext', () => {
-  // Create a real TenantContext class
-  class MockTenantContext {
-    tenantId: string;
-    userId: string;
-    requestId: string;
-    timestamp: number;
-    
-    constructor(tenantId: string, userId: string) {
-      this.tenantId = tenantId;
-      this.userId = userId;
-      this.requestId = TEST_REQUEST_ID;
-      this.timestamp = Date.now();
-    }
-    
-    static async fromRequest(req: any): Promise<MockTenantContext | null> {
-      const tenantId = req.headers.get('x-tenant-id');
-      if (!tenantId) return null;
-      return new MockTenantContext(tenantId, USER_ID);
-    }
-  }
-  
-  // Create custom implementations for middleware
-  const withSecureTenantContextMock = jest.fn().mockImplementation(async (req, handler) => {
-    const context = await MockTenantContext.fromRequest(req);
-    
-    if (!context) {
-      return mockJsonResponse(
-        { error: 'Unauthorized', message: 'Invalid tenant context' },
-        { status: 401 }
-      );
-    }
-    
-    // If this is the second test in the flow, we want to control the response
-    if (mockResponseStatus !== 200) {
-      return mockJsonResponse(
-        mockResponseBody,
-        { status: mockResponseStatus }
-      );
-    }
-    
-    return handler(req, context);
-  });
-  
-  const withSecureTenantPermissionMock = jest.fn().mockImplementation(async (req, resourceType, permission, handler, resourceId) => {
-    // Handle the special case for the end-to-end test
-    // For the valid test case, use status 200
-    if (mockResponseStatus === 200) {
-      const context = await MockTenantContext.fromRequest(req);
-      if (!context) {
-        return mockJsonResponse(
-          { error: 'Unauthorized', message: 'Invalid tenant context' },
-          { status: 401 }
-        );
-      }
-      return handler(req, context);
-    } 
-    // For the invalid test case, use the status we've set (403)
-    else {
-      return mockJsonResponse(
-        mockResponseBody,
-        { status: mockResponseStatus }
-      );
-    }
-  });
-  
-  // Return the mocked module
-  return {
-    TenantContext: MockTenantContext,
-    withSecureTenantContext: withSecureTenantContextMock,
-    withSecureTenantPermission: withSecureTenantPermissionMock
-  };
-});
-
-// Import modules after mocking
-import { NextResponse } from 'next/server';
-import { 
-  TenantContext, 
-  withSecureTenantContext,
-  withSecureTenantPermission
-} from '@/app/api/middleware/secureTenantContext';
-
-// Mock URL search params
-let mockURLSearchParams = new Map();
-
-// Helper functions for testing
-function createMockRequest(options: any = {}) {
-  const headers = new Map();
-  headers.set('x-tenant-id', options.tenantId || VALID_TENANT_ID);
-  headers.set('authorization', options.auth || 'Bearer valid-token');
-  
-  const url = options.url || `https://example.com/api/tenants/${options.tenantId || VALID_TENANT_ID}/resources`;
-  
-  return {
-    headers: {
-      get: (name: string) => headers.get(name)
-    },
-    method: options.method || 'POST',
-    url,
-    clone: jest.fn().mockReturnValue({
-      json: jest.fn().mockResolvedValue(options.body || {})
-    }),
-    nextUrl: {
-      searchParams: {
-        get: jest.fn().mockImplementation((param) => mockURLSearchParams.get(param))
-      }
-    }
-  } as unknown as NextRequest;
-}
-
-function createHandlerMock(returnValue = { success: true }) {
-  return jest.fn().mockImplementation((req, context) => {
-    return NextResponse.json({
-      ...returnValue,
-      tenantId: context.tenantId
-    });
-  });
-}
-
-describe('Secure Tenant Context - Integration', () => {
-  // Setup before tests
-  beforeAll(() => {
-    mockURLSearchParams = new Map();
-  });
-  
-  // Reset mocks between tests
+describe('Secure Tenant Context Middleware', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockResponseStatus = 200;
-    mockResponseBody = { success: true };
-    mockURLSearchParams.clear();
   });
-  
-  describe('withSecureTenantContext with withSecureTenantPermission', () => {
-    it('should correctly chain the middleware functions', async () => {
-      // Arrange
-      const mockReq = createMockRequest();
-      const handlerMock = createHandlerMock();
-      
-      // Mock TenantContext.fromRequest to return a valid context
-      jest.spyOn(TenantContext, 'fromRequest').mockResolvedValue(
-        new TenantContext(VALID_TENANT_ID, USER_ID)
-      );
-            
-      // Act
-      await withSecureTenantPermission(
-        mockReq,
-        ResourceType.DOCUMENT,
-        Permission.READ,
-        handlerMock
-      );
-      
-      // Assert
-      expect(handlerMock).toHaveBeenCalled();
+
+  // Helper to create a mock request
+  const createMockRequest = (headers = {}) => ({
+    headers: {
+      get: (name) => headers[name]
+    },
+    url: 'https://example.com/api/resources'
+  }) as unknown as NextRequest;
+
+  it('should reject requests without tenant ID', async () => {
+    // Create a request without tenant ID
+    const req = createMockRequest();
+    
+    // Create a mock handler
+    const handler = jest.fn().mockResolvedValue({});
+
+    // Call the middleware
+    const result = await withSecureTenantContext(req, handler);
+
+    // Verify the handler was NOT called
+    expect(handler).not.toHaveBeenCalled();
+    
+    // Verify the response is a 401 Unauthorized
+    expect(NextResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'Unauthorized' }),
+      expect.objectContaining({ status: 401 })
+    );
+  });
+
+  it('should reject requests with invalid token', async () => {
+    // Create a request with tenant ID but invalid token
+    const req = createMockRequest({ 
+      'x-tenant-id': VALID_TENANT_ID,
+      'authorization': 'Bearer invalid-token' 
     });
     
-    it('should properly nest security validations', async () => {
-      // Arrange - set up a request with cross-tenant issues
-      const mockReq = createMockRequest({
-        body: { tenantId: DIFFERENT_TENANT_ID }
-      });
-      
-      const handlerMock = createHandlerMock();
-      
-      // Configure mocks to return a 403 for this test
-      mockResponseStatus = 403;
-      mockResponseBody = { error: 'Cross-tenant access denied' };
-      
-      // Set up URL search params for tenant ID mismatch
-      mockURLSearchParams.set('tenantId', DIFFERENT_TENANT_ID);
-      
-      // Mock TenantContext.fromRequest to return a valid context
-      jest.spyOn(TenantContext, 'fromRequest').mockResolvedValue(
-        new TenantContext(VALID_TENANT_ID, USER_ID)
-      );
-      
-      // Override middleware implementation for this test
-      (withSecureTenantContext as jest.Mock).mockImplementationOnce(async (req, handler) => {
-        return mockJsonResponse(
-          { error: 'Cross-tenant access denied' },
-          { status: 403 }
-        );
-      });
-      
-      // Act
-      const response = await withSecureTenantPermission(
-        mockReq,
-        ResourceType.DOCUMENT,
-        Permission.WRITE,
-        handlerMock
-      );
-      
-      // Assert - ensure handler was not called and the response is a 403
-      expect(handlerMock).not.toHaveBeenCalled();
-      expect(response.status).toBe(403);
-      
-      expect(response.body).toEqual({ error: 'Cross-tenant access denied' });
+    // Mock verify to throw an error for invalid token
+    (verify as jest.Mock).mockImplementation(() => {
+      throw new Error('Invalid token');
     });
+    
+    // Create a mock handler
+    const handler = jest.fn().mockResolvedValue({});
+
+    // Call the middleware
+    const result = await withSecureTenantContext(req, handler);
+
+    // Verify the handler was NOT called
+    expect(handler).not.toHaveBeenCalled();
+    
+    // Verify the response is a 401 Unauthorized
+    expect(NextResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'Unauthorized' }),
+      expect.objectContaining({ status: 401 })
+    );
   });
-  
-  describe('End-to-end security flow', () => {
-    it('should maintain tenant isolation across all security layers', async () => {
-      // Step 1: Configure for valid test case
-      mockResponseStatus = 200;
-      mockResponseBody = { success: true, tenantId: VALID_TENANT_ID };
-      
-      // Step 2: Create API route using our middleware
-      const apiRoute = (req: NextRequest) => {
-        // This simulates an API route that uses our middleware
-        return withSecureTenantPermission(
-          req,
-          ResourceType.DOCUMENT,
-          Permission.READ,
-          async (req, context) => {
-            // Inside the innermost handler, all security checks have passed
-            return NextResponse.json({ success: true, tenantId: context.tenantId });
-          }
-        );
-      };
-      
-      // Step 3: Create a valid request
-      const validRequest = createMockRequest();
-      
-      // Step 4: Execute the API route with a valid request
-      const validResponse = await apiRoute(validRequest);
-      
-      // Assert valid response
-      expect(validResponse.status).toBe(200);
-      expect(validResponse.body).toEqual({
-        success: true,
-        tenantId: VALID_TENANT_ID
-      });
-      
-      // Step 5: Configure for invalid test case
-      mockResponseStatus = 403;
-      mockResponseBody = { error: 'Cross-tenant access denied' };
-      
-      // Step 6: Create an invalid (cross-tenant) request
-      const invalidRequest = createMockRequest();
-      mockURLSearchParams.set('tenantId', DIFFERENT_TENANT_ID);
-      
-      // Step 7: Execute the API route with an invalid request
-      const invalidResponse = await apiRoute(invalidRequest);
-      
-      // Assert invalid response
-      expect(invalidResponse.status).toBe(403);
-      expect(invalidResponse.body).toEqual({
-        error: 'Cross-tenant access denied'
-      });
+
+  it('should handle unexpected errors in the middleware', async () => {
+    // Create a request with tenant ID
+    const req = createMockRequest({ 
+      'x-tenant-id': VALID_TENANT_ID,
+      'authorization': 'Bearer valid-token' 
     });
+    
+    // Import TenantContext class
+    const { TenantContext } = require('../../../src/app/api/middleware/secureTenantContext');
+    
+    // Mock TenantContext.fromRequest to return a valid context first
+    // This is needed to get past the initial null check
+    const mockContext = { tenantId: VALID_TENANT_ID, userId: 'user-123' };
+    jest.spyOn(TenantContext, 'fromRequest').mockResolvedValueOnce(mockContext);
+    
+    // Mock URL constructor to throw an error
+    const urlSpy = jest.spyOn(global, 'URL');
+    urlSpy.mockImplementationOnce(() => {
+      throw new Error('URL parsing error');
+    });
+    
+    // Create a mock handler
+    const handler = jest.fn().mockResolvedValue({});
+
+    // Call the middleware
+    const result = await withSecureTenantContext(req, handler);
+
+    // Verify the handler was NOT called
+    expect(handler).not.toHaveBeenCalled();
+    
+    // Verify the response is a 500 Internal Server Error
+    expect(NextResponse.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'Internal Server Error' }),
+      expect.objectContaining({ status: 500 })
+    );
+    
+    // Restore URL mock
+    urlSpy.mockRestore();
+  });
+
+  it('should allow requests with valid tenant context', async () => {
+    // Create a request with valid tenant ID and auth token
+    const req = createMockRequest({ 
+      'x-tenant-id': VALID_TENANT_ID, 
+      'authorization': 'Bearer valid-token' 
+    });
+    
+    // Import TenantContext class
+    const { TenantContext } = require('../../../src/app/api/middleware/secureTenantContext');
+    
+    // Mock TenantContext.fromRequest to return a valid context
+    const mockContext = { 
+      tenantId: VALID_TENANT_ID, 
+      userId: 'user-123',
+      requestId: 'test-request-id',
+      timestamp: 1234567890
+    };
+    jest.spyOn(TenantContext, 'fromRequest').mockResolvedValueOnce(mockContext);
+    
+    // Mock URL for path checking
+    const mockUrl = new URL(`https://example.com/api/tenants/${VALID_TENANT_ID}/resources`);
+    jest.spyOn(global, 'URL').mockImplementationOnce(() => mockUrl);
+    
+    // Create a mock handler that returns a success response
+    const mockResponse = { success: true };
+    const handler = jest.fn().mockResolvedValue(mockResponse);
+
+    // Call the middleware
+    const result = await withSecureTenantContext(req, handler);
+
+    // Verify the handler was called
+    expect(handler).toHaveBeenCalled();
+    
+    // Verify the handler was called with the request and a context object
+    expect(handler).toHaveBeenCalledWith(
+      req, 
+      expect.objectContaining({
+        tenantId: VALID_TENANT_ID,
+        userId: 'user-123'
+      })
+    );
+    
+    // Verify the result is the mock response
+    expect(result).toBe(mockResponse);
   });
 });

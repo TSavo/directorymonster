@@ -1,0 +1,131 @@
+/**
+ * Authentication Middleware Tests
+ * Using standardized mocks
+ */
+
+import { NextRequest } from 'next/server';
+import { withAuthentication } from '@/app/api/middleware';
+
+// Import standardized mocks
+import { createMockNextRequest } from '@/tests/mocks/next/request';
+import { mockNextResponseJson } from '@/tests/mocks/next/response';
+import { 
+  VALID_TOKEN, 
+  INVALID_TOKEN, 
+  setupJwtMock, 
+  verify, 
+  DEFAULT_USER_ID 
+} from '@/tests/mocks/lib/auth/jwt';
+
+// Set up JWT mock
+setupJwtMock();
+
+describe('Authentication Middleware', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('withAuthentication', () => {
+    it('should reject requests without authentication', async () => {
+      // Create a request without authorization header
+      const req = createMockNextRequest({
+        headers: { 'authorization': undefined }
+      });
+      
+      const handler = jest.fn().mockResolvedValue(
+        mockNextResponseJson({ success: true })
+      );
+
+      await withAuthentication(req, handler);
+
+      expect(mockNextResponseJson).toHaveBeenCalledWith(
+        expect.objectContaining({ error: 'Unauthorized' }),
+        expect.objectContaining({ status: 401 })
+      );
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    it('should reject requests with invalid token format', async () => {
+      // Create a request with invalid token format
+      const req = createMockNextRequest({
+        headers: { 'authorization': 'InvalidFormat' }
+      });
+      
+      const handler = jest.fn().mockResolvedValue(
+        mockNextResponseJson({ success: true })
+      );
+
+      await withAuthentication(req, handler);
+
+      expect(mockNextResponseJson).toHaveBeenCalledWith(
+        expect.objectContaining({ error: 'Unauthorized' }),
+        expect.objectContaining({ status: 401 })
+      );
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    it('should reject requests with invalid token', async () => {
+      // Create a request with invalid token
+      const req = createMockNextRequest({
+        headers: { 'authorization': `Bearer ${INVALID_TOKEN}` }
+      });
+      
+      const handler = jest.fn().mockResolvedValue(
+        mockNextResponseJson({ success: true })
+      );
+
+      await withAuthentication(req, handler);
+
+      expect(verify).toHaveBeenCalled();
+      expect(mockNextResponseJson).toHaveBeenCalledWith(
+        expect.objectContaining({ error: 'Invalid token' }),
+        expect.objectContaining({ status: 401 })
+      );
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    it('should allow requests with valid token', async () => {
+      // Create a request with valid token
+      const req = createMockNextRequest({
+        headers: { 'authorization': `Bearer ${VALID_TOKEN}` }
+      });
+      
+      const handlerResult = { success: true };
+      const mockResponse = mockNextResponseJson(handlerResult);
+      const handler = jest.fn().mockResolvedValue(mockResponse);
+
+      const result = await withAuthentication(req, handler);
+
+      expect(verify).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalledWith(req, DEFAULT_USER_ID);
+      
+      // Check that the result is the mockResponse
+      expect(result).toBe(mockResponse);
+    });
+
+    it('should handle token verification errors', async () => {
+      // Create a request with valid token
+      const req = createMockNextRequest({
+        headers: { 'authorization': `Bearer ${VALID_TOKEN}` }
+      });
+      
+      // Mock the verify function to throw an error
+      verify.mockImplementationOnce(() => {
+        throw new Error('Invalid token');
+      });
+
+      const handler = jest.fn().mockResolvedValue(
+        mockNextResponseJson({ success: true })
+      );
+
+      await withAuthentication(req, handler);
+
+      expect(verify).toHaveBeenCalled();
+      expect(handler).not.toHaveBeenCalled();
+      expect(mockNextResponseJson).toHaveBeenCalledWith(
+        expect.objectContaining({ error: 'Invalid token' }),
+        expect.objectContaining({ status: 401 })
+      );
+    });
+  });
+});
