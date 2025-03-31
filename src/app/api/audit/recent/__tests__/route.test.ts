@@ -2,10 +2,16 @@ import { NextRequest } from 'next/server';
 import { GET } from '../route';
 import AuditService from '@/lib/audit/audit-service';
 import { withPermission } from '../../../middleware/withPermission';
+import jwt from 'jsonwebtoken';
 
 // Mock dependencies
-jest.mock('@/lib/audit/audit-service');
+jest.mock('@/lib/audit/audit-service', () => ({
+  getRecentEvents: jest.fn()
+}));
 jest.mock('../../../middleware/withPermission');
+jest.mock('jsonwebtoken', () => ({
+  decode: jest.fn()
+}));
 
 describe('Recent Audit API', () => {
   beforeEach(() => {

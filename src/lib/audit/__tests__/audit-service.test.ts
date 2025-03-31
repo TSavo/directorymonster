@@ -46,7 +46,7 @@ describe('AuditService', () => {
       expect(redis.set).toHaveBeenCalled();
 
       // Check that all indexes were created
-      expect(redis.zadd).toHaveBeenCalledTimes(5); // tenant, user, action, resource, global indexes
+      expect(redis.zadd).toHaveBeenCalledTimes(6); // tenant, user, action, resourceType, resourceId, global indexes
     });
 
     it('should use default severity if not provided', async () => {

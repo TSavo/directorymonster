@@ -3,11 +3,18 @@ import { GET, POST } from '../route';
 import AuditService from '@/lib/audit/audit-service';
 import { withPermission } from '../../middleware/withPermission';
 import RoleService from '@/lib/role-service';
+import jwt from 'jsonwebtoken';
 
 // Mock dependencies
-jest.mock('@/lib/audit/audit-service');
+jest.mock('@/lib/audit/audit-service', () => ({
+  queryEvents: jest.fn(),
+  logEvent: jest.fn()
+}));
 jest.mock('../../middleware/withPermission');
 jest.mock('@/lib/role-service');
+jest.mock('jsonwebtoken', () => ({
+  decode: jest.fn()
+}));
 
 describe('Audit API Routes', () => {
   beforeEach(() => {
@@ -33,7 +40,7 @@ describe('Audit API Routes', () => {
       );
       
       // Mock JWT decode
-      jest.requireMock('jsonwebtoken').decode.mockReturnValue({ userId: 'user-123' });
+      jwt.decode.mockReturnValue({ userId: 'user-123' });
       
       // Mock RoleService
       (RoleService.hasGlobalRole as jest.Mock).mockResolvedValue(false);
@@ -83,7 +90,7 @@ describe('Audit API Routes', () => {
       );
       
       // Mock JWT decode
-      jest.requireMock('jsonwebtoken').decode.mockReturnValue({ userId: 'admin-user' });
+      jwt.decode.mockReturnValue({ userId: 'admin-user' });
       
       // Mock RoleService - user is global admin
       (RoleService.hasGlobalRole as jest.Mock).mockResolvedValue(true);
@@ -125,7 +132,7 @@ describe('Audit API Routes', () => {
       );
       
       // Mock JWT decode
-      jest.requireMock('jsonwebtoken').decode.mockReturnValue({ userId: 'admin-user' });
+      jwt.decode.mockReturnValue({ userId: 'admin-user' });
       
       // Mock RoleService
       (RoleService.hasGlobalRole as jest.Mock).mockResolvedValue(false);
@@ -183,7 +190,7 @@ describe('Audit API Routes', () => {
       );
       
       // Mock JWT decode
-      jest.requireMock('jsonwebtoken').decode.mockReturnValue({ userId: 'user-123' });
+      jwt.decode.mockReturnValue({ userId: 'user-123' });
       
       // Mock RoleService - not a global admin
       (RoleService.hasGlobalRole as jest.Mock).mockResolvedValue(false);

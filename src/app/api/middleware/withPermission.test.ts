@@ -10,6 +10,7 @@ import {
   withAuditedPermission
 } from './withPermission';
 import { withTenantAccess } from './withTenantAccess';
+import AuditService from '@/lib/audit/audit-service';
 
 // Mock dependencies
 jest.mock('jsonwebtoken', () => ({
@@ -27,6 +28,10 @@ jest.mock('@/lib/tenant-membership-service', () => ({
 
 jest.mock('./withTenantAccess', () => ({
   withTenantAccess: jest.fn(),
+}));
+
+jest.mock('@/lib/audit/audit-service', () => ({
+  logPermissionEvent: jest.fn(),
 }));
 
 describe('Permission middleware', () => {
@@ -285,9 +290,6 @@ describe('Permission middleware', () => {
   
   describe('withAuditedPermission', () => {
     it('should log successful permission access', async () => {
-      // Mock console.log to track audit logging
-      const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation();
-      
       const response = await withAuditedPermission(
         mockRequest,
         'category',
@@ -306,22 +308,24 @@ describe('Permission middleware', () => {
       );
       expect(mockHandler).toHaveBeenCalled();
       
-      // Verify audit logging occurred
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        'Audit event:',
-        expect.stringContaining('access')
+      // Verify audit logging occurred using AuditService
+      expect(AuditService.logPermissionEvent).toHaveBeenCalledWith(
+        'test-user-id',
+        'test-tenant-id',
+        'category',
+        'read',
+        true,
+        undefined,
+        expect.objectContaining({
+          method: 'GET',
+          path: '/api/test'
+        })
       );
       
       expect(response.status).toBe(200);
-      
-      // Restore console.log
-      mockConsoleLog.mockRestore();
     });
     
     it('should log permission denied events', async () => {
-      // Mock console.log to track audit logging
-      const mockConsoleLog = jest.spyOn(console, 'log').mockImplementation();
-      
       // Make permission check fail
       (RoleService.hasPermission as jest.Mock).mockResolvedValue(false);
       
@@ -332,16 +336,21 @@ describe('Permission middleware', () => {
         mockHandler
       );
       
-      // Verify denial was logged
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        'Audit event:',
-        expect.stringContaining('denied')
+      // Verify denial was logged using AuditService
+      expect(AuditService.logPermissionEvent).toHaveBeenCalledWith(
+        'test-user-id',
+        'test-tenant-id',
+        'category',
+        'update',
+        false,
+        undefined,
+        expect.objectContaining({
+          method: 'GET',
+          path: '/api/test'
+        })
       );
       
       expect(response.status).toBe(403);
-      
-      // Restore console.log
-      mockConsoleLog.mockRestore();
     });
   });
 });
