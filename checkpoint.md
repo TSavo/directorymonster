@@ -17,6 +17,17 @@ I'm working on implementing the changes specified in this document to address co
    - Added getTenantKeyPrefix method to KeyNamespaceService
 
 ### Remaining Tasks:
+5. ✅ Expand request method coverage in SecureTenantContext
+6. Improve error handling in SecureRedisClient
+7. Fix documentation in SecureRedisClient
+8. Refactor KeyNamespaceService class
+9. Improve type safety in test helpers
+10. Fix documentation naming conventions
+11. Remove duplicate documentation heading
+12. Fix trailing punctuation in specs files
+
+### Next Task
+I'll now work on expanding request method coverage in SecureTenantContext to include PATCH and DELETE methods for cross-tenant reference detection.
 5. Expand request method coverage in SecureTenantContext
 6. Improve error handling in SecureRedisClient
 7. Fix documentation in SecureRedisClient
