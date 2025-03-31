@@ -34,6 +34,7 @@ export enum KeyResourceType {
   CACHE = 'cache',
   HOSTNAME = 'hostname',
   SEARCH = 'search',
+  RESOURCE = 'resource',
 }
 
 /**
@@ -60,6 +61,11 @@ export class KeyNamespaceService {
    */
   static getNamespacedKey(components: KeyComponents): string {
     const { tenantId, resourceType, resourceId, subType, action } = components;
+    
+    // Validate tenant ID format for security (part of Tenant ID Protection)
+    if (!KeyNamespaceService.isValidTenantId(tenantId) && tenantId !== SYSTEM_NAMESPACE) {
+      console.warn(`Invalid tenant ID format: ${tenantId}`);
+    }
     
     // Build key parts array, filtering out undefined/null values
     const keyParts = [
@@ -140,6 +146,16 @@ export class KeyNamespaceService {
   }
   
   /**
+   * Get the tenant key prefix for pattern-based operations
+   * 
+   * @param tenantId Tenant identifier
+   * @returns Key prefix for the tenant
+   */
+  static getTenantKeyPrefix(tenantId: string): string {
+    return `${tenantId}${NAMESPACE_DELIMITER}`;
+  }
+  
+  /**
    * Get a tenant key with proper namespace
    * 
    * @param tenantId Tenant identifier
@@ -147,7 +163,7 @@ export class KeyNamespaceService {
    * @returns Namespaced tenant key
    */
   static getTenantKey(tenantId: string, resourceId?: string): string {
-    return this.getNamespacedKey({
+    return KeyNamespaceService.getNamespacedKey({
       tenantId: SYSTEM_NAMESPACE, // Tenant IDs are stored at system level
       resourceType: KeyResourceType.TENANT,
       resourceId: resourceId || tenantId
@@ -163,7 +179,7 @@ export class KeyNamespaceService {
    * @returns Namespaced user key
    */
   static getUserKey(tenantId: string, userId: string, subType?: string): string {
-    return this.getNamespacedKey({
+    return KeyNamespaceService.getNamespacedKey({
       tenantId,
       resourceType: KeyResourceType.USER,
       resourceId: userId,
@@ -180,7 +196,7 @@ export class KeyNamespaceService {
    * @returns Namespaced role key
    */
   static getRoleKey(tenantId: string, roleId: string, subType?: string): string {
-    return this.getNamespacedKey({
+    return KeyNamespaceService.getNamespacedKey({
       tenantId,
       resourceType: KeyResourceType.ROLE,
       resourceId: roleId,
@@ -195,7 +211,7 @@ export class KeyNamespaceService {
    * @returns Namespaced tenant users key
    */
   static getTenantUsersKey(tenantId: string): string {
-    return this.getNamespacedKey({
+    return KeyNamespaceService.getNamespacedKey({
       tenantId,
       resourceType: KeyResourceType.TENANT,
       subType: 'users'
@@ -210,7 +226,7 @@ export class KeyNamespaceService {
    * @returns Namespaced user roles key
    */
   static getUserRolesKey(userId: string, tenantId: string): string {
-    return this.getNamespacedKey({
+    return KeyNamespaceService.getNamespacedKey({
       tenantId,
       resourceType: KeyResourceType.USER,
       resourceId: userId,
@@ -224,7 +240,7 @@ export class KeyNamespaceService {
    * @returns Namespaced global roles key
    */
   static getGlobalRolesKey(): string {
-    return this.getSystemKey(KeyResourceType.ROLE, 'global');
+    return KeyNamespaceService.getSystemKey(KeyResourceType.ROLE, 'global');
   }
   
   /**
@@ -245,7 +261,7 @@ export class KeyNamespaceService {
    * @returns Namespaced audit event key
    */
   static getAuditEventKey(tenantId: string, eventId?: string): string {
-    return this.getNamespacedKey({
+    return KeyNamespaceService.getNamespacedKey({
       tenantId,
       resourceType: KeyResourceType.AUDIT,
       resourceId: eventId,
@@ -261,7 +277,7 @@ export class KeyNamespaceService {
    * @returns Namespaced tenant settings key
    */
   static getTenantSettingsKey(tenantId: string, settingKey?: string): string {
-    return this.getNamespacedKey({
+    return KeyNamespaceService.getNamespacedKey({
       tenantId,
       resourceType: KeyResourceType.SETTINGS,
       resourceId: settingKey
@@ -278,8 +294,8 @@ export class KeyNamespaceService {
    */
   static async validateSameTenant(key1: string, key2: string, userId?: string): Promise<boolean> {
     // Extract tenant IDs from keys
-    const tenantId1 = this.extractTenantId(key1);
-    const tenantId2 = this.extractTenantId(key2);
+    const tenantId1 = KeyNamespaceService.extractTenantId(key1);
+    const tenantId2 = KeyNamespaceService.extractTenantId(key2);
     
     // Check if both keys are system keys (no tenant validation needed)
     if (tenantId1 === SYSTEM_NAMESPACE && tenantId2 === SYSTEM_NAMESPACE) {
@@ -368,14 +384,14 @@ export class KeyNamespaceService {
    */
   static getSessionKey(sessionId: string, tenantId?: string): string {
     if (tenantId) {
-      return this.getNamespacedKey({
+      return KeyNamespaceService.getNamespacedKey({
         tenantId,
         resourceType: KeyResourceType.SESSION,
         resourceId: sessionId
       });
     } else {
       // Fall back to system namespace if no tenant provided
-      return this.getSystemKey(KeyResourceType.SESSION, sessionId);
+      return KeyNamespaceService.getSystemKey(KeyResourceType.SESSION, sessionId);
     }
   }
 }
