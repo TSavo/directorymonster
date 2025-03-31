@@ -208,6 +208,12 @@ export class TenantService {
    * @returns True if successful, false otherwise
    */
   static async deleteTenant(id: string): Promise<boolean> {
+    // Validate tenant ID format for security (part of Tenant ID Protection)
+    if (!KeyNamespaceService.isValidTenantId(id) && id !== 'default') {
+      console.warn(`Invalid tenant ID format: ${id}`);
+      return false;
+    }
+    
     try {
       // Get the tenant
       const tenant = await this.getTenantById(id);
