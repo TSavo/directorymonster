@@ -259,7 +259,7 @@ export async function withSecureTenantPermission(
       }
       
       // Check for cross-tenant resource references in request body
-      if (req.method === 'POST' || req.method === 'PUT') {
+      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
         try {
           const clonedReq = req.clone();
           const body = await clonedReq.json();
