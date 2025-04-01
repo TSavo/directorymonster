@@ -9,12 +9,12 @@
   - Created a new branch 'fix/merge-issue-96-categories-route' based on main
   - Created a new PR #100 to incrementally resolve the conflicts
   
-- Files successfully resolved (2 of 6):
+- Files successfully resolved (3 of 6):
   - ✅ src/app/api/admin/categories/route.ts
   - ✅ src/app/api/admin/categories/[id]/route.ts
+  - ✅ src/app/api/admin/categories/reorder/route.ts
   
-- Files still pending resolution (4 of 6):
-  - ⬜ src/app/api/admin/categories/reorder/route.ts
+- Files still pending resolution (3 of 6):
   - ⬜ src/app/api/admin/dashboard/activity/route.ts
   - ⬜ src/app/api/admin/dashboard/stats/route.ts
   - ⬜ tests/unit/api/admin/dashboard/activity.test.ts
@@ -29,8 +29,13 @@
 5. Resolved conflicts in src/app/api/admin/categories/[id]/route.ts
    - Used CategoryService implementation from main
    - Enhanced documentation with details from PR #96
-6. Created PR #100 with the resolved files
-7. Updated PR #100 description to reflect both resolved files
+6. Resolved conflicts in src/app/api/admin/categories/reorder/route.ts
+   - Added CategoryService for reordering categories
+   - Replaced direct Redis operations with CategoryService methods
+   - Maintained audit logging functionality
+   - Combined best documentation from both versions
+7. Created PR #100 with the resolved files
+8. Updated PR #100 description to reflect all three resolved files
 
 ## Resolution Approach
 For each conflicted file:
@@ -40,11 +45,11 @@ For each conflicted file:
    - CategoryService usage from main
    - Documentation style and detail from PR #96
    - Proper error handling and tenant validation
+   - Avoiding direct Redis operations where possible
 
 ## Next Steps
 1. Continue resolving conflicts in the remaining files:
-   - Next: src/app/api/admin/categories/reorder/route.ts
-   - Then: src/app/api/admin/dashboard/activity/route.ts
+   - Next: src/app/api/admin/dashboard/activity/route.ts
    - Then: src/app/api/admin/dashboard/stats/route.ts
    - Finally: tests/unit/api/admin/dashboard/activity.test.ts
 2. Once all conflicts are resolved in PR #100:
