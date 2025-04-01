@@ -55,7 +55,7 @@
     "test:integration:coverage": "jest \"tests/integration/.*\\.test\\.ts\" --config=jest.coverage.config.js",
     "test:docker:coverage": "bash scripts/docker-coverage-test.sh",
     "test:docker:coverage:ci": "docker-compose -f docker-compose.test.yml up --exit-code-from app -d && docker-compose -f docker-compose.test.yml exec -T app npm run test:coverage",
-    "test:specific": "node run-test.js",
+    "test:specific": "node direct-test.js",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "docker:build": "docker-compose build",
