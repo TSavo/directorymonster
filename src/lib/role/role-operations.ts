@@ -12,9 +12,14 @@ import { generateUUID } from './utils';
 import { getGlobalRoleKey, GLOBAL_ROLES_KEY, SYSTEM_TENANT_ID } from './constants';
 
 /**
- * Create a new role in a tenant
- * @param role Role definition (without id and timestamps)
- * @returns Created role with ID and timestamps
+ * Creates a new role for a tenant or as a global role.
+ *
+ * This function generates a unique ID and timestamps for the new role, validates that global roles are associated with the system tenant ID, and stores the role using the appropriate Redis key. Audit events are logged to track the creation process.
+ *
+ * @param role - The role details excluding id, createdAt, and updatedAt. For global roles, tenantId must be the system tenant ID.
+ * @returns A promise that resolves to the created role, now including its generated id and timestamp fields.
+ *
+ * @throws {Error} If a global role is provided with an invalid tenantId or if an error occurs during role creation.
  */
 export async function createRole(
   role: Omit<Role, 'id' | 'createdAt' | 'updatedAt'>
@@ -93,11 +98,14 @@ export async function createRole(
 }
 
 /**
- * Create a global role
- * Helper method to simplify global role creation with proper validation
- * 
- * @param role Global role definition (without id, tenantId, and timestamps)
- * @returns Created global role with ID and timestamps
+ * Creates a global role.
+ *
+ * This function simplifies global role creation by automatically assigning the system tenant ID and setting the global flag. It accepts a role definition that excludes system-assigned properties (id, createdAt, updatedAt, tenantId, and isGlobal) and delegates to the primary role creation function.
+ *
+ * @param role - Global role definition excluding id, tenantId, createdAt, updatedAt, and isGlobal.
+ * @returns A promise that resolves to the created global role with a unique id and timestamp properties.
+ *
+ * @throws {Error} When the creation of the global role fails.
  */
 export async function createGlobalRole(
   role: Omit<Role, 'id' | 'createdAt' | 'updatedAt' | 'tenantId' | 'isGlobal'>
@@ -118,10 +126,13 @@ export async function createGlobalRole(
 }
 
 /**
- * Get a role by ID
- * @param tenantId Tenant ID
- * @param roleId Role ID
- * @returns Role or null if not found
+ * Retrieves a role by its identifier in a tenant-aware manner.
+ *
+ * The function first searches for the role using a tenant-specific key. If the role is not found and the provided tenant ID is the system tenant ID, it then attempts to retrieve the role as a global role. In case of errors or if no matching role is found, it returns null.
+ *
+ * @param tenantId The tenant identifier associated with the role.
+ * @param roleId The unique identifier of the role.
+ * @returns The role object if found; otherwise, null.
  */
 export async function getRole(
   tenantId: string,
@@ -150,9 +161,13 @@ export async function getRole(
 }
 
 /**
- * Get a global role by ID
- * @param roleId Global role ID
- * @returns Global role or null if not found
+ * Retrieves a global role using its unique identifier.
+ *
+ * This asynchronous function fetches the role corresponding to the provided ID and verifies that it is flagged as global.
+ * If the role does not exist, is not marked as global, or an error occurs during retrieval, the function returns null.
+ *
+ * @param roleId - The unique identifier for the global role.
+ * @returns The global role if found and valid; otherwise, null.
  */
 export async function getGlobalRole(roleId: string): Promise<Role | null> {
   try {
@@ -172,11 +187,14 @@ export async function getGlobalRole(roleId: string): Promise<Role | null> {
 }
 
 /**
- * Update an existing role
- * @param tenantId Tenant ID
- * @param roleId Role ID
- * @param updates Partial role updates
- * @returns Updated role or null if not found
+ * Updates an existing role with the provided partial updates.
+ *
+ * The function retrieves the current role using the tenant and role identifiers, then applies the updates while preserving immutable fields such as id, tenantId, isGlobal, and createdAt. It explicitly prevents modifications to the isGlobal property; any attempt to change it results in an error (caught internally, leading to a null return). Depending on whether the role is global or tenant-specific, the updated role is stored in Redis under the appropriate key, and an audit event is logged.
+ *
+ * @param tenantId The identifier for the tenant that owns the role.
+ * @param roleId The unique identifier of the role to update.
+ * @param updates An object containing the role properties to update.
+ * @returns The updated role if successful; otherwise, null if the role is not found or an error occurs.
  */
 export async function updateRole(
   tenantId: string,
@@ -263,8 +281,11 @@ export async function updateRole(
 }
 
 /**
- * Get all global roles in the system
- * @returns Array of global roles
+ * Retrieves all global roles stored in the system.
+ *
+ * This function fetches global role IDs from Redis using the designated global roles key and retrieves each role via the {@link getGlobalRole} function. Roles that cannot be retrieved are omitted. If an error occurs during the process, the error is logged and an empty array is returned.
+ *
+ * @returns A promise that resolves to an array of global roles.
  */
 export async function getGlobalRoles(): Promise<Role[]> {
   try {

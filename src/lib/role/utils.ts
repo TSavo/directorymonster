@@ -25,7 +25,14 @@ export function generateUUID(): string {
 }
 
 /**
- * Helper method to scan Redis keys with a pattern
+ * Scans and retrieves all Redis keys matching a specified pattern.
+ *
+ * This asynchronous function repeatedly issues the Redis `SCAN` command using a cursor-based approach until
+ * the entire keyspace has been processed. Matching keys from each scan iteration are accumulated into an array,
+ * which is returned as a promise.
+ *
+ * @param pattern - The pattern used to match Redis keys.
+ * @returns A promise that resolves to an array of keys matching the pattern.
  */
 export async function scanKeys(redisClient: any, pattern: string): Promise<string[]> {
   const keys: string[] = [];

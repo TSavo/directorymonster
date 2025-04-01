@@ -8,10 +8,14 @@ import { scanKeys } from './utils';
 import { getGlobalRoles } from './role-operations';
 
 /**
- * Get all roles for a tenant, including applicable global roles
- * @param tenantId Tenant ID
- * @param includeGlobalRoles Whether to include global roles (default: true)
- * @returns Array of roles
+ * Retrieves all roles associated with a tenant.
+ *
+ * This function returns a promise that resolves to an array containing tenant-specific roles and, if requested,
+ * global roles as well. If an error occurs during retrieval, the function logs the error and returns an empty array.
+ *
+ * @param tenantId - The identifier of the tenant.
+ * @param includeGlobalRoles - Whether to include global roles; defaults to true.
+ * @returns A promise that resolves to an array of roles.
  */
 export async function getRolesByTenant(
   tenantId: string,
