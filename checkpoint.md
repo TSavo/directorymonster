@@ -49,6 +49,11 @@
     - Added src/app/api/admin/listings/[id]/images/route.ts
     - Added src/app/api/admin/listings/[id]/verify/route.ts
     - Added tests/unit/api/admin/listings/permission-middleware.test.ts
+    - Added tests/unit/api/admin/listings/route.test.ts
+    - Added tests/unit/api/admin/listings/id-route.test.ts
+    - Added tests/unit/api/admin/listings/feature-route.test.ts
+    - Added tests/unit/api/admin/listings/images-route.test.ts
+    - Added tests/unit/api/admin/listings/verify-route.test.ts
 
 ## Final Outcome
 All conflicts have been successfully resolved and the changes from PR #96 have been incorporated into the main branch through PR #100 and direct commits. The codebase now has consistent implementations of:
