@@ -25,7 +25,10 @@ import {
 } from './user-role-management';
 
 // Import compatibility functions
-import { assignGlobalRoleToUser as assignGlobalRoleToUserOp } from '../role-service/role-service-compat';
+import {
+  assignGlobalRoleToUser as assignGlobalRoleToUserOp,
+  removeGlobalRoleFromUser as removeGlobalRoleFromUserOp
+} from '../role-service/role-service-compat';
 
 import {
   hasPermission as hasPermissionOp,
@@ -64,6 +67,7 @@ export const getUserRoles = getUserRolesOp;
 export const hasRoleInTenant = hasRoleInTenantOp;
 export const hasSpecificRole = hasSpecificRoleOp;
 export const assignGlobalRoleToUser = assignGlobalRoleToUserOp;
+export const removeGlobalRoleFromUser = removeGlobalRoleFromUserOp;
 
 // Re-export permission management
 export const hasPermission = hasPermissionOp;
@@ -97,6 +101,7 @@ export class RoleService {
   static assignRoleToUser = assignRoleToUserOp;
   static assignGlobalRoleToUser = assignGlobalRoleToUserOp;
   static removeRoleFromUser = removeRoleFromUserOp;
+  static removeGlobalRoleFromUser = removeGlobalRoleFromUserOp;
   static getUserRoles = getUserRolesOp;
   static hasRoleInTenant = hasRoleInTenantOp;
   static hasSpecificRole = hasSpecificRoleOp;

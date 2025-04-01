@@ -152,3 +152,29 @@ export async function assignGlobalRoleToUser(
     return false;
   }
 }
+
+/**
+ * Remove a global role from a user
+ * @param userId User ID
+ * @param roleId Global role ID
+ * @returns true if successful, false otherwise
+ */
+export async function removeGlobalRoleFromUser(
+  userId: string,
+  roleId: string
+): Promise<boolean> {
+  try {
+    // Verify the role exists and is global
+    const globalRole = await this.getGlobalRole(roleId);
+    if (!globalRole || !globalRole.isGlobal) {
+      console.error(`Role ${roleId} is not a global role`);
+      return false;
+    }
+
+    // Remove the role from the user in the system tenant
+    return await this.removeRoleFromUser(userId, SYSTEM_TENANT_ID, roleId);
+  } catch (error) {
+    console.error(`Error removing global role ${roleId} from user ${userId}:`, error);
+    return false;
+  }
+}
