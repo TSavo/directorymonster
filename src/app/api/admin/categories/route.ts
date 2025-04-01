@@ -60,6 +60,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           // Get tenant context
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
 
+          // Get tenant context
+          const tenantId = validatedReq.headers.get('x-tenant-id') as string;
+
+          // Parse and validate request body
+          const data = await req.json();
+          if (!data.name) {
+            return NextResponse.json(
+              { error: 'Category name is required' },
+              { status: 400 }
+            );
+          }
+
           // Implementation will be added later
           // For now, just return a mock response to make the test pass
           return NextResponse.json({
