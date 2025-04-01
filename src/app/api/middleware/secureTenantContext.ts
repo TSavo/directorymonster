@@ -8,7 +8,10 @@ import { AuditAction } from '@/lib/audit/types';
 import TenantMembershipService from '@/lib/tenant-membership-service';
 
 // JWT secret should be stored in environment variables
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable must be set in production.');
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 
 /**
  * TenantContext class for encapsulating tenant context information
