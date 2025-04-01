@@ -16,6 +16,9 @@ You can also use the runner directly with custom options:
 # Run tests with a specific mode
 node jest-runner.js --mode=quiet tests/unit/api
 
+# Run tests in default mode (no reduced output)
+node jest-runner.js --mode=default
+
 # Run tests including e2e tests
 node jest-runner.js --with-e2e
 
@@ -66,11 +69,14 @@ npm run test:e2e
 npm run test:with-e2e
 ```
 
-### Reducing Test Output
+### Test Output Modes
 
-When running tests, you can use these commands to reduce the output:
+The default test command uses a balanced output mode that reduces noise while still providing useful information. You can also use these commands to further control the output:
 
 ```bash
+# Run tests with balanced output (default)
+npm test
+
 # Run tests with minimal output (custom formatter)
 npm run test:minimal
 
