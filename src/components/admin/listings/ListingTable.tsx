@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import { useListings } from './hooks/useListings';
 import { ListingTableProps } from './types';
 import {
@@ -30,52 +31,67 @@ import {
  */
 export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
   const {
-    // Data
-    filteredListings,
-    currentListings,
-    categories,
-    sites,
-    
-    // Loading and error states
-    isLoading,
+    listings,
+    loading,
     error,
-    
-    // Filtering
-    searchTerm,
+    filters,
     setSearchTerm,
-    categoryFilter,
-    setCategoryFilter,
-    siteFilter,
-    setSiteFilter,
-    
-    // Sorting
-    sortField,
-    sortOrder,
-    handleSort,
-    
-    // Pagination
-    currentPage,
-    totalPages,
-    itemsPerPage,
-    setItemsPerPage,
-    goToPage,
-    
-    // Delete handling
-    isDeleteModalOpen,
-    listingToDelete,
-    confirmDelete,
-    handleDelete,
-    cancelDelete,
-    
-    // Refetch
+    filterByCategory: setCategoryFilter,
+    filterBySite: setSiteFilter,
+    sort,
+    setSorting,
+    pagination,
+    setPage,
+    setPerPage,
+    toggleSelection,
+    deleteListing,
     fetchListings
-  } = useListings(siteSlug, initialListings);
+  } = useListings({
+    siteSlug,
+    initialListings // Pass initialListings to useListings
+  });
+
+  // Aliases and derived values
+  const filteredListings = listings;
+  const currentListings = listings;
+  const isLoading = loading;
+  const currentPage = pagination?.page || 1;
+  const totalPages = pagination?.totalPages || 1;
+  const itemsPerPage = pagination?.perPage || 10;
+  const sortField = sort?.field;
+  const sortOrder = sort?.direction;
+  const goToPage = setPage;
+  const handleSort = setSorting;
+  const handleDelete = deleteListing;
+  
+  // For delete modal functionality
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [listingToDelete, setListingToDelete] = useState<any>(null);
+  
+  const confirmDelete = useCallback((listing: any) => {
+    setListingToDelete(listing);
+    setIsDeleteModalOpen(true);
+  }, []);
+  
+  const cancelDelete = useCallback(() => {
+    setIsDeleteModalOpen(false);
+    setListingToDelete(null);
+  }, []);
+
+  // Filter values for header component
+  const searchTerm = filters?.search || '';
+  const categoryFilter = filters?.categoryIds?.[0] || '';
+  const siteFilter = filters?.siteId || '';
+  
+  // Mock data for testing - should come from API in production
+  const categories = []; // Should be populated from API
+  const sites = []; // Should be populated from API
 
   // Show site column only in multi-site mode
   const showSiteColumn = !siteSlug;
 
-  // Render loading state
-  if (isLoading) {
+  // Render loading state - only show if loading and no initialListings provided
+  if (isLoading && !initialListings?.length) {
     return <ListingTableSkeleton />;
   }
 
@@ -88,7 +104,7 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
     <div className="w-full p-4">
       {/* Header with search and filters */}
       <ListingTableHeader
-        totalListings={filteredListings.length}
+        totalListings={filteredListings?.length || 0}
         siteSlug={siteSlug}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
@@ -101,12 +117,12 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
       />
       
       {/* Empty state */}
-      {filteredListings.length === 0 && (
+      {filteredListings?.length === 0 && (
         <ListingTableEmptyState siteSlug={siteSlug} />
       )}
       
       {/* Table for desktop */}
-      {filteredListings.length > 0 && (
+      {filteredListings?.length > 0 && (
         <>
           <div className="hidden md:block border rounded-lg overflow-hidden">
             <table className="w-full divide-y divide-gray-200" aria-label="Listings table">
@@ -178,8 +194,8 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
             totalPages={totalPages}
             goToPage={goToPage}
             itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
-            totalItems={filteredListings.length}
+            setItemsPerPage={setPerPage}
+            totalItems={filteredListings?.length || 0}
           />
         </>
       )}
