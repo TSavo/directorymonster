@@ -10,15 +10,22 @@ import { ResourceType, Permission } from '@/components/admin/auth/utils/accessCo
 const JWT_SECRET = process.env.JWT_SECRET || 'development-secret';
 
 /**
- * Retrieves recent activity events for the admin dashboard.
+ * Retrieves recent activity data for the admin dashboard.
  *
- * This endpoint validates the request for tenant access and the required 'read' permission on the audit resource.
- * It extracts tenant context and user information from headers, verifies the JWT token from the authorization header to
- * determine the user ID, and supports query parameters for pagination and filtering (limit, offset, entityType, actionType, and userId).
- * If the user is a global admin, events across tenants are returned.
+ * This endpoint validates tenant access and requires the user to have 'read' permission on the 'audit' resource.
+ * It extracts the tenant ID and decodes the JWT from the authorization header to obtain the user ID.
+ * Query parameters such as limit, offset, entity type, action type, and an optional user ID are used to filter
+ * the activity events. If the user is a global admin, cross-tenant events are included.
  *
- * @param req - The incoming NextRequest with tenant information, authorization credentials, and optional query parameters.
- * @returns A NextResponse with a JSON object containing the retrieved activity events, or an error message if retrieval fails.
+ * The function supports the following query parameters:
+ * - limit: Maximum number of events to return (default: 10)
+ * - offset: Number of events to skip for pagination (default: 0)
+ * - entityType: Filter by resource type
+ * - actionType: Filter by action type
+ * - userId: Filter events by a specific user
+ *
+ * @param req The incoming API request.
+ * @returns A NextResponse containing the recent activity data or an error message.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(
