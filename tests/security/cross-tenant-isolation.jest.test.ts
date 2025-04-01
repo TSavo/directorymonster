@@ -48,6 +48,25 @@ describe('Cross-Tenant Security Isolation', () => {
     jest.clearAllMocks();
   });
   
+  // Clean up after all tests with comprehensive pattern-based cleanup
+  afterAll(async () => {
+    // Clean up all tenant keys using pattern matching
+    const tenant1Pattern = KeyNamespaceService.getTenantKeyPrefix(tenant1Id) + '*';
+    const tenant2Pattern = KeyNamespaceService.getTenantKeyPrefix(tenant2Id) + '*';
+    
+    // Get all tenant keys
+    const tenant1Keys = await redis.keys(tenant1Pattern);
+    const tenant2Keys = await redis.keys(tenant2Pattern);
+    
+    // Delete all keys for both tenants if they exist
+    if (tenant1Keys.length > 0) {
+      await redis.del(...tenant1Keys);
+    }
+    if (tenant2Keys.length > 0) {
+      await redis.del(...tenant2Keys);
+    }
+  });
+  
   describe('Basic Key Namespacing', () => {
     test('generates different keys for different tenants', async () => {
       // Generate keys for different tenants but same resource
@@ -116,6 +135,26 @@ describe('Cross-Tenant Security Isolation', () => {
       const crossTenantAttempt = await tenant1Redis.get('settings', KeyResourceType.CONFIG);
       expect(crossTenantAttempt).toEqual(tenant1Data);
       expect(crossTenantAttempt).not.toEqual(tenant2Data);
+    });
+    
+    test('SecureRedisClient prevents partial data collisions', async () => {
+      // Create data with partially matching properties
+      const tenant1PartialData = { id: 'shared-id', name: 'Tenant One', owner: 'Owner 1' };
+      const tenant2PartialData = { id: 'shared-id', name: 'Tenant Two', owner: 'Owner 2' };
+      
+      // Store data for each tenant
+      await tenant1Redis.set('shared-resource', tenant1PartialData, KeyResourceType.RESOURCE);
+      await tenant2Redis.set('shared-resource', tenant2PartialData, KeyResourceType.RESOURCE);
+      
+      // Retrieve data for each tenant
+      const retrievedTenant1Data = await tenant1Redis.get('shared-resource', KeyResourceType.RESOURCE);
+      const retrievedTenant2Data = await tenant2Redis.get('shared-resource', KeyResourceType.RESOURCE);
+      
+      // Check that data is isolated despite having some shared property values
+      expect(retrievedTenant1Data.id).toEqual(retrievedTenant2Data.id); // Same ID
+      expect(retrievedTenant1Data.name).not.toEqual(retrievedTenant2Data.name); // Different names
+      expect(retrievedTenant1Data.owner).toEqual('Owner 1'); // Each gets its own owner value
+      expect(retrievedTenant2Data.owner).toEqual('Owner 2');
     });
   });
   

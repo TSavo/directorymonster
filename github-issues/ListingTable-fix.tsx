@@ -90,7 +90,7 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
   // Show site column only in multi-site mode
   const showSiteColumn = !siteSlug;
 
-  // Render loading state - only show if loading and no initialListings provided
+  // Render loading state
   if (isLoading && !initialListings?.length) {
     return <ListingTableSkeleton />;
   }

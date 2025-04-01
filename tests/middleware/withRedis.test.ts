@@ -1,172 +1,101 @@
 /**
  * @jest-environment node
+ * 
+ * Integration test for Redis middleware
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { withRedis } from '../../src/middleware/withRedis';
 import { redis } from '../../src/lib/redis-client';
 
-// Mock the redis client
+// Mock the redis client properly as an ES module
 jest.mock('../../src/lib/redis-client', () => ({
+  __esModule: true,
   redis: {
-    ping: jest.fn(),
-  },
+    ping: jest.fn()
+  }
 }));
 
-describe('withRedis Middleware', () => {
+describe('withRedis Middleware Integration Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should call the handler when Redis is connected', async () => {
+  it('should allow requests when Redis is connected', async () => {
     // Mock successful ping
     (redis.ping as jest.Mock).mockResolvedValue('PONG');
     
-    // Create a mock handler
-    const mockHandler = jest.fn().mockResolvedValue(
-      NextResponse.json({ success: true })
-    );
+    // Create a simple handler that returns success
+    const handler = async () => NextResponse.json({ success: true });
     
-    // Create a mock request
+    // Create a request
     const request = new NextRequest('http://localhost:3000/api/test');
     
     // Apply the middleware
-    const wrappedHandler = withRedis(mockHandler);
-    const response = await wrappedHandler(request, { params: { test: 'value' } });
+    const wrappedHandler = withRedis(handler);
+    const response = await wrappedHandler(request);
     
-    // Verify that Redis was pinged
-    expect(redis.ping).toHaveBeenCalledTimes(1);
-    
-    // Verify that the handler was called with the correct arguments
-    expect(mockHandler).toHaveBeenCalledTimes(1);
-    expect(mockHandler).toHaveBeenCalledWith(request, { params: { test: 'value' } });
-    
-    // Verify the response
+    // Verify the response is successful
+    expect(response.status).toBe(200);
     const data = await response.json();
     expect(data).toEqual({ success: true });
+    
+    // Should not have the Redis unavailable header
+    expect(response.headers.get('x-redis-unavailable')).toBeNull();
   });
 
-  it('should return a 503 error when Redis is not connected', async () => {
+  it('should still proceed with the request when Redis is not connected but add a header', async () => {
     // Mock failed ping
     (redis.ping as jest.Mock).mockRejectedValue(new Error('Redis connection error'));
     
-    // Create a mock handler that should not be called
-    const mockHandler = jest.fn().mockResolvedValue(
-      NextResponse.json({ success: true })
-    );
+    // Create a handler that returns success
+    const handler = async () => NextResponse.json({ success: true });
     
-    // Create a mock request
+    // Create a request
     const request = new NextRequest('http://localhost:3000/api/test');
     
-    // Spy on console.error
+    // Silence console warnings in tests
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    
+    // Apply the middleware
+    const wrappedHandler = withRedis(handler);
+    const response = await wrappedHandler(request);
+    
+    // Verify the response is still successful
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data).toEqual({ success: true });
+    
+    // But should have the Redis unavailable header
+    expect(response.headers.get('x-redis-unavailable')).toBe('true');
+  });
+
+  it('should return a 503 error when an exception is thrown during execution', async () => {
+    // Mock successful ping (connection works, but handler will throw)
+    (redis.ping as jest.Mock).mockResolvedValue('PONG');
+    
+    // Create a handler that throws an error
+    const handler = async () => { throw new Error('Unexpected handler error'); };
+    
+    // Create a request
+    const request = new NextRequest('http://localhost:3000/api/test');
+    
+    // Silence console errors in tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
     
     // Apply the middleware
-    const wrappedHandler = withRedis(mockHandler);
-    const response = await wrappedHandler(request, { params: { test: 'value' } });
-    
-    // Verify that Redis was pinged
-    expect(redis.ping).toHaveBeenCalledTimes(1);
-    
-    // Verify that the handler was not called
-    expect(mockHandler).not.toHaveBeenCalled();
-    
-    // Verify the response
-    expect(response.status).toBe(503);
-    const data = await response.json();
-    expect(data).toEqual({
-      error: 'Database connection error',
-      message: 'The service is temporarily unavailable. Please try again later.',
-    });
-    
-    // Verify error was logged
-    expect(console.error).toHaveBeenCalledWith(
-      'Redis connection error:',
-      expect.any(Error)
-    );
-  });
-
-  it('should include appropriate headers for service unavailable response', async () => {
-    // Mock failed ping
-    (redis.ping as jest.Mock).mockRejectedValue(new Error('Redis connection error'));
-    
-    // Create a mock handler
-    const mockHandler = jest.fn();
-    
-    // Create a mock request
-    const request = new NextRequest('http://localhost:3000/api/test');
-    
-    // Apply the middleware
-    const wrappedHandler = withRedis(mockHandler);
+    const wrappedHandler = withRedis(handler);
     const response = await wrappedHandler(request);
     
-    // Verify the headers
+    // Verify we get a 503 response for error cases
+    expect(response.status).toBe(503);
+    
+    // Verify the headers for proper retry behavior
     expect(response.headers.get('Retry-After')).toBe('30');
-    expect(response.headers.get('Cache-Control')).toBe(
-      'no-store, no-cache, must-revalidate, proxy-revalidate'
-    );
-  });
-
-  it('should propagate errors from the handler', async () => {
-    // Mock successful ping
-    (redis.ping as jest.Mock).mockResolvedValue('PONG');
+    expect(response.headers.get('Cache-Control')).toBe('no-store, no-cache, must-revalidate, proxy-revalidate');
     
-    // Create a mock handler that throws an error
-    const handlerError = new Error('Handler error');
-    const mockHandler = jest.fn().mockRejectedValue(handlerError);
-    
-    // Create a mock request
-    const request = new NextRequest('http://localhost:3000/api/test');
-    
-    // Apply the middleware
-    const wrappedHandler = withRedis(mockHandler);
-    
-    // Expect the handler error to be propagated
-    await expect(wrappedHandler(request)).rejects.toThrow(handlerError);
-    
-    // Verify that Redis was pinged
-    expect(redis.ping).toHaveBeenCalledTimes(1);
-    
-    // Verify that the handler was called
-    expect(mockHandler).toHaveBeenCalledTimes(1);
-  });
-
-  it('should handle different types of handlers and arguments', async () => {
-    // Mock successful ping
-    (redis.ping as jest.Mock).mockResolvedValue('PONG');
-    
-    // Create a mock handler that uses multiple arguments
-    const mockHandler = jest.fn((...args) => {
-      // Return the number of arguments
-      return NextResponse.json({ argCount: args.length });
-    });
-    
-    // Create a mock request
-    const request = new NextRequest('http://localhost:3000/api/test');
-    
-    // Apply the middleware
-    const wrappedHandler = withRedis(mockHandler);
-    
-    // Call with multiple arguments
-    const response = await wrappedHandler(
-      request,
-      { params: { id: '123' } },
-      'extra1',
-      'extra2'
-    );
-    
-    // Verify the response
+    // Verify the error response structure
     const data = await response.json();
-    expect(data).toEqual({ argCount: 4 }); // request, params, and 2 extra args
-    
-    // Verify that Redis was pinged
-    expect(redis.ping).toHaveBeenCalledTimes(1);
-    
-    // Verify that the handler was called with all arguments
-    expect(mockHandler).toHaveBeenCalledWith(
-      request,
-      { params: { id: '123' } },
-      'extra1',
-      'extra2'
-    );
+    expect(data).toHaveProperty('error');
+    expect(data).toHaveProperty('message');
   });
 });

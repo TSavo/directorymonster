@@ -116,14 +116,6 @@ export class TenantService {
         this.normalizeHostname(h)
       );
       
-      // Check for duplicate hostnames
-      for (const hostname of normalizedHostnames) {
-        const existingTenantId = await kv.get<string>(`${HOSTNAME_PREFIX}${hostname}`);
-        if (existingTenantId) {
-          throw new Error(`Hostname ${hostname} is already used by another tenant`);
-        }
-      }
-      
       // Create the tenant object
       const tenant: TenantConfig = {
         ...config,

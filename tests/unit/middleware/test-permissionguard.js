@@ -81,7 +81,7 @@ describe('Secure Tenant Context Basic Tests', () => {
     expect(context.userId).toBe('user-id');
   });
   
-  it('should call withSecureTenantContext', () => {
+  it('should call withSecureTenantContext with correct parameters', () => {
     // Arrange
     const mockReq = {};
     const mockHandler = jest.fn();
@@ -91,9 +91,13 @@ describe('Secure Tenant Context Basic Tests', () => {
     
     // Assert
     expect(withSecureTenantContext).toHaveBeenCalledWith(mockReq, mockHandler);
+    // Verify the mock implementation was called correctly
+    expect(withSecureTenantContext.mock.calls.length).toBe(1);
+    expect(withSecureTenantContext.mock.calls[0][0]).toBe(mockReq);
+    expect(withSecureTenantContext.mock.calls[0][1]).toBe(mockHandler);
   });
   
-  it('should call withSecureTenantPermission', () => {
+  it('should call withSecureTenantPermission with correct parameters', () => {
     // Arrange
     const mockReq = {};
     const mockHandler = jest.fn();
@@ -113,5 +117,11 @@ describe('Secure Tenant Context Basic Tests', () => {
       Permission.READ,
       mockHandler
     );
+    // Verify the mock implementation was called correctly
+    expect(withSecureTenantPermission.mock.calls.length).toBe(1);
+    expect(withSecureTenantPermission.mock.calls[0][0]).toBe(mockReq);
+    expect(withSecureTenantPermission.mock.calls[0][1]).toBe(ResourceType.DOCUMENT);
+    expect(withSecureTenantPermission.mock.calls[0][2]).toBe(Permission.READ);
+    expect(withSecureTenantPermission.mock.calls[0][3]).toBe(mockHandler);
   });
 });

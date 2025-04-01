@@ -15,6 +15,7 @@ jest.mock('jsonwebtoken', () => ({
 
 // Mock TenantMembershipService
 jest.mock('@/lib/tenant-membership-service', () => ({
+  __esModule: true,
   default: {
     isTenantMember: jest.fn()
   }
@@ -22,6 +23,7 @@ jest.mock('@/lib/tenant-membership-service', () => ({
 
 // Mock RoleService
 jest.mock('@/lib/role-service', () => ({
+  __esModule: true,
   default: {
     hasPermission: jest.fn()
   }
@@ -29,6 +31,7 @@ jest.mock('@/lib/role-service', () => ({
 
 // Mock TenantService (used in withTenantContext)
 jest.mock('@/lib/tenant/tenant-service', () => ({
+  __esModule: true,
   default: {
     getTenantByHostname: jest.fn()
   }

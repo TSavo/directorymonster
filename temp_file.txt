@@ -116,14 +116,6 @@ export class TenantService {
         this.normalizeHostname(h)
       );
       
-      // Check for duplicate hostnames
-      for (const hostname of normalizedHostnames) {
-        const existingTenantId = await kv.get<string>(`${HOSTNAME_PREFIX}${hostname}`);
-        if (existingTenantId) {
-          throw new Error(`Hostname ${hostname} is already used by another tenant`);
-        }
-      }
-      
       // Create the tenant object
       const tenant: TenantConfig = {
         ...config,
@@ -216,12 +208,6 @@ export class TenantService {
    * @returns True if successful, false otherwise
    */
   static async deleteTenant(id: string): Promise<boolean> {
-    // Validate tenant ID format for security (part of Tenant ID Protection)
-    if (!KeyNamespaceService.isValidTenantId(id) && id !== 'default') {
-      console.warn(`Invalid tenant ID format: ${id}`);
-      return false;
-    }
-    
     try {
       // Get the tenant
       const tenant = await this.getTenantById(id);
