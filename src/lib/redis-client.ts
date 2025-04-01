@@ -81,7 +81,6 @@ class MemoryRedis {
     return removed;
   }
 
-<<<<<<< HEAD
   async sismember(key: string, member: string): Promise<number> {
     if (!this.store.has(key)) return 0;
     const set = this.store.get(key);
