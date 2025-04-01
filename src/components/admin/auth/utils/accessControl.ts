@@ -318,13 +318,13 @@ export function createSuperAdminACL(userId: string): ACL {
 /**
  * Checks the provided ACL for unauthorized access to resources of a different tenant.
  *
- * This function iterates through the ACL entries and returns true if it finds any entry
- * referencing a tenant ID different from the specified tenantId, except for entries where
- * the tenant ID is "system" (which are allowed for super administrators).
+ * This function checks if the ACL has at least one entry for the specified tenant
+ * or the system tenant. It returns false if such an entry exists (indicating that
+ * access to the tenant is authorized), and true otherwise (indicating unauthorized access).
  *
  * @param acl - The access control list to inspect.
  * @param tenantId - The tenant ID that the ACL is expected to be associated with.
- * @returns True if an entry with an unauthorized tenant ID is detected; otherwise, false.
+ * @returns True if there's no authorized access for the specified tenant; otherwise, false.
  */
 export function detectCrossTenantAccess(
   acl: ACL,
@@ -333,11 +333,14 @@ export function detectCrossTenantAccess(
   // Only check ACLs that have entries
   if (!acl.entries.length) return false;
   
-  // Check if any ACL entry references a different tenant
-  return acl.entries.some(entry => 
-    entry.resource.tenantId !== tenantId && 
-    entry.resource.tenantId !== 'system' // System tenant is allowed for super admins
+  // Check if any ACL entry references the specified tenant or system tenant
+  const hasTenantOrSystemAccess = acl.entries.some(entry => 
+    entry.resource.tenantId === tenantId || 
+    entry.resource.tenantId === 'system' // System tenant is allowed for super admins
   );
+  
+  // Return true if no access to the specified tenant or system
+  return !hasTenantOrSystemAccess;
 }
 
 /**
