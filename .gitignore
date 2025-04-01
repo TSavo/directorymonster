@@ -104,3 +104,20 @@ test-local-ci.bat
 run_pythondev.*
 run-tests.sh
 commit-message.txt
+
+# Screenshots and debugging assets
+admin-*.png
+*-dashboard*.png
+*-statistics*.png
+*-page*.png
+*-mobile*.png
+*-activity*.png
+before-*.png
+after-*.png
+/html-dumps/
+*.html-dump
+/screenshots/
+*-screenshot-*.png
+
+# Coverage reports
+/coverage*/

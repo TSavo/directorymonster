@@ -1,37 +1,53 @@
-# DirectoryMonster Testing Documentation
+# DirectoryMonster Specifications
 
-This directory contains comprehensive documentation for testing the DirectoryMonster application.
+This directory contains specifications and design documents for the DirectoryMonster project. These documents define how components should work and serve as references for implementation.
+
+## Document Types
+
+- **Feature Specifications**: Define requirements and architecture for features
+- **Testing Specifications**: Define testing requirements and standards
+- **Security Specifications**: Define security requirements and implementation details
+- **Design Specifications**: Define UI/UX design requirements
+
+## Naming Convention
+
+Documents in this directory follow these naming conventions:
+- `*_SPEC.md`: Specifications for specific features or components
+- `*.md`: General reference documentation
 
 ## Directory Structure
 
-### Main Testing Guides
-- **[TESTING.md](./TESTING.md)**: Main testing guide with an overview of testing approaches, structure, and practices
-- **[COMPONENT_TESTING.md](./COMPONENT_TESTING.md)**: Detailed patterns and examples for component testing
-- **[API_TESTING.md](./API_TESTING.md)**: Patterns and examples for API endpoint testing
-- **[INTEGRATION_TESTING.md](./INTEGRATION_TESTING.md)**: Guide for integration testing, including multitenancy and end-to-end flows
-- **[TEST_HELPERS.md](./TEST_HELPERS.md)**: Documentation for test helpers, fixtures, mocks, and utilities
+### Core Specifications
+- **[TESTING_SPEC.md](./TESTING_SPEC.md)**: Main testing specification with requirements
+- **[CROSS_TENANT_SECURITY_SPEC.md](./CROSS_TENANT_SECURITY_SPEC.md)**: Security specification for tenant isolation
+- **[MULTI_TENANT_ACL_SPEC.md](./MULTI_TENANT_ACL_SPEC.md)**: ACL system specification for multi-tenancy
 
-### Specialized Testing Guides
-- **[ACCESSIBILITY.md](./ACCESSIBILITY.md)**: Guide for accessibility testing practices
-- **[AUTH_TESTING.md](./AUTH_TESTING.md)**: Guide for authentication and authorization testing
-- **[HOOK_TESTING.md](./HOOK_TESTING.md)**: Guide for testing React hooks
+### Testing Specifications
+- **[COMPONENT_TESTING.md](./COMPONENT_TESTING.md)**: Standards for component testing
+- **[API_TESTING.md](./API_TESTING.md)**: Standards for API endpoint testing
+- **[INTEGRATION_TESTING.md](./INTEGRATION_TESTING.md)**: Standards for integration testing
+- **[TEST_HELPERS.md](./TEST_HELPERS.md)**: Specifications for test helpers
+- **[ACCESSIBILITY.md](./ACCESSIBILITY.md)**: Standards for accessibility testing
+- **[AUTH_TESTING.md](./AUTH_TESTING.md)**: Standards for auth testing
+- **[HOOK_TESTING.md](./HOOK_TESTING.md)**: Standards for hook testing
 
-### Project Component Documentation
-- **[api/](./api/)**: API endpoints documentation
-- **[seeding/](./seeding/)**: Data seeding scripts and procedures
-- **[seo/](./seo/)**: SEO configuration and practices
-- **[utilities/](./utilities/)**: Utility functions documentation
+### Component Specification Directories
+- **[api/](./api/)**: API endpoint specifications
+- **[seeding/](./seeding/)**: Data seeding specifications
+- **[seo/](./seo/)**: SEO specifications
+- **[utilities/](./utilities/)**: Utility function specifications
 
 ## Quick Links
 
-- [Test Types](./TESTING.md#test-types)
-- [Test Organization](./TESTING.md#test-organization)
-- [Running Tests](./TESTING.md#running-tests)
-- [Component Test Patterns](./COMPONENT_TESTING.md#common-testing-patterns)
-- [API Test Structure](./API_TESTING.md#api-test-structure)
-- [Integration Test Types](./INTEGRATION_TESTING.md#integration-test-types)
-- [Test Helpers](./TEST_HELPERS.md#test-helpers)
-- [Test Fixtures](./TEST_HELPERS.md#test-fixtures)
+- [Test Types](./TESTING_SPEC.md#test-types)
+- [Test Organization](./TESTING_SPEC.md#test-organization)
+- [Security Architecture](./CROSS_TENANT_SECURITY_SPEC.md#security-measures)
+- [ACL Model](./MULTI_TENANT_ACL_SPEC.md#core-concepts)
+
+## Related Resources
+
+- [Implementation Documentation](/docs) - Implementation guides and how-to documentation
+- [Archived Specifications](./docs-archive) - Historical specification documents
 
 ## Test Coverage
 
