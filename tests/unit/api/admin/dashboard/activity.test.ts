@@ -312,7 +312,14 @@ describe('Dashboard Activity Permission Middleware', () => {
   const TEST_TOKEN = jwt.sign({ userId: TEST_USER_ID }, TEST_SECRET, { expiresIn: '1h' });
 
   // Set up JWT_SECRET for testing
+  // Set up JWT_SECRET for testing
+  const originalJwtSecret = process.env.JWT_SECRET;
   process.env.JWT_SECRET = TEST_SECRET;
+
+  // Restore original JWT_SECRET after tests
+  afterAll(() => {
+    process.env.JWT_SECRET = originalJwtSecret;
+  });
 
   // Create a mock RoleService
   const mockRoleService = {
