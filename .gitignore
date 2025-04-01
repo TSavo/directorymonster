@@ -121,3 +121,7 @@ after-*.png
 
 # Coverage reports
 /coverage*/
+
+# Checkpoint files
+checkpoint.md
+debug-logs/
