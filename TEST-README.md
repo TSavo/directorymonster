@@ -26,7 +26,7 @@ npm test -- tests/unit/api
 
 ### Using the Specific Test Helper
 
-We've created a helper script that provides warnings if you try to run e2e tests:
+We've created a helper script that directly runs Jest with the specified arguments:
 
 ```bash
 # Run a specific test file
@@ -46,6 +46,9 @@ npm run test:e2e:categories
 
 # Run all E2E tests (will be resource-intensive)
 npm run test:e2e
+
+# Run all tests including E2E tests (use with caution)
+npm run test:with-e2e
 ```
 
 ### Other Useful Test Commands
