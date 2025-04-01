@@ -81,10 +81,11 @@ class MemoryRedis {
     return removed;
   }
 
-  async sismember(key: string, member: string): Promise<boolean> {
-    if (!this.store.has(key)) return false;
+<<<<<<< HEAD
+  async sismember(key: string, member: string): Promise<number> {
+    if (!this.store.has(key)) return 0;
     const set = this.store.get(key);
-    return set.has(member);
+    return set.has(member) ? 1 : 0;
   }
 
   async sinter(...keys: string[]): Promise<string[]> {
@@ -238,7 +239,6 @@ class MemoryRedis {
 
     return newValue;
   }
-
   // Transaction support
   multi(): any {
     const commands: { cmd: string; args: any[] }[] = [];
@@ -277,6 +277,7 @@ class MemoryRedis {
       sadd: addCommand('sadd'),
       srem: addCommand('srem'),
       smembers: addCommand('smembers'),
+      sismember: addCommand('sismember'),
       sinter: addCommand('sinter'),
       scard: addCommand('scard'),
       sismember: addCommand('sismember'),
@@ -292,10 +293,35 @@ class MemoryRedis {
 
     return multi;
   }
+  // Expiration support
+  async expire(key: string, seconds: number): Promise<number> {
+    if (!this.store.has(key)) return 0;
+
+    // Schedule deletion after the specified seconds
+    setTimeout(() => {
+      if (this.store.has(key)) {
+        this.store.delete(key);
+        console.log(`[Memory Redis] Expired key: ${key}`);
+      }
+    }, seconds * 1000);
+
+    return 1;
+  }
+
+  // Utility
+  async ping(): Promise<string> {
+    return 'PONG';
+  }
 }
 
 // Create a singleton instance of the in-memory Redis client
 const memoryRedis = new MemoryRedis();
+
+// First check if we're in a proper Node.js environment
+// Edge runtime or certain Next.js contexts might lack full Node.js APIs
+const isNodeEnvironment = typeof process !== 'undefined'
+                          && typeof process.version === 'string'
+                          && typeof process.version.charCodeAt === 'function';
 
 // Determine if we're in a browser environment
 const isBrowser = typeof window !== 'undefined';
@@ -305,6 +331,17 @@ if (isBrowser) {
   console.log('Browser environment detected, using memory fallback');
 }
 
+// Only use real Redis if explicitly enabled and we're in a server context
+const USE_MEMORY_FALLBACK = process.env.NODE_ENV === "test" ||
+  (process.env.USE_MEMORY_FALLBACK === 'true');
+
+// Declare global memory store for persistence across API routes
+declare global {
+  var inMemoryRedisStore: Map<string, any>;
+  var redisClient: any;
+}
+
+// Setup Redis client (real or in-memory)
 console.log('Setting up Redis client...');
 
 // Use memory implementation for browser or testing

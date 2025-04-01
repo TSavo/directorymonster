@@ -92,6 +92,11 @@ export class MemoryRedis {
     return removed;
   }
 
+  async sismember(key: string, member: string): Promise<number> {
+    if (!this.store.has(key)) return 0;
+    const set = this.store.get(key);
+    return set.has(member) ? 1 : 0;
+  }
   async sinter(...keys: string[]): Promise<string[]> {
     if (keys.length === 0) return [];
 
@@ -238,7 +243,6 @@ export class MemoryRedis {
 
     return newValue;
   }
-
   // Transaction support
   multi(): any {
     const commands: { cmd: string; args: any[] }[] = [];
@@ -277,12 +281,21 @@ export class MemoryRedis {
       sadd: addCommand('sadd'),
       srem: addCommand('srem'),
       smembers: addCommand('smembers'),
+      sismember: addCommand('sismember'),
       sinter: addCommand('sinter'),
       zadd: addCommand('zadd'),
       zrange: addCommand('zrange'),
       zrevrange: addCommand('zrevrange'),
       zcount: addCommand('zcount'),
       scan: addCommand('scan'),
+      // Hash operations
+      hset: addCommand('hset'),
+      hget: addCommand('hget'),
+      hdel: addCommand('hdel'),
+      hkeys: addCommand('hkeys'),
+      hgetall: addCommand('hgetall'),
+      hmset: addCommand('hmset'),
+      hincrby: addCommand('hincrby'),
     };
 
     return multi;
