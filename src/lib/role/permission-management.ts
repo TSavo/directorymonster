@@ -187,8 +187,8 @@ export async function hasGlobalPermissionAnyTenant(
     // across any tenant (tenantId doesn't matter for this check)
     return globalRoles.some(role => 
       role.aclEntries.some((entry: any) => 
-        entry.resource.type === resourceType && 
-        entry.permission === permission
+        entry?.resource?.type === resourceType && 
+        entry?.permission === permission
       )
     );
   } catch (error) {
