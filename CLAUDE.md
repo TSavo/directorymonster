@@ -60,19 +60,19 @@ gh issue close 9 --repo TSavo/directorymonster
 2. **Follow the Red-Green-Refactor cycle**:
    - **Red**: Write a failing test
      ```bash
-     npm test -- -t "should perform specific behavior"
+     npx jest -t "should perform specific behavior"
      # Verify test fails
      ```
    - **Green**: Write minimal code to pass the test
      ```bash
      # Implement minimal code
-     npm test -- -t "should perform specific behavior"
+     npx jest -t "should perform specific behavior"
      # Verify test passes
      ```
    - **Refactor**: Clean up code while tests pass
      ```bash
      # Refactor implementation
-     npm test -- -t "should perform specific behavior"
+     npx jest -t "should perform specific behavior"
      # Verify test still passes
      ```
 

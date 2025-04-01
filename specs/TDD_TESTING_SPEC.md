@@ -22,7 +22,7 @@ This document outlines the Test-Driven Development approach required for all fea
 3. **Write a single test** that verifies a specific aspect of functionality
 4. **Run the test** and confirm it fails (Red phase)
    ```bash
-   npm test -- -t "TestName"
+   npx jest -t "TestName"
    ```
 
 ### 2. Implementation Phase
@@ -32,7 +32,7 @@ This document outlines the Test-Driven Development approach required for all fea
 3. **Focus only on the test passing**, not on architecture or design
 4. **Run the test** and confirm it passes (Green phase)
    ```bash
-   npm test -- -t "TestName"
+   npx jest -t "TestName"
    ```
 
 ### 3. Refactoring Phase
@@ -121,16 +121,16 @@ TDD provides several critical benefits to our development process:
 
 ```bash
 # Run a specific test
-npm test -- -t "TestName"
+npx jest -t "TestName"
 
 # Run tests in watch mode
-npm run test:watch
+npx jest --watch
 
 # Run tests for a specific file
-npm test -- path/to/test/file.test.ts
+npx jest path/to/test/file.test.ts
 
 # Run all tests with code coverage
-npm run test:coverage
+npx jest --coverage
 ```
 
 ## Common TDD Pitfalls to Avoid

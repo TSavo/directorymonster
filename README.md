@@ -109,7 +109,7 @@ Data can be saved via:
 npm run test:all-with-seed
 
 # Component tests
-npm test -- -t "ComponentName"
+npx jest -t "ComponentName"
 
 # Domain and multitenancy tests
 npm run test:domain
