@@ -5,14 +5,16 @@ import { ResourceType, Permission } from '@/types/permissions';
 import { CategoryService } from '@/lib/category-service';
 
 /**
- * Retrieves all categories for the current tenant.
+ * Retrieves all categories for a tenant.
  *
- * Validates tenant access and read permission on the 'category' resource before processing the request.
- * If the tenant is valid and authorized, the function returns an empty list as a placeholder.
- * In the event of an error during processing, it logs the error and responds with a 500 status code along with an error message.
+ * This endpoint handles GET requests for fetching all categories associated with a tenant.
+ * It validates tenant access and ensures the request has the 'read' permission on the category resource,
+ * with the tenant identified by the "x-tenant-id" header.
  *
- * @param req - The incoming HTTP request containing tenant details in its headers.
- * @returns A NextResponse with a JSON payload containing either the categories data or an error message.
+ * In case of an error during processing, the function logs the error and returns a JSON response with a 500 status and an error message.
+ *
+ * @param req - The incoming Next.js request that contains tenant and permission details.
+ * @returns A JSON response containing categories data or an error message.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(
@@ -46,13 +48,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 /**
  * Handles POST requests to create a new category.
  *
- * This endpoint validates tenant access and checks for the 'create' permission on the 'category'
- * resource. It extracts the tenant identifier from the 'x-tenant-id' header and responds with a mock
- * category object that includes an id, a name, and the tenant id. If an error occurs during processing,
- * a JSON response with a 500 status code and an error message is returned.
+ * This function validates tenant access and confirms that the request has the required 'create'
+ * permission on the 'category' resource. It expects a JSON body with category data.
+ * If validation fails, a 400 response with an error message is returned. On successful creation,
+ * it returns the new category object with its ID and tenant association.
+ * In case of an unexpected error, it logs the error and responds with a 500 error.
  *
- * @param req - The incoming NextRequest object.
- * @returns A NextResponse containing the newly created category data as JSON.
+ * @param req - The incoming request object.
+ * @returns A NextResponse containing either the created category data or an error message.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(
