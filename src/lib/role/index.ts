@@ -1,6 +1,6 @@
 /**
  * Role Service - Centralized exports
- * 
+ *
  * This module provides methods for managing roles and user-role assignments
  * with tenant isolation for multi-tenancy support.
  * Enhanced with global roles functionality that works across tenant boundaries.
@@ -23,6 +23,12 @@ import {
   hasRoleInTenant as hasRoleInTenantOp,
   hasSpecificRole as hasSpecificRoleOp
 } from './user-role-management';
+
+// Import compatibility functions
+import {
+  assignGlobalRoleToUser as assignGlobalRoleToUserOp,
+  removeGlobalRoleFromUser as removeGlobalRoleFromUserOp
+} from '../role-service/role-service-compat';
 
 import {
   hasPermission as hasPermissionOp,
@@ -60,6 +66,8 @@ export const removeRoleFromUser = removeRoleFromUserOp;
 export const getUserRoles = getUserRolesOp;
 export const hasRoleInTenant = hasRoleInTenantOp;
 export const hasSpecificRole = hasSpecificRoleOp;
+export const assignGlobalRoleToUser = assignGlobalRoleToUserOp;
+export const removeGlobalRoleFromUser = removeGlobalRoleFromUserOp;
 
 // Re-export permission management
 export const hasPermission = hasPermissionOp;
@@ -88,25 +96,27 @@ export class RoleService {
   static getGlobalRoles = getGlobalRolesOp;
   static updateRole = updateRoleOp;
   static deleteRole = deleteRoleOp;
-  
+
   // User-role management
   static assignRoleToUser = assignRoleToUserOp;
+  static assignGlobalRoleToUser = assignGlobalRoleToUserOp;
   static removeRoleFromUser = removeRoleFromUserOp;
+  static removeGlobalRoleFromUser = removeGlobalRoleFromUserOp;
   static getUserRoles = getUserRolesOp;
   static hasRoleInTenant = hasRoleInTenantOp;
   static hasSpecificRole = hasSpecificRoleOp;
-  
+
   // Permission management
   static hasPermission = hasPermissionOp;
   static getUserGlobalRoles = getUserGlobalRolesOp;
   static hasGlobalPermission = hasGlobalPermissionOp;
   static hasGlobalRole = hasGlobalRoleOp;
   static hasGlobalPermissionAnyTenant = hasGlobalPermissionAnyTenantOp;
-  
+
   // Role deletion
   static getUsersWithRole = getUsersWithRoleOp;
   static getUsersWithGlobalRole = getUsersWithGlobalRoleOp;
-  
+
   // Tenant-specific operations
   static getRolesByTenant = getRolesByTenantOp;
 }

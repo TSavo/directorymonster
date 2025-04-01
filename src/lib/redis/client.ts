@@ -4,6 +4,9 @@
 import { createRedisClient, isRedisConnected, forceRedisReconnect, getRedisConnectionState, onRedisConnectionStateChange } from './connection-manager';
 import { MemoryRedis } from './memory-store';
 
+// Import hash operations to extend MemoryRedis
+import './hash-operations';
+
 // Create or reuse the global client instance
 declare global {
   var redisClient: any;
@@ -13,10 +16,10 @@ declare global {
 // Initialize Redis client if not already created
 if (typeof global !== 'undefined' && (!global.redisClient || !global.redisInitTime)) {
   console.log('[Redis] Initializing Redis client');
-  
+
   // Track when we initialized Redis - for debugging connection cycles
   global.redisInitTime = Date.now();
-  
+
   // Only create a new client if one doesn't exist
   if (!global.redisClient) {
     global.redisClient = createRedisClient();
@@ -40,7 +43,7 @@ export const clearUsers = async (): Promise<void> => {
   try {
     // Get all user keys
     const userKeys = await redis.keys('user:*');
-    
+
     if (userKeys.length > 0) {
       // Delete each user key
       if (redis instanceof MemoryRedis) {
@@ -60,9 +63,9 @@ export const clearUsers = async (): Promise<void> => {
 };
 
 // Export connection management functions
-export { 
-  isRedisConnected, 
-  forceRedisReconnect, 
+export {
+  isRedisConnected,
+  forceRedisReconnect,
   getRedisConnectionState,
   onRedisConnectionStateChange
 };
@@ -83,7 +86,7 @@ export const kv = {
       return null;
     }
   },
-  
+
   set: async (key: string, value: any, options?: { ex?: number }): Promise<void> => {
     try {
       const serializedValue = typeof value === 'string' ? value : JSON.stringify(value);
@@ -96,7 +99,7 @@ export const kv = {
       console.error(`[Redis] Error setting key ${key}:`, error);
     }
   },
-  
+
   del: async (key: string): Promise<void> => {
     try {
       await redis.del(key);
@@ -104,7 +107,7 @@ export const kv = {
       console.error(`[Redis] Error deleting key ${key}:`, error);
     }
   },
-  
+
   keys: async (pattern: string): Promise<string[]> => {
     try {
       return await redis.keys(pattern);
@@ -113,7 +116,7 @@ export const kv = {
       return [];
     }
   },
-  
+
   // Add expire function for rate limiting
   expire: async (key: string, seconds: number): Promise<void> => {
     try {
@@ -122,17 +125,17 @@ export const kv = {
       console.error(`[Redis] Error setting expiry for key ${key}:`, error);
     }
   },
-  
+
   // Check connection status
   isConnected: async (): Promise<boolean> => {
     return await isRedisConnected();
   },
-  
+
   // Force reconnection
   reconnect: (): void => {
     forceRedisReconnect();
   },
-  
+
   // Get connection state
   getConnectionState: (): string => {
     return getRedisConnectionState();
