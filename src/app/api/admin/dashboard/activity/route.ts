@@ -10,13 +10,16 @@ import { ResourceType, Permission } from '@/components/admin/auth/utils/accessCo
 const JWT_SECRET = process.env.JWT_SECRET || 'development-secret';
 
 /**
- * GET /api/admin/dashboard/activity
+ * Retrieves recent activity data for the admin dashboard.
  *
- * Retrieves recent activity for the admin dashboard
- * Requires 'read' permission on 'audit' resource
+ * This endpoint validates tenant access and requires the user to have 'read' permission on the 'audit' resource.
+ * It extracts the tenant ID and decodes the JWT from the authorization header to obtain the user ID.
+ * Query parameters such as limit, offset, entity type, action type, and an optional user ID are used to filter
+ * the activity events. If the user is a global admin, cross-tenant events are included.
+ * On success, the function returns a JSON response with the activity data; otherwise, a 500 status JSON response is returned.
  *
- * @param req The incoming request
- * @returns Recent activity data
+ * @param req The incoming API request.
+ * @returns A NextResponse containing the recent activity data or an error message.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(

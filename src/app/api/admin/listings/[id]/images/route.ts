@@ -5,14 +5,17 @@ import { ResourceType, Permission } from '@/types/permissions';
 import { kv } from '@/lib/redis-client';
 
 /**
- * POST /api/admin/listings/:id/images
+ * Handles POST requests to add or update images for a listing.
  *
- * Adds or updates images for a listing
- * Requires 'update' permission on 'listing' resource
+ * This endpoint updates the images of a listing identified by its ID. It expects the JSON body to contain either an
+ * `imageUrl` (which appends a new image) or an `images` array (which replaces the existing images). Tenant access and
+ * update permission on the listing are validated before processing. The function checks that the listing exists and that
+ * it belongs to the requesting tenant, returning a 404 error if either condition fails. On successful update, the
+ * listing is saved with a new timestamp and the updated data is returned.
  *
- * @param req The incoming request
- * @param params Route parameters containing the listing ID
- * @returns Updated listing data with images
+ * @param req - The incoming request containing headers and a JSON payload.
+ * @param params - Route parameters including the listing ID.
+ * @returns A response containing the updated listing data and a success message, or an error response with an appropriate status code.
  */
 export async function POST(
   req: NextRequest,

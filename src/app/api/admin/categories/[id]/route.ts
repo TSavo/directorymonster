@@ -4,14 +4,18 @@ import { withResourcePermission } from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
 
 /**
- * GET /api/admin/categories/:id
+ * Retrieves a category by its ID.
  *
- * Retrieves a specific category by ID
- * Requires 'read' permission on 'category' resource
+ * This endpoint validates tenant access and confirms that the requester has 'read' permission on the
+ * 'category' resource. It fetches the category from the Redis store and ensures that the category exists
+ * and belongs to the tenant specified in the 'x-tenant-id' header.
  *
- * @param req The incoming request
- * @param params Route parameters containing the category ID
- * @returns Category data
+ * - Returns a 404 response if the category is not found or does not belong to the tenant.
+ * - Returns a 500 response for unexpected errors during retrieval.
+ *
+ * @param req - The incoming HTTP request.
+ * @param params - An object containing route parameters, including the category ID.
+ * @returns A JSON response with the category data on success or an error message on failure.
  */
 export async function GET(
   req: NextRequest,
@@ -66,14 +70,13 @@ export async function GET(
 }
 
 /**
- * PUT /api/admin/categories/:id
+ * Updates a category resource identified by its ID.
  *
- * Updates a specific category by ID
- * Requires 'update' permission on 'category' resource
+ * Handles PUT requests for updating a category. This function enforces tenant access and the 'update' permission for the category resource. It extracts the tenant ID from the request headers and obtains the category ID from the route parameters. The request body must contain a valid `name` property (a string not exceeding 100 characters). If the `name` is missing or invalid, the endpoint responds with a 400 status code. On success, the function returns a JSON response with the updated category details. In case of any errors during processing, a 500 error response is returned.
  *
- * @param req The incoming request
- * @param params Route parameters containing the category ID
- * @returns Updated category data
+ * @param req - The incoming HTTP request.
+ * @param params - Route parameters containing the category ID.
+ * @returns A NextResponse object containing the updated category data or an error message.
  */
 export async function PUT(
   req: NextRequest,
@@ -133,14 +136,14 @@ export async function PUT(
 }
 
 /**
- * DELETE /api/admin/categories/:id
+ * Deletes a category by its ID.
  *
- * Deletes a specific category by ID
- * Requires 'delete' permission on 'category' resource
+ * This handler validates tenant access and ensures the requester has the 'delete' permission on the 'category' resource before deleting the specified category.
+ * On success, it returns a JSON response confirming the deletion; if an error occurs, it responds with a JSON error message and a 500 status code.
  *
- * @param req The incoming request
- * @param params Route parameters containing the category ID
- * @returns Success message
+ * @param req - The incoming request.
+ * @param params - The route parameters containing the category ID to delete.
+ * @returns A NextResponse with a JSON payload indicating success or error.
  */
 export async function DELETE(
   req: NextRequest,

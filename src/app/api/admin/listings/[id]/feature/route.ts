@@ -5,14 +5,13 @@ import { ResourceType, Permission } from '@/types/permissions';
 import { kv } from '@/lib/redis-client';
 
 /**
- * POST /api/admin/listings/:id/feature
+ * Toggles the featured status of a listing.
  *
- * Toggles the featured status of a listing
- * Requires 'manage' permission on 'listing' resource
+ * This endpoint validates tenant access and listing management permissions before updating a listing’s featured status in the datastore. The request must include a JSON body with a boolean `featured` value and contain a tenant identifier in the `x-tenant-id` header. If the listing does not exist or does not belong to the tenant, a 404 response is returned. On success, the listing is updated with the new featured status and timestamp, and the updated data is saved to Redis.
  *
- * @param req The incoming request
- * @param params Route parameters containing the listing ID
- * @returns Updated listing data with featured status
+ * @param req - The incoming NextRequest; it should include the tenant ID in the 'x-tenant-id' header.
+ * @param params - An object containing the route parameter `id`, which specifies the listing to update.
+ * @returns A Promise that resolves to a NextResponse containing the updated listing data and a success message.
  */
 export async function POST(
   req: NextRequest,

@@ -13,14 +13,15 @@ if (process.env.NODE_ENV === 'production' &&
 }
 
 /**
- * Verifies a JWT token and returns its decoded payload.
+ * Verifies the provided JWT token and returns its decoded payload.
  *
- * The function validates the provided token using the configured secret by ensuring that it contains a mandatory
- * `userId` claim and has not expired. If the token is invalid, missing required claims, or expired, an error is logged
- * and the function returns null.
+ * The function validates the token using a configured secret, ensuring it includes the mandatory `userId` claim and
+ * has not expired. In test environments, a token with the exact value 'valid-token' returns a mock payload with
+ * a userId of 'test-user-id'. If the token is invalid, expired, or missing required claims, an error is logged and
+ * null is returned.
  *
  * @param token - The JWT token to verify.
- * @returns The decoded token payload if valid, otherwise null.
+ * @returns The decoded token payload if valid; otherwise, null.
  */
 export function verifyAuthToken(token: string): JwtPayload | null {
   try {
@@ -106,14 +107,19 @@ async function validatePermissionRequest(req: NextRequest): Promise<
 }
 
 /**
- * Middleware to handle API-level permission checks
- * 
- * @param req NextRequest object
- * @param resourceType Type of resource being accessed
- * @param permission Permission needed for the operation
- * @param handler Function to handle the request if permission check passes
- * @param resourceId Optional specific resource ID
- * @returns NextResponse object
+ * Checks if the authenticated user has the required permission for a specified resource and processes the request accordingly.
+ *
+ * This middleware validates the request's authentication token to extract user and tenant information, then verifies that the user (within the tenant)
+ * has the necessary permission for the provided resource type and, optionally, a specific resource ID. If the user lacks permission, it returns a 403
+ * JSON response with an explanatory error message. In case of an error during validation, it returns a 500 response. When the permission check passes,
+ * the provided handler is executed.
+ *
+ * @param req - The incoming HTTP request.
+ * @param resourceType - The type of resource for which permission is being verified.
+ * @param permission - The permission required for the operation.
+ * @param handler - The function to execute if the permission check is successful.
+ * @param resourceId - An optional identifier for a specific resource.
+ * @returns The HTTP response resulting from the handler or a JSON error response if access is denied.
  */
 export async function withPermission(
   req: NextRequest,
@@ -344,25 +350,26 @@ export async function withAllPermissions(
 /**
  * Extracts a resource ID from the request and verifies the user's permission for that resource.
  *
- * This middleware attempts to retrieve the resource identifier by checking, in order:
- * - The query parameter specified by `idParam` in the URL.
- * - The request body for `POST`, `PUT`, or `PATCH` methods.
- * - The last segment of the URL path if it resembles an identifier.
+ * The function attempts to extract the resource identifier using a prioritized approach:
+ * 1. URL query parameter specified by the given idParam.
+ * 2. Request body for POST, PUT, or PATCH methods.
+ * 3. The last segment of the URL path if it matches an identifier pattern.
  *
- * If the request includes the header `x-require-resource-id` set to 'true' and no resource ID is extracted,
- * it returns a JSON error response with a 400 status. Otherwise, it delegates to the standard permission middleware
- * by invoking `withPermission` with the extracted resource ID.
+ * If the header 'x-require-resource-id' is 'true' and no resource ID is found,
+ * a JSON error response with a 400 status is returned. Otherwise, after validating
+ * the authentication tokens, it verifies whether the user has the required permission
+ * for the resource. A JSON error response with a 403 status is returned if permission is denied.
  *
- * @param req - The incoming request from which the resource ID is extracted.
- * @param resourceType - The type of resource being accessed.
- * @param permission - The permission required to perform the requested operation.
- * @param handler - The async function to handle the request if the permission check succeeds.
- * @param idParam - The key used to extract the resource ID from the request (default is 'id').
- * @returns A NextResponse from the handler if permission is granted, or a JSON error response otherwise.
+ * @param req - The incoming request containing resource information.
+ * @param resourceType - The type of the resource being accessed.
+ * @param permission - The required permission to perform the operation.
+ * @param handler - The async function to handle the request if permission is granted.
+ * @param idParam - The key used to extract the resource ID from the request (defaults to 'id').
+ * @returns A NextResponse from the handler on success, or a JSON error response on failure.
  *
  * @remarks
- * Resource ID extraction prioritizes URL query parameters, then the request body (for applicable methods),
- * and finally the URL path. Any issues encountered during extraction are logged for debugging purposes.
+ * Resource ID extraction is attempted from URL query parameters, then the request body (for applicable methods),
+ * and finally from the URL path. Issues during extraction are logged for debugging.
  */
 export async function withResourcePermission(
   req: NextRequest,

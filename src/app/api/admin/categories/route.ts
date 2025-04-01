@@ -4,13 +4,16 @@ import { withPermission } from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
 
 /**
- * GET /api/admin/categories
+ * Retrieves all categories for a tenant.
  *
- * Retrieves all categories for the tenant
- * Requires 'read' permission on 'category' resource
+ * This endpoint handles GET requests for fetching all categories associated with a tenant.
+ * It validates tenant access and ensures the request has the 'read' permission on the category resource,
+ * with the tenant identified by the "x-tenant-id" header. The response currently returns a placeholder empty array of categories.
  *
- * @param req The incoming request
- * @returns Categories data
+ * In case of an error during processing, the function logs the error and returns a JSON response with a 500 status and an error message.
+ *
+ * @param req - The incoming Next.js request that contains tenant and permission details.
+ * @returns A JSON response containing categories data or an error message.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(
@@ -40,13 +43,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 }
 
 /**
- * POST /api/admin/categories
+ * Handles POST requests to create a new category.
  *
- * Creates a new category
- * Requires 'create' permission on 'category' resource
+ * This function validates tenant access and confirms that the request has the required 'create'
+ * permission on the 'category' resource. It expects a JSON body with a "name" field; if the field is
+ * missing, a 400 response with an error message is returned. On successful validation, it returns a
+ * mock category object containing a unique category ID, the provided name, and the tenant ID extracted
+ * from the request headers. In case of an unexpected error, it logs the error and responds with a 500 error.
  *
- * @param req The incoming request
- * @returns The created category data
+ * @returns A NextResponse containing either the created category data or an error message.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(

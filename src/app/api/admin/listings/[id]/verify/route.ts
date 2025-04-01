@@ -5,14 +5,18 @@ import { ResourceType, Permission } from '@/types/permissions';
 import { kv } from '@/lib/redis-client';
 
 /**
- * POST /api/admin/listings/:id/verify
+ * Handles the verification update of a listing.
  *
- * Verifies or unverifies a listing
- * Requires 'manage' permission on 'listing' resource
+ * This endpoint processes a request to verify or unverify a listing. It extracts the tenant ID from the request headers
+ * and the listing ID from the route parameters, then checks that the listing exists and belongs to the specified tenant.
+ * If valid, it updates the listing's verification status and timestamp, returning a JSON response with the updated listing
+ * and a message indicating whether the listing has been verified or the verification has been removed.
+ * A 404 response is returned if the listing is not found or does not belong to the tenant, while a 500 response is returned
+ * if an error occurs during the update process.
  *
- * @param req The incoming request
- * @param params Route parameters containing the listing ID
- * @returns Updated listing data with verification status
+ * @param req - The incoming API request.
+ * @param params - An object containing the listing ID from the route parameters.
+ * @returns A JSON response with the updated listing data and a verification status message.
  */
 export async function POST(
   req: NextRequest,

@@ -7,13 +7,18 @@ import { Category } from '@/types';
 import { AuditService } from '@/lib/audit/audit-service';
 
 /**
- * POST /api/admin/categories/reorder
+ * Handles a POST request to reorder categories for a tenant.
  *
- * Reorders categories based on the provided order
- * Requires 'update' permission on 'category' resource
+ * This endpoint validates tenant access and verifies that the user has 'update'
+ * permission on the category resource. It parses the JSON request body to extract an
+ * array of category IDs, checks that each corresponds to an existing category, and then
+ * updates their order atomically using a Redis transaction. If the input data is invalid
+ * or any category IDs cannot be found, it returns a 400 response with an error message.
+ * On successful processing, it logs the action and returns a JSON response containing
+ * the updated categories.
  *
- * @param req The incoming request
- * @returns Success message
+ * @param req The HTTP request with tenant headers and a JSON body containing category IDs.
+ * @returns A JSON response indicating success with the updated categories, or an error message.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(
