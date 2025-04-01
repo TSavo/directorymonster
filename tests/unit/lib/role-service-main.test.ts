@@ -1,6 +1,6 @@
 /**
  * Main entry point for RoleService tests
- * 
+ *
  * This file imports all the individual test files to make it easier to run all tests at once.
  */
 
@@ -16,4 +16,4 @@ import './role-service/audit-permissions.test';
 import './role-service/audit-simple.test';
 import './role-service/audit-skip.test';
 
-// Note: Permission checking tests are skipped for now as they require more complex setup
+// Permission checking tests are now implemented in role-service-comprehensive.test.ts
