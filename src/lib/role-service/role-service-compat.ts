@@ -1,18 +1,19 @@
 /**
  * Compatibility layer for RoleService
- * 
+ *
  * This file provides implementations that are compatible with the existing tests
  * while using the new implementation from role-service-patch.ts.
  */
 
 import { Role, TenantACE } from '@/components/admin/auth/utils/roles';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
-import { 
-  addACLEntryImpl, 
-  removeACLEntryImpl, 
-  updateRoleACLImpl, 
-  hasACLEntryImpl 
+import {
+  addACLEntryImpl,
+  removeACLEntryImpl,
+  updateRoleACLImpl,
+  hasACLEntryImpl
 } from './role-service-patch';
+import { SYSTEM_TENANT_ID } from '@/lib/role/constants';
 
 /**
  * Add an ACL entry to a role
@@ -32,7 +33,7 @@ export async function addACLEntry(
     if (!role) {
       return false;
     }
-    
+
     return await addACLEntryImpl(tenantId, roleId, aclEntry, role);
   } catch (error) {
     console.error(`Error adding ACL entry to role ${roleId}:`, error);
@@ -62,7 +63,7 @@ export async function removeACLEntry(
     if (!role) {
       return false;
     }
-    
+
     return await removeACLEntryImpl(tenantId, roleId, resourceType, permission, role, resourceId);
   } catch (error) {
     console.error(`Error removing ACL entry from role ${roleId}:`, error);
@@ -88,7 +89,7 @@ export async function updateRoleACL(
     if (!role) {
       return null;
     }
-    
+
     return await updateRoleACLImpl(tenantId, roleId, aclEntries, role);
   } catch (error) {
     console.error(`Error updating ACL entries for role ${roleId}:`, error);
@@ -118,10 +119,36 @@ export async function hasACLEntry(
     if (!role) {
       return false;
     }
-    
+
     return hasACLEntryImpl(role, resourceType, permission, resourceId);
   } catch (error) {
     console.error(`Error checking ACL entry for role ${roleId}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Assign a global role to a user
+ * @param userId User ID
+ * @param roleId Global role ID
+ * @returns true if successful, false otherwise
+ */
+export async function assignGlobalRoleToUser(
+  userId: string,
+  roleId: string
+): Promise<boolean> {
+  try {
+    // Verify the role exists and is global
+    const globalRole = await this.getGlobalRole(roleId);
+    if (!globalRole || !globalRole.isGlobal) {
+      console.error(`Role ${roleId} is not a global role`);
+      return false;
+    }
+
+    // Assign the role to the user in the system tenant
+    return await this.assignRoleToUser(userId, SYSTEM_TENANT_ID, roleId);
+  } catch (error) {
+    console.error(`Error assigning global role ${roleId} to user ${userId}:`, error);
     return false;
   }
 }
