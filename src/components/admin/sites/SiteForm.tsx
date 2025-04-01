@@ -61,6 +61,10 @@ export interface SiteFormProps {
    * API endpoint for form submission
    */
   apiEndpoint?: string;
+  /**
+   * Initial step for the form (for testing)
+   */
+  initialStep?: string;
 }
 
 // Define steps for the form
@@ -77,10 +81,11 @@ export const SiteForm: React.FC<SiteFormProps> = ({
   mode = 'create',
   onCancel,
   onSuccess,
-  apiEndpoint = '/api/sites'
+  apiEndpoint = '/api/sites',
+  initialStep
 }) => {
   const router = useRouter();
-  const [activeStep, setActiveStep] = useState<string>(STEPS[0].id);
+  const [activeStep, setActiveStep] = useState<string>(initialStep || STEPS[0].id);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [newDomain, setNewDomain] = useState<string>('');
 
