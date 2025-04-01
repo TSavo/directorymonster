@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAccess } from '@/middleware/tenant-validation';
 import { withResourcePermission } from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
+import { kv } from '@/lib/redis-client';
 
 /**
  * POST /api/admin/listings/:id/verify
@@ -33,17 +34,40 @@ export async function POST(
           const data = await validatedReq.json();
           const verified = !!data.verified; // Convert to boolean
 
-          // Implementation will be added later
-          // For now, just return a mock response to make the test pass
+          // Get the existing listing from Redis
+          const existingListing = await kv.get(`listing:id:${listingId}`);
+
+          // Check if listing exists
+          if (!existingListing) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          // Check if listing belongs to the tenant
+          if (existingListing.tenantId !== tenantId) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          // Update the listing's verification status
+          const updatedListing = {
+            ...existingListing,
+            verified,
+            updatedAt: new Date().toISOString()
+          };
+
+          // Save the updated listing to Redis
+          await kv.set(`listing:tenant:${tenantId}:${listingId}`, updatedListing);
+          await kv.set(`listing:id:${listingId}`, updatedListing);
+
           return NextResponse.json({
-            listing: {
-              id: listingId,
-              verified,
-              tenantId,
-              updatedAt: new Date().toISOString()
-            },
-            message: verified 
-              ? 'Listing has been verified successfully' 
+            listing: updatedListing,
+            message: verified
+              ? 'Listing has been verified successfully'
               : 'Listing verification has been removed'
           });
         } catch (error) {

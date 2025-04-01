@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAccess } from '@/middleware/tenant-validation';
 import { withResourcePermission } from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
+import { kv } from '@/lib/redis-client';
 
 /**
  * GET /api/admin/listings/:id
@@ -29,15 +30,26 @@ export async function GET(
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
           const listingId = params.id;
 
-          // Implementation will be added later
-          // For now, just return a mock response to make the test pass
-          return NextResponse.json({
-            listing: {
-              id: listingId,
-              title: 'Mock Listing',
-              tenantId
-            }
-          });
+          // Get the listing from Redis
+          const listing = await kv.get(`listing:id:${listingId}`);
+
+          // Check if listing exists
+          if (!listing) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          // Check if listing belongs to the tenant
+          if (listing.tenantId !== tenantId) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          return NextResponse.json({ listing });
         } catch (error) {
           console.error('Error retrieving listing:', error);
           return NextResponse.json(
@@ -78,7 +90,7 @@ export async function PUT(
 
           // Parse the request body
           const data = await validatedReq.json();
-          
+
           // Validate required fields
           if (!data.title) {
             return NextResponse.json(
@@ -87,16 +99,41 @@ export async function PUT(
             );
           }
 
-          // Implementation will be added later
-          // For now, just return a mock response to make the test pass
-          return NextResponse.json({
-            listing: {
-              id: listingId,
-              title: data.title,
-              tenantId,
-              updatedAt: new Date().toISOString()
-            }
-          });
+          // Get the existing listing from Redis
+          const existingListing = await kv.get(`listing:id:${listingId}`);
+
+          // Check if listing exists
+          if (!existingListing) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          // Check if listing belongs to the tenant
+          if (existingListing.tenantId !== tenantId) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          // Update the listing
+          const updatedListing = {
+            ...existingListing,
+            title: data.title,
+            description: data.description || existingListing.description,
+            status: data.status || existingListing.status,
+            categoryIds: data.categoryIds || existingListing.categoryIds,
+            customFields: data.customFields || existingListing.customFields,
+            updatedAt: new Date().toISOString()
+          };
+
+          // Save the updated listing to Redis
+          await kv.set(`listing:tenant:${tenantId}:${listingId}`, updatedListing);
+          await kv.set(`listing:id:${listingId}`, updatedListing);
+
+          return NextResponse.json({ listing: updatedListing });
         } catch (error) {
           console.error('Error updating listing:', error);
           return NextResponse.json(
@@ -135,8 +172,29 @@ export async function DELETE(
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
           const listingId = params.id;
 
-          // Implementation will be added later
-          // For now, just return a mock response to make the test pass
+          // Get the existing listing from Redis
+          const existingListing = await kv.get(`listing:id:${listingId}`);
+
+          // Check if listing exists
+          if (!existingListing) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          // Check if listing belongs to the tenant
+          if (existingListing.tenantId !== tenantId) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          // Delete the listing from Redis
+          await kv.del(`listing:tenant:${tenantId}:${listingId}`);
+          await kv.del(`listing:id:${listingId}`);
+
           return NextResponse.json({
             success: true,
             message: `Listing ${listingId} deleted successfully`

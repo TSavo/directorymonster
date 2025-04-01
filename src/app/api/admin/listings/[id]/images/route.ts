@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAccess } from '@/middleware/tenant-validation';
 import { withResourcePermission } from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
+import { kv } from '@/lib/redis-client';
 
 /**
  * POST /api/admin/listings/:id/images
@@ -31,7 +32,7 @@ export async function POST(
 
           // Parse the request body
           const data = await validatedReq.json();
-          
+
           // Validate required fields
           if (!data.imageUrl && !data.images) {
             return NextResponse.json(
@@ -40,15 +41,47 @@ export async function POST(
             );
           }
 
-          // Implementation will be added later
-          // For now, just return a mock response to make the test pass
+          // Get the existing listing from Redis
+          const existingListing = await kv.get(`listing:id:${listingId}`);
+
+          // Check if listing exists
+          if (!existingListing) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          // Check if listing belongs to the tenant
+          if (existingListing.tenantId !== tenantId) {
+            return NextResponse.json(
+              { error: 'Listing not found' },
+              { status: 404 }
+            );
+          }
+
+          // Update the listing's images
+          let updatedImages;
+          if (data.images) {
+            // Replace all images with the provided array
+            updatedImages = data.images;
+          } else if (data.imageUrl) {
+            // Add the new image to the existing images array
+            updatedImages = [...(existingListing.images || []), data.imageUrl];
+          }
+
+          const updatedListing = {
+            ...existingListing,
+            images: updatedImages,
+            updatedAt: new Date().toISOString()
+          };
+
+          // Save the updated listing to Redis
+          await kv.set(`listing:tenant:${tenantId}:${listingId}`, updatedListing);
+          await kv.set(`listing:id:${listingId}`, updatedListing);
+
           return NextResponse.json({
-            listing: {
-              id: listingId,
-              images: data.images || [data.imageUrl],
-              tenantId,
-              updatedAt: new Date().toISOString()
-            },
+            listing: updatedListing,
             message: 'Listing images updated successfully'
           });
         } catch (error) {
