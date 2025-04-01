@@ -280,7 +280,6 @@ class MemoryRedis {
       sismember: addCommand('sismember'),
       sinter: addCommand('sinter'),
       scard: addCommand('scard'),
-      sismember: addCommand('sismember'),
       // Hash operations
       hset: addCommand('hset'),
       hget: addCommand('hget'),
