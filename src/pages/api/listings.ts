@@ -123,14 +123,30 @@ export default async function handler(
         updatedAt: timestamp,
       };
       
-      // Store listing in Redis
+      // Store listing in Redis using a transaction for atomicity
       console.log(`API: POST /api/listings - Storing listing: ${listing.id}`);
-      await redis.set(`listing:id:${listing.id}`, JSON.stringify(listing));
-      await redis.set(`listing:site:${site.id}:${listing.slug}`, JSON.stringify(listing));
-      await redis.set(`listing:category:${listing.categoryId}:${listing.slug}`, JSON.stringify(listing));
+      const transaction = redis.multi();
+      transaction.set(`listing:id:${listing.id}`, JSON.stringify(listing));
+      transaction.set(`listing:site:${site.id}:${listing.slug}`, JSON.stringify(listing));
+      transaction.set(`listing:category:${listing.categoryId}:${listing.slug}`, JSON.stringify(listing));
       
-      console.log(`API: POST /api/listings - Successfully created listing: ${listing.id}`);
-      return res.status(201).json(listing);
+      try {
+        // Execute all commands as a transaction
+        const results = await transaction.exec();
+        
+        // Check for errors in the transaction
+        const errors = results.filter(([err]) => err !== null);
+        if (errors.length > 0) {
+          console.error('Transaction errors:', errors);
+          return res.status(500).json({ error: 'Failed to save listing data' });
+        }
+        
+        console.log(`API: POST /api/listings - Successfully created listing: ${listing.id}`);
+        return res.status(201).json(listing);
+      } catch (error) {
+        console.error('Error executing Redis transaction:', error);
+        return res.status(500).json({ error: 'Failed to save listing data' });
+      }
     } else {
       return res.status(405).json({ error: 'Method not allowed' });
     }
