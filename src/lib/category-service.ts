@@ -42,7 +42,8 @@ export class CategoryService {
   static async getCategoriesByTenant(tenantId: string): Promise<Category[]> {
     try {
       // Get all category keys
-      const categoryKeys = await kv.keys('category:id:*');
+-     const categoryKeys = await kv.keys('category:id:*');
++     const categoryKeys = await kv.keys(`category:tenant:${tenantId}:id:*`);
       const categories: Category[] = [];
       
       // Fetch each category and filter by tenant
