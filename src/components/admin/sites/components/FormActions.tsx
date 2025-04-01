@@ -35,7 +35,7 @@ export interface FormActionsProps {
 
 /**
  * FormActions - Navigation buttons for multi-step forms
- * 
+ *
  * Provides back, next, and submit buttons
  */
 export const FormActions: React.FC<FormActionsProps> = ({
@@ -55,14 +55,14 @@ export const FormActions: React.FC<FormActionsProps> = ({
             type="button"
             onClick={onPrevious}
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded focus:outline-none focus:ring-2"
-            data-testid="previous-button"
+            data-testid="form-back-button"
             disabled={isLoading}
           >
             ← Back
           </button>
         )}
       </div>
-      
+
       <div className="flex justify-end space-x-3">
         <button
           type="button"
@@ -73,12 +73,12 @@ export const FormActions: React.FC<FormActionsProps> = ({
         >
           Cancel
         </button>
-        
+
         {isLastStep ? (
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded focus:outline-none focus:ring-2 disabled:opacity-50"
-            data-testid="submit-button"
+            data-testid="form-next-button"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -98,7 +98,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
             type="button"
             onClick={onNext}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded focus:outline-none focus:ring-2 disabled:opacity-50"
-            data-testid="next-button"
+            data-testid="form-next-button"
             disabled={isLoading}
           >
             Next →
