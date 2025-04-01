@@ -11,15 +11,16 @@ import { getGlobalRole } from './role-operations';
 import { getUserRoles } from './user-role-management';
 
 /**
- * Check if a user has a specific permission in a tenant
- * This method checks both tenant-specific roles and global roles
- * 
- * @param userId User ID
- * @param tenantId Tenant ID
- * @param resourceType Resource type
- * @param permission Permission to check
- * @param resourceId Optional specific resource ID
- * @returns true if user has permission
+ * Determines whether a user possesses a specific permission within a tenant.
+ *
+ * The function retrieves the user's roles for the given tenant and checks if any role grants the specified permission on the target resource type and (optionally) a particular resource. If an error occurs during processing, the function logs the error and returns false.
+ *
+ * @param userId - The identifier of the user.
+ * @param tenantId - The identifier of the tenant.
+ * @param resourceType - The type of resource to check.
+ * @param permission - The permission to verify.
+ * @param resourceId - An optional identifier for a specific resource.
+ * @returns A promise that resolves to true if the permission is granted; otherwise, false.
  */
 export async function hasPermission(
   userId: string,
@@ -49,9 +50,14 @@ export async function hasPermission(
 }
 
 /**
- * Get all global roles assigned to a user across all tenants
- * @param userId User ID
- * @returns Array of global roles
+ * Retrieves all global role objects assigned to a user across all tenants.
+ *
+ * This function checks whether the user is listed among global role users in Redis. If so, it scans for tenant-specific role keys,
+ * collects unique global role IDs, and fetches the complete role objects for each ID. If the user has no global roles or if an error occurs,
+ * the function returns an empty array.
+ *
+ * @param userId The unique identifier of the user.
+ * @returns A Promise that resolves to an array of global role objects.
  */
 export async function getUserGlobalRoles(userId: string): Promise<any[]> {
   try {
@@ -96,15 +102,19 @@ export async function getUserGlobalRoles(userId: string): Promise<any[]> {
 }
 
 /**
- * Check if a user has a specific global permission
- * This checks if the user has a global role with the specified permission
- * 
- * @param userId User ID
- * @param resourceType Resource type
- * @param permission Permission to check
- * @param tenantId Optional tenant context for the permission check
- * @param resourceId Optional specific resource ID
- * @returns true if user has the global permission
+ * Determines whether a user possesses a specific global permission.
+ *
+ * This function retrieves all global roles assigned to the user and checks if any role grants the
+ * specified permission for the given resource type. If no tenant is provided, the check defaults to
+ * a system tenant context. The function returns false when the user has no global roles or if an
+ * error is encountered during the process.
+ *
+ * @param userId The unique identifier of the user.
+ * @param resourceType The type of resource to check the permission against.
+ * @param permission The permission to verify.
+ * @param tenantId (Optional) The tenant identifier providing context for the permission check.
+ * @param resourceId (Optional) A specific resource identifier for a more granular check.
+ * @returns True if the user has the specified global permission; otherwise, false.
  */
 export async function hasGlobalPermission(
   userId: string,
@@ -139,9 +149,13 @@ export async function hasGlobalPermission(
 }
 
 /**
- * Check if a user has any global role
- * @param userId User ID
- * @returns true if user has any global role
+ * Determines if the specified user holds any global role.
+ *
+ * The function checks if the user is present in the global role users index and verifies that they have at least one global role
+ * assigned. If either the index check fails or no roles are found, the function returns false.
+ *
+ * @param userId - The identifier of the user.
+ * @returns A Promise that resolves to true if the user has any global role, otherwise false.
  */
 export async function hasGlobalRole(userId: string): Promise<boolean> {
   try {
@@ -162,13 +176,16 @@ export async function hasGlobalRole(userId: string): Promise<boolean> {
 }
 
 /**
- * Check if a user has a specific global permission in any tenant
- * This is a specialized version of hasGlobalPermission that checks across all tenants
- * 
- * @param userId User ID
- * @param resourceType Resource type
- * @param permission Permission to check
- * @returns true if user has the global permission in any tenant
+ * Checks if the specified user has the given global permission across any tenant.
+ *
+ * This function retrieves the user's global roles and examines their access control entries to determine
+ * whether any entry grants the specified permission for the provided resource type. It returns false if the
+ * user has no global roles or if an error occurs during the checking process.
+ *
+ * @param userId - The identifier of the user.
+ * @param resourceType - The type of resource for which the permission is verified.
+ * @param permission - The global permission to assess.
+ * @returns True if the user has the designated global permission in any tenant; otherwise, false.
  */
 export async function hasGlobalPermissionAnyTenant(
   userId: string,

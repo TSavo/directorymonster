@@ -13,11 +13,16 @@ import { GLOBAL_ROLE_USERS_KEY } from './constants';
 import { getRole, getGlobalRole } from './role-operations';
 
 /**
- * Assign a role to a user in a tenant
- * @param userId User ID
- * @param tenantId Tenant ID
- * @param roleId Role ID
- * @returns true if successful
+ * Assigns a specified role to a user within a tenant.
+ *
+ * The function verifies that the role exists either as a tenant-specific role or as a global role. If the role is global, it updates the global role users index and logs a global assignment event; otherwise, it logs a standard role assignment event. It then adds the role to the user's set of roles for the tenant and ensures the user is part of the tenant's user list.
+ *
+ * @param userId - Identifier of the user.
+ * @param tenantId - Identifier of the tenant.
+ * @param roleId - Identifier of the role to assign.
+ * @returns A promise that resolves to true if the assignment is successful; otherwise, false.
+ *
+ * @remarks If the role is not found in both tenant-specific and global roles, or if an error occurs during the assignment, the error is logged and the function returns false.
  */
 export async function assignRoleToUser(
   userId: string,
@@ -88,11 +93,18 @@ export async function assignRoleToUser(
 }
 
 /**
- * Remove a role from a user in a tenant
- * @param userId User ID
- * @param tenantId Tenant ID
- * @param roleId Role ID
- * @returns true if successful
+ * Removes a role from a user within a tenant.
+ *
+ * This function handles both global and tenant-specific roles. For global roles,
+ * it checks whether the user holds the role in other tenants. If not, the user is
+ * removed from the global role index and a global role removal event is audited.
+ * For tenant-specific roles, a local role removal event is audited before the role
+ * is removed from the user's assigned roles in the tenant.
+ *
+ * @param userId - Unique identifier of the user.
+ * @param tenantId - Identifier of the tenant from which the role is being removed.
+ * @param roleId - Unique identifier of the role to remove.
+ * @returns A boolean indicating whether the role removal was successful.
  */
 export async function removeRoleFromUser(
   userId: string,
@@ -170,10 +182,16 @@ export async function removeRoleFromUser(
 }
 
 /**
- * Get all roles assigned to a user in a tenant
- * @param userId User ID
- * @param tenantId Tenant ID
- * @returns Array of roles
+ * Retrieves all roles assigned to a user within a tenant.
+ *
+ * This asynchronous function fetches role IDs from Redis for the specified user and tenant,
+ * then attempts to resolve each role ID to a role object by first checking tenant-specific roles and,
+ * if not found, falling back to global roles. In case of an error during retrieval, it logs the error
+ * and returns an empty array.
+ *
+ * @param userId - The unique identifier of the user.
+ * @param tenantId - The tenant identifier from which roles are being retrieved.
+ * @returns A promise that resolves to an array of role objects, or an empty array if retrieval fails.
  */
 export async function getUserRoles(
   userId: string,
@@ -208,10 +226,14 @@ export async function getUserRoles(
 }
 
 /**
- * Check if a user has any role in a tenant
- * @param userId User ID
- * @param tenantId Tenant ID
- * @returns true if user has any role
+ * Determines whether a user has any roles assigned within a specific tenant.
+ *
+ * This function retrieves the roles associated with the user in the tenant and returns true if one or more roles are found.
+ * If an error occurs (such as issues accessing the role store), the error is logged and the function returns false.
+ *
+ * @param userId Unique identifier of the user.
+ * @param tenantId Unique identifier of the tenant.
+ * @returns True if the user has at least one role in the tenant, otherwise false.
  */
 export async function hasRoleInTenant(
   userId: string,
@@ -228,11 +250,15 @@ export async function hasRoleInTenant(
 }
 
 /**
- * Check if a user has a specific role in a tenant
- * @param userId User ID
- * @param tenantId Tenant ID
- * @param roleId Role ID to check
- * @returns true if user has the role
+ * Determines whether a specified role is assigned to a user within a tenant.
+ *
+ * Retrieves the user’s role identifiers for the given tenant and checks for the presence of the specified role.
+ * Returns false if the role is not found or if an error occurs during the operation.
+ *
+ * @param userId - The identifier of the user.
+ * @param tenantId - The identifier of the tenant.
+ * @param roleId - The identifier of the role to check.
+ * @returns True if the user has the specified role in the tenant; otherwise, false.
  */
 export async function hasSpecificRole(
   userId: string,
