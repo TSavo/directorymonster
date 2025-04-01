@@ -19,7 +19,22 @@ const args = process.argv.slice(2);
 const jestBin = path.join(__dirname, 'node_modules', '.bin', 'jest');
 
 // Always exclude e2e tests no matter what
-const testArgs = ['--testPathIgnorePatterns=tests/e2e', ...args];
+// If a specific test file or pattern is provided, use testMatch instead of testPathIgnorePatterns
+let testArgs = [];
+
+if (args.length > 0 && !args[0].startsWith('-')) {
+  // If the first argument is a file path or pattern, use testMatch
+  const testPattern = args[0];
+  testArgs = ['--testMatch', testPattern, '--testPathIgnorePatterns=tests/e2e'];
+
+  // Add any remaining arguments (except the first one which we already processed)
+  if (args.length > 1) {
+    testArgs = [...testArgs, ...args.slice(1)];
+  }
+} else {
+  // No specific test file/pattern provided, just exclude e2e tests
+  testArgs = ['--testPathIgnorePatterns=tests/e2e', ...args];
+}
 
 // Check if user is trying to run e2e tests
 if (args.some(arg => arg.includes('e2e'))) {
