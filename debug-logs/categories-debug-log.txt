@@ -1,44 +1,15 @@
-Categories Debug Test Started: 2025-03-30T12:09:54.018Z
+Categories Debug Test Started: 2025-04-01T04:01:07.215Z
 
-[2025-03-30T12:09:54.022Z] Starting admin categories E2E tests
-[2025-03-30T12:09:54.035Z] Starting browser for debug test...
-[2025-03-30T12:09:59.031Z] Completed admin categories E2E tests
-[2025-03-30T12:10:04.218Z] Browser setup complete
-[2025-03-30T12:10:04.245Z] Starting login process...
-[2025-03-30T12:10:08.233Z] Console error: Failed to load resource: the server responded with a status of 404 (Not Found)
-[2025-03-30T12:10:09.535Z] Console info: %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
-[2025-03-30T12:10:09.667Z] Console log: Created global in-memory Redis store
-[2025-03-30T12:10:09.672Z] Console log: Setting up Redis client...
-[2025-03-30T12:10:09.676Z] Console log: Using in-memory Redis with 0 keys
-[2025-03-30T12:10:09.684Z] Console warn: No default component was found for a parallel route rendered on this page. Falling back to nearest NotFound boundary.
-Learn more: https://nextjs.org/docs/app/building-your-application/routing/parallel-routes#defaultjs
-
-
-[2025-03-30T12:10:09.753Z] 
+[2025-04-01T04:01:07.216Z] Starting admin categories E2E tests
+[2025-04-01T04:01:07.220Z] Starting browser for debug test...
+[2025-04-01T04:01:09.803Z] Browser setup complete
+[2025-04-01T04:01:09.803Z] Starting login process...
+[2025-04-01T04:01:10.932Z] Console error: Failed to load resource: the server responded with a status of 404 (Not Found)
+[2025-04-01T04:01:12.242Z] 
 ----- COMPREHENSIVE ANALYSIS: login-page -----
-[2025-03-30T12:10:09.757Z] Saved URL to: C:\Users\T\directorymonster\html-dumps\login-page-2025-03-30T12-10-09-756Z-url.txt
-[2025-03-30T12:10:09.762Z] Saved HTML to: C:\Users\T\directorymonster\html-dumps\login-page-2025-03-30T12-10-09-756Z.html
-[2025-03-30T12:10:09.820Z] Error extracting page info: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:contains("Add Category"), a:contains("Add Category")' is not a valid selector.
-[2025-03-30T12:10:09.967Z] Saved screenshot to: C:\Users\T\directorymonster\debug-logs\login-page-2025-03-30T12-10-09-822Z.png
-[2025-03-30T12:10:09.982Z] Saved component information to: C:\Users\T\directorymonster\debug-logs\login-page-2025-03-30T12-10-09-976Z-components.json
-[2025-03-30T12:10:09.988Z] Saved JavaScript errors to: C:\Users\T\directorymonster\debug-logs\login-page-2025-03-30T12-10-09-988Z-js-errors.json
-[2025-03-30T12:10:09.989Z] Found 12 JavaScript errors
-[2025-03-30T12:10:09.995Z] Saved network request information to: C:\Users\T\directorymonster\debug-logs\login-page-2025-03-30T12-10-09-995Z-network.json
-[2025-03-30T12:10:10.003Z] ----- ANALYSIS COMPLETE -----
-
-[2025-03-30T12:10:10.006Z] Regular login form detected
-[2025-03-30T12:10:10.076Z] Login error: No element found for selector: input[name="username"]
-[2025-03-30T12:10:10.077Z] 
+[2025-04-01T04:01:12.246Z] Saved URL to: C:\Users\T\directorymonster\html-dumps\login-page-2025-04-01T04-01-12-245Z-url.txt
+[2025-04-01T04:01:12.313Z] Login error: Protocol error (Runtime.callFunctionOn): Target closed
+[2025-04-01T04:01:12.314Z] 
 ----- COMPREHENSIVE ANALYSIS: login-error -----
-[2025-03-30T12:10:10.079Z] Saved URL to: C:\Users\T\directorymonster\html-dumps\login-error-2025-03-30T12-10-10-078Z-url.txt
-[2025-03-30T12:10:10.087Z] Saved HTML to: C:\Users\T\directorymonster\html-dumps\login-error-2025-03-30T12-10-10-078Z.html
-[2025-03-30T12:10:10.097Z] Error extracting page info: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:contains("Add Category"), a:contains("Add Category")' is not a valid selector.
-[2025-03-30T12:10:10.199Z] Saved screenshot to: C:\Users\T\directorymonster\debug-logs\login-error-2025-03-30T12-10-10-099Z.png
-[2025-03-30T12:10:10.221Z] Saved component information to: C:\Users\T\directorymonster\debug-logs\login-error-2025-03-30T12-10-10-207Z-components.json
-[2025-03-30T12:10:10.225Z] Saved JavaScript errors to: C:\Users\T\directorymonster\debug-logs\login-error-2025-03-30T12-10-10-224Z-js-errors.json
-[2025-03-30T12:10:10.226Z] Found 12 JavaScript errors
-[2025-03-30T12:10:10.232Z] Saved network request information to: C:\Users\T\directorymonster\debug-logs\login-error-2025-03-30T12-10-10-231Z-network.json
-[2025-03-30T12:10:10.236Z] ----- ANALYSIS COMPLETE -----
-
-[2025-03-30T12:10:10.237Z] ❌ Login failed, tests may not work correctly
-[2025-03-30T12:10:10.815Z] Console error: Failed to load resource: the server responded with a status of 404 (Not Found)
+[2025-04-01T04:01:12.315Z] Saved URL to: C:\Users\T\directorymonster\html-dumps\login-error-2025-04-01T04-01-12-314Z-url.txt
+[2025-04-01T04:01:12.629Z] Completed admin categories E2E tests

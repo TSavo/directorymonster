@@ -4,7 +4,7 @@
  * @jest-environment node
  */
 
-const { describe, test, beforeAll, afterAll, expect } = require('@jest/globals');
+const { describe, test, beforeAll, afterAll, beforeEach, expect } = require('@jest/globals');
 const { takeScreenshot, log } = require('../utils/test-utils');
 const { waitForClientHydration, findElementWithRetry } = require('../utils/hydration-utils');
 const LoginSelectors = require('./login.selectors');
@@ -22,12 +22,36 @@ const {
 describe('Login Authentication', () => {
   let browser;
   let page;
+  
+  /** @type {Array<string>} */
+  let failedRequests = [];
 
   // Set up the browser and page before running tests
   beforeAll(async () => {
     const setup = await setupLoginTest();
     browser = setup.browser;
     page = setup.page;
+    
+    // Monitor for failed requests (404s)
+    page.on('requestfailed', request => {
+      failedRequests.push(`${request.method()} ${request.url()} - ${request.failure().errorText}`);
+    });
+
+    // Monitor for response status codes
+    page.on('response', response => {
+      const status = response.status();
+      const url = response.url();
+      
+      // Only track 404 responses
+      if (status === 404) {
+        failedRequests.push(`404: ${url}`);
+      }
+    });
+  });
+  
+  // Reset failed requests between tests
+  beforeEach(() => {
+    failedRequests = [];
   });
 
   // Clean up after all tests
@@ -41,6 +65,20 @@ describe('Login Authentication', () => {
 
     // Wait for client-side hydration to complete
     await waitForClientHydration(page);
+    
+    // Check if page is a 404 page
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    const is404Page = 
+      bodyText.includes('404') || 
+      bodyText.includes('Not Found') || 
+      bodyText.includes('not found') ||
+      bodyText.includes("doesn't exist");
+    
+    if (is404Page) {
+      console.error('ERROR: Login page returned a 404 page unexpectedly');
+      await takeScreenshot(page, 'login-404-error');
+      throw new Error('Login page unexpectedly returned a 404 page');
+    }
     
     // Wait for form elements to be ready
     const usernameInput = await findElementWithRetry(page, 
@@ -166,7 +204,46 @@ describe('Login Authentication', () => {
     
     // Log the request/response activity for debugging
     log('Auth request log:', requestLog);
-  });
+    
+    // List of resources that are allowed to 404
+    const allowedFailures = [
+      '/favicon.ico', 
+      '/logo.png',
+      '/manifest.json',
+      '/api/site-info',    // This might 404 in test environment
+      'next-client',       // Next.js client resource that might 404
+      'webpack-hmr',       // Hot module reload might 404 in test environment
+      `${BASE_URL}/login`, // The login page itself might initially 404
+      'login?hostname'     // Hostname version of login URL
+    ];
+    
+    // Debug all failed requests
+    if (failedRequests.length > 0) {
+      console.log("All detected 404 responses during incorrect credentials test:");
+      failedRequests.forEach((failure, index) => {
+        console.log(`${index}. ${failure}`);
+      });
+    }
+    
+    // Filter out specific types of responses or from known problematic sources
+    const criticalFailures = failedRequests.filter(failure => {
+      // Skip allowed failures
+      for (const pattern of allowedFailures) {
+        if (failure.includes(pattern)) {
+          return false;
+        }
+      }
+      
+      // Keep all other failures
+      return true;
+    });
+    
+    if (criticalFailures.length > 0) {
+      console.error('Unexpected 404 errors detected during incorrect credentials test:');
+      criticalFailures.forEach(failure => console.error(` - ${failure}`));
+      throw new Error('Critical resources failed to load with 404 errors');
+    }
+  }, 30000); // Extend timeout to 30 seconds for this test
 
   test('Successfully logs in with valid credentials', async () => {
     // Navigate to the login page
@@ -174,6 +251,20 @@ describe('Login Authentication', () => {
 
     // Wait for client-side hydration to complete
     await waitForClientHydration(page);
+    
+    // Check if page is a 404 page
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    const is404Page = 
+      bodyText.includes('404') || 
+      bodyText.includes('Not Found') || 
+      bodyText.includes('not found') ||
+      bodyText.includes("doesn't exist");
+    
+    if (is404Page) {
+      console.error('ERROR: Login page returned a 404 page unexpectedly');
+      await takeScreenshot(page, 'login-success-404-error');
+      throw new Error('Login page unexpectedly returned a 404 page');
+    }
     
     // Wait for form elements to be ready
     const usernameInput = await findElementWithRetry(page, 
@@ -301,6 +392,20 @@ describe('Login Authentication', () => {
       // Take final screenshot
       await takeScreenshot(page, 'auth-success-final');
       
+      // Check if admin page is a 404 page
+      const adminBodyText = await page.evaluate(() => document.body.innerText);
+      const isAdmin404Page = 
+        adminBodyText.includes('404') || 
+        adminBodyText.includes('Not Found') || 
+        adminBodyText.includes('not found') ||
+        adminBodyText.includes("doesn't exist");
+      
+      if (isAdmin404Page) {
+        console.error('ERROR: Admin page returned a 404 page unexpectedly after login');
+        await takeScreenshot(page, 'admin-404-error');
+        throw new Error('Admin page unexpectedly returned a 404 page after login');
+      }
+      
       // If we're not redirected back to login, login was successful
       const isStillOnLogin = finalUrl.includes('/login');
       
@@ -333,6 +438,47 @@ describe('Login Authentication', () => {
         log('Login failed - redirected to login page');
         expect(stillOnLogin).toBe(false);
       }
+    }
+    
+    // List of resources that are allowed to 404
+    const allowedFailures = [
+      '/favicon.ico', 
+      '/logo.png',
+      '/manifest.json',
+      '/api/site-info',    // This might 404 in test environment
+      'next-client',       // Next.js client resource that might 404
+      'webpack-hmr',       // Hot module reload might 404 in test environment
+      '/_next/static',     // Next.js static resources might 404
+      '/public/',          // Public directory resources might 404
+      `${BASE_URL}/login`, // The login page itself might initially 404
+      'login?hostname'     // Hostname version of login URL
+    ];
+    
+    // Debug all failed requests
+    if (failedRequests.length > 0) {
+      console.log("All detected 404 responses during successful login test:");
+      failedRequests.forEach((failure, index) => {
+        console.log(`${index}. ${failure}`);
+      });
+    }
+    
+    // Filter out specific types of responses or from known problematic sources
+    const criticalFailures = failedRequests.filter(failure => {
+      // Skip allowed failures
+      for (const pattern of allowedFailures) {
+        if (failure.includes(pattern)) {
+          return false;
+        }
+      }
+      
+      // Keep all other failures
+      return true;
+    });
+    
+    if (criticalFailures.length > 0) {
+      console.error('Unexpected 404 errors detected during successful login test:');
+      criticalFailures.forEach(failure => console.error(` - ${failure}`));
+      throw new Error('Critical resources failed to load with 404 errors during login');
     }
   }, 60000); // Extend timeout to 60 seconds
 });

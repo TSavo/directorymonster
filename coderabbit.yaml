@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit Configuration
+# Docs: https://docs.coderabbit.ai/configuration/coderabbit-yaml
+
+# General settings
+name: DirectoryMonster
+version: 1.0
+
+# Review settings
+review:
+  # Request review on all pull requests
+  on_pull_request: true
+  # Request review on all push events
+  on_push: false
+  # Request review on all commit comments
+  on_commit_comment: false
+
+  # Review only in pull requests
+  auto_review:
+    enabled: true
+    ignore_title_keywords:
+      - WIP
+      - DO NOT REVIEW
+
+  # Focus on these types of feedback
+  focus:
+    - security
+    - performance
+    - best_practices
+    - code_style
+    - documentation
+
+  # Feedback level configuration
+  feedback_level:
+    performance: medium
+    security: high
+    best_practices: medium
+    code_style: low
+    documentation: medium
+
+  # Path filters
+  path_filters:
+    - include: "src/**"
+    - exclude: "**/*.test.{ts,tsx,js,jsx}" # Exclude test files
+    - exclude: "**/__tests__/**" # Exclude test directories
+    - exclude: "**/__mocks__/**" # Exclude mock directories
+    - exclude: "src/stories/**" # Exclude Storybook stories
+    - exclude: "**/*.d.ts" # Exclude TypeScript declaration files
+    - exclude: "node_modules/**" # Exclude node_modules
+    - exclude: ".next/**" # Exclude Next.js build output
+
+  # Set max number of suggestions per PR
+  max_suggestions: 20
+
+  # Set max number of lines of code for PR review
+  max_lines_of_code: 500
+
+  # Custom rules
+  rules:
+    # React-specific rules
+    - name: react_hooks_deps
+      description: "Check that React Hook dependencies are properly declared"
+      pattern: "useEffect|useCallback|useMemo"
+      hint: "Ensure all external variables used in hooks are included in the dependency array."
+    
+    # TypeScript-specific rules
+    - name: no_any_type
+      description: "Avoid using 'any' type"
+      pattern: ":\\s*any[\\s,);]"
+      hint: "Consider using a more specific type instead of 'any'."
+    
+    # Security rules
+    - name: no_dangerouslySetInnerHTML
+      description: "Avoid using dangerouslySetInnerHTML"
+      pattern: "dangerouslySetInnerHTML"
+      hint: "This can lead to XSS vulnerabilities. Consider safer alternatives."
+
+# Change suggestions settings  
+suggestions:
+  # Set up change suggestions
+  enabled: true
+  
+  # Set confidence threshold for automatic approval of suggestions
+  confidence_threshold: 0.8
+  
+  # Set the max tokens for each suggestion
+  max_tokens: 2000
+
+# Summarization settings
+summarize:
+  # Set up PR summaries
+  enabled: true
+  # Include code snippets in the summary
+  include_code_snippets: true
+  # Mark breaking changes
+  mark_breaking_changes: true
+
+# Language specific settings
+languages:
+  typescript:
+    enabled: true
+    review:
+      # TypeScript-specific review settings
+      focus:
+        - types
+        - best_practices
+        - performance
+  javascript:
+    enabled: true
+  css:
+    enabled: true
+  html:
+    enabled: true
+
+# Custom descriptions for AI to better understand your codebase
+repository_description: "DirectoryMonster is a multi-tenant directory application with ACL management and permission controls."

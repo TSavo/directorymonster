@@ -5,10 +5,10 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install \
+# Install dependencies with verbose logging for debugging
+RUN npm install --verbose \
     && npm install -g uuid jsonwebtoken \
-    && npm install --save uuid jsonwebtoken \
+    && npm install --save uuid jsonwebtoken ioredis@5.3.2 \
     && npm install -D tailwindcss postcss autoprefixer
 
 # Next.js telemetry
@@ -19,6 +19,8 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 ENV NODE_ENV=development
 ENV AUTH_SECRET=development-auth-secret
+ENV REDIS_URL=redis://redis:6379
+ENV USE_MEMORY_FALLBACK=false
 
 # We don't copy the project here since we're mounting it in docker-compose
 # This keeps only package.json and installed dependencies in the image
@@ -31,6 +33,7 @@ RUN echo "export { }; // Placeholder" > /app/src/components/admin/sites/index.ts
 
 # Verbose logging for troubleshooting
 RUN ls -la
+RUN ls -la /app/node_modules/ioredis || echo "ioredis module not found"
 RUN ls -la /app/src/components/admin/sites || echo "sites directory not found"
 
 # Expose port

@@ -32,13 +32,22 @@ const customJestConfig = {
     '^./ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
     '^@/ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
   },
-  collectCoverage: true,
+  // Disable coverage collection by default
+  collectCoverage: false,
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!**/node_modules/**',
     '!**/.next/**',
   ],
+  // Configuration for JSON output
+  verbose: false,
+  silent: false,
+  maxWorkers: '50%',
+  errorOnDeprecated: false,
+  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  // Use JSON output by default
+  json: true,
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
