@@ -6,7 +6,22 @@ This document explains how to run tests effectively in this project.
 
 **E2E tests are NEVER run by default.** They are resource-intensive and can cause performance issues. You must explicitly use the e2e-specific commands to run them.
 
-## Common Test Commands
+## Consolidated Test Runner
+
+All test commands use a consolidated test runner that provides various modes for running tests with different output options.
+
+You can also use the runner directly with custom options:
+
+```bash
+# Run tests with a specific mode
+node jest-runner.js --mode=quiet tests/unit/api
+
+# Run tests including e2e tests
+node jest-runner.js --with-e2e
+
+# Combine options
+node jest-runner.js --mode=minimal --with-e2e tests/unit/api
+```
 
 ### Running Regular Tests (Never Includes E2E Tests)
 
@@ -51,15 +66,34 @@ npm run test:e2e
 npm run test:with-e2e
 ```
 
+### Reducing Test Output
+
+When running tests, you can use these commands to reduce the output:
+
+```bash
+# Run tests with minimal output (custom formatter)
+npm run test:minimal
+
+# Run tests in quiet mode (less verbose)
+npm run test:quiet
+
+# Run only tests that failed in the previous run
+npm run test:failures-only
+```
+
+You can also combine these modes with specific test files or patterns:
+
+```bash
+# Run a specific test file with minimal output
+npm run test:minimal tests/unit/api/admin/dashboard/stats.test.ts
+
+# Run tests in a directory with quiet mode
+npm run test:quiet tests/unit/api
+```
+
 ### Other Useful Test Commands
 
 ```bash
-# Run tests with minimal output
-npm run test:minimal
-
-# Run tests and only show failures
-npm run test:failures-only
-
 # Run component tests
 npm run test:components
 

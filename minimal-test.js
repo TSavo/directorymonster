@@ -5,15 +5,19 @@ const args = process.argv.slice(2);
 
 console.log('Running tests with minimal output...');
 
-// Execute Jest with verbose flag to get more test information
-const child = spawn('npx', [
+// Add flags to minimize output but still get test names
+const minimalArgs = [
   'jest',
   '--no-watchman',
   '--colors',
   '--verbose', // Enable verbose output to get test names
+  '--testPathIgnorePatterns=tests/e2e', // Always exclude e2e tests
   ...args
-], { 
-  stdio: ['inherit', 'pipe', 'pipe'], 
+];
+
+// Execute Jest with verbose flag to get more test information
+const child = spawn('npx', minimalArgs, {
+  stdio: ['inherit', 'pipe', 'pipe'],
   shell: process.platform === 'win32'
 });
 
@@ -34,17 +38,17 @@ child.on('close', (code) => {
   const failedTests = [];
   const testFiles = [];
   const allTests = [];
-  
+
   // First pass: extract all test files and test names
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    
+
     // Capture test file name
     if (line.match(/^FAIL\s+(.+)$/i)) {
       const testFile = line.replace(/^FAIL\s+/i, '').trim();
       testFiles.push(testFile);
     }
-    
+
     // Capture any test name in verbose output (PASS or FAIL)
     if (line.match(/^\s*(PASS|FAIL)\s+/)) {
       const testName = line.replace(/^\s*(PASS|FAIL)\s+/, '').trim();
@@ -56,47 +60,47 @@ child.on('close', (code) => {
       }
     }
   }
-  
+
   // Second pass: extract failures
   let currentTestFile = '';
   let errorSection = false;
   let errorMessage = '';
-  
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    
+
     // Update current test file
     if (line.match(/^FAIL\s+(.+)$/i)) {
       currentTestFile = line.replace(/^FAIL\s+/i, '').trim();
     }
-    
+
     // Identify failed test blocks
     if (line.match(/^\s*●\s/)) {
       const testName = line.replace(/^\s*●\s+/, '').trim();
       errorSection = true;
       errorMessage = '';
-      
+
       // Look ahead for error message
       for (let j = i + 1; j < Math.min(i + 10, lines.length); j++) {
         const nextLine = lines[j].trim();
-        
+
         // Skip empty lines, stack traces, and line numbers
-        if (nextLine === '' || 
-            nextLine.includes('at ') || 
+        if (nextLine === '' ||
+            nextLine.includes('at ') ||
             nextLine.includes('node_modules/') ||
             nextLine.match(/^\s*\d+\s*\|/)) {
           continue;
         }
-        
+
         // Found potential error message
         errorMessage = nextLine;
         break;
       }
-      
+
       // Find matching test from our test list or use default
-      const matchedTest = allTests.find(t => testName.includes(t.name)) || 
+      const matchedTest = allTests.find(t => testName.includes(t.name)) ||
                           { name: testName, file: currentTestFile };
-      
+
       failedTests.push({
         file: matchedTest.file,
         name: matchedTest.name,
@@ -104,25 +108,25 @@ child.on('close', (code) => {
       });
     }
   }
-  
+
   // Special handling for PermissionGuard test failures
   if (output.includes('PermissionGuard') || args.some(arg => arg.includes('PermissionGuard'))) {
     const permGuardFilePattern = /src\/components\/admin\/auth\/guards\/__tests__\/PermissionGuard\.test\.tsx/;
     let permGuardFile = testFiles.find(file => permGuardFilePattern.test(file));
-    
+
     if (!permGuardFile && testFiles.length > 0) {
       permGuardFile = testFiles[0];
     } else if (!permGuardFile) {
       permGuardFile = "src/components/admin/auth/guards/__tests__/PermissionGuard.test.tsx";
     }
-    
+
     // Extract permission guard specific errors
     const mockErrors = [];
     const permGuardTestErrors = [];
-    
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
-      
+
       // Mock not defined errors
       if (line.includes('ReferenceError: mock') && line.includes('is not defined')) {
         mockErrors.push({
@@ -131,12 +135,12 @@ child.on('close', (code) => {
           error: line
         });
       }
-      
+
       // Permission guard test failures
       if (line.includes('PermissionGuard') && line.match(/^\s*●\s/)) {
         const testName = line.replace(/^\s*●\s+/, '').trim();
         let errorMsg = 'Test failed';
-        
+
         // Look ahead for error message
         for (let j = i + 1; j < Math.min(i + 10, lines.length); j++) {
           const nextLine = lines[j].trim();
@@ -145,7 +149,7 @@ child.on('close', (code) => {
             break;
           }
         }
-        
+
         permGuardTestErrors.push({
           file: permGuardFile,
           name: testName,
@@ -153,17 +157,17 @@ child.on('close', (code) => {
         });
       }
     }
-    
+
     // Add these errors to our failures list
     failedTests.push(...mockErrors);
     failedTests.push(...permGuardTestErrors);
   }
-  
+
   // Handle invariant errors specially - they appear differently in the output
-  if ((failedTests.length === 0 || 
-      failedTests.every(f => !f.error.includes('invariant'))) && 
+  if ((failedTests.length === 0 ||
+      failedTests.every(f => !f.error.includes('invariant'))) &&
       output.includes('invariant')) {
-    
+
     const invariantMatches = output.match(/Error: (invariant.+?)(?:\n|$)/g);
     if (invariantMatches && invariantMatches.length > 0) {
       // If we have test files but no specific failures found
@@ -172,7 +176,7 @@ child.on('close', (code) => {
         const uniqueTestFiles = [...new Set(testFiles)];
         invariantMatches.forEach((match, index) => {
           const testFile = uniqueTestFiles[index % uniqueTestFiles.length];
-          
+
           // Try to find the test name from the file content
           let testName = '';
           const fileLines = lines.filter(line => line.includes(testFile));
@@ -189,7 +193,7 @@ child.on('close', (code) => {
             }
             if (testName) break;
           }
-          
+
           // If no specific test name found, try to get it from all tests
           if (!testName) {
             const matchingTests = allTests.filter(t => t.file === testFile);
@@ -197,12 +201,12 @@ child.on('close', (code) => {
               testName = matchingTests[0].name;
             }
           }
-          
+
           // Still no test name? Use the file path
           if (!testName) {
             testName = `Test in ${testFile}`;
           }
-          
+
           failedTests.push({
             file: testFile,
             name: testName,
@@ -212,9 +216,9 @@ child.on('close', (code) => {
       }
     }
   }
-  
+
   // Handle punycode warnings
-  if (output.includes('punycode') && 
+  if (output.includes('punycode') &&
       failedTests.every(f => !f.error.includes('punycode'))) {
     // Only add this if we have test files and it's not already captured
     if (testFiles.length > 0) {
@@ -225,7 +229,7 @@ child.on('close', (code) => {
       });
     }
   }
-  
+
   // If we still couldn't find any specific tests but have files
   if (failedTests.length === 0 && testFiles.length > 0 && code !== 0) {
     testFiles.forEach(file => {
@@ -236,7 +240,7 @@ child.on('close', (code) => {
       });
     });
   }
-  
+
   // Last resort: Look for any line with '● ' that might indicate a test failure
   if (failedTests.length === 0 && code !== 0) {
     for (let i = 0; i < lines.length; i++) {
@@ -246,7 +250,7 @@ child.on('close', (code) => {
         const testName = line.replace(/^\s*●\s+/, '').trim();
         let testFile = testFiles.length > 0 ? testFiles[0] : "Unknown file";
         let errorMsg = "Unknown error";
-        
+
         // Look ahead for error message
         for (let j = i + 1; j < Math.min(i + 10, lines.length); j++) {
           const nextLine = lines[j].trim();
@@ -255,7 +259,7 @@ child.on('close', (code) => {
             break;
           }
         }
-        
+
         failedTests.push({
           file: testFile,
           name: testName,
@@ -264,19 +268,19 @@ child.on('close', (code) => {
       }
     }
   }
-  
+
   // Display minimal test failure information
   if (failedTests.length > 0) {
     console.log('\nFailed Tests:');
     // Remove duplicates by converting to strings and using Set
     const uniqueFailures = [...new Set(failedTests.map(f => JSON.stringify(f)))].map(f => JSON.parse(f));
-    
+
     // Format the file paths for better readability
     uniqueFailures.forEach(failure => {
       // Extract just the filename from the path
       const filePathParts = failure.file.split(/[\/\\]/);
       const fileName = filePathParts[filePathParts.length - 1];
-      
+
       // Add shortened file info to the test name if not already there
       if (!failure.name.includes(fileName)) {
         failure.displayName = `${failure.name} (${fileName})`;
@@ -284,7 +288,7 @@ child.on('close', (code) => {
         failure.displayName = failure.name;
       }
     });
-    
+
     uniqueFailures.forEach((failure, index) => {
       console.log(`${index + 1}. ${failure.displayName}`);
       console.log(`   File: ${failure.file}`);
@@ -294,24 +298,24 @@ child.on('close', (code) => {
   } else if (code !== 0) {
     // Last resort - just show exit code and check if the string "error" appears anywhere
     console.log('\nTests failed with exit code: ' + code);
-    
+
     if (testFiles.length > 0) {
       console.log('Failed test files:');
       testFiles.forEach(file => {
         console.log(`- ${file}`);
       });
     }
-    
+
     // Grab any line with "error" in it as a hint
     const errorHints = lines
-      .filter(line => (line.toLowerCase().includes('error') || 
-                      line.toLowerCase().includes('fail') || 
-                      line.match(/^\s*●\s/)) && 
+      .filter(line => (line.toLowerCase().includes('error') ||
+                      line.toLowerCase().includes('fail') ||
+                      line.match(/^\s*●\s/)) &&
                       !line.includes('●●●'))
       .map(line => line.trim())
       .filter(line => line.length > 0 && !line.includes('at '))
       .slice(0, 3);
-      
+
     if (errorHints.length > 0) {
       console.log('Possible errors detected:');
       errorHints.forEach(hint => {
