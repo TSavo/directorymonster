@@ -125,6 +125,19 @@ The test suite covers:
 - API endpoints and data management
 - End-to-end user workflows
 
+### Test-Driven Development
+
+DirectoryMonster follows a strict TDD (Test-Driven Development) approach:
+
+1. **Write tests first** before implementation code
+2. **Follow Red-Green-Refactor cycle**:
+   - Red: Write a failing test
+   - Green: Write minimal code to pass the test
+   - Refactor: Clean up code while ensuring tests still pass
+3. **Tests as documentation** for future developers (including our future selves)
+
+For detailed TDD guidelines, see [TDD Testing Specification](specs/TDD_TESTING_SPEC.md).
+
 ## Development Guidelines
 
 1. **Always Use Docker** for consistent environment
@@ -136,6 +149,7 @@ The test suite covers:
    - Use `@import` instead of `@tailwind` in CSS files
    - Follow mobile-first responsive design
 4. **Testing**:
+   - Use TDD for all feature development
    - Test behavior, not implementation
    - Use data-testid attributes for selection
    - Cover accessibility requirements
@@ -180,6 +194,7 @@ The project documentation is organized into implementation guides and specificat
 
 ### Specifications
 - [Testing Specification](specs/TESTING_SPEC.md)
+- [TDD Testing Specification](specs/TDD_TESTING_SPEC.md)
 - [Cross-Tenant Security Specification](specs/CROSS_TENANT_SECURITY_SPEC.md)
 - [Multi-Tenant ACL Specification](specs/MULTI_TENANT_ACL_SPEC.md)
 

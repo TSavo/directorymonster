@@ -45,6 +45,41 @@ gh issue close 9 --repo TSavo/directorymonster
    gh issue comment 9 --body "Fixed the setSearchTerm function, working on tests"
    ```
 
+## Test-Driven Development
+
+**CRITICAL: All features MUST be developed using Test-Driven Development (TDD).**
+
+### TDD Workflow
+
+1. **Write tests first**:
+   ```bash
+   # Create test file before implementation
+   touch tests/unit/component-name.test.ts
+   ```
+
+2. **Follow the Red-Green-Refactor cycle**:
+   - **Red**: Write a failing test
+     ```bash
+     npm test -- -t "should perform specific behavior"
+     # Verify test fails
+     ```
+   - **Green**: Write minimal code to pass the test
+     ```bash
+     # Implement minimal code
+     npm test -- -t "should perform specific behavior"
+     # Verify test passes
+     ```
+   - **Refactor**: Clean up code while tests pass
+     ```bash
+     # Refactor implementation
+     npm test -- -t "should perform specific behavior"
+     # Verify test still passes
+     ```
+
+3. **Tests first for each feature**: Never write implementation code without first writing tests
+
+For detailed TDD guidelines, see [TDD Testing Specification](specs/TDD_TESTING_SPEC.md).
+
 ## Development Setup
 
 Always use Docker for development with the dedicated dev configuration:
@@ -104,6 +139,7 @@ src/components/admin/categories/
    - Use utility classes consistently
 
 3. **Testing**
+   - Always follow TDD workflow
    - Use data-testid attributes
    - Test behavior, not implementation
    - Organize tests to mirror component structure
