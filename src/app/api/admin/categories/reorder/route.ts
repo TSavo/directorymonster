@@ -4,13 +4,16 @@ import { withPermission } from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
 
 /**
- * POST /api/admin/categories/reorder
+ * Handles a POST request to reorder categories.
  *
- * Reorders categories based on the provided order
- * Requires 'update' permission on 'category' resource
+ * This endpoint validates tenant access and ensures the caller has 'update'
+ * permission for the "category" resource. It parses the request body to extract
+ * an array of category IDs, returning a 400 response if the array is missing or empty.
+ * On success, it returns a response indicating that the categories were reordered.
+ * If an unexpected error occurs, a 500 response is returned.
  *
- * @param req The incoming request
- * @returns Success message
+ * @param req - The incoming request.
+ * @returns A response indicating success or the appropriate error.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(
