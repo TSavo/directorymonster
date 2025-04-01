@@ -1,6 +1,7 @@
 'use client';
 
 import { Search, X, Layers, RefreshCcw, PlusCircle } from 'lucide-react';
+import Link from 'next/link';
 import { CategoryTableHeaderProps } from '../types';
 
 /**
@@ -23,10 +24,10 @@ export function CategoryTableHeader({
 }: CategoryTableHeaderProps) {
   // Get only parent categories for the filter (exclude child categories)
   const parentCategories = categories.filter(category => !category.parentId);
-  
+
   // Check if any filters are applied
   const hasFilters = searchTerm !== '' || parentFilter !== '' || siteFilter !== '';
-  
+
   // Reset all filters
   const handleResetFilters = () => {
     setSearchTerm('');
@@ -51,17 +52,18 @@ export function CategoryTableHeader({
             <Layers size={16} />
             <span>{showHierarchy ? "Hide Hierarchy" : "View Hierarchy"}</span>
           </button>
-          <button 
+          <Link
+            href={siteSlug ? `/admin/sites/${siteSlug}/categories/new` : '/admin/categories/new'}
             onClick={onCreateClick}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-1"
             data-testid="add-category-button"
           >
             <PlusCircle size={16} />
             <span>Add Category</span>
-          </button>
+          </Link>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-4" data-testid="filter-controls">
           {/* Search input */}
@@ -89,7 +91,7 @@ export function CategoryTableHeader({
               </button>
             )}
           </div>
-          
+
           {/* Parent filter */}
           {parentCategories.length > 0 && (
             <div className="w-full sm:w-64" data-testid="parent-filter-container">
@@ -109,7 +111,7 @@ export function CategoryTableHeader({
               </select>
             </div>
           )}
-          
+
           {/* Site filter (only in multi-site mode) */}
           {sites.length > 0 && siteSlug === undefined && (
             <div className="w-full sm:w-64" data-testid="site-filter-container">
@@ -129,7 +131,7 @@ export function CategoryTableHeader({
               </select>
             </div>
           )}
-          
+
           {/* Reset filters button - only show when filters are actually applied */}
           {hasFilters && (
             <button

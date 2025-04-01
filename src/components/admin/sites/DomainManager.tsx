@@ -2,13 +2,13 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDomains } from './hooks';
+import { useDomains } from './hooks/useDomains';
 
 /**
  * DomainManager - Domain management component for handling site domains
- * 
+ *
  * A component for managing domain settings for a site.
- * 
+ *
  * Features:
  * - Domain validation with error messages
  * - Add and remove domains
@@ -50,7 +50,7 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
   apiEndpoint = '/api/domain-manager'
 }) => {
   const router = useRouter();
-  
+
   // Initialize domains hook with initial data
   const {
     domains,
@@ -73,19 +73,19 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const result = await submitDomains(
       initialData.id,
       {},
       mode === 'edit' ? 'PUT' : 'POST'
     );
-    
+
     if (result.success) {
       // Call success callback if provided
       if (onSuccess && result.data) {
         onSuccess(result.data);
       }
-      
+
       // Redirect after successful submission
       setTimeout(() => {
         router.push(`/sites/${result.data?.id || result.data?.slug}`);
@@ -95,54 +95,54 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded shadow">
-      <h1 
-        id="domainManager-header" 
+      <h1
+        id="domainManager-header"
         className="text-xl font-bold mb-6"
         data-testid="domainManager-header"
       >
         {mode === 'edit' ? 'Edit' : 'Create'} Domain Settings
       </h1>
-      
+
       {/* Error message */}
       {error && (
-        <div 
-          className="mb-4 p-3 bg-red-100 text-red-700 rounded" 
+        <div
+          className="mb-4 p-3 bg-red-100 text-red-700 rounded"
           role="alert"
           data-testid="domainManager-error"
         >
           {error}
         </div>
       )}
-      
+
       {/* Success message */}
       {success && (
-        <div 
-          className="mb-4 p-3 bg-green-100 text-green-700 rounded" 
+        <div
+          className="mb-4 p-3 bg-green-100 text-green-700 rounded"
           role="alert"
           data-testid="domainManager-success"
         >
           {success}
         </div>
       )}
-      
-      <form 
-        onSubmit={handleSubmit} 
-        role="form" 
+
+      <form
+        onSubmit={handleSubmit}
+        role="form"
         aria-labelledby="domainManager-header"
         data-testid="domainManager-form"
       >
-        <fieldset 
-          className="mb-6" 
+        <fieldset
+          className="mb-6"
           data-testid="domainManager-fieldset"
         >
           <legend className="text-lg font-semibold mb-3" data-testid="domainManager-section-heading">
             Domain Management
           </legend>
-          
+
           {/* Domain list */}
           <div className="mb-4">
             <h3 className="text-md font-medium mb-2">Current Domains</h3>
-            
+
             {domains.length === 0 ? (
               <p className="text-gray-500 italic">No domains added yet</p>
             ) : (
@@ -169,22 +169,22 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
                 ))}
               </ul>
             )}
-            
+
             {errors.domains && (
-              <p 
-                className="mt-1 text-sm text-red-500" 
-                role="alert" 
+              <p
+                className="mt-1 text-sm text-red-500"
+                role="alert"
                 data-testid="domainManager-domains-error"
               >
                 {errors.domains}
               </p>
             )}
           </div>
-          
+
           {/* Add domain */}
           <div className="mb-4">
             <h3 className="text-md font-medium mb-2">Add Domain</h3>
-            
+
             <div className="flex items-center">
               <input
                 type="text"
@@ -199,7 +199,7 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
                 data-testid="domainManager-domain-input"
                 disabled={isLoading}
               />
-              
+
               <button
                 type="button"
                 onClick={addDomain}
@@ -210,28 +210,28 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
                 + Add
               </button>
             </div>
-            
+
             {errors.domainInput && (
-              <p 
-                className="mt-1 text-sm text-red-500" 
-                role="alert" 
+              <p
+                className="mt-1 text-sm text-red-500"
+                role="alert"
                 id="domainManager-domain-input-error"
                 data-testid="domainManager-domain-input-error"
               >
                 {errors.domainInput}
               </p>
             )}
-            
+
             <p className="text-sm text-gray-500 mt-2">
               Enter valid domain names without http:// or www prefixes
             </p>
           </div>
-          
+
           <p className="text-sm text-gray-500 mt-4" data-testid="domainManager-format-help">
             * At least one domain is required.
           </p>
         </fieldset>
-        
+
         <div className="flex justify-end space-x-3 mt-8">
           <button
             type="button"
