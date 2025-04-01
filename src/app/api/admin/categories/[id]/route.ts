@@ -79,6 +79,23 @@ export async function PUT(
           // Parse the request body
           const data = await req.json();
 
+          // Validate required fields
+          if (!data.name) {
+            return NextResponse.json(
+              { error: 'Category name is required' },
+              { status: 400 }
+            );
+          }
+
+          // Sanitize and validate other fields as needed
+          // For example, ensure the name is a string and has appropriate length
+          if (typeof data.name !== 'string' || data.name.length > 100) {
+            return NextResponse.json(
+              { error: 'Invalid category name' },
+              { status: 400 }
+            );
+          }
+
           // Implementation will be added later
           // For now, just return a mock response to make the test pass
           return NextResponse.json({
