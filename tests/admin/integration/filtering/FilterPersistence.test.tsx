@@ -4,9 +4,9 @@ import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ListingTable } from '../../../../src/components/admin/listings/ListingTable';
-import { ListingFilterBar } from '../../../../src/components/admin/listings/components/table/ListingFilterBar';
-import { CategoryFilterTree } from '../../../../src/components/admin/listings/components/table/CategoryFilterTree';
-import { AdminNavigation } from '../../../../src/components/admin/navigation/AdminNavigation';
+import ListingFilterBar from '../../../../src/components/admin/listings/components/table/ListingFilterBar';
+import CategoryFilterTree from '../../../../src/components/admin/listings/components/table/CategoryFilterTree';
+import { AdminSidebar } from '../../../../src/components/admin/layout/AdminSidebar';
 
 // Mock the hooks and API calls
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
@@ -19,6 +19,10 @@ jest.mock('../../../../src/components/admin/categories/hooks/useCategories', () 
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(),
+}));
+
+jest.mock('next/navigation', () => ({
+  usePathname: jest.fn().mockReturnValue('/admin/listings'),
 }));
 
 // Mock data
@@ -98,14 +102,22 @@ describe('Integration: Filter Persistence Between Navigation Events', () => {
     
     render(
       <Provider store={store}>
-        <ListingFilterBar>
-          <CategoryFilterTree />
+        <ListingFilterBar
+          categories={mockCategories}
+          activeFilters={{}}
+          onFilterChange={jest.fn()}
+        >
+          <CategoryFilterTree 
+            categories={mockCategories}
+            selectedCategoryIds={[]}
+            onChange={jest.fn()}
+          />
         </ListingFilterBar>
       </Provider>
     );
 
     // Apply category filter
-    fireEvent.click(screen.getByTestId('category-filter-cat1'));
+    fireEvent.click(screen.getByTestId('category-checkbox-cat1'));
     
     // Check that filters were saved to session storage
     expect(saveFiltersToSessionStorage).toHaveBeenCalledWith(expect.objectContaining({
@@ -119,12 +131,12 @@ describe('Integration: Filter Persistence Between Navigation Events', () => {
     
     render(
       <Provider store={store}>
-        <AdminNavigation />
+        <AdminSidebar isOpen={true} closeSidebar={jest.fn()} />
       </Provider>
     );
 
     // Navigate away from listings
-    fireEvent.click(screen.getByTestId('nav-link-sites'));
+    fireEvent.click(screen.getByTestId('nav-sites'));
     expect(push).toHaveBeenCalledWith('/admin/sites');
     
     // Simulate returning to listings page
@@ -191,15 +203,24 @@ describe('Integration: Filter Persistence Between Navigation Events', () => {
     
     render(
       <Provider store={store}>
-        <ListingFilterBar>
-          <CategoryFilterTree />
+        <ListingFilterBar
+          categories={mockCategories}
+          activeFilters={storedFilters}
+          onFilterChange={jest.fn()}
+        >
+          <CategoryFilterTree 
+            categories={mockCategories}
+            selectedCategoryIds={[storedFilters.categoryId]}
+            onChange={jest.fn()}
+          />
         </ListingFilterBar>
         <ListingTable />
       </Provider>
     );
     
-    // Check that the active filters are displayed in the UI
-    expect(screen.getByTestId('active-category-filter')).toHaveTextContent('Category 1');
+    // Check that the active filters are displayed in the UI - using the category filter button
+    const categoryFilterButton = screen.getByTestId('category-filter-button');
+    expect(categoryFilterButton).toHaveTextContent('1'); // Badge showing 1 selected category
     
     // Check that the filtered listings are displayed
     expect(screen.getByText('Listing 1')).toBeInTheDocument(); 
