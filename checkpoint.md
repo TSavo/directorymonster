@@ -18,15 +18,20 @@ I'm working on implementing the changes specified in this document to address co
 5. ✅ Added ACL implementation test for cross-tenant security:
    - Created unit test verifying tenant boundary enforcement in ACL permissions
    - Tested cross-tenant access detection functionality
+6. ✅ Added ACL integration tests:
+   - Created integration test files with small focused tests
+   - Tested tenant isolation enforcement
+   - Tested role-based permission validation
+   - Tested cross-tenant reference detection in requests
 
 ### Remaining Tasks:
-6. Improve error handling in SecureRedisClient
-7. Fix documentation in SecureRedisClient
-8. Refactor KeyNamespaceService class
-9. Improve type safety in test helpers
-10. Fix documentation naming conventions
-11. Remove duplicate documentation heading
-12. Fix trailing punctuation in specs files
+7. Improve error handling in SecureRedisClient
+8. Fix documentation in SecureRedisClient
+9. Refactor KeyNamespaceService class
+10. Improve type safety in test helpers
+11. Fix documentation naming conventions
+12. Remove duplicate documentation heading
+13. Fix trailing punctuation in specs files
 
 ### Next Task
 I've implemented a new test for the ACL security functionality, focusing on cross-tenant isolation and permission boundaries. The test verifies that:
