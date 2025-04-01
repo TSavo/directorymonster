@@ -115,6 +115,130 @@ export class MemoryRedis {
     return Array.from(result);
   }
 
+  // Hash operations
+  async hset(key: string, field: string, value: string): Promise<number> {
+    // Create a Map for the hash if it doesn't exist
+    if (!this.store.has(key)) {
+      this.store.set(key, new Map<string, string>());
+    }
+
+    const hash = this.store.get(key);
+    const isNew = !hash.has(field);
+
+    // Set the field-value pair
+    hash.set(field, value);
+
+    // Return 1 if field is new, 0 if field was updated
+    return isNew ? 1 : 0;
+  }
+
+  async hget(key: string, field: string): Promise<string | null> {
+    // Return null if hash doesn't exist
+    if (!this.store.has(key)) {
+      return null;
+    }
+
+    const hash = this.store.get(key);
+    const value = hash.get(field);
+
+    // Return null if field doesn't exist
+    return value !== undefined ? value : null;
+  }
+
+  async hdel(key: string, ...fields: string[]): Promise<number> {
+    // Return 0 if hash doesn't exist
+    if (!this.store.has(key)) {
+      return 0;
+    }
+
+    const hash = this.store.get(key);
+    let deleted = 0;
+
+    // Delete each field and count successful deletions
+    for (const field of fields) {
+      if (hash.delete(field)) {
+        deleted++;
+      }
+    }
+
+    // If hash is now empty, remove it
+    if (hash.size === 0) {
+      this.store.delete(key);
+    }
+
+    return deleted;
+  }
+
+  async hkeys(key: string): Promise<string[]> {
+    // Return empty array if hash doesn't exist
+    if (!this.store.has(key)) {
+      return [];
+    }
+
+    const hash = this.store.get(key);
+
+    // Return all field names
+    return Array.from(hash.keys());
+  }
+
+  async hgetall(key: string): Promise<Record<string, string> | null> {
+    // Return null if hash doesn't exist
+    if (!this.store.has(key)) {
+      return null;
+    }
+
+    const hash = this.store.get(key);
+    const result: Record<string, string> = {};
+
+    // Convert Map to plain object
+    for (const [field, value] of hash.entries()) {
+      result[field] = value;
+    }
+
+    return result;
+  }
+
+  async hmset(key: string, ...fieldValues: string[]): Promise<'OK'> {
+    // Create a Map for the hash if it doesn't exist
+    if (!this.store.has(key)) {
+      this.store.set(key, new Map<string, string>());
+    }
+
+    const hash = this.store.get(key);
+
+    // Process field-value pairs
+    for (let i = 0; i < fieldValues.length; i += 2) {
+      const field = fieldValues[i];
+      const value = fieldValues[i + 1];
+
+      if (field && value !== undefined) {
+        hash.set(field, value);
+      }
+    }
+
+    return 'OK';
+  }
+
+  async hincrby(key: string, field: string, increment: number): Promise<number> {
+    // Create a Map for the hash if it doesn't exist
+    if (!this.store.has(key)) {
+      this.store.set(key, new Map<string, string>());
+    }
+
+    const hash = this.store.get(key);
+
+    // Get current value or default to 0
+    const currentValue = hash.has(field) ? parseInt(hash.get(field), 10) : 0;
+
+    // Calculate new value
+    const newValue = currentValue + increment;
+
+    // Store new value
+    hash.set(field, newValue.toString());
+
+    return newValue;
+  }
+
   // Transaction support
   multi(): any {
     const commands: { cmd: string; args: any[] }[] = [];
