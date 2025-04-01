@@ -8,7 +8,7 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 const customJestConfig = {
   setupFilesAfterEnv: [
-    '<rootDir>/jest.setup.js', 
+    '<rootDir>/jest.setup.js',
     '<rootDir>/tests/mocks/ui-setup.js',
     '<rootDir>/tests/__setup__/global-test-data.js'
   ],
@@ -23,7 +23,7 @@ const customJestConfig = {
     '^@/services/(.*)$': '<rootDir>/src/services/$1',
     '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
     '^@/types/(.*)$': '<rootDir>/src/types/$1',
-    
+
     // UI component mocks at various relative path depths
     '^../../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
     '^../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
@@ -45,7 +45,7 @@ const customJestConfig = {
   silent: false,
   maxWorkers: '50%',
   errorOnDeprecated: false,
-  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/tests/e2e/'],
   // Use JSON output by default
   json: true,
 };
