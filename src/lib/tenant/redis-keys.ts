@@ -10,17 +10,17 @@ export const siteKeys = {
    * Key for a site by its ID
    */
   byId: (siteId: string) => `site:id:${siteId}`,
-  
+
   /**
    * Key for a site by its slug
    */
   bySlug: (slug: string) => `site:slug:${slug}`,
-  
+
   /**
    * Key for a site by its domain
    */
   byDomain: (domain: string) => `site:domain:${domain}`,
-  
+
   /**
    * Pattern for all sites
    */
@@ -35,26 +35,56 @@ export const categoryKeys = {
    * Key for a category by its ID
    */
   byId: (categoryId: string) => `category:id:${categoryId}`,
-  
+
+  /**
+   * Key for a category by its ID with tenant isolation
+   */
+  byIdWithTenant: (tenantId: string, categoryId: string) => `category:tenant:${tenantId}:id:${categoryId}`,
+
   /**
    * Key for a category by its site and slug
    */
   bySlug: (siteId: string, slug: string) => `category:site:${siteId}:${slug}`,
-  
+
+  /**
+   * Key for a category by its tenant, site and slug
+   */
+  byTenantAndSlug: (tenantId: string, siteId: string, slug: string) => `category:tenant:${tenantId}:site:${siteId}:${slug}`,
+
   /**
    * Pattern for all categories belonging to a site
    */
   allForSite: (siteId: string) => `category:site:${siteId}:*`,
-  
+
+  /**
+   * Pattern for all categories belonging to a tenant
+   */
+  allForTenant: (tenantId: string) => `category:tenant:${tenantId}:*`,
+
+  /**
+   * Pattern for all categories belonging to a tenant and site
+   */
+  allForTenantAndSite: (tenantId: string, siteId: string) => `category:tenant:${tenantId}:site:${siteId}:*`,
+
   /**
    * Pattern for all categories with a specific parent
    */
   byParent: (parentId: string) => `category:parent:${parentId}:*`,
-  
+
+  /**
+   * Pattern for all categories with a specific parent in a tenant
+   */
+  byParentWithTenant: (tenantId: string, parentId: string) => `category:tenant:${tenantId}:parent:${parentId}:*`,
+
   /**
    * Key for storing child categories of a parent
    */
   childList: (parentId: string) => `category:parent:${parentId}:children`,
+
+  /**
+   * Key for storing child categories of a parent with tenant isolation
+   */
+  childListWithTenant: (tenantId: string, parentId: string) => `category:tenant:${tenantId}:parent:${parentId}:children`,
 };
 
 /**
@@ -65,27 +95,27 @@ export const listingKeys = {
    * Key for a listing by its ID
    */
   byId: (listingId: string) => `listing:id:${listingId}`,
-  
+
   /**
    * Key for a listing by its site and slug
    */
   bySlug: (siteId: string, slug: string) => `listing:site:${siteId}:${slug}`,
-  
+
   /**
    * Key for a listing by its category and slug
    */
   byCategoryAndSlug: (categoryId: string, slug: string) => `listing:category:${categoryId}:${slug}`,
-  
+
   /**
    * Pattern for all listings belonging to a site
    */
   allForSite: (siteId: string) => `listing:site:${siteId}:*`,
-  
+
   /**
    * Pattern for all listings belonging to a category
    */
   allForCategory: (categoryId: string) => `listing:category:${categoryId}:*`,
-  
+
   /**
    * Key for storing the list of featured listings
    */
@@ -100,22 +130,22 @@ export const userKeys = {
    * Key for a user by its ID
    */
   byId: (userId: string) => `user:id:${userId}`,
-  
+
   /**
    * Key for a user by email
    */
   byEmail: (email: string) => `user:email:${email}`,
-  
+
   /**
    * Pattern for all users
    */
   all: () => 'user:id:*',
-  
+
   /**
    * Key for storing site admin access
    */
   siteAdmin: (userId: string, siteId: string) => `user:${userId}:admin:${siteId}`,
-  
+
   /**
    * Pattern for all sites a user is admin of
    */
@@ -130,7 +160,7 @@ export const apiKeyKeys = {
    * Key for an API key
    */
   byKey: (key: string) => `apikey:${key}`,
-  
+
   /**
    * Pattern for all API keys for a site
    */
@@ -145,42 +175,42 @@ export const searchKeys = {
    * Key for category search index
    */
   categoryIndex: (siteId: string) => `search:site:${siteId}:categories`,
-  
+
   /**
    * Key for listing search index
    */
   listingIndex: (siteId: string) => `search:site:${siteId}:listings`,
-  
+
   /**
    * Key for category term index (for full-text search)
    */
   categoryTermIndex: (siteId: string, term: string) => `search:site:${siteId}:category:term:${term}`,
-  
+
   /**
    * Key for listing term index (for full-text search)
    */
   listingTermIndex: (siteId: string, term: string) => `search:site:${siteId}:listing:term:${term}`,
-  
+
   /**
    * Key for tracking all terms for a category
    */
   categoryTermsSet: (siteId: string, categoryId: string) => `search:site:${siteId}:category:${categoryId}:terms`,
-  
+
   /**
    * Key for tracking all terms for a listing
    */
   listingTermsSet: (siteId: string, listingId: string) => `search:site:${siteId}:listing:${listingId}:terms`,
-  
+
   /**
    * Key for tracking all listings in a category
    */
   categoryListings: (siteId: string, categoryId: string) => `search:site:${siteId}:category:${categoryId}:listings`,
-  
+
   /**
    * Key for tracking all featured listings
    */
   featuredListings: (siteId: string) => `search:site:${siteId}:featured`,
-  
+
   /**
    * Key for tracking listings by status
    */
@@ -195,37 +225,37 @@ export const roleKeys = {
    * Key for a role by its ID within a tenant
    */
   byId: (tenantId: string, roleId: string) => `role:${tenantId}:${roleId}`,
-  
+
   /**
    * Key for a role by its name within a tenant
    */
   byName: (tenantId: string, name: string) => `role:${tenantId}:name:${name}`,
-  
+
   /**
    * Pattern for all roles in a tenant
    */
   allForTenant: (tenantId: string) => `role:${tenantId}:*`,
-  
+
   /**
    * Key for global roles (across all tenants)
    */
   global: () => `role:global`,
-  
+
   /**
    * Key for a user's roles in a specific tenant
    */
   userRoles: (userId: string, tenantId: string) => `user:roles:${userId}:${tenantId}`,
-  
+
   /**
    * Pattern for all roles a user has across all tenants
    */
   allUserRoles: (userId: string) => `user:roles:${userId}:*`,
-  
+
   /**
    * Key for users in a tenant
    */
   tenantUsers: (tenantId: string) => `tenant:users:${tenantId}`,
-  
+
   /**
    * Key for users with a specific role in a tenant
    */
@@ -240,7 +270,7 @@ export const rateLimitKeys = {
    * Key for IP-based rate limiting
    */
   byIp: (ip: string, endpoint: string) => `ratelimit:ip:${ip}:${endpoint}`,
-  
+
   /**
    * Key for user-based rate limiting
    */

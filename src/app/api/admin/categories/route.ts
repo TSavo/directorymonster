@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAccess } from '@/middleware/tenant-validation';
 import { withPermission } from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
+import { CategoryService } from '@/lib/category-service';
 
 /**
  * Retrieves all categories for the current tenant.
@@ -25,9 +26,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           // Get tenant context
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
 
-          // Implementation will be added later
-          // For now, just return an empty array to make the test pass
-          return NextResponse.json({ categories: [] });
+          // Get all categories for this tenant
+          const categories = await CategoryService.getCategoriesByTenant(tenantId);
+
+          // Return the categories
+          return NextResponse.json({ categories });
         } catch (error) {
           console.error('Error retrieving categories:', error);
           return NextResponse.json(
@@ -63,15 +66,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           // Get tenant context
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
 
-          // Implementation will be added later
-          // For now, just return a mock response to make the test pass
-          return NextResponse.json({
-            category: {
-              id: 'mock-category-id',
-              name: 'Mock Category',
-              tenantId
-            }
-          });
+          // Parse the request body
+          const data = await req.json();
+
+          // Create a new category with tenant association
+          const newCategory = await CategoryService.createCategoryWithTenant(data, tenantId);
+
+          // Check if the category was created successfully
+          if (!newCategory) {
+            return NextResponse.json(
+              { error: 'Failed to create category' },
+              { status: 500 }
+            );
+          }
+
+          return NextResponse.json({ category: newCategory });
         } catch (error) {
           console.error('Error creating category:', error);
           return NextResponse.json(

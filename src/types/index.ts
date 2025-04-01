@@ -15,6 +15,7 @@ export interface SiteConfig {
 export interface Category {
   id: string;
   siteId: string;
+  tenantId: string; // Added tenantId to ensure tenant isolation
   name: string;
   slug: string;
   metaDescription: string;

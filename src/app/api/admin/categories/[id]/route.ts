@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAccess } from '@/middleware/tenant-validation';
 import { withResourcePermission } from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
+import { CategoryService } from '@/lib/category-service';
 
 /**
  * Retrieves a category by ID with tenant access and permission validation.
@@ -31,15 +32,19 @@ export async function GET(
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
           const categoryId = params.id;
 
-          // Implementation will be added later
-          // For now, just return a mock response to make the test pass
-          return NextResponse.json({
-            category: {
-              id: categoryId,
-              name: 'Mock Category',
-              tenantId
-            }
-          });
+          // Get the category with tenant validation
+          const category = await CategoryService.getCategoryWithTenantValidation(categoryId, tenantId);
+
+          // Check if the category exists and belongs to the tenant
+          if (!category) {
+            return NextResponse.json(
+              { error: 'Category not found or does not belong to this tenant' },
+              { status: 404 }
+            );
+          }
+
+          // Return the category data
+          return NextResponse.json({ category });
         } catch (error) {
           console.error(`Error retrieving category ${params.id}:`, error);
           return NextResponse.json(
@@ -85,15 +90,23 @@ export async function PUT(
           // Parse the request body
           const data = await req.json();
 
-          // Implementation will be added later
-          // For now, just return a mock response to make the test pass
-          return NextResponse.json({
-            category: {
-              id: categoryId,
-              ...data,
-              tenantId
-            }
-          });
+          // Update the category with tenant validation
+          const updatedCategory = await CategoryService.updateCategoryWithTenantValidation(
+            categoryId,
+            tenantId,
+            data
+          );
+
+          // Check if the category exists and belongs to the tenant
+          if (!updatedCategory) {
+            return NextResponse.json(
+              { error: 'Category not found or does not belong to this tenant' },
+              { status: 404 }
+            );
+          }
+
+          // Return the updated category
+          return NextResponse.json({ category: updatedCategory });
         } catch (error) {
           console.error(`Error updating category ${params.id}:`, error);
           return NextResponse.json(
@@ -135,8 +148,20 @@ export async function DELETE(
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
           const categoryId = params.id;
 
-          // Implementation will be added later
-          // For now, just return a mock response to make the test pass
+          // Delete the category with tenant validation
+          const success = await CategoryService.deleteCategoryWithTenantValidation(
+            categoryId,
+            tenantId
+          );
+
+          // Check if the category exists and belongs to the tenant
+          if (!success) {
+            return NextResponse.json(
+              { error: 'Category not found or does not belong to this tenant' },
+              { status: 404 }
+            );
+          }
+
           return NextResponse.json({
             success: true,
             message: `Category ${categoryId} deleted successfully`
