@@ -5,13 +5,14 @@ import { DashboardService } from '@/lib/dashboard-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 
 /**
- * GET /api/admin/dashboard/stats
+ * Handles GET requests to retrieve dashboard statistics for the admin interface.
  *
- * Retrieves dashboard statistics for the admin interface
- * Requires 'read' permission on 'setting' resource
+ * Validates tenant access and checks for 'read' permission on the 'setting' resource. Extracts the tenant ID from
+ * the request headers and processes optional query parameters (period, startDate, and endDate) to query the
+ * statistics. Returns a JSON response containing the dashboard statistics, or a 500 error response if retrieval fails.
  *
- * @param req The incoming request
- * @returns Dashboard statistics data
+ * @param req - The incoming request with tenant headers and query parameters.
+ * @returns A promise resolving to a NextResponse with the dashboard statistics data or an error message.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(

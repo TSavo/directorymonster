@@ -5,13 +5,15 @@ import { ResourceType, Permission } from '@/types/permissions';
 import { kv } from '@/lib/redis-client';
 
 /**
- * GET /api/admin/listings
+ * Retrieves tenant listings with optional filtering by status and category.
  *
- * Retrieves all listings for the tenant
- * Requires 'read' permission on 'listing' resource
+ * This function validates tenant access and the required 'read' permission on listings before fetching all listings
+ * associated with the tenant specified in the request's 'x-tenant-id' header. It supports optional query parameters
+ * "status" and "categoryId" to filter listings by their status or associated category. On success, it returns a JSON
+ * response containing the filtered listings; if an error occurs, it returns a JSON error response with a 500 status.
  *
- * @param req The incoming request
- * @returns Listings data
+ * @param req - The incoming request.
+ * @returns A response with a JSON object containing the listings data or an error message.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(
@@ -64,13 +66,19 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 }
 
 /**
- * POST /api/admin/listings
+ * Creates a new listing for the current tenant.
  *
- * Creates a new listing
- * Requires 'create' permission on 'listing' resource
+ * This function validates the incoming request to ensure a title is provided and extracts the tenant identifier from the request headers.
+ * It generates a unique ID and slug for the listing, constructs the listing object with provided and default values, and saves the listing
+ * in the key-value store under keys scoped by tenant and listing ID.
  *
- * @param req The incoming request
- * @returns The created listing data
+ * On a successful creation, the function returns a JSON response with the created listing and a 201 status code.
+ * If the title is missing, it returns a 400 error, and unexpected errors result in a 500 error response.
+ *
+ * Note: The request must have valid tenant access and 'create' permission on the listing resource.
+ *
+ * @param req - The incoming NextRequest containing listing details and tenant context.
+ * @returns A NextResponse with the created listing data or an error message.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   return withTenantAccess(

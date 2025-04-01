@@ -5,14 +5,15 @@ import { ResourceType, Permission } from '@/types/permissions';
 import { kv } from '@/lib/redis-client';
 
 /**
- * GET /api/admin/listings/:id
+ * Retrieves a listing by its ID if it exists and belongs to the tenant specified in the request headers.
  *
- * Retrieves a specific listing by ID
- * Requires 'read' permission on 'listing' resource
+ * This endpoint requires that the request has valid tenant access with "read" permission on the listing resource.
+ * It verifies that the listing exists in the data store and is associated with the tenant, returning the listing data in JSON format.
+ * If the listing is not found or does not belong to the tenant, it responds with a 404 error; unexpected errors yield a 500 error.
  *
- * @param req The incoming request
- * @param params Route parameters containing the listing ID
- * @returns Listing data
+ * @param req - The incoming request, which must include tenant access headers.
+ * @param params - An object containing the listing ID.
+ * @returns A JSON response with either the listing data or an error message.
  */
 export async function GET(
   req: NextRequest,
@@ -63,14 +64,17 @@ export async function GET(
 }
 
 /**
- * PUT /api/admin/listings/:id
+ * Updates a specific listing by its ID.
  *
- * Updates a specific listing by ID
- * Requires 'update' permission on 'listing' resource
+ * This endpoint validates tenant access and requires update permission on the "listing" resource.
+ * It parses the request body expecting at least a title, retrieves the existing listing,
+ * verifies ownership, and merges the provided data with existing listing properties.
+ * Upon success, it returns a JSON response containing the updated listing. If validation fails,
+ * the listing is not found, or an internal error occurs, an appropriate error status is returned.
  *
- * @param req The incoming request
- * @param params Route parameters containing the listing ID
- * @returns Updated listing data
+ * @param req The incoming HTTP request.
+ * @param params Contains the listing ID.
+ * @returns A JSON response with the updated listing data.
  */
 export async function PUT(
   req: NextRequest,
@@ -147,14 +151,14 @@ export async function PUT(
 }
 
 /**
- * DELETE /api/admin/listings/:id
+ * Deletes an existing listing by its ID for a tenant.
  *
- * Deletes a specific listing by ID
- * Requires 'delete' permission on 'listing' resource
+ * This endpoint validates tenant access and checks for the required 'delete' permission on listings. It ensures
+ * that the listing exists and belongs to the tenant identified by the request header before deleting it from Redis.
+ * If the listing is not found or is not owned by the tenant, a 404 response is returned. A 500 response is sent if an error occurs during deletion.
  *
- * @param req The incoming request
- * @param params Route parameters containing the listing ID
- * @returns Success message
+ * @param params - An object containing route parameters, where `id` represents the listing identifier.
+ * @returns A NextResponse with a JSON payload indicating the result of the deletion operation.
  */
 export async function DELETE(
   req: NextRequest,
