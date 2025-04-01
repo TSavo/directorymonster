@@ -312,8 +312,12 @@ describe('Dashboard Activity Permission Middleware', () => {
   const TEST_TOKEN = jwt.sign({ userId: TEST_USER_ID }, TEST_SECRET, { expiresIn: '1h' });
 
   // Set up JWT_SECRET for testing
+  const originalEnv = process.env.JWT_SECRET;
   process.env.JWT_SECRET = TEST_SECRET;
-
+  
+  afterAll(() => {
+    process.env.JWT_SECRET = originalEnv;
+  });
   // Create a mock RoleService
   const mockRoleService = {
     hasPermission: jest.fn().mockResolvedValue(true)
