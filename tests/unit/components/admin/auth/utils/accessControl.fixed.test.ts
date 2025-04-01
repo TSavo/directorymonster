@@ -40,9 +40,8 @@ describe('Access Control Utilities', () => {
       // Act
       const result = detectCrossTenantAccess(acl, requestedTenantId);
       
-      // Update expectation to match actual implementation behavior
-      // The function returns true if there is cross-tenant access (tenant-789 != tenant-456)
-      expect(result).toBe(true);
+      // Assert
+      expect(result).toBe(false);
     });
     
     it('should return true when user has no access to the requested tenant', () => {

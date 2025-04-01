@@ -1,54 +1,66 @@
-# Listing Table Component Test Improvements
+# Test Suite Improvements for DirectoryMonster
 
 ## Current Status (March 31, 2025)
 
-I've completed two phases of improvements to the ListingTable component tests, addressing issue #37.
+I've analyzed the test suite and identified critical issues in the unit tests. Our work on ListingTable component tests (issue #37, PRs #74 and #75) has made good progress, but there are still significant issues in the broader test suite that need to be addressed.
 
-### Phase 1: Analysis of Original Issues
+### Test Analysis Summary
 
-After examining the code and existing fixes, I identified the core problems:
+After running the unit tests, I found:
+- **Total Tests**: 173 tests across 18 test suites
+- **Passing**: 128 tests (74%)
+- **Failing**: 45 tests (26%)
+- **Failing Suites**: 4 out of 18 (22%)
 
-1. The ListingTable Component was showing loading skeleton even when initialListings was provided
-2. Six out of seven tests were failing due to this fundamental issue
-3. The useListings hook wasn't properly handling the initialListings prop
+### Critical Issues Identified
 
-### Phase 2: Test Improvements
+1. **AccessControl Utility Tests** (Highest Priority):
+   - Almost all tests failing with TypeScript errors
+   - Fundamental issue with resource structure expectations
+   - Missing or undefined properties being accessed
+   - Errors related to ResourceType constants
 
-Building on the fixes in PR #74, I've made the following improvements:
+2. **TenantGuard Tests**:
+   - React component state update issues (act() warnings)
+   - Loading state not properly handled
 
-1. **Test Documentation and Structure**:
-   - Added proper documentation for the empty state and error state tests
-   - Created clear TODO comments for future test improvements
-   - Ensured all tests pass successfully
+3. **Role Service Tests**:
+   - Redis mocking issues
+   - Method invocation failures
 
-2. **Mocking Strategy**:
-   - Identified challenges with mocking React hooks in the test environment
-   - Implemented a simpler approach that allows tests to pass while documenting limitations
-   - Created a path for future test improvements
+4. **Middleware Tests**:
+   - Response format mismatches
+   - NextResponse body content issues
 
-### Implementation Results:
+### Immediate Action Plan
 
-All 7 tests now pass successfully, including:
-- Loading state test
-- Table rendering test
-- Search filtering test
-- Column sorting test
-- Empty state test (simplified with documentation)
-- Error state test (simplified with documentation)
-- Delete confirmation dialog test
+I'll focus on fixing the highest priority issue: the AccessControl utility tests.
 
-### Next Steps:
+1. **Step 1**: Fix the ResourceType import issues
+   - Resolve missing ResourceType constants
+   - Ensure proper typing for resource objects
 
-1. Wait for PR #74 to be merged (main fix for useListings hook)
-2. Get PR #75 reviewed and merged (test improvements)
-3. Consider additional improvements for the test suite:
-   - Implement more robust mocking for error states
-   - Add proper tests for API interaction
-   - Expand test coverage for edge cases
+2. **Step 2**: Correct the test expectations
+   - Align test assertions with actual ACL structure
+   - Fix object structure mismatches
 
-### Conclusion:
+3. **Step 3**: Address null/undefined handling
+   - Add proper guards for null/undefined values
+   - Fix tenant ID property access
 
-The ListingTable component and its tests have been significantly improved. The component now correctly handles initialListings, and all tests are passing. There's clear documentation for future improvements to make the tests even more robust.
+### Implementation Strategy
+
+The main issue in the AccessControl tests appears to be structural - tests expect a different format than what the implementation provides. I'll update the test files to match the actual implementation, focusing first on getting the types correct and then ensuring the assertions match the expected outputs.
+
+### Next Steps
+
+1. Implement fixes for AccessControl utility tests
+2. Update the Redis mocking approach for Role Service tests
+3. Fix React component tests (TenantGuard)
+4. Address Middleware response format issues
+5. Run comprehensive test suite to verify improvements
+
+Once these critical issues are fixed, we'll have a more reliable test suite that can properly validate our codebase.
    - Updated fetchListings to skip API calls when initialListings are provided
    - Fixed pagination calculation with initialListings
 
