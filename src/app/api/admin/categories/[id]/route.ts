@@ -29,14 +29,29 @@ export async function GET(
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
           const categoryId = params.id;
 
+          // Get the category from Redis
+          const category = await kv.get(`category:id:${categoryId}`);
+
+          // Check if category exists
+          if (!category) {
+            return NextResponse.json(
+              { error: 'Category not found' },
+              { status: 404 }
+            );
+          }
+
+          // Check if category belongs to the tenant
+          if (category.tenantId !== tenantId) {
+            return NextResponse.json(
+              { error: 'Category not found' },
+              { status: 404 }
+            );
+          }
+
           // Implementation will be added later
           // For now, just return a mock response to make the test pass
           return NextResponse.json({
-            category: {
-              id: categoryId,
-              name: 'Mock Category',
-              tenantId
-            }
+            category
           });
         } catch (error) {
           console.error(`Error retrieving category ${params.id}:`, error);
