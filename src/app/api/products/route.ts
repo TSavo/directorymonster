@@ -128,14 +128,36 @@ export async function POST(request: NextRequest) {
       updatedAt: timestamp,
     };
     
-    // Store listing in Redis
+    // Store listing in Redis using a transaction for atomicity
     console.log(`POST /api/products - Storing listing: ${listing.id}`);
-    await redis.set(`listing:id:${listing.id}`, JSON.stringify(listing));
-    await redis.set(`listing:site:${site.id}:${listing.slug}`, JSON.stringify(listing));
-    await redis.set(`listing:category:${listing.categoryId}:${listing.slug}`, JSON.stringify(listing));
+    const transaction = redis.multi();
+    transaction.set(`listing:id:${listing.id}`, JSON.stringify(listing));
+    transaction.set(`listing:site:${site.id}:${listing.slug}`, JSON.stringify(listing));
+    transaction.set(`listing:category:${listing.categoryId}:${listing.slug}`, JSON.stringify(listing));
     
-    console.log(`POST /api/products - Successfully created listing: ${listing.id}`);
-    return NextResponse.json(listing, { status: 201 });
+    try {
+      // Execute all commands as a transaction
+      const results = await transaction.exec();
+      
+      // Check for errors in the transaction
+      const errors = results.filter(([err]) => err !== null);
+      if (errors.length > 0) {
+        console.error('Transaction errors:', errors);
+        return NextResponse.json(
+          { error: 'Failed to save listing data' },
+          { status: 500 }
+        );
+      }
+      
+      console.log(`POST /api/products - Successfully created listing: ${listing.id}`);
+      return NextResponse.json(listing, { status: 201 });
+    } catch (error) {
+      console.error('Error executing Redis transaction:', error);
+      return NextResponse.json(
+        { error: 'Failed to save listing data' },
+        { status: 500 }
+      );
+    }
   } catch (error: any) {
     console.error('API Error:', error);
     return NextResponse.json({ error: 'Internal server error', details: error.message }, { status: 500 });
