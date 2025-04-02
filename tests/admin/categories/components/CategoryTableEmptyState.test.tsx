@@ -36,7 +36,7 @@ describe('CategoryTableEmptyState Component', () => {
   it('renders the create button with default URL', () => {
     render(<CategoryTableEmptyState />);
 
-    const createButton = screen.getByTestId('create-category-button');
+    const createButton = screen.getByRole('link', { name: /Add New Category/i });
     expect(createButton).toBeInTheDocument();
     expect(createButton).toHaveAttribute('href', '/admin/categories/new');
     expect(createButton.textContent).toContain('Add New Category');
@@ -45,7 +45,7 @@ describe('CategoryTableEmptyState Component', () => {
   it('uses site-specific URL when siteSlug is provided', () => {
     render(<CategoryTableEmptyState siteSlug="test-site" />);
 
-    const createButton = screen.getByTestId('create-category-button');
+    const createButton = screen.getByRole('link', { name: /Add New Category/i });
     expect(createButton).toHaveAttribute('href', '/admin/sites/test-site/categories/new');
     expect(createButton.textContent).toContain('Add New Category');
   });
@@ -62,7 +62,7 @@ describe('CategoryTableEmptyState Component', () => {
   it('has accessible focus states for the create button', () => {
     render(<CategoryTableEmptyState />);
 
-    const createButton = screen.getByTestId('create-category-button');
+    const createButton = screen.getByRole('link', { name: /Add New Category/i });
     // Test for the presence of focus-related attributes but not specific implementation
     const className = createButton.getAttribute('class') || '';
     expect(className).toContain('focus:');
