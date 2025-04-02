@@ -32,7 +32,7 @@ export interface StepNavigationProps {
 
 /**
  * StepNavigation - Navigation component for multi-step forms
- * 
+ *
  * Provides a UI for navigating between form steps
  */
 export const StepNavigation: React.FC<StepNavigationProps> = ({
@@ -43,7 +43,7 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
   isLoading = false
 }) => {
   return (
-    <nav 
+    <nav
       className="mb-6"
       aria-label="Form Steps"
       data-testid="site-form-steps-navigation"
@@ -52,27 +52,31 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
         {steps.map((step, index) => {
           const isActive = step.id === activeStep;
           const isCompleted = completedSteps.includes(step.id);
-          const isDisabled = !isActive && !isCompleted && !isLoading;
-          
+          const isDisabled = !isActive && !isCompleted;
+
           return (
-            <li 
-              key={step.id} 
+            <li
+              key={step.id}
               className={`relative flex-grow px-2 text-center`}
               data-testid={`step-item-${step.id}`}
             >
               <button
                 type="button"
-                onClick={() => onStepChange(step.id)}
+                onClick={() => {
+                  if (!isDisabled) {
+                    onStepChange(step.id);
+                  }
+                }}
                 className={`
                   py-3 w-full text-sm font-medium
-                  ${isActive 
-                    ? 'text-blue-600 border-b-2 border-blue-600' 
-                    : isCompleted 
-                      ? 'text-gray-700 hover:text-blue-500' 
+                  ${isActive
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : isCompleted
+                      ? 'text-gray-700 hover:text-blue-500'
                       : 'text-gray-400'
                   }
                 `}
-                disabled={!isActive && !isCompleted}
+                disabled={isLoading || isDisabled}
                 aria-current={isActive ? 'step' : undefined}
                 data-testid={`step-button-${step.id}`}
               >
