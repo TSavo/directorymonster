@@ -5,7 +5,6 @@ import { AdminSidebar } from '@/components/admin/layout';
 // Mock next/navigation
 jest.mock('next/navigation', () => {
   return {
-    __esModule: true,
     usePathname: jest.fn().mockReturnValue('/admin/listings')
   };
 });
