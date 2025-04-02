@@ -5,22 +5,26 @@ import { withRedis } from '@/middleware/withRedis';
 
 export const GET = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string } }) => {
   const siteSlug = params.siteSlug;
-  
+
+  // Determine if we're in test mode
+  const isTestMode = process.env.NODE_ENV === 'test';
+  const keyPrefix = isTestMode ? 'test:' : '';
+
   // Get site by slug
-  const site = await kv.get<SiteConfig>(`site:slug:${siteSlug}`);
-  
+  const site = await kv.get<SiteConfig>(`${keyPrefix}site:slug:${siteSlug}`);
+
   if (!site) {
     return NextResponse.json(
       { error: 'Site not found' },
       { status: 404 }
     );
   }
-  
+
   try {
     // Get all categories for this site
-    const categoryKeys = await kv.keys(`category:site:${site.id}:*`);
+    const categoryKeys = await kv.keys(`${keyPrefix}category:site:${site.id}:*`);
     const categoriesPromises = categoryKeys.map(async (key) => await kv.get<Category>(key));
-    
+
     // Handle each promise individually to prevent one failure from breaking everything
     const categories: Category[] = [];
     for (let i = 0; i < categoriesPromises.length; i++) {
@@ -34,7 +38,7 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
         // Continue with other categories
       }
     }
-    
+
     return NextResponse.json(categories);
   } catch (error) {
     console.error('Error fetching categories:', error);
@@ -47,27 +51,31 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
 
 export const POST = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string } }) => {
   const siteSlug = params.siteSlug;
-  
+
+  // Determine if we're in test mode
+  const isTestMode = process.env.NODE_ENV === 'test';
+  const keyPrefix = isTestMode ? 'test:' : '';
+
   console.log(`Looking for site with slug: ${siteSlug}`);
-  
+
   // Debugging - list all site keys
-  const siteKeys = await kv.keys('site:*');
+  const siteKeys = await kv.keys(`${keyPrefix}site:*`);
   console.log('Available site keys:', siteKeys);
-  
+
   // Get site by slug
-  const site = await kv.get<SiteConfig>(`site:slug:${siteSlug}`);
+  const site = await kv.get<SiteConfig>(`${keyPrefix}site:slug:${siteSlug}`);
   console.log('Found site:', site);
-  
+
   if (!site) {
     return NextResponse.json(
       { error: 'Site not found' },
       { status: 404 }
     );
   }
-  
+
   try {
     const data = await request.json();
-    
+
     // Validate required fields
     if (!data.name || !data.metaDescription) {
       return NextResponse.json(
@@ -75,30 +83,30 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
         { status: 400 }
       );
     }
-    
+
     // Generate a slug from the name
     const slug = data.slug || data.name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
-    
+
     // Check if slug already exists
-    const existingCategory = await kv.get(`category:site:${site.id}:${slug}`);
+    const existingCategory = await kv.get(`${keyPrefix}category:site:${site.id}:${slug}`);
     if (existingCategory) {
       return NextResponse.json(
         { error: 'A category with this name or slug already exists' },
         { status: 409 }
       );
     }
-    
+
     // Get the current highest order value
-    const categoryKeys = await kv.keys(`category:site:${site.id}:*`);
+    const categoryKeys = await kv.keys(`${keyPrefix}category:site:${site.id}:*`);
     const categories = await Promise.all(
       categoryKeys.map(async (key) => await kv.get<Category>(key))
     );
-    
+
     const highestOrder = categories.reduce((max, cat) => Math.max(max, cat?.order || 0), 0);
-    
+
     // Create new category
     const timestamp = Date.now();
     const category: Category = {
@@ -112,17 +120,17 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
       createdAt: timestamp,
       updatedAt: timestamp,
     };
-    
+
     // Use a Redis transaction for atomicity
     const multi = redis.multi();
-    
-    multi.set(`category:id:${category.id}`, JSON.stringify(category));
-    multi.set(`category:site:${site.id}:${category.slug}`, JSON.stringify(category));
-    
+
+    multi.set(`${keyPrefix}category:id:${category.id}`, JSON.stringify(category));
+    multi.set(`${keyPrefix}category:site:${site.id}:${category.slug}`, JSON.stringify(category));
+
     try {
       // Execute all commands as a transaction
       const results = await multi.exec();
-      
+
       // Check for errors in the transaction
       const errors = results.filter(([err]) => err !== null);
       if (errors.length > 0) {
@@ -132,7 +140,7 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
           { status: 500 }
         );
       }
-      
+
       return NextResponse.json(category, { status: 201 });
     } catch (error) {
       console.error('Error executing Redis transaction:', error);
