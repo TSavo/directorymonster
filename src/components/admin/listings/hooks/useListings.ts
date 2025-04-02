@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  Listing, 
-  ListingFilters, 
-  ListingSortField, 
-  SortDirection, 
-  ListingPagination, 
+import { useRouter } from 'next/router';
+import {
+  Listing,
+  ListingFilters,
+  ListingSortField,
+  SortDirection,
+  ListingPagination,
   ListingApiResponse,
-  ListingStatus 
+  ListingStatus
 } from '../types';
 
 interface UseListingsProps {
@@ -35,12 +36,13 @@ export const useListings = ({
   initialSort = { field: 'updatedAt', direction: 'desc' },
   initialPagination = { page: 1, perPage: 10 }
 }: UseListingsProps = {}) => {
+  const router = useRouter();
   // Initialize with initialListings if provided, otherwise empty array
   const [listings, setListings] = useState<Listing[]>(initialListings || []);
-  
+
   // Set loading to false if initialListings is provided with items
   const [loading, setLoading] = useState(initialListings?.length ? false : true);
-  
+
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ListingFilters>(initialFilters || {});
   const [sort, setSort] = useState<{
@@ -54,7 +56,7 @@ export const useListings = ({
     totalPages: Math.ceil((initialListings?.length || 0) / (initialPagination?.perPage || 10))
   });
   const [selected, setSelected] = useState<string[]>([]);
-  
+
   // Used to track active filters for UI components
   const [activeFilters, setActiveFilters] = useState<{
     categoryId?: string | null;
@@ -87,7 +89,7 @@ export const useListings = ({
       setLoading(false);
       return;
     }
-    
+
     // Only fetch from API if siteSlug is provided
     if (!siteSlug) return;
 
@@ -96,44 +98,44 @@ export const useListings = ({
 
     try {
       const queryParams = new URLSearchParams();
-      
+
       // Add pagination params
       queryParams.append('page', pagination.page.toString());
       queryParams.append('perPage', pagination.perPage.toString());
-      
+
       // Add sort params
       queryParams.append('sortField', sort.field);
       queryParams.append('sortDirection', sort.direction);
-      
+
       // Add filter params
       if (filters.search) {
         queryParams.append('search', filters.search);
       }
-      
+
       if (filters.status && filters.status.length > 0) {
         filters.status.forEach(status => {
           queryParams.append('status', status);
         });
       }
-      
+
       if (filters.categoryIds && filters.categoryIds.length > 0) {
         filters.categoryIds.forEach(categoryId => {
           queryParams.append('categoryId', categoryId);
         });
       }
-      
+
       if (filters.featured !== undefined) {
         queryParams.append('featured', filters.featured.toString());
       }
-      
+
       if (filters.fromDate) {
         queryParams.append('fromDate', filters.fromDate);
       }
-      
+
       if (filters.toDate) {
         queryParams.append('toDate', filters.toDate);
       }
-      
+
       if (filters.userId) {
         queryParams.append('userId', filters.userId);
       }
@@ -143,13 +145,13 @@ export const useListings = ({
       }
 
       const response = await fetch(`/api/sites/${siteSlug}/listings?${queryParams.toString()}`);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch listings: ${response.statusText}`);
       }
-      
+
       const data: ListingApiResponse = await response.json();
-      
+
       setListings(data.data);
       setPagination(data.pagination);
     } catch (err) {
@@ -169,7 +171,7 @@ export const useListings = ({
     if (initialListings?.length) {
       return;
     }
-    
+
     fetchListings();
   }, [fetchListings, initialListings]);
 
@@ -196,9 +198,9 @@ export const useListings = ({
   const setCategoryFilter = useCallback((categoryIds: string[]) => {
     setFilters(prev => ({ ...prev, categoryIds }));
     setPagination(prev => ({ ...prev, page: 1 }));
-    setActiveFilters(prev => ({ 
-      ...prev, 
-      categoryId: categoryIds.length > 0 ? categoryIds[0] : null 
+    setActiveFilters(prev => ({
+      ...prev,
+      categoryId: categoryIds.length > 0 ? categoryIds[0] : null
     }));
   }, []);
 
@@ -206,13 +208,23 @@ export const useListings = ({
    * Filter by a specific category
    */
   const filterByCategory = useCallback((categoryId: string) => {
-    setFilters(prev => ({ 
-      ...prev, 
-      categoryIds: categoryId ? [categoryId] : [] 
+    setFilters(prev => ({
+      ...prev,
+      categoryIds: categoryId ? [categoryId] : []
     }));
     setPagination(prev => ({ ...prev, page: 1 }));
     setActiveFilters(prev => ({ ...prev, categoryId }));
-  }, []);
+
+    // Update URL with category filter
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, category: categoryId },
+      },
+      undefined,
+      { shallow: true }
+    );
+  }, [router]);
 
   /**
    * Filter by a specific site
@@ -227,9 +239,9 @@ export const useListings = ({
    * Filter by status
    */
   const filterByStatus = useCallback((status: ListingStatus) => {
-    setFilters(prev => ({ 
-      ...prev, 
-      status: status ? [status] : [] 
+    setFilters(prev => ({
+      ...prev,
+      status: status ? [status] : []
     }));
     setPagination(prev => ({ ...prev, page: 1 }));
     setActiveFilters(prev => ({ ...prev, status: status ? [status] : null }));
@@ -317,7 +329,7 @@ export const useListings = ({
           direction: prev.direction === 'asc' ? 'desc' : 'asc'
         };
       }
-      
+
       // Otherwise, set the new field and direction (default to 'asc')
       return {
         field,
@@ -376,22 +388,22 @@ export const useListings = ({
    */
   const deleteListing = useCallback(async (id: string) => {
     if (!siteSlug) return false;
-    
+
     try {
       const response = await fetch(`/api/sites/${siteSlug}/listings/${id}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to delete listing: ${response.statusText}`);
       }
-      
+
       // Remove from selected list if it was selected
       setSelected(prev => prev.filter(item => item !== id));
-      
+
       // Refresh listings
       await fetchListings();
-      
+
       return true;
     } catch (err) {
       console.error('Error deleting listing:', err);
@@ -405,26 +417,26 @@ export const useListings = ({
    */
   const deleteSelected = useCallback(async () => {
     if (!siteSlug || selected.length === 0) return false;
-    
+
     try {
       let success = true;
-      
+
       for (const id of selected) {
         const response = await fetch(`/api/sites/${siteSlug}/listings/${id}`, {
           method: 'DELETE',
         });
-        
+
         if (!response.ok) {
           success = false;
         }
       }
-      
+
       // Clear selected list
       setSelected([]);
-      
+
       // Refresh listings
       await fetchListings();
-      
+
       return success;
     } catch (err) {
       console.error('Error deleting listings:', err);
@@ -461,11 +473,11 @@ export const useListings = ({
       if (savedFilters) {
         setFilters(JSON.parse(savedFilters));
       }
-      
+
       if (savedSorting) {
         setSort(JSON.parse(savedSorting));
       }
-      
+
       if (savedPagination) {
         const { page, perPage } = JSON.parse(savedPagination);
         setPagination(prev => ({ ...prev, page, perPage }));
