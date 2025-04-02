@@ -1,7 +1,7 @@
 export { withAuthentication } from './withAuthentication';
-export { 
-  withTenantAccess, 
-  withTenantContext 
+export {
+  withTenantAccess,
+  withTenantContext
 } from './withTenantAccess';
 export {
   withPermission,
@@ -10,6 +10,7 @@ export {
   withResourcePermission,
   withAuditedPermission
 } from './withPermission';
+export { withSitePermission } from './withSitePermission';
 export {
   withSecureTenantContext,
   withSecureTenantPermission,

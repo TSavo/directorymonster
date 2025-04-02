@@ -48,6 +48,10 @@ import {
   getRolesByTenant as getRolesByTenantOp
 } from './tenant-role-operations';
 
+import {
+  hasSitePermission as hasSitePermissionOp
+} from './site-permission';
+
 // Re-export constants and utility functions
 export * from './constants';
 export * from './utils';
@@ -84,6 +88,9 @@ export const getUsersWithGlobalRole = getUsersWithGlobalRoleOp;
 // Re-export tenant-specific operations
 export const getRolesByTenant = getRolesByTenantOp;
 
+// Re-export site permission operations
+export const hasSitePermission = hasSitePermissionOp;
+
 /**
  * RoleService class that provides a centralized interface to all role management operations
  */
@@ -112,6 +119,7 @@ export class RoleService {
   static hasGlobalPermission = hasGlobalPermissionOp;
   static hasGlobalRole = hasGlobalRoleOp;
   static hasGlobalPermissionAnyTenant = hasGlobalPermissionAnyTenantOp;
+  static hasSitePermission = hasSitePermissionOp;
 
   // Role deletion
   static getUsersWithRole = getUsersWithRoleOp;
