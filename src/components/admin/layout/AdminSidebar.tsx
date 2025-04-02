@@ -31,6 +31,7 @@ const navigation: NavigationItem[] = [
   { name: 'Categories', href: '/admin/categories', icon: FolderIcon },
   { name: 'Sites', href: '/admin/sites', icon: GlobeIcon },
   { name: 'Users', href: '/admin/users', icon: UsersIcon },
+  { name: 'Public Tenant', href: '/admin/public-tenant', icon: UsersIcon },
   { name: 'Analytics', href: '/admin/analytics', icon: ChartIcon },
   { name: 'Settings', href: '/admin/settings', icon: SettingsIcon },
 ];
@@ -89,7 +90,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
                   `}
                   aria-current={isActive ? 'page' : undefined}
                   onClick={isOpen ? closeSidebar : undefined}
-                  data-testid={`nav-${item.name.toLowerCase()}`}
+                  data-testid={`nav-${item.name.toLowerCase().replace(' ', '-')}`}
                 >
                   <item.icon 
                     className={`
