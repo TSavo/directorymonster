@@ -2,87 +2,80 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DomainStep } from '@/components/admin/sites/components/DomainStep';
 
-// Mock the DomainManager component that's used by DomainStep
-jest.mock('@/components/admin/sites/DomainManager', () => ({
-  DomainManager: ({ domains, onDomainsChange, errors }) => (
-    <div data-testid="domain-manager">
-      <div data-testid="domain-count">{domains.length}</div>
-      <div data-testid="domain-error">{errors?.domains}</div>
-      <button 
-        data-testid="add-domain-button" 
-        onClick={() => onDomainsChange([...domains, 'new-domain.com'])}
-      >
-        Add Domain
-      </button>
-    </div>
-  )
-}));
-
 describe('DomainStep Component - Basic Rendering', () => {
   // Mock props
-  const mockValues = {
-    domains: ['example.com', 'test.org']
-  };
-  
+  const mockDomains = ['example.com', 'test.org'];
+
   // Mock functions
   const mockOnChange = jest.fn();
+  const mockOnAdd = jest.fn();
+  const mockOnRemove = jest.fn();
   const mockErrors = {};
-  
-  it('renders the DomainManager component', () => {
+
+  it('renders the DomainStep component', () => {
     render(
-      <DomainStep 
-        values={mockValues}
+      <DomainStep
+        domains={mockDomains}
         onChange={mockOnChange}
+        onAdd={mockOnAdd}
+        onRemove={mockOnRemove}
         errors={mockErrors}
       />
     );
-    
-    // Check if the DomainManager component is rendered
-    expect(screen.getByTestId('domain-manager')).toBeInTheDocument();
+
+    // Check if the component is rendered with the correct heading
+    expect(screen.getByTestId('domainStep-heading')).toBeInTheDocument();
   });
 
-  it('passes domains from values to DomainManager', () => {
+  it('displays domains list correctly', () => {
     render(
-      <DomainStep 
-        values={mockValues}
+      <DomainStep
+        domains={mockDomains}
         onChange={mockOnChange}
+        onAdd={mockOnAdd}
+        onRemove={mockOnRemove}
         errors={mockErrors}
       />
     );
-    
-    // Check if domains are passed to DomainManager
-    expect(screen.getByTestId('domain-count')).toHaveTextContent('2');
+
+    // Check if domains are displayed
+    expect(screen.getByTestId('domainStep-domain-0')).toHaveTextContent('example.com');
+    expect(screen.getByTestId('domainStep-domain-1')).toHaveTextContent('test.org');
   });
 
   it('displays section heading and description', () => {
     render(
-      <DomainStep 
-        values={mockValues}
+      <DomainStep
+        domains={mockDomains}
         onChange={mockOnChange}
+        onAdd={mockOnAdd}
+        onRemove={mockOnRemove}
         errors={mockErrors}
       />
     );
-    
+
     // Check if heading and description are rendered
-    expect(screen.getByTestId('domain-step-heading')).toBeInTheDocument();
-    expect(screen.getByTestId('domain-step-heading')).toHaveTextContent(/domains|domain management/i);
-    expect(screen.getByTestId('domain-step-description')).toBeInTheDocument();
+    expect(screen.getByTestId('domainStep-heading')).toBeInTheDocument();
+    expect(screen.getByTestId('domainStep-heading')).toHaveTextContent(/domains|domain management/i);
+    expect(screen.getByTestId('domainStep-description')).toBeInTheDocument();
   });
 
-  it('passes errors to DomainManager when provided', () => {
+  it('displays domain error when provided', () => {
     const mockErrorsWithDomains = {
       domains: 'At least one domain is required'
     };
-    
+
     render(
-      <DomainStep 
-        values={mockValues}
+      <DomainStep
+        domains={mockDomains}
         onChange={mockOnChange}
+        onAdd={mockOnAdd}
+        onRemove={mockOnRemove}
         errors={mockErrorsWithDomains}
       />
     );
-    
-    // Check if error is passed to DomainManager
-    expect(screen.getByTestId('domain-error')).toHaveTextContent('At least one domain is required');
+
+    // Check if error is displayed
+    expect(screen.getByTestId('domainStep-domains-error')).toHaveTextContent('At least one domain is required');
   });
 });
