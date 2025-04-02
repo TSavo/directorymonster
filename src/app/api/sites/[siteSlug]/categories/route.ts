@@ -5,6 +5,7 @@ import { withRedis } from '@/middleware/withRedis';
 
 export const GET = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string } }) => {
   const siteSlug = params.siteSlug;
+  console.log(`Looking for site with slug: ${siteSlug}`);
 
   // Determine if we're in test mode
   const isTestMode = process.env.NODE_ENV === 'test';
@@ -12,6 +13,7 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
 
   // Get site by slug
   const site = await kv.get<SiteConfig>(`${keyPrefix}site:slug:${siteSlug}`);
+  console.log('Site found:', site);
 
   if (!site) {
     return NextResponse.json(
@@ -22,22 +24,52 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
 
   try {
     // Get all categories for this site
-    const categoryKeys = await kv.keys(`${keyPrefix}category:site:${site.id}:*`);
-    const categoriesPromises = categoryKeys.map(async (key) => await kv.get<Category>(key));
+    console.log(`Looking for categories for site ID: ${site.id}`);
 
-    // Handle each promise individually to prevent one failure from breaking everything
-    const categories: Category[] = [];
-    for (let i = 0; i < categoriesPromises.length; i++) {
-      try {
-        const category = await categoriesPromises[i];
-        if (category) {
-          categories.push(category);
-        }
-      } catch (error) {
-        console.error(`Error fetching category at index ${i}:`, error);
-        // Continue with other categories
+    // First try to get categories from the site categories index
+    const categoryIds = await kv.smembers(`${keyPrefix}site:${site.id}:categories`);
+    console.log(`Found ${categoryIds.length} category IDs in index:`, categoryIds);
+
+    let categories: Category[] = [];
+
+    if (categoryIds.length > 0) {
+      // Get categories by ID
+      const categoriesPromises = categoryIds.map(async (id) => await kv.get<Category>(`${keyPrefix}category:id:${id}`));
+
+      // Resolve all promises
+      const resolvedCategories = await Promise.all(categoriesPromises);
+      categories = resolvedCategories.filter(Boolean) as Category[];
+    }
+
+    // If no categories found via index, try pattern matching
+    if (categories.length === 0) {
+      // Fallback: try to get categories by pattern matching
+      const categoryKeys = await kv.keys(`${keyPrefix}category:site:${site.id}:*`);
+      console.log(`Fallback: Found ${categoryKeys.length} category keys by pattern:`, categoryKeys);
+
+      if (categoryKeys.length > 0) {
+        const categoriesPromises = categoryKeys.map(async (key) => await kv.get<Category>(key));
+        const resolvedCategories = await Promise.all(categoriesPromises);
+        categories = resolvedCategories.filter(Boolean) as Category[];
       }
     }
+
+    // If still no categories, try to get all categories and filter by siteId
+    if (categories.length === 0) {
+      console.log('No categories found via index or pattern matching, trying to get all categories');
+      const allCategoryKeys = await kv.keys(`${keyPrefix}category:id:*`);
+      console.log(`Found ${allCategoryKeys.length} total category keys`);
+
+      if (allCategoryKeys.length > 0) {
+        const allCategoriesPromises = allCategoryKeys.map(async (key) => await kv.get<Category>(key));
+        const allCategories = await Promise.all(allCategoriesPromises);
+        categories = allCategories
+          .filter(Boolean)
+          .filter(category => category?.siteId === site.id) as Category[];
+      }
+    }
+
+    console.log(`Retrieved ${categories.length} categories for site ${site.id}:`, categories);
 
     return NextResponse.json(categories);
   } catch (error) {
