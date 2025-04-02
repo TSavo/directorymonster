@@ -4,8 +4,10 @@ import { AdminSidebar } from '@/components/admin/layout';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => {
+  const usePathnameMock = jest.fn();
+  usePathnameMock.mockReturnValue('/admin/listings');
   return {
-    usePathname: jest.fn().mockReturnValue('/admin/listings')
+    usePathname: usePathnameMock
   };
 });
 
