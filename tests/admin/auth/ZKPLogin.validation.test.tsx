@@ -4,6 +4,32 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { ZKPLogin } from '@/components/admin/auth';
 
+// Mock TextEncoder and crypto.subtle for Jest environment
+global.TextEncoder = class TextEncoder {
+  encode(text: string): Uint8Array {
+    return new Uint8Array(Buffer.from(text));
+  }
+};
+
+// Mock the generateProof function to avoid crypto.subtle issues
+jest.mock('@/lib/zkp', () => ({
+  generateProof: jest.fn().mockImplementation(() => {
+    return Promise.resolve({
+      proof: {
+        pi_a: ['mock_proof_a', '2', '3'],
+        pi_b: [['4', '5'], ['6', '7'], ['8', '9']],
+        pi_c: ['mock_proof_c', '11', '12'],
+        protocol: 'groth16'
+      },
+      publicSignals: ['mock_public_signal_1', 'mock_public_signal_2']
+    });
+  }),
+  generatePublicKey: jest.fn().mockImplementation(() => {
+    return Promise.resolve('mock_public_key');
+  }),
+  generateSalt: jest.fn().mockReturnValue('mock-salt')
+}));
+
 // Mock the Next.js router
 const mockRouter = {
   push: jest.fn(),
@@ -15,7 +41,13 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock fetch for API calls
-global.fetch = jest.fn();
+global.fetch = jest.fn().mockImplementation(() =>
+  Promise.resolve({
+    ok: false,
+    status: 401,
+    json: () => Promise.resolve({ error: 'Invalid credentials' }),
+  })
+);
 
 describe('ZKPLogin Validation Tests', () => {
   beforeEach(() => {
