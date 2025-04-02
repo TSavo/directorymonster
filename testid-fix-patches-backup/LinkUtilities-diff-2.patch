@@ -1,0 +1,16 @@
+# Patch for src/components/LinkUtilities.tsx
+
+--- a/src/components/LinkUtilities.tsx
++++ b/src/components/LinkUtilities.tsx
+@@ -25,7 +25,8 @@ function ListingLinkWithCategory({ categorySlug, listingSlug, className, children, ...p
+   return (
+     <Link 
+-      href={generateListingHref(categorySlug, listingSlug)}
++      href={generateListingHref(categorySlug, listingSlug)}
+       className={className}
+-      {...props}
++      data-testid={{ prop[data-testid] }}
++      className={className}
++      {...props without {data-testid}}
+    >
+      {children}

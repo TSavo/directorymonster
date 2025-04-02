@@ -1,0 +1,59 @@
+# Patch for src/componentsSitesTablePagination.tsx
+
+--- a/src/componentsSitesTablePagination.tsx
++++ b/src/componentsSitesTablePagination.tsx
+@@ -15,7 +15,7 @@
+       className="px-3 py-1 rounded ${
+         currentPage <= 1
+           ? 'text-gray-400 cursor-not-allowed'
+-          : 'text-blue-600 hover:bg-blue-50'
++          : 'text-blue-600 hover:bg-blue-50 data-testid="previous-page-button"'
+       }"
+     >
+       &laquo;
+@@ -23,13 +23,14 @@
+       {currentPage === page ? 'bg-blue-600 text-white' : 'text-blue-600 hover:bg-blue-50'}}
+         <button
+           key={page}
+           onClick={() => onPageChange(page)}
+           className={`px-3 py-1 rounded ${
+             currentPage === page
+               ? 'bg-blue-600 text-white'
++              : 'text-blue-600 hover:bg-blue-50 data-testid="current-page-button"'
++          }`}
+           aria-label={`Page ${page}`}
+           aria-current={currentPage === page ? 'page' : undefined}
+           data-testid={`page-button-${page}`}
+         >
+           {page}
+         </button>
+       </button>
+@@ -39,7 +40,7 @@
+             currentPage >= totalPages
+               ? 'text-gray-400 cursor-not-allowed'
+               : 'text-blue-600 hover:bg-blue-50'
+         }`}
+         aria-label="Next page"
+         data-testid="next-page-button"
+       >
+         &raquo;
+@@ -13,7 +13,8 @@
+           className="border rounded p-1 text-gray-600"
+           data-testid="page-size-select"
+         >
+-          <option value="5">5</option>
++          <option value="5" data-testid="select-page-size-5">
++            5
++          </option>
+         <option value="10">10</option>
+         <option value="25">25</option>
+         <option value="50">50</option>
+@@ -39,7 +40,7 @@
+           aria-label="Next page"
+           data-testid="next-page-button"
+         >
+-          &raquo;
++            &raquo; data-testid="select-next-page-button"
+         </button>
+       </div>
+     </div>

@@ -1,0 +1,14 @@
+# Patch for src/components/admin/auth/ZKPLoginComponent.tsx
+
+--- a/src/components/admin/auth/ZKPLoginComponent.tsx
++++ b/src/components/admin/auth/ZKPLoginComponent.tsx
+@@ -153,6 +153,9 @@ function ZKPLoginComponent() {
+       <div className="login-info" data-testid="login-info">
+         <div>
+           <h2 className="title">Authentication Status</h2>
++          <div>Username: {user?.username}</div>
++          <div>Role: {user?.role}</div>
++          <div>Auth Status: {authStatus ? 'success' : 'error'}</div>
+           <p className="subtitle"></p>
+         </div>
+       </div>

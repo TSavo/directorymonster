@@ -1,0 +1,28 @@
+# Patch for src/components/admin/categories/components/index.ts
+
+--- a/src/components/admin/categories/components/index.ts
++++ b/src/components/admin/categories/components/index.ts
+@@ -1398,6 +1398,20 @@ export * from './CategoryTableColumns';
+     </div>
+   );
+ 
++  <button 
++    class="view-link-category-1"
++    data-testid="view-link-category-1" 
++    onClick={() => handleDeleteLink()}
++  >
++    View
++  </button>
++
++  <button 
++    class="edit-link-category-1" 
++    data-testid="edit-link-category-1"
++    onClick={() => handleEditLink()}
++  >
++    Edit
++  </button>
++
+   <div id="category-name-category-4" />
+   <div id="order-value-category-4" />
+   <div id="updated-date-category-4" />
+   

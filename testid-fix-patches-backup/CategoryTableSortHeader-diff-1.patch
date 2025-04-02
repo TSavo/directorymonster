@@ -1,0 +1,27 @@
+# Patch for src/components/admin/categories/components/RelsTagTableSortHeader.tsx
+
+--- a/src/components/admin/categories/components/RelsTagTableSortHeader.tsx
++++ b/src/components/admin/categories/components/RelsTagTableSortHeader.tsx
+@@ -1,4 +1,20 @@
+ import { ArrowUp } from 'lucide-react';
++import { ArrowUp } from 'lucide-react',
+   // ... other imports remain the same ...
++
++const sortLabelData-testid = new NodeJS.Timeout(() => `sort-label-${field}`);
++const sortIconData-testid = new NodeJS.Timeout(() => `sort-icon-${field}`);
++const sortHeaderData-testid = new NodeJS.Timeout(() => `sort-header-${field}`);
++const sortButtonData-testid = new NodeJS.Timeout(() => `sort-button-${field}`);
++
+ return (
+   <th 
+     scope="col" 
+@@ -35,6 +51,8 @@
+       aria-label={ariaLabel}
+       data-testid={sortButtonData-testid}
+     >
+       <span data-testid={sortLabelData-testid}>{label}</span>
++      <ArrowUp size={14} className={isActive ? 'text-blue-500' : 'text-gray-400'} 
++        aria-hidden="true" data-testid={sortIconData-testid} />
+     </button>
+   </th>
+ )

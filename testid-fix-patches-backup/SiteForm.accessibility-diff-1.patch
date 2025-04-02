@@ -1,0 +1,31 @@
+# Patch for src/components/SiteForm.tsx
+
+--- a/src/components/SiteForm.tsx
++++ b/src/components/SiteForm.tsx
+@@ -62,7 +62,7 @@ const SiteForm = ({ mode, activeStep, site }) => {
+         <StepNavigation
+           steps={STEPS}
+           activeStep={activeStep}
+           completedSteps={completedSteps}
+@@ -80,13 +80,19 @@ const SiteForm = ({ mode, activeStep, site }) => {
+       {activeStep === 'preview' && (
+         <SiteFormPreview siteData={site} />
+       )}
+     </div>
+ 
+     {/* Form Actions */}
+     <FormActions
+       isFirstStep={isFirstStep}
+       isLastStep={isLastStep}
+-      isLoading={isLoading}
++      isLoading={isLoading}
++      data-testid="siteForm-submit"
++      onPrevious={handlePrevious}
++      onNext={handleNext}
++      onCancel={onCancel || (() => router.back())}
++      data-testid="siteForm-cancel"
++      mode={mode}
+     />
+   </form>
+ 
+   {/* Error message */}

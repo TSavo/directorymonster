@@ -1,0 +1,12 @@
+# Patch for src/components/create-item.tsx
+
+--- a/src/components/create-item.tsx
++++ b/src/components/create-item.tsx
+@@ -14,5 +14,5 @@ function CreateItem() {
+         createNewItem
+       />
+-      <button onClick={createNewItem}>
++      <button onClick={createNewItem} data-testid="site-table-create-button">
+         Add New Item
+       </button>
+     </div>

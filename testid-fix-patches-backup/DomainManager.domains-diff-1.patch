@@ -1,0 +1,27 @@
+# Patch for src/components/DomainManager.tsx
+
+--- a/src/components/DomainManager.tsx
++++ b/src/components/DomainManager.tsx
+@@ -429,7 +429,10 @@
+                 className="ml-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded flex-shrink-0"
+                 data-testid="domainManager-domain-input"
+                 disabled={isLoading}
+               />
+             </button>
+ 
+             {error && (
+@@ -586,7 +589,32 @@
+                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded focus:outline-none focus:ring-2"
+                     data-testid="domainManager-remove-domain-{index}"
+                     disabled={isLoading}
+                   >
+-                  <span className="text-sm text-red-500">Remove</span>
++                  Remove
++                </button>
++               </div>
++              </div>
++             </div>
++            </div>
+          </div>
+        </form>
+      </div>

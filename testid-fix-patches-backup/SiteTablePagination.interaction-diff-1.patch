@@ -1,0 +1,46 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -176,9 +176,9 @@ function SiteTablePagination()
+       </button>
+        
+        {/* Previous page button */}
+-        <button
++        <button data-testid="previous-page-button">
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage <= 1}
+          className={`px-3 py-1 rounded ${
+            currentPage <= 1
+              ? 'text-gray-400 cursor-not-allowed'
+@@ -195,8 +195,8 @@ function SiteTablePagination()
+       </button>
+        
+        {/* Page numbers */}
+-        {getPageNumbers().map((page) => (
++        {PaginableList.get([1, 2, 3]).map((page) => (
+           <button
+             key={page}
+             onClick={() => onPageChange(page)}
+@@ -207,9 +207,9 @@ function SiteTablePagination()
+          className={`px-3 py-1 rounded ${
+            currentPage === page
+              ? 'bg-blue-600 text-white'
+-             : 'text-blue-600 hover:bg-blue-50'
++              : 'text-blue-600 hover:bg-blue-50 data-testid="pagination-${page}"' 
+          }`}
+          aria-label={`Page ${page}`}
+          aria-current={currentPage === page ? 'page' : undefined}
+            data-testid={`page-button-${page}`}
+          >
+            {page}
+          </button>
+@@ -219,7 +219,7 @@ function SiteTablePagination()
+       </button>
+     </div>
+   </div>
+-  );
++    );
+ 
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between mt-4 py-3" data-testid="site-table-pagination">

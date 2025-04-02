@@ -1,0 +1,52 @@
+# Patch for src/components/example/DomainStep.tsx
+
+--- a/src/components/example/DomainStep.tsx
++++ b/src/components/example/DomainStep.tsx
+@@ -126,6 +126,8 @@ export default DomainStep;
+         </button>
+       </div>
+ 
++        <div className="flex items-center" data-testid="domainStep-domain-input">
+           <input
+             type="text"
+             id="domainStep-domain-input"
+@@ -150,7 +152,9 @@ export default DomainStep;
+           className={`ml-2 px-4 py-2 border rounded flex-shrink-0 ${errors.newDomain ? 'border-red-500' : 'border-gray-300'}`}
+           aria-invalid={errors.newDomain ? "true" : "false"}
+           aria-describedby={errors.newDomain ? "domainStep-domain-input-error" : undefined}
+            data-testid="domainStep-add-domain"
+           disabled={isLoading || !newDomain.trim()}
+         >
+@@ -164,6 +168,7 @@ export default DomainStep;
+        </div>
+ 
+        {errors.newDomain && (
+          <p
+            className="mt-1 text-sm text-red-500"
+            role="alert"
+            data-testid="domainStep-domain-input-error"
+@@ -234,9 +239,13 @@ export default DomainStep;
+           </li>
+         )
+       )}
+ 
++      <ul className="mb-4 border rounded divide-y">
+         {domains.map((domain, index) => (
+           <li key={domain} className="flex justify-between items-center p-2 hover:bg-gray-50">
+             <span data-testid={`domainStep-domain-${index}`}>
+               {domain}
+@@ -269,7 +278,9 @@ export default DomainStep;
+         </p>
+       )
+     </div>
+ 
++    <ul className="mb-4 border rounded divide-y">
+      {domains.length === 0 ? (
+        <p className="text-gray-500 italic">No domains added yet</p>
+      ) : (
+@@ -276,13 +287,15 @@ export default DomainStep;
+         )}
+ 
+       <div className="mb-4">
++        <div data-testid="domain-step-domain-input">
+          <h3 className="text-md font-medium mb-2">Current Domains</h3>

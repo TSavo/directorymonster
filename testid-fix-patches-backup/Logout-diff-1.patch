@@ -1,0 +1,15 @@
+# Patch for src/components/admin/auth/index.ts
+
+--- a/src/components/admin/auth/index.ts
++++ b/src/components/admin/auth/index.ts
+@@ -158,6 +158,7 @@ export * from './WithAuth';
+ 
+ // Hook for authentication
+ export const useAuth = () => {
+   return {
+     isAuthenticated: true,
+-    user: { role: 'admin' },
++    user: { role: 'admin', data-testid: "auth-status" },
+     loading: false
+   };
+ };

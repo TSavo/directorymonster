@@ -48,26 +48,35 @@ export const SEOStep: React.FC<SEOStepProps> = ({
   };
 
   return (
-    <SEOSettings
-      initialData={{
-        id: values.id || '',
-        seoTitle: values.seoTitle,
-        seoDescription: values.seoDescription,
-        seoKeywords: values.seoKeywords,
-        ogTitle: values.ogTitle,
-        ogDescription: values.ogDescription,
-        ogImage: values.ogImage,
-        twitterCard: values.twitterCard,
-        twitterSite: values.twitterSite,
-        enableCanonicalUrls: values.enableCanonicalUrls,
-        noindexPages: values.noindexPages,
-        structuredData: values.structuredData,
-        robotsTxt: values.robotsTxt
-      }}
-      onSuccess={handleSEOChange}
-      // In the multi-step form, we'll handle submission in the parent component
-      apiEndpoint={undefined} // Prevent direct API submission
-    />
+    <div>
+      <h2 className="text-lg font-semibold mb-4" data-testid="seo-step-heading">
+        Search Engine Optimization
+      </h2>
+      <p className="text-gray-600 mb-4" data-testid="seo-step-description">
+        Configure SEO settings to improve visibility in search results
+      </p>
+
+      <SEOSettings
+        initialData={{
+          id: values.id || '',
+          seoTitle: values.seoTitle,
+          seoDescription: values.seoDescription,
+          seoKeywords: values.seoKeywords,
+          ogTitle: values.ogTitle,
+          ogDescription: values.ogDescription,
+          ogImage: values.ogImage,
+          twitterCard: values.twitterCard,
+          twitterSite: values.twitterSite,
+          enableCanonicalUrls: values.enableCanonicalUrls,
+          noindexPages: values.noindexPages,
+          structuredData: values.structuredData,
+          robotsTxt: values.robotsTxt
+        }}
+        onSuccess={handleSEOChange}
+        // In the multi-step form, we'll handle submission in the parent component
+        apiEndpoint={undefined} // Prevent direct API submission
+      />
+    </div>
   );
 };
 

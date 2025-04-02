@@ -1,0 +1,23 @@
+# Patch for src/components/admin/sites/components/SEOStep.tsx
+
+--- a/src/components/admin/sites/components/SEOStep.tsx
++++ b/src/components/admin/sites/components/SEOStep.tsx
+@@ -20,6 +20,8 @@ interface SEOStepProps {
+   const handleSEOChange = (data: any) => {
+     onSEOChange(data);
+   };
+ 
+   return (
+     <SEOSettings
+@@ -35,6 +37,14 @@ export const SEOStep: React.FC<SEOStepProps> = ({
+       enableCanonicalUrls: values.enableCanonicalUrls,
+       noindexPages: values.noindexPages,
+       structuredData: values.structuredData,
++      metaTitle: values.seoTitle,
++      metaDescription: values.seoDescription
++    />
++    
++  )}
+
+  export default SEOStep;
+}

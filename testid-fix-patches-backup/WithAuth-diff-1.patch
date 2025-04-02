@@ -1,0 +1,12 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -15,7 +15,8 @@ function Example() {
+     return (
+       <div>
+-        <button onClick={handleClick}>
++        {data-testid !== 'example-button' && <button onClick={handleClick} data-testid="example-button">}
+         Click me
+       </button>
+     </div>

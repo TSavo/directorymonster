@@ -5,7 +5,7 @@ import { StepNavigation } from '@/components/admin/sites/components/StepNavigati
 
 // Mock step definitions
 const mockSteps = [
-  { id: 'basic-info', label: 'Basic Info' },
+  { id: 'basic_info', label: 'Basic Info' },
   { id: 'domains', label: 'Domains' },
   { id: 'theme', label: 'Theme' },
   { id: 'seo', label: 'SEO' }
@@ -21,13 +21,13 @@ describe('StepNavigation Component - Interaction', () => {
     render(
       <StepNavigation 
         steps={mockSteps} 
-        currentStep="basic-info" 
-        completedSteps={[]} 
+        activeStep="basic_info" 
+        completedSteps={['domains']} 
         onStepChange={mockOnStepChange} 
       />
     );
     
-    // Click on a different step
+    // Click on a completed step
     const domainsStepButton = screen.getByTestId('step-button-domains');
     await user.click(domainsStepButton);
     
@@ -42,10 +42,9 @@ describe('StepNavigation Component - Interaction', () => {
     render(
       <StepNavigation 
         steps={mockSteps} 
-        currentStep="basic-info" 
+        activeStep="basic_info" 
         completedSteps={[]} 
         onStepChange={mockOnStepChange}
-        disabledSteps={['theme', 'seo']} 
       />
     );
     
@@ -63,18 +62,18 @@ describe('StepNavigation Component - Interaction', () => {
     render(
       <StepNavigation 
         steps={mockSteps} 
-        currentStep="domains" 
-        completedSteps={['basic-info']} 
+        activeStep="domains" 
+        completedSteps={['basic_info']} 
         onStepChange={mockOnStepChange} 
       />
     );
     
     // Click on a completed step
-    const basicInfoStepButton = screen.getByTestId('step-button-basic-info');
+    const basicInfoStepButton = screen.getByTestId('step-button-basic_info');
     await user.click(basicInfoStepButton);
     
     // Verify callback was called
     expect(mockOnStepChange).toHaveBeenCalledTimes(1);
-    expect(mockOnStepChange).toHaveBeenCalledWith('basic-info');
+    expect(mockOnStepChange).toHaveBeenCalledWith('basic_info');
   });
 });

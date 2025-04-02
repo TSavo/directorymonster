@@ -1,253 +1,225 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
-import { useSites } from './hooks';
+import { SiteFormProvider, useSiteForm } from './context/SiteFormContext';
 import {
   BasicInfoStep,
   DomainStep,
   ThemeStep,
   SEOStep,
   SiteFormPreview,
-  StepNavigation,
-  FormActions
 } from './components';
 
-/**
- * SiteForm - Form for creating and editing site configurations
- *
- * A modular multi-step form component for creating and editing Site data.
- *
- * Features:
- * - Multi-step form with step navigation
- * - Form validation with error messages
- * - API integration for submission
- * - Loading states and error handling
- * - Accessibility support with ARIA attributes
- * - Keyboard navigation
- * - Preview mode for reviewing before submission
- */
-export interface SiteFormProps {
-  /**
-   * Initial data for editing an existing item
-   */
-  initialData?: {
-    id?: string;
-    name?: string;
-    slug?: string;
-    description?: string;
-    domains?: string[];
-    theme?: string;
-    customStyles?: string;
-    seoTitle?: string;
-    seoDescription?: string;
-    seoKeywords?: string;
-    enableCanonicalUrls?: boolean;
-    [key: string]: any;
+// Define the steps for the form
+const STEPS = [
+  { id: 'basic_info', label: 'Basic Information', component: BasicInfoStep, testId: 'basic-info-step' },
+  { id: 'domains', label: 'Domains', component: DomainStep, testId: 'domains-step' },
+  { id: 'theme', label: 'Appearance', component: ThemeStep, testId: 'theme-step' },
+  { id: 'seo', label: 'SEO', component: SEOStep, testId: 'seo-step' },
+  { id: 'preview', label: 'Preview', component: SiteFormPreview, testId: 'preview-step' }
+];
+
+// Step Navigation Component
+const StepNavigation: React.FC<{
+  steps: typeof STEPS;
+  activeStep: string;
+  completedSteps: string[];
+  onStepChange: (stepId: string) => void;
+}> = ({ steps, activeStep, completedSteps, onStepChange }) => {
+  return (
+    <nav className="mb-6" aria-label="Form Steps" data-testid="step-navigation">
+      <ol className="flex flex-wrap border-b border-gray-200">
+        {steps.map((step) => {
+          const isActive = activeStep === step.id;
+          const isCompleted = completedSteps.includes(step.id);
+          const isDisabled = !isActive && !isCompleted;
+
+          return (
+            <li key={step.id} className="relative flex-grow px-2 text-center" data-testid={`step-item-${step.id}`}>
+              <button
+                type="button"
+                onClick={() => onStepChange(step.id)}
+                disabled={isDisabled}
+                aria-current={isActive ? 'step' : undefined}
+                className={`
+                  py-3 w-full text-sm font-medium
+                  ${isActive ? 'text-blue-600 border-b-2 border-blue-600' : ''}
+                  ${isCompleted && !isActive ? 'text-gray-700 hover:text-blue-500' : ''}
+                  ${isDisabled ? 'text-gray-400' : ''}
+                `}
+                data-testid={`step-button-${step.id}`}
+              >
+                <span className="inline-flex items-center justify-center mr-2 w-5 h-5 rounded-full text-xs">
+                  {isCompleted ? (
+                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      />
+                    </svg>
+                  ) : (
+                    <span className={isActive ? 'text-blue-600' : 'text-gray-400'}>
+                      {steps.findIndex(s => s.id === step.id) + 1}
+                    </span>
+                  )}
+                </span>
+                {step.label}
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+};
+
+// Form Actions Component
+const FormActions: React.FC = () => {
+  const { state, goToStep, validateStep, markStepComplete, submitForm } = useSiteForm();
+  const { currentStep, isLoading, completedSteps, formData } = state;
+  const router = useRouter();
+
+  // Determine if we're on the first or last step
+  const currentStepIndex = STEPS.findIndex(step => step.id === currentStep);
+  const isFirstStep = currentStepIndex === 0;
+  const isLastStep = currentStepIndex === STEPS.length - 1;
+
+  // Handle next button click
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      // Mark current step as complete
+      markStepComplete(currentStep);
+
+      // Go to next step
+      if (currentStepIndex < STEPS.length - 1) {
+        goToStep(STEPS[currentStepIndex + 1].id);
+      }
+    }
   };
-  /**
-   * Mode for the form (create or edit)
-   */
+
+  // Handle previous button click
+  const handlePrevious = () => {
+    if (currentStepIndex > 0) {
+      goToStep(STEPS[currentStepIndex - 1].id);
+    }
+  };
+
+  // Handle cancel button click
+  const handleCancel = () => {
+    router.back();
+  };
+
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (isLastStep || process.env.NODE_ENV === 'test') {
+      submitForm();
+    }
+  };
+
+  return (
+    <div className="flex justify-between mt-8" data-testid="form-actions">
+      <div className="flex justify-start">
+        {!isFirstStep && (
+          <button
+            type="button"
+            onClick={handlePrevious}
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded focus:outline-none focus:ring-2"
+            data-testid="form-back-button"
+            disabled={isLoading}
+          >
+            ← Back
+          </button>
+        )}
+      </div>
+
+      <div className="flex justify-end space-x-3">
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded focus:outline-none focus:ring-2"
+          data-testid="cancel-button"
+          disabled={isLoading}
+        >
+          Cancel
+        </button>
+
+        {isLastStep ? (
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded focus:outline-none focus:ring-2 disabled:opacity-50"
+            data-testid="form-next-button"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span data-testid="submit-loading">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Loading...
+              </span>
+            ) : (
+              formData.id ? 'Update Site' : 'Create Site'
+            )}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleNext}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded focus:outline-none focus:ring-2 disabled:opacity-50"
+            data-testid="form-next-button"
+            disabled={isLoading}
+          >
+            Next →
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Main SiteForm Component
+export interface SiteFormProps {
+  initialData?: any;
   mode?: 'create' | 'edit';
-  /**
-   * Callback when form is canceled
-   */
   onCancel?: () => void;
-  /**
-   * Callback when form is submitted successfully
-   */
   onSuccess?: (data: any) => void;
-  /**
-   * API endpoint for form submission
-   */
   apiEndpoint?: string;
-  /**
-   * Initial step for the form (for testing)
-   */
   initialStep?: string;
 }
 
-// Define steps for the form
-const STEPS = [
-  { id: 'basic_info', label: 'Basic Information' },
-  { id: 'domains', label: 'Domains' },
-  { id: 'theme', label: 'Appearance' },
-  { id: 'seo', label: 'SEO' },
-  { id: 'preview', label: 'Preview' }
-];
-
 export const SiteForm: React.FC<SiteFormProps> = ({
-  initialData = {},
+  initialData,
   mode = 'create',
   onCancel,
   onSuccess,
-  apiEndpoint = '/api/sites',
+  apiEndpoint,
   initialStep
 }) => {
-  const router = useRouter();
-  const [activeStep, setActiveStep] = useState<string>(initialStep || STEPS[0].id);
-  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
-  const [newDomain, setNewDomain] = useState<string>('');
+  return (
+    <SiteFormProvider
+      initialData={initialData}
+      mode={mode}
+      apiEndpoint={apiEndpoint}
+      onSuccess={onSuccess}
+      initialStep={initialStep}
+    >
+      <SiteFormContent mode={mode} onCancel={onCancel} />
+    </SiteFormProvider>
+  );
+};
 
-  // Use the useSites hook for form management
-  const {
-    site,
-    updateSite,
-    createSite,
-    saveSite,
-    isLoading,
-    error,
-    success,
-    errors,
-    validateSite,
-    resetErrors
-  } = useSites({
-    initialData: {
-      id: initialData.id || '',
-      name: initialData.name || '',
-      slug: initialData.slug || '',
-      description: initialData.description || '',
-      domains: initialData.domains || [],
-      theme: initialData.theme || 'default',
-      customStyles: initialData.customStyles || '',
-      seoTitle: initialData.seoTitle || '',
-      seoDescription: initialData.seoDescription || '',
-      seoKeywords: initialData.seoKeywords || '',
-      enableCanonicalUrls: initialData.enableCanonicalUrls !== undefined ? initialData.enableCanonicalUrls : false
-    },
-    apiEndpoint
-  });
-
-  // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | string, valueOrEvent?: any) => {
-    // Handle both event objects and direct name/value pairs
-    let name: string;
-    let value: any;
-
-    if (typeof e === 'string') {
-      // Called with name, value pair
-      name = e;
-      value = valueOrEvent;
-    } else if (e && e.target) {
-      // Called with event object
-      name = e.target.name;
-      value = e.target.value;
-    } else {
-      // Invalid input
-      return;
-    }
-
-    if (name === 'newDomain') {
-      setNewDomain(value);
-    } else {
-      updateSite(name, value);
-    }
-  };
-
-  // Handle domain management
-  const addDomain = () => {
-    if (!newDomain.trim()) return;
-
-    // Validate domain format
-    const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](\.[a-zA-Z]{2,})+$/;
-    if (!domainRegex.test(newDomain)) {
-      // Set domain validation error manually
-      updateSite('errors', {
-        ...errors,
-        newDomain: 'Please enter a valid domain name'
-      });
-      return;
-    }
-
-    // Check if domain already exists
-    if (site.domains.includes(newDomain)) {
-      updateSite('errors', {
-        ...errors,
-        newDomain: 'This domain has already been added'
-      });
-      return;
-    }
-
-    // Add domain and clear input
-    const updatedDomains = [...site.domains, newDomain];
-    updateSite('domains', updatedDomains);
-    setNewDomain('');
-  };
-
-  const removeDomain = (domain: string) => {
-    const updatedDomains = site.domains.filter(d => d !== domain);
-    updateSite('domains', updatedDomains);
-  };
-
-  // Step navigation
-  const handleStepChange = (stepId: string) => {
-    // Only allow navigation to completed steps or the current step
-    if (stepId === activeStep || completedSteps.includes(stepId)) {
-      setActiveStep(stepId);
-    }
-  };
-
-  const handleNext = () => {
-    // Validate current step
-    if (validateSite(activeStep)) {
-      // Mark current step as completed
-      markStepAsCompleted(activeStep);
-
-      // Find the next step
-      const currentIndex = STEPS.findIndex(step => step.id === activeStep);
-      if (currentIndex < STEPS.length - 1) {
-        setActiveStep(STEPS[currentIndex + 1].id);
-      }
-    }
-  };
-
-  const handlePrevious = () => {
-    const currentIndex = STEPS.findIndex(step => step.id === activeStep);
-    if (currentIndex > 0) {
-      setActiveStep(STEPS[currentIndex - 1].id);
-    }
-  };
-
-  const markStepAsCompleted = (stepId: string) => {
-    if (!completedSteps.includes(stepId)) {
-      setCompletedSteps(prev => [...prev, stepId]);
-    }
-  };
-
-  // Form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // For testing purposes, we'll allow form submission even if not on the last step
-    // In production, we'd only allow submission on the last step
-    const isTest = process.env.NODE_ENV === 'test';
-
-    // Only proceed if we're on the last step or in a test environment
-    if (isLastStep || isTest) {
-      let result;
-      if (mode === 'edit' && site.id) {
-        result = await saveSite(site.id);
-      } else {
-        result = await createSite();
-      }
-
-      if (result.success) {
-        // Call success callback if provided
-        if (onSuccess) {
-          onSuccess(result.data);
-        }
-
-        // Redirect after successful submission
-        setTimeout(() => {
-          router.push(`/admin/sites/${result.data?.id || result.data?.slug || site.slug}`);
-        }, 1500);
-      }
-    }
-  };
-
-  // Determine if we're on the first or last step
-  const isFirstStep = activeStep === STEPS[0].id;
-  const isLastStep = activeStep === STEPS[STEPS.length - 1].id;
+// Separate component to use the context
+const SiteFormContent: React.FC<{
+  mode: 'create' | 'edit';
+  onCancel?: () => void;
+}> = ({ mode, onCancel }) => {
+  const { state, goToStep, submitForm } = useSiteForm();
+  const { currentStep, completedSteps, error, success } = state;
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded shadow" data-testid="site-form">
@@ -277,108 +249,38 @@ export const SiteForm: React.FC<SiteFormProps> = ({
           role="alert"
           data-testid="siteForm-success"
         >
-          {success}
+          {mode === 'edit' ? 'Site updated successfully' : 'Site created successfully'}
         </div>
       )}
 
       {/* Step Navigation */}
       <StepNavigation
         steps={STEPS}
-        activeStep={activeStep}
+        activeStep={currentStep}
         completedSteps={completedSteps}
-        onStepChange={handleStepChange}
-        isLoading={isLoading}
+        onStepChange={goToStep}
       />
 
       {/* Form */}
       <form
-        onSubmit={handleSubmit}
+        onSubmit={(e) => submitForm()}
         role="form"
         aria-labelledby="siteForm-header"
         data-testid="siteForm-form"
       >
         {/* Step Content */}
         <div className="mb-6" data-testid="step-content">
-          {activeStep === 'basic_info' && (
-            <BasicInfoStep
-              values={{
-                name: site.name,
-                slug: site.slug,
-                description: site.description || ''
-              }}
-              errors={{
-                name: errors.name,
-                slug: errors.slug,
-                description: errors.description
-              }}
-              onChange={handleChange}
-              isLoading={isLoading}
-            />
-          )}
-
-          {activeStep === 'domains' && (
-            <DomainStep
-              domains={site.domains}
-              newDomain={newDomain}
-              errors={{
-                domains: errors.domains,
-                newDomain: errors.newDomain
-              }}
-              onChange={handleChange}
-              onAdd={addDomain}
-              onRemove={removeDomain}
-              isLoading={isLoading}
-            />
-          )}
-
-          {activeStep === 'theme' && (
-            <ThemeStep
-              values={{
-                theme: site.theme,
-                customStyles: site.customStyles || ''
-              }}
-              errors={{
-                theme: errors.theme,
-                customStyles: errors.customStyles
-              }}
-              onChange={handleChange}
-              isLoading={isLoading}
-            />
-          )}
-
-          {activeStep === 'seo' && (
-            <SEOStep
-              values={{
-                seoTitle: site.seoTitle || '',
-                seoDescription: site.seoDescription || '',
-                seoKeywords: site.seoKeywords || '',
-                enableCanonicalUrls: site.enableCanonicalUrls || false
-              }}
-              errors={{
-                seoTitle: errors.seoTitle,
-                seoDescription: errors.seoDescription,
-                seoKeywords: errors.seoKeywords
-              }}
-              onChange={handleChange}
-              isLoading={isLoading}
-            />
-          )}
-
-          {activeStep === 'preview' && (
-            <SiteFormPreview siteData={site} />
-          )}
+          {STEPS.map((step) => (
+            currentStep === step.id && (
+              <div key={step.id} data-testid={step.testId}>
+                <step.component />
+              </div>
+            )
+          ))}
         </div>
 
         {/* Form Actions */}
-        <FormActions
-          isFirstStep={isFirstStep}
-          isLastStep={isLastStep}
-          isLoading={isLoading}
-          onPrevious={handlePrevious}
-          onNext={handleNext}
-          onCancel={onCancel || (() => router.back())}
-          mode={mode}
-        />
+        <FormActions />
       </form>
     </div>
   );

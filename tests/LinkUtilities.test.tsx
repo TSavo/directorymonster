@@ -7,10 +7,25 @@ import { CategoryLink, ListingLink, ListingLinkWithCategory } from '../src/compo
 import { Category, Listing } from '../src/types';
 import '@testing-library/jest-dom';
 
+// Mock the next/link component
+jest.mock('next/link', () => ({
+  __esModule: true,
+  default: ({ href, className, children, ...props }: any) => (
+    <a
+      href={href}
+      className={className}
+      data-testid="test-link"
+      {...props}
+    >
+      {children}
+    </a>
+  ),
+}));
+
 // Mock the site-utils module
 jest.mock('../src/lib/site-utils', () => ({
   generateCategoryHref: (slug: string) => `/mock-category/${slug}`,
-  generateListingHref: (categorySlug: string, listingSlug: string) => 
+  generateListingHref: (categorySlug: string, listingSlug: string) =>
     `/mock-category/${categorySlug}/mock-listing/${listingSlug}`,
 }));
 
@@ -52,25 +67,27 @@ describe('Link Utility Components', () => {
           Category Text
         </CategoryLink>
       );
-      
-      const link = screen.getByText('Category Text');
+
+      const link = screen.getByTestId('test-link');
       expect(link).toBeInTheDocument();
-      expect(link.closest('a')).toHaveAttribute('href', '/mock-category/test-category');
-      expect(link.closest('a')).toHaveClass('test-class');
+      expect(link).toHaveAttribute('href', '/mock-category/test-category');
+      expect(link).toHaveClass('test-class');
+      expect(link).toHaveTextContent('Category Text');
     });
-    
+
     it('works with minimal category object containing only slug', () => {
       render(
         <CategoryLink category={{ slug: 'minimal-slug' }}>
           Minimal Category
         </CategoryLink>
       );
-      
-      const link = screen.getByText('Minimal Category');
-      expect(link.closest('a')).toHaveAttribute('href', '/mock-category/minimal-slug');
+
+      const link = screen.getByTestId('test-link');
+      expect(link).toHaveAttribute('href', '/mock-category/minimal-slug');
+      expect(link).toHaveTextContent('Minimal Category');
     });
   });
-  
+
   describe('ListingLink', () => {
     it('renders with the correct href and children', () => {
       render(
@@ -78,71 +95,74 @@ describe('Link Utility Components', () => {
           Listing Text
         </ListingLink>
       );
-      
-      const link = screen.getByText('Listing Text');
+
+      const link = screen.getByTestId('test-link');
       expect(link).toBeInTheDocument();
-      expect(link.closest('a')).toHaveAttribute(
-        'href', 
+      expect(link).toHaveAttribute(
+        'href',
         '/mock-category/test-category/mock-listing/test-listing'
       );
-      expect(link.closest('a')).toHaveClass('test-class');
+      expect(link).toHaveClass('test-class');
+      expect(link).toHaveTextContent('Listing Text');
     });
-    
+
     it('falls back to categoryId when categorySlug is not available', () => {
       const listingWithoutSlug = { ...listing, categorySlug: undefined };
-      
+
       render(
         <ListingLink listing={listingWithoutSlug}>
           Fallback Listing
         </ListingLink>
       );
-      
-      const link = screen.getByText('Fallback Listing');
-      expect(link.closest('a')).toHaveAttribute(
-        'href', 
+
+      const link = screen.getByTestId('test-link');
+      expect(link).toHaveAttribute(
+        'href',
         '/mock-category/cat1/mock-listing/test-listing'
       );
+      expect(link).toHaveTextContent('Fallback Listing');
     });
   });
-  
+
   describe('ListingLinkWithCategory', () => {
     it('renders with the correct href and children', () => {
       render(
-        <ListingLinkWithCategory 
-          categorySlug="explicit-category" 
+        <ListingLinkWithCategory
+          categorySlug="explicit-category"
           listingSlug="explicit-listing"
           className="test-class"
         >
           Direct Link
         </ListingLinkWithCategory>
       );
-      
-      const link = screen.getByText('Direct Link');
+
+      const link = screen.getByTestId('test-link');
       expect(link).toBeInTheDocument();
-      expect(link.closest('a')).toHaveAttribute(
-        'href', 
+      expect(link).toHaveAttribute(
+        'href',
         '/mock-category/explicit-category/mock-listing/explicit-listing'
       );
-      expect(link.closest('a')).toHaveClass('test-class');
+      expect(link).toHaveClass('test-class');
+      expect(link).toHaveTextContent('Direct Link');
     });
   });
-  
+
   describe('Additional props forwarding', () => {
     it('forwards additional props to the underlying link', () => {
       render(
-        <CategoryLink 
-          category={category} 
-          data-testid="test-link"
+        <CategoryLink
+          category={category}
           aria-label="Test Link"
           target="_blank"
         >
           Props Test
         </CategoryLink>
       );
-      
+
       const link = screen.getByTestId('test-link');
       expect(link).toHaveAttribute('aria-label', 'Test Link');
       expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveTextContent('Props Test');
     });
   });
 });

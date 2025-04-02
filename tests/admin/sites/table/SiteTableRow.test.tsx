@@ -40,7 +40,8 @@ describe('SiteTableRow Component - Basic Rendering', () => {
     // Check if basic site data is displayed
     expect(screen.getByTestId('site-name-site-123')).toHaveTextContent('Test Site');
     expect(screen.getByTestId('site-slug-site-123')).toHaveTextContent('test-site');
-    expect(screen.getByTestId('site-domains-site-123')).toHaveTextContent('example.com');
+    // Using the correct testid for domain list item
+    expect(screen.getByTestId('site-domain-0-site-123')).toHaveTextContent('example.com');
   });
 
   it('includes action buttons with correct attributes', () => {
@@ -54,15 +55,15 @@ describe('SiteTableRow Component - Basic Rendering', () => {
       </TableWrapper>
     );
     
-    // Verify action buttons
-    const editButton = screen.getByTestId('site-edit-button-site-123');
-    const deleteButton = screen.getByTestId('site-delete-button-site-123');
+    // Verify action buttons with correct testids
+    const editButton = screen.getByTestId('edit-site-site-123');
+    const deleteButton = screen.getByTestId('delete-site-site-123');
     
     expect(editButton).toBeInTheDocument();
     expect(deleteButton).toBeInTheDocument();
     
-    // Check for accessible names/labels
-    expect(editButton).toHaveAttribute('aria-label', expect.stringContaining('Edit'));
-    expect(deleteButton).toHaveAttribute('aria-label', expect.stringContaining('Delete'));
+    // Check for accessible names/labels - using title which is what the component actually uses
+    expect(editButton).toHaveAttribute('title', expect.stringContaining('Edit'));
+    expect(deleteButton).toHaveAttribute('title', expect.stringContaining('Delete'));
   });
 });

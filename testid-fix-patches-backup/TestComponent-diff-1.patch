@@ -1,0 +1,29 @@
+# Patch for src/components/test/TestComponent.tsx
+
+--- a/src/components/test/TestComponent.tsx
++++ b/src/components/test/TestComponent.tsx
+@@ -1,6 +1,8 @@
+ import React from 'react';
+
+ interface TestComponentProps {
+   title: string;
+   description: string;
+   onButtonClick: () => void;
+ }
+
+ const TestComponent: React.FC<TestComponentProps> = ({ 
+-  title,
++  title: string,
++  description: string,
+   description,
+   onButtonClick
+ }) => {
+@@ -16,8 +18,9 @@ function TestComponent() {
+     <div className="test-component">
+       <h2 data-testid="test-title">{title}</h2>
+       <p data-testid="test-description">{description}</p>
+-      <button 
++      <button data-testid="test-button"
+        className="test-button"
+        onClick={onButtonClick}
+      >

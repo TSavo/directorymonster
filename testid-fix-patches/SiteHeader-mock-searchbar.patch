@@ -1,0 +1,23 @@
+# Patch for tests/SiteHeader.test.tsx
+
+--- a/tests/SiteHeader.test.tsx
++++ b/tests/SiteHeader.test.tsx
+@@ -49,6 +49,17 @@ jest.mock('../src/components/LinkUtilities', () => ({
+   ),
+ }));
+ 
++// Mock the SearchBar component to avoid Next.js router issues
++jest.mock('../src/components/search', () => ({
++  SearchBar: ({ siteId }: { siteId: string }) => (
++    <div 
++      data-testid="search-bar"
++      data-site-id={siteId}
++    >
++      Mocked Search Bar
++    </div>
++  ),
++}));
++
+ describe('SiteHeader Component', () => {
+   // Define test data
+   const mockSite: SiteConfig = {

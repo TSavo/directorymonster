@@ -1,0 +1,22 @@
+# Patch for src/components/category-table/category-table.tsx
+
+--- a/src/components/category-table/category-table.tsx
++++ b/src/components/category-table/category-table.tsx
+@@ -103,7 +103,8 @@ function CategoryTable() {
+       </tr>
+     </tbody>
+   </CategoryTableError>
+   
+-  <CategoriesMobileView
++  <CategoriesMobileView data-testid="categories-mobile">
+     categories={currentCategories}
+     showSiteColumn={showSiteColumn}
+@@ -256,6 +257,8 @@ function CategoryTable() {
+       onClose={handleCloseFormModal}
+       siteSlug={siteSlug || ''}
+       categoryId={selectedCategoryId}
++      data-testid="delete-button-category_1"
++      data-testid="confirm-delete-button"
+     onSaved={handleCategorySaved}
+     title={selectedCategoryId ? 'Edit Category' : 'Create New Category'}
+   </CategoryTable>

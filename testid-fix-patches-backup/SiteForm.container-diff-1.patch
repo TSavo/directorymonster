@@ -1,0 +1,34 @@
+# Patch for src/components/admin/sites/components/SiteForm.tsx
+
+--- a/src/components/admin/sites/components/SiteForm.tsx
++++ b/src/components/admin/sites/components/SiteForm.tsx
+@@ -128,6 +128,7 @@ function SiteForm({ mode, isFirstStep, isLastStep, onPrevious, onNext, onCancel, mod
+       {activeStep === 'basic_info' && (
+         <div className="mb-6" data-testid="step-content">
+           <BasicInfoStep
+@@ -135,6 +136,7 @@ function SiteForm({ mode, isFirstStep, isLastStep, onPrevious, onNext, onCancel, mod
+       {activeStep === 'domains' && (
+         <div className="mb-6" data-testid="step-content">
+           <DomainStep
+@@ -142,6 +144,7 @@ function SiteForm({ mode, isFirstStep, isLastStep, onPrevious, onNext, onCancel, mod
+       {activeStep === 'theme' && (
+         <div className="mb-6" data-testid="step-content">
+           <ThemeStep
+@@ -149,6 +152,7 @@ function SiteForm({ mode, isFirstStep, isLastStep, onPrevious, onNext, onCancel, mod
+       {activeStep === 'seo' && (
+         <div className="mb-6" data-testid="step-content">
+           <SEOStep
+@@ -156,6 +160,7 @@ function SiteForm({ mode, isFirstStep, isLastStep, onPrevious, onNext, onCancel, mod
+       {activeStep === 'preview' && (
+         <div className="mb-6" data-testid="step-content">
+           <SiteFormPreview siteData={site} />
+@@ -184,7 +188,7 @@ function SiteForm({ mode, isFirstStep, isLastStep, onPrevious, onNext, onCancel, mod
+        {/* Form Actions */}
+        <FormActions
+          isFirstStep={isFirstStep}
+          isLastStep={isLastStep}
+-          isLoading={isLoading}
++          isLoading={isLoading}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          onCancel={onCancel || (() => router.back())}

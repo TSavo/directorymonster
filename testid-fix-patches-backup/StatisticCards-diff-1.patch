@@ -1,0 +1,27 @@
+# Patch for src/components/StatisticCards.tsx
+
+--- a/src/components/StatisticCards.tsx
++++ b/src/components/StatisticCards.tsx
+@@ -204,7 +204,13 @@
+           onRefresh={refetch}
+         />
+       </StatisticCard>
+-      <MetricsError message={error.message} onRetry={refetch} />
++        <MetricsError 
++          message={error.message} 
++          onRetry={refetch} 
++          data-testid="metrics-error" 
++        />
++      </MetricsError>
+
+     {/* Listings Card */}
+     <StatisticCard
+@@ -214,7 +220,7 @@
+           subtitle={`Period: ${period}`}
+           onRefresh={refetch}
+         />
+-      </StatisticCard>
++        data-testid="statistic-card" />
+       </StatisticCard>
+ 
+     {/* Categories Card */}

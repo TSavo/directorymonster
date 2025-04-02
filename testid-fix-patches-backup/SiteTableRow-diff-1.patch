@@ -1,0 +1,45 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -19,6 +19,8 @@ function Example() {
+         <Link 
+           href={`/admin/sites/${site.id}/edit`}
+           className="p-1 text-yellow-600 hover:text-yellow-800"
+             title="Edit Site"
+             data-testid={`edit-site-${site.id}`}
++          data-testid="site-name-site-123"
++        >
+         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+           <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+         </svg>
+       </Link>
+@@ -28,6 +30,8 @@ function Example() {
+             data-testid={`delete-site-${site.id}`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
++              data-testid="site-slug-site-123"
++            </svg>
+            <span className="sr-only">Delete Site</span>
+          </button>
+        </div>
+@@ -64,6 +68,9 @@ function Example() {
+             title="Edit Your Domain"
+           data-testid={`edit-domain-${site.id}`}
+         />
++        <a href="#" class="text-gray-500 hover:text-gray-700" 
++            data-testid="site-domains-site-123"
++          >
+           YourDomains
+         </a>
+       </div>
+@@ -84,6 +91,8 @@ function Example() {
+             title="Update Details"
+           data-testid={`update-detail-${site.id}`}
+         />
++        <button 
++            data-testid="site-update-detail-site-123"
++          >
+           Save Changes
+         </button>
+       </div>

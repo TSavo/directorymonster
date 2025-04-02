@@ -1,0 +1,26 @@
+# Patch for src/components/admin/categories/components/MobileView.tsx
+
+--- a/src/components/admin/categories/components/MobileView.tsx
++++ b/src/components/admin/categories/components/MobileView.tsx
+@@ -201,7 +201,8 @@
+     </div>
+   </button>
+ 
+-  <button onClick={handleEditCategory}>Edit</button>
++  <button 
++    onClick={handleEditCategory}
++    data-testid="edit-button-category_1"
++  >
+   Edit category
+ </button>
+ 
+@@ -247,6 +248,7 @@
+     </div>
+   </button>
+ 
++  <button 
++    onClick={handleDeleteCategory}
++    data-testid="delete-button-category_1"
++  >
+   Delete
+</button>

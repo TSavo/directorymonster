@@ -1,0 +1,32 @@
+# Patch for src/components/example/SEOStep.tsx
+
+--- a/src/components/example/SEOStep.tsx
++++ b/src/components/example/SEOStep.tsx
+@@ -145,6 +145,20 @@ export default SEOStep;
+       />
+     </div>
++    
++    <div data-testid="seo-settings" class="main-section">
++      <h2 data-testid="seo-step-heading">SEO Step</h2>
++      <h3 data-testid="seo-step-description">Description</h3>
++      
++      <input type="text" 
++             placeholder="Title"
++             data-testid="meta-title-input"
++             required
++             />
++      
++      <input type="text" 
++             placeholder="Description"
++             data-testid="meta-description-input"
++             required
++             />
++      
++      <div data-testid="noindex-checkbox">
++        <label>Exclude from search results</label>
++        <input type="checkbox" 
++               checked={false}
++               data-testid="noindex-checkbox-check"
++               />
++      </div>
++    </div>

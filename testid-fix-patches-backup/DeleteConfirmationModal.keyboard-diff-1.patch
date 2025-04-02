@@ -1,0 +1,38 @@
+# Patch for src/components/DeleteConfirmationModal.tsx
+
+--- a/src/components/DeleteConfirmationModal.tsx
++++ b/src/components/DeleteConfirmationModal.tsx
+@@ -61,9 +61,13 @@ const DeleteConfirmationModal = ({ siteName }: { siteName: string }) => {
+               className="text-lg leading-6 font-medium text-gray-900" 
+               id="modal-title"
+               data-testid="modal-title"
+             >
+               Delete Site
+             </h3>
+             <div className="mt-2">
+               <p className="text-sm text-gray-500">
+                 Are you sure you want to delete <span className="font-semibold">{siteName}</span>? This action cannot be undone.
+               </p>
+             </div>
+           </div>
+           <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+             <button
+@@ -71,8 +75,9 @@ const DeleteConfirmationModal = ({ siteName }: { siteName: string }) => {
+               onClick={onConfirm}
+               disabled={isLoading}
+               data-testid="delete-modal-confirm"
+             >
+               Deleting...
+             </svg>
+             Deleting...
+           </button>
+           <button
+@@ -83,7 +88,8 @@ const DeleteConfirmationModal = ({ siteName }: { siteName: string }) => {
+               onClick={onCancel}
+               ref={cancelButtonRef}
+               disabled={isLoading}
+-              data-testid="cancel-delete-button"
++              data-testid="delete-modal-cancel"
+             >
+               Cancel
+             </button>

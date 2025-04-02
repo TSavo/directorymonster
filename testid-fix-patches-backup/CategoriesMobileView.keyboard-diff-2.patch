@@ -1,0 +1,20 @@
+# Patch for src/components/admin/categories/components/index.ts
+
+--- a/src/components/admin/categories/components/index.ts
++++ b/src/components/admin/categories/components/index.ts
+@@ -40,8 +40,9 @@
+     <div>
+       <button onClick={handleClick}>
+-        Click me
++          data-testid="view-button-category_1"
++        View me
+       </button>
+     </div>
+   return (
+@@ -65,7 +66,7 @@
+     // Activate with Space key
+     await user.keyboard(' ');
+     expect(mockOnDeleteClick).toHaveBeenCalledTimes(1);
+-    expect(mockOnDeleteClick).toHaveBeenCalledWith('category_2', 'Test Category 2');
++    expect(mockOnDeleteClick).toHaveBeenCalledWith('category_2', 'Test Category 2', data-testid="delete-button-category_2");
+   });

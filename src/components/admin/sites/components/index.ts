@@ -1,31 +1,25 @@
 "use client";
 
 // Import the components directly
-import BasicInfoStep from './BasicInfoStep';
-import DomainStep from './DomainStep';
-import ThemeStep from './ThemeStep';
-import SEOStep from './SEOStep';
-import SiteFormPreview from './SiteFormPreview';
-import StepNavigation from './StepNavigation';
-import FormActions from './FormActions';
+import BasicInfoStep from './BasicInfoStepNew';
+import DomainStep from './DomainStepFixed';
+import ThemeStep from './ThemeStepNew';
+import SEOStep from './SEOStepNew';
+import SiteFormPreview from './SiteFormPreviewNew';
 
 // Export all named exports from each component
-export * from './BasicInfoStep';
-export * from './DomainStep';
-export * from './ThemeStep';
-export * from './SEOStep';
-export * from './SiteFormPreview';
-export * from './StepNavigation';
-export * from './FormActions';
+export * from './BasicInfoStepNew';
+export * from './DomainStepFixed';
+export * from './ThemeStepNew';
+export * from './SEOStepNew';
+export * from './SiteFormPreviewNew';
 
 // Re-export default exports as named exports
-export { default as BasicInfoStep } from './BasicInfoStep';
-export { default as DomainStep } from './DomainStep';
-export { default as ThemeStep } from './ThemeStep';
-export { default as SEOStep } from './SEOStep';
-export { default as SiteFormPreview } from './SiteFormPreview';
-export { default as StepNavigation } from './StepNavigation';
-export { default as FormActions } from './FormActions';
+export { default as BasicInfoStep } from './BasicInfoStepNew';
+export { default as DomainStep } from './DomainStepFixed';
+export { default as ThemeStep } from './ThemeStepNew';
+export { default as SEOStep } from './SEOStepNew';
+export { default as SiteFormPreview } from './SiteFormPreviewNew';
 
 // Default export with all components grouped together
 export default {
@@ -33,7 +27,5 @@ export default {
   DomainStep,
   ThemeStep,
   SEOStep,
-  SiteFormPreview,
-  StepNavigation,
-  FormActions
+  SiteFormPreview
 };

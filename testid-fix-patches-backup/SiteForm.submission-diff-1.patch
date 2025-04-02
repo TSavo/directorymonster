@@ -1,0 +1,27 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -130,6 +130,9 @@ function SiteForm({ mode, isPreviousStep, isActiveStep, nextStep, activeStep, mode}
+           <BasicInfoStep
+             values={{
+               name: site.name,
+@@ -224,7 +227,8 @@ function SiteForm({ mode, isPreviousStep, isActiveStep, nextStep, activeStep, mode}
+            />
+          </DomainStep>
+
+-          {activeStep === 'theme' && (
++          {activeStep === 'theme' && (
+             <ThemeStep
+@@ -315,6 +319,7 @@ function SiteForm({ mode, isPreviousStep, isActiveStep, nextStep, activeStep, mode}
+           <SEOStep
+             values={{
+               seoTitle: site.seoTitle || '',
+@@ -408,6 +413,7 @@ function SiteForm({ mode, isPreviousStep, isActiveStep, nextStep, activeStep, mode}
+         </SiteFormPreview />
+       </form>
+     </div>
+   );
+}
+
+export default SiteForm;

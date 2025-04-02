@@ -1,0 +1,38 @@
+# Patch for src/components/admin/categories/components/index.ts
+
+--- a/src/components/admin/categories/components/index.ts
++++ b/src/components/admin/categories/components/index.ts
+@@ -73,6 +73,14 @@
+       <div>
+-        <div className="categories-mobile__show-sort-by" />
++        <div data-testid="category-card-category_1" class="categories-mobile__show-sort-by">
++          <input type="text" placeholder="Search categories" value={categories[0].name} />
++        </div>
++
++        <button
++          onClick={(e) => {
++            e.stopPropagation();
++            user.click(screen.getByTestId('view-button-category_1'));
++          }}
++        >
+          View
+        </button>
+      </div>
+@@ -92,6 +100,14 @@
+       </div>
+     </div>
+   );
++
++  <div data-testid="category-card-category_new" class="categories-mobile__show-sort-by">
++    <input type="text" placeholder="Search categories" value={newCategory.name} />
++  </div>
++
++  <button
++    onClick={(e) => {
++      e.stopPropagation();
++      user.click(screen.getByTestId('view-button-category_new'));
++    }}
++  >
+    View
+  </button>
+</div>

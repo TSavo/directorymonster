@@ -1,0 +1,60 @@
+# Patch for src/components/site-table.tsx
+
+--- a/src/components/site-table.tsx
++++ b/src/components/site-table.tsx
+@@ -14,7 +14,7 @@ function SiteTable() {
+   return (
+     <div className="p-4" data-testid="site-table">
+       <SiteTableHeader 
+-        searchTerm={filters.search}
++        searchTerm={filters.search}
+          onSearchChange={handleSearch}
+        />
+        
+@@ -32,7 +32,10 @@ function SiteTable() {
+           {sites.map(site => (
+             <SiteTableRow 
+               key={site.id}
+-              site={site}
++              site={site}
++              site-name={site.name}
++              site-slug={site.slug}
++              site-domains={site.domains}
++              site-status={site.status}
++              handleDeleteConfirm={handleDeleteConfirm}
++              handleDeleteCancel={handleDeleteCancel}
+             />
+           ))}
+         </tbody>
+@@ -50,7 +53,10 @@ function SiteTable() {
+           {sites.map(site => (
+             <SiteMobileCard 
+               key={site.id}
+-              site={site}
++              site={site}
++              site-name={site.name}
++              site-slug={site.slug}
++              site-domains={site.domains}
++              site-status={site.status}
++              handleDeleteConfirm={handleDeleteConfirm}
++              handleDeleteCancel={handleDeleteCancel}
+             />
+           ))}
+         </tbody>
+@@ -64,7 +70,12 @@ function SiteTable() {
+          <DeleteConfirmationModal 
+-            isOpen={deleteModalOpen}
+-            siteName={siteToDelete?.name || ''}
+-            isLoading={isLoading}
++            isOpen={deleteModalOpen}
++            siteName={siteToDelete?.name || ''}
++            isLoading={isLoading}
++            site-name={siteToDelete?.name || ''}
++            site-slug={siteToDelete?.slug || ''}
++            site-domains={siteToDelete?.domains || ''}
++            site-status={siteToDelete?.status || ''}
++            handleDeleteConfirm={handleDeleteConfirm}
++            handleDeleteCancel={handleDeleteCancel}
+          />
+        </div>
+      </div>

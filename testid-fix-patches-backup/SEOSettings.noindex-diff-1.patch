@@ -1,0 +1,56 @@
+# Patch for src/components/SEOSettings.tsx
+
+--- a/src/components/SEOSettings.tsx
++++ b/src/components/SEOSettings.tsx
+@@ -148,6 +148,9 @@ class SEOSettings(React functionalComponent) {
+               className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+               data-testid="seoSettings-cancel"
+               disabled={isLoading}
+             >
+               Cancel
+             </button>
+@@ -157,6 +160,9 @@ class SEOSettings(React functionalComponent) {
+               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50"
+               data-testid="seoSettings-submit"
+               disabled={isLoading}
+             >
+               {isLoading ? (
+                 <span data-testid="seoSettings-submit-loading">
+@@ -182,6 +188,9 @@ class SEOSettings(React functionalComponent) {
+                   className="block text-sm font-medium mb-1">
+                     Custom robots.txt Content
+                   </label>
+                   <textarea
+                    id="seoSettings-robotsTxt"
+                    name="robotsTxt"
+@@ -193,6 +202,9 @@ class SEOSettings(React functionalComponent) {
+                   className="text-sm text-gray-600 mt-1">
+                     Leave blank to use default robots.txt.
+                   </p>
+                 </div>
+               </form>
+             </div>
++
++              <button
++                type="button"
++                onClick={onCancel}
++                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
++                data-testid="seoSettings-noindexPage-0"
++                disabled={isLoading}
++              >
++                No Index Page (User Role 1)
++              </button>
++
++              <button
++                type="button"
++                onClick={onCancel}
++                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
++                data-testid="seoSettings-noindexPage-1"
++                disabled={isLoading}
++              >
++                No Index Page (User Role 2)
++              </button>
++
+             <div className="flex justify-end space-x-3 mt-8">
+               <button
+                 type="button"

@@ -9,7 +9,7 @@ expect.extend(toHaveNoViolations);
 
 // Mock step definitions
 const mockSteps = [
-  { id: 'basic-info', label: 'Basic Info' },
+  { id: 'basic_info', label: 'Basic Info' },
   { id: 'domains', label: 'Domains' },
   { id: 'theme', label: 'Theme' },
   { id: 'seo', label: 'SEO' }
@@ -21,7 +21,7 @@ describe('StepNavigation Component - Accessibility', () => {
     const { container } = render(
       <StepNavigation 
         steps={mockSteps} 
-        currentStep="basic-info" 
+        activeStep="basic_info" 
         completedSteps={['domains']} 
         onStepChange={mockOnStepChange} 
       />
@@ -37,8 +37,8 @@ describe('StepNavigation Component - Accessibility', () => {
     render(
       <StepNavigation 
         steps={mockSteps} 
-        currentStep="domains" 
-        completedSteps={['basic-info']} 
+        activeStep="domains" 
+        completedSteps={['basic_info']} 
         onStepChange={mockOnStepChange} 
       />
     );
@@ -55,15 +55,15 @@ describe('StepNavigation Component - Accessibility', () => {
     render(
       <StepNavigation 
         steps={mockSteps} 
-        currentStep="basic-info" 
-        completedSteps={[]} 
+        activeStep="basic_info" 
+        completedSteps={['domains']} 
         onStepChange={mockOnStepChange} 
       />
     );
     
     // Tab to the first step button
     await user.tab();
-    expect(screen.getByTestId('step-button-basic-info')).toHaveFocus();
+    expect(screen.getByTestId('step-button-basic_info')).toHaveFocus();
     
     // Tab to the next step button
     await user.tab();
@@ -80,14 +80,14 @@ describe('StepNavigation Component - Accessibility', () => {
     render(
       <StepNavigation 
         steps={mockSteps} 
-        currentStep="theme" 
-        completedSteps={['basic-info', 'domains']} 
+        activeStep="theme" 
+        completedSteps={['basic_info', 'domains']} 
         onStepChange={mockOnStepChange} 
       />
     );
     
     // Completed steps should have appropriate ARIA attributes
-    const completedStep = screen.getByTestId('step-button-basic-info');
+    const completedStep = screen.getByTestId('step-button-basic_info');
     expect(completedStep).toHaveAttribute('aria-label', expect.stringContaining('completed'));
   });
 });

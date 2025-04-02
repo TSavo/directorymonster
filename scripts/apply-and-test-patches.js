@@ -36,7 +36,8 @@ function writeFile(filePath, content) {
 // Function to run tests for a specific file
 function runTestForFile(testFile) {
   try {
-    const result = execSync(`npx jest ${testFile} --json`, { encoding: 'utf8' });
+    // Run Jest with the config file
+    const result = execSync(`npx jest ${testFile} --config=jest.config.js --json`, { encoding: 'utf8' });
     const jsonResult = JSON.parse(result);
     return {
       success: jsonResult.numPassedTests,

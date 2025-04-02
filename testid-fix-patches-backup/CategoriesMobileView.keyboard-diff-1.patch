@@ -1,0 +1,27 @@
+# Patch for src/components/admin/categories/components/index.ts
+
+--- a/src/components/admin/categories/components/index.ts
++++ b/src/components/admin/categories/components/index.ts
+@@ -149,6 +149,7 @@ export * from './CategoryTableColumns';
+ export * from './CategoryTableContainer';
+ export * from './CategoryTableEmptyState';
+ export * from './CategoryTableError';
+ export * from './CategoryTableHeader';
+ export * from './CategoryTablePagination';
+ export * from './CategoryTableRow';
++export * from './DeleteConfirmationModal';
+
+ // Re-export default exports as named exports
+ export { default as CategoriesMobileView } from './CategoriesMobileView';
+@@ -193,6 +194,7 @@ export { default as CategoryErrorBoundary } from './CategoryErrorBoundary';
+ export { default as CategoryFormModal } from './CategoryFormModal';
+ export { default as CategoryHierarchyManager } from './CategoryHierarchyManager';
+ export { default as CategoryTableActions } from './CategoryTableActions';
++export * from './CategoryTableEmptyState';
+
+ export { default as CategoryTableColumns } from './CategoryTableColumns';
+ export { default as CategoryTableContainer } from './CategoryTableContainer';
+ export { default as CategoryTableEmptyState } from './CategoryTableEmptyState';
+@@ -237,6 +239,7 @@ export { default as CategoryTableSortHeader } from './CategoryTableSortHeader';
+ export { default as DeleteConfirmationModal } from './DeleteConfirmationModal';
+}

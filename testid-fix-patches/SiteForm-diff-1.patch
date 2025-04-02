@@ -1,0 +1,30 @@
+# Patch for src/components/site-form.tsx
+
+--- a/src/components/site-form.tsx
++++ b/src/components/site-form.tsx
+@@ -12,6 +12,8 @@ function SiteForm({ mode, className, data-testid }) {
+     <h1 className="text-xl font-bold mb-6" data-testid="siteForm-header">
+       {mode === 'edit' ? 'Edit' : 'Create'} Site
+     </h1>
++    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded" role="alert" data-testid="siteForm-basic-info-heading">
++      Basic Info
+     </div>
+   </h1>
+
+   {/* Error message */}
+@@ -26,6 +28,15 @@ function SiteForm({ mode, className, data-testid }) {
+       className
+     })
+   />
++
++  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded" role="alert" data-testid="siteForm-name">
++    Name: {{ name }}
++  </div>
++  
++  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded" role="alert" data-testid="siteForm-slug">
++    Slug: {{ slug }}
++  </div>
++
+   <h2 data-testid="siteForm-domains" className="text-xl font-bold mb-6">Domains</h2>
+   <form>
+     {domainSteps}

@@ -1,0 +1,32 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -54,10 +54,12 @@ const DeleteConfirmationModal = ({ siteName }: { 
+               className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm ${
+                 isLoading ? 'opacity-75 cursor-not-allowed' : 'hover:bg-red-700'
+               }`}
+               onClick={onConfirm}
+               disabled={isLoading}
+               data-testid="delete-modal-confirm"
+             >
+               {isLoading ? (
+                 <>
+                   <svg 
+                     className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" 
+@@ -68,7 +70,9 @@ const DeleteConfirmationModal = ({ siteName }: { 
+                   </svg>
+                   <path 
+                     className="opacity-75" 
+                     fill="currentColor" 
+                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                   ></path>
+                 </>
+               ) : (
+@@ -83,7 +87,9 @@ const DeleteConfirmationModal = ({ siteName }: { 
+                 className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm data-testid="delete-modal-cancel" 
+               >
+                 Cancel
+               </button>
+             </div>
+           </div>

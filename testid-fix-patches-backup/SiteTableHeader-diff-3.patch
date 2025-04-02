@@ -1,0 +1,17 @@
+# Patch for src/components/site-table.tsx
+
+--- a/src/components/site-table.tsx
++++ b/src/components/site-table.tsx
+@@ -10,7 +10,7 @@ function SiteTable() {
+   return (
+     <div className="container">
+-      <input type="text" 
++      <input type="text" data-testid="site-table-search" 
+         placeholder="Search...">
+         {itemsList}
+         <button onClick={createNewItem}>
+@@ -23,6 +23,7 @@ function SiteTable() {
+     </div>
+   </div>
+ )
++

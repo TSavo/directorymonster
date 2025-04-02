@@ -1,0 +1,17 @@
+# Patch for src/components/admin/auth/ZKPLoginComponent.tsx
+
+--- a/src/components/admin/auth/ZKPLoginComponent.tsx
++++ b/src/components/admin/auth/ZKPLoginComponent.tsx
+@@ -16,7 +16,12 @@ interface AuthContainerProps {
+     <div className="container">
+-    <form onSubmit={handleSubmit}>
++      <button 
++        type="submit"
++        data-testid="login-error-message"
++        onClick={handleSubmit}
++      >
++        {errorText || 'Sign in'}
+     </button>
++
+     {/* Security Indicator */}
+     <div className="security-indicator" data-testid="security-indicator"></div>

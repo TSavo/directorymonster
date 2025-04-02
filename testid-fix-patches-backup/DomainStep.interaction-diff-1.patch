@@ -1,0 +1,42 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -70,13 +70,15 @@ export default DomainStep {
+          className="ml-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded flex-shrink-0"
+          data-testid="domainStep-add-domain"
+          disabled={isLoading || !newDomain.trim()}
+        >
+          + Add
+        </button>
+      </div>
+@@ -93,8 +95,7 @@ export default DomainStep {
+            className={`flex-grow p-2 border rounded focus:ring-2 focus:border-blue-500 ${errors.newDomain ? 'border-red-500' : 'border-gray-300'}`}
+            aria-invalid={errors.newDomain ? "true" : "false"}
+            aria-describedby={errors.newDomain ? "domainStep-domain-input-error" : undefined}
+-          data-testid="domainStep-domain-input"
++          data-testid="domainStep-domain-input-error"
+          disabled={isLoading}
+        />
+      </div>
+@@ -108,7 +109,7 @@ export default DomainStep {
+            onClick={onAdd}
+            className="ml-2 px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded flex-shrink-0"
+            data-testid="domainStep-add-domain"
+            disabled={isLoading || !newDomain.trim()}
+        >
+          + Add
+        </button>
+      </div>
+
+      {/* Remove Domain */}
+      <div className="mb-4">
+@@ -139,7 +140,7 @@ export default DomainStep {
+         className="text-sm text-red-500 hover:text-red-700 p-1"
+         aria-label={`Remove domain ${domain}`}
+         data-testid={index === 0 ? "domainStep-remove-domain-n" : null}
+-                  disabled={isLoading}
++                  disabled={isLoading || !newDomain.trim()}
+               }
+             </button>
+           )}

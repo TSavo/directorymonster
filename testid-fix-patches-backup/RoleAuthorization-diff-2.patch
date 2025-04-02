@@ -1,0 +1,38 @@
+# Patch for src/components/session_manager.tsx
+
+--- a/src/components/session_manager.tsx
++++ b/src/components/session_manager.tsx
+@@ -24,6 +24,15 @@
+   return (
+     <div>
+-      {onDrop ? (\d) : (\d)}-Dropzone for files
++      {/* Listen to focus events and set data-testid attributes */}
++      <IntersectionObserver
++        observerFn={(event) => 
++          event.target?.documentElementInViewport
++            && (event.target.classList.contains('data-testid') || event.targetfocus)}
++        runOnce={true}
++        once={() => {
++          const onElementInView = (event: ElementEvent) => {
++            if (event.target.classList.contains('data-testid')) {
++              const role = useAuth.user.role;
++              switch(role) {
++                case 'admin':
++                  event.target.dataset-testid = 'admin-access';
++                  break;
++                case 'editor':
++                  event.target.dataset-testid = 'editor-access';
++                  break;
++                case 'viewer':
++                  event.target.dataset-testid = 'viewer-access';
++                  break;
++              }
++            }
++          }
++          return false;
++        }}
++      >
++        {this}
+       </IntersectionObserver>
+     </div>
+   );

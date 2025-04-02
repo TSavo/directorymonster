@@ -1,41 +1,45 @@
-# Checkpoint: Sites API Authentication Fix - April 1, 2025
+# Checkpoint: Fix ListingTable Tests - April 1, 2025
 
 ## Identified Issue
 
-After reviewing the codebase, I found a security issue in the `/api/sites/route.ts` file. The GET and POST endpoints are not properly secured with authentication middleware:
+After reviewing the test files, I found two incomplete tests in `tests/admin/listings/ListingTable.test.tsx` that are currently using dummy assertions. The tests are marked with TODO comments and are only using `expect(true).toBe(true)` which doesn't actually test anything:
 
 ```typescript
-export const GET = withRedis(async (request: NextRequest) => {
-  // TODO: Add authentication
-  
-  const sites = await kv.keys('site:slug:*');
-  // ...
+// Simplified test for empty state - note the issue in PR comments
+it('displays an empty state when there are no listings', () => {
+  // TODO: This test needs to be improved with proper mocking
+  // Currently the component shows loading state even with empty initialListings
+  // See issue #37 for details on the fix
+  expect(true).toBe(true);
 });
 
-export const POST = withRedis(async (request: NextRequest) => {
-  // TODO: Add authentication
-  
-  try {
-    const data = await request.json();
-    // ...
-  }
+// Simplified test for error state - note the issue in PR comments 
+it('displays an error state when fetch fails', () => {
+  // TODO: This test needs to be improved with proper error state testing
+  // Currently testing the error state requires more advanced mocking
+  // See issue #37 for details on the fix
+  expect(true).toBe(true);
 });
 ```
 
-These endpoints are only using the `withRedis` middleware, which handles Redis connectivity, but not authentication or tenant validation. This is a security vulnerability as it allows unauthenticated access to site data.
-
-Based on the patterns used in other parts of the application, these endpoints should be secured using one of the following security middleware:
-1. `withTenantAccess` - For basic tenant authorization
-2. `withPermission` - For specific permission checks
+These tests should be properly implemented to verify that:
+1. The ListingTable component shows an empty state when there are no listings
+2. The ListingTable component displays an error state when the fetch operation fails
 
 ## Plan
 
-1. Create a new branch: `fix/sites-api-authentication`
-2. Update both API endpoints to use proper security middleware
-3. Use the `withPermission` middleware to ensure users have the appropriate permissions:
-   - For GET: Require 'site' resource type with 'read' permission
-   - For POST: Require 'site' resource type with 'create' permission
-4. Test the API endpoints to ensure they work correctly with authentication
+1. Create a new branch: `fix/listing-table-empty-error-tests`
+2. Implement a proper test for the empty state:
+   - Render `<ListingTable initialListings={[]} />` to simulate an empty listings array
+   - Verify that the ListingTableEmptyState component is rendered by checking for its content
+   - Check for the "No listings found" text and create button
+
+3. Implement a proper test for the error state:
+   - Mock the fetch API to simulate a failed fetch operation
+   - Verify the ListingTableError component is rendered correctly
+   - Check for error messaging and retry button
+
+4. Run tests to verify both new implementations work correctly
 5. Commit changes and create a PR
 
 ## Implementation

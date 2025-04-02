@@ -1,0 +1,55 @@
+# Patch for src/components/admin/categories/components/index.ts
+
+--- a/src/components/admin/categories/components/index.ts
++++ b/src/components/admin/categories/components/index.ts
+@@ -470,6 +470,20 @@
+       <div>
+         {categories.map((category) => {
+           // Add data-testid for category-card
++           <div 
++             key={category.id}
++             data-testid={`category-card-${category.id}`}
++             className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
++           >
++             {category.name || ''}<br>
++             {category.value}
++           </div>
++
++           // Add data-testid for category name
++           <div 
++             key={category.id}
++             data-testid={`category-name-${category.id}`}
++             className="text-sm font-medium text-gray-700"
++           >
++             {category.name || ''}
+           </div>
+         });
+       </div>
+
+       {categories.length > 0 && (
+@@ -526,6 +540,18 @@
+           <div 
+             key={child.id}
+             data-testid={`child-card-${child.id}`}
+-            className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
++            className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow mb-2"
+           >
+             <div 
+               key={child.parent}
+@@ -538,6 +560,18 @@
+             </div>
+           </div>
+         });
++        
++        // Add data-testid for child-card
++        <div 
++          key={child.id}
++          data-testid={`child-card-${child.id}`}
++          className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
++        >
++          {child.value}
++        </div>
++
+       )}
+
+     </div>

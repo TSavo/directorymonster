@@ -1,0 +1,45 @@
+# Patch for src/components/SearchResults.tsx
+
+--- a/src/components/SearchResults.tsx
++++ b/src/components/SearchResults.tsx
+@@ -37,6 +37,7 @@ interface SearchResultsProps {
+             className="lg:col-span-3">
+               {/* Loading state */}
+               {isLoading && (
+@@ -102,6 +103,8 @@ function SearchResults({ filters, site }: SearchResultsProps) {
+         <div className="grid gap-6 grid-cols-1">
+           {results.map((listing) =>(
+             <ListingCard 
+@@ -149,7 +152,8 @@ function SearchResults({ filters, site }: SearchResultsProps) {
+                     className={`px-4 py-2 border-t border-b ${
+                       page === number
+                         ? 'bg-blue-500 text-white'
+                         : 'bg-white text-gray-700 hover:bg-gray-50'
+                     }`}
+                     aria-label={`Page ${number}`}
+@@ -186,6 +190,7 @@ function SearchResults({ filters, site }: SearchResultsProps) {
+                   className="px-4 py-2 rounded-l-md border ${
+                     page === 1
+                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
++                    data-testid="mock-search-filters"
+                       : 'bg-white text-gray-700 hover:bg-gray-50'
+                   }"
+                   aria-label="Previous page"
+@@ -236,6 +241,7 @@ function SearchResults({ filters, site }: SearchResultsProps) {
+                     className={`px-4 py-2 border-t border-b ${
+                       page === number
+                         ? 'bg-blue-500 text-white'
+                         : 'bg-white text-gray-700 hover:bg-gray-50'
+                     }`}
++                    data-testid="filter-category-button"
+                     aria-label={`Page ${number}`}
+                     aria-current={page === number ? 'page' : undefined}
+                   >
+@@ -263,6 +269,7 @@ function SearchResults({ filters, site }: SearchResultsProps) {
+                     className={`px-4 py-2 border-t border-b ${
+                       page === totalPages
+                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
++                    data-testid="mock-search-filters"
+                         : 'bg-white text-gray-700 hover:bg-gray-50'
+                     }`}
+                     aria-label="Next page"

@@ -1,0 +1,31 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -105,7 +105,8 @@ export default SiteTableComponent;
+       <button 
+         onClick={handleCreate}
+         data-testid="create-site-button"
+-        >
++        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-center create-site-button"
++        data-testid="site-table-create-button">
+         Create Site
+       </button>
+     </div>
+@@ -113,7 +114,8 @@ export default SiteTableComponent;
+         <svg 
+             xmlns="http://www.w3.org/2000/svg" 
+             viewBox="0 0 24 24" 
+-            className="mx-auto h-5 w-5 text-white"
++            className="mx-auto h-5 w-5 text-white create-site-button"
++            data-testid="site-table-search-clear">
+             <path d="M13.765,3.765a4 4 0 015.208,-5.922l-5.638-5.762A3.997 3.997 0 0113.765,12.238l-5.764 5.762a3.997 3.997 0 010,-11.547V7.763a4 4 0 11-5.922,0l-5.208 0 a3.997 3.997 0 11-11.547,0z" />
+         </svg>
++        
+         <button 
+           onClick={handleCreate}
+@@ -122,6 +124,7 @@ export default SiteTableComponent;
+       </div>
+     </div>
+   );
++

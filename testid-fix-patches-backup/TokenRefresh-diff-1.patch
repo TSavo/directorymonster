@@ -1,0 +1,20 @@
+# Patch for src/components/admin/auth/index.ts
+
+--- a/src/components/admin/auth/index.ts
++++ b/src/components/admin/auth/index.ts
+@@ -481,6 +481,20 @@ function useAuth() {
+   }
+   
+   return auth;
++  }
++
++  // Added Auth Status Display component
++  const AuthStatusComponent: React.FC<props> => {
++    return (
++      <div className="auth-status" data-testid="auth-status">
++        {props.authenticated ? 'Authenticated' : 'Not authenticated'}
++      </div>
++    );
++  };
++
+ }

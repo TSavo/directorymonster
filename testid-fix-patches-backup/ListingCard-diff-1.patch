@@ -1,0 +1,11 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -509,6 +509,7 @@ function Example() {
+       </div>
+     </div>
+   );
++    <img data-testid="mocked-image" src="https://via.placeholder.com/150" alt="Mocked Image">
+ 
+</script>

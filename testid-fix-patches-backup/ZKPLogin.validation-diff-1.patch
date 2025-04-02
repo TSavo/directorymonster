@@ -1,0 +1,15 @@
+# Patch for src/components/admin/auth/index.ts
+
+--- a/src/components/admin/auth/index.ts
++++ b/src/components/admin/auth/index.ts
+@@ -37,6 +37,9 @@ function ZKPLogin() {
+     <div className="auth-container">
+       <form>
+         <input type="text" placeholder="ZKP ID" required>
++        <button 
++          onClick={handlePasswordStrength}
++          data-testid="security-indicator"
++        >
+           Password Strength: Strong
+         </button>
+         <input type="password" placeholder="Enter password">

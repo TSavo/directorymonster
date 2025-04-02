@@ -1,0 +1,13 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -107,6 +107,7 @@ function Example() {
+       </form>
+     </div>
+   </form>
+
++  data-testid="siteForm-submit"
+ 
+   <FormActions
+     isFirstStep={isFirstStep}

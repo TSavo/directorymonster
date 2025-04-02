@@ -1,0 +1,58 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -154,20 +154,32 @@ const BasicInfoStep = ({ values }: { values: { name?: string; slug?: string; desc
+       className={`w-full p-2 border rounded focus:ring-2 focus:border-blue-500 ${
+           errors.name ? 'border-red-500' : 'border-gray-300'}`}
+         aria-invalid={errors.name ? "true" : "false"}
+         aria-describedby={errors.name ? "siteForm-name-error" : undefined}
++        data-testid={errors.name ? "siteForm-name" : "siteForm-name"}
+       />
+       {errors.name && (
+         <p 
+           className="mt-1 text-sm text-red-500" 
+           role="alert" 
+           id="siteForm-name-error"
+           data-testid="siteForm-name-error"
++          data-testid={errors.name ? "siteForm-name-error" : undefined}
+         >
+           {errors.name}
+         </p>
+       )}
+     </div>
+-
+     {/* Slug field */}
+     <div className="mb-4">
+@@ -183,20 +195,27 @@ const BasicInfoStep = ({ values }: { values: { name?: string; slug?: string; desc
+         className={`w-full p-2 border rounded focus:ring-2 focus:border-blue-500 ${
+             errors.slug ? 'border-red-500' : 'border-gray-300'}`}
+         aria-invalid={errors.slug ? "true" : "false"}
+         aria-describedby={errors.slug ? "siteForm-slug-error" : undefined}
++        data-testid={errors.slug ? "siteForm-slug" : "siteForm-slug"}
+       />
+       {errors.slug && (
+         <p 
+           className="mt-1 text-sm text-red-500" 
+           role="alert" 
+           id="siteForm-slug-error"
+           data-testid="siteForm-slug-error"
++          data-testid={errors.slug ? "siteForm-slug-error" : undefined}
+         >
+           {errors.slug}
+         </p>
+       )}
+     </div>
+-
+     {/* Description field */}
+     <div className="mb-4">
+@@ -215,8 +234,9 @@ const BasicInfoStep = ({ values }: { values: { name?: string; slug?: string; desc
+         className={`w-full p-2 border rounded focus:ring-2 focus:border-blue-500 ${
+             errors.description ? 'border-red-500' : 'border-gray-300'}`}
+         aria-invalid={errors.description ? "true" : "false"}
++        data-testid={errors.description ? "siteForm-description" : "siteForm-description"}
+       />
++    <div id="siteForm-description-error" data-testid="siteForm-description-error">
+         {errors.description && (
+           <p className="mt-1 text-sm text-red-500">
+             The description is required.

@@ -1,0 +1,16 @@
+# Patch for src/components/LinkUtilities.tsx
+
+--- a/src/components/LinkUtilities.tsx
++++ b/src/components/LinkUtilities.tsx
+@@ -25,7 +25,8 @@ function CategoryLink({ category, className, children, ...props }: CategoryLinkProps) {
+   return (
+     <Link 
+-      href={generateCategoryHref(category.slug)}
++      href={generateCategoryHref(category.slug)}
+       className={className}
+-      {...props}
++      data-testid={{ prop[data-testid] }}
++      className={className}
++      {...props without {data-testid}}
+    >
+      {children}

@@ -70,6 +70,55 @@ jest.mock('next/link', () => {
   );
 });
 
+// Mock the ListingTableEmptyState component
+jest.mock('../../../src/components/admin/listings/components/ListingTableEmptyState', () => {
+  return {
+    __esModule: true,
+    default: ({ siteSlug }: { siteSlug?: string }) => (
+      <div data-testid="empty-state">
+        <p>No listings found.</p>
+        <a href={siteSlug ? `/admin/${siteSlug}/listings/new` : "/admin/listings/new"}>
+          Create your first listing
+        </a>
+      </div>
+    ),
+  };
+});
+
+// Mock the useListings hook for error testing
+jest.mock('../../../src/components/admin/listings/hooks/useListings', () => {
+  // Keep track of the implementation to conditionally return different values
+  const actualModule = jest.requireActual('../../../src/components/admin/listings/hooks/useListings');
+  
+  return {
+    useListings: jest.fn((props) => {
+      // If this is the error test, return a mock with error
+      if (props && props.testError) {
+        return {
+          listings: [],
+          loading: false,
+          error: 'Failed to fetch listings data',
+          filters: {},
+          setSearchTerm: jest.fn(),
+          filterByCategory: jest.fn(),
+          filterBySite: jest.fn(),
+          sort: { field: 'title', direction: 'asc' },
+          setSorting: jest.fn(),
+          pagination: { page: 1, totalPages: 0, perPage: 10 },
+          setPage: jest.fn(),
+          setPerPage: jest.fn(),
+          toggleSelection: jest.fn(),
+          deleteListing: jest.fn(),
+          fetchListings: jest.fn(),
+        };
+      }
+      
+      // Otherwise, return the actual implementation
+      return actualModule.useListings(props);
+    }),
+  };
+});
+
 describe('ListingTable Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -130,20 +179,38 @@ describe('ListingTable Component', () => {
     }
   });
   
-  // Simplified test for empty state - note the issue in PR comments
   it('displays an empty state when there are no listings', () => {
-    // TODO: This test needs to be improved with proper mocking
-    // Currently the component shows loading state even with empty initialListings
-    // See issue #37 for details on the fix
-    expect(true).toBe(true);
+    // Pass an empty array for initialListings to avoid loading state
+    render(<ListingTable initialListings={[]} />);
+    
+    // Check for empty state component
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+    
+    // Check for empty state message
+    expect(screen.getByText('No listings found.')).toBeInTheDocument();
+    
+    // Check for create button
+    expect(screen.getByText('Create your first listing')).toBeInTheDocument();
+    
+    // Make sure the button is a proper link
+    const createButton = screen.getByText('Create your first listing');
+    expect(createButton.tagName).toBe('A');
+    expect(createButton).toHaveAttribute('href', '/admin/listings/new');
   });
   
-  // Simplified test for error state - note the issue in PR comments 
   it('displays an error state when fetch fails', () => {
-    // TODO: This test needs to be improved with proper error state testing
-    // Currently testing the error state requires more advanced mocking
-    // See issue #37 for details on the fix
-    expect(true).toBe(true);
+    // Render the component with the test error flag
+    render(<ListingTable testError={true} />);
+    
+    // Check for error message heading (would be in ListingTableError component)
+    expect(screen.getByText('Error Loading Listings')).toBeInTheDocument();
+    
+    // Check for error message content
+    expect(screen.getByText('Failed to fetch listings data')).toBeInTheDocument();
+    
+    // Check for retry button (would be in ListingTableError component)
+    const retryButton = screen.getByRole('button', { name: /retry/i });
+    expect(retryButton).toBeInTheDocument();
   });
   
   it('shows delete confirmation dialog when delete is clicked', async () => {

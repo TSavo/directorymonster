@@ -1,0 +1,105 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -56,9 +56,12 @@
+         // Clear error when field is changed
+         if (errors[name]) {
+           setErrors(prev => ({
+-          ...prev,
++          ...prev,
++          [name]: undefined
++        }));
++      }
+     }
+   };
+ 
+   // Submit domains to API
+   const submitDomains = async (
+@@ -86,7 +89,10 @@
+       setResultText('Domain settings updated successfully');
+     } else {
+       throw new Error(result.error || 'An error occurred');
+     }
+   };
+ 
+   const addDomain = () => {
+-    const existingDomains = domains.length;
++    const existingDomains = domains.map(domain => domain).length;
+     if (existingDomains >= 0) {
+       setDomains([...domains, null]);
+@@ -97,6 +103,8 @@
+       setAdded(false);
+     });
+   };
++    // Add data-testid to the new domain button
++    const newDomainButton = document.createElement('button');
++    newDomainButton.textContent = 'Add Domain';
++    newDomainButton.style.position = 'fixed';
++    newDomainButton.style.left = `${index * 30}px`;
++    newDomainButton.style.top = `20px`;
++    newDomainButton.style.backgroundColor = '#fff8dc';
++    newDomainButton.style.borderRadius = '5px';
++    newDomainButton.addEventListener('click', (e) => { setDomains([...domains, null]); });
++    document.body.appendChild(newDomainButton);
+     );
+   }
+ 
+   const removeDomain = (index: number) => {
+-    if (!exists && index < domains.length) {
+-      setDomains(prev => prev.slice(0, index));
+-      exists = true;
+-    } else {
+-      console.error('Error');
++    const domainButtons = document.querySelectorAll(`#domain-${domains.map((d)=>d === null ? '' : d.id)} button`);
++    if (domainButtons.length > 0) {
++      for (let i = 0; i < domainButtons.length; i++) {
++        const domainButton = domainButtons[i];
++        if (domainButton.textContent.trim() === `${domains[index] || ''}.delete`) {
++          domainButton.remove();
++          setDomains(prev => prev.slice(0, index));
++          break;
++        }
++      }
++    } else {
++      console.error('Error');
+     }
+   };
+   
+   const removeAll = () => {
+     setDomains(prev => prev.filter(d => d !== null));
+   };
+ 
+   // Add data-testid to the domain buttons
+-  const domainButtons = document.querySelectorAll('.delete-btn');
++  if (domainButtons.length > 0) {
+    for (let i = 0; i < domainButtons.length; i++) {
+      const domainButton = domainButtons[i];
+      const domainId = domainButton.textContent.split('.')[0];
+      domainButton.setAttribute('data-testid', `domainManager-domain-${i}`);
++    }
+     document.addEventListener('DOMContentLoaded', () => {
+       // Add data-testid to remove buttons
+         const removeButtons = document.querySelectorAll('.delete-btn');
+         if (removeButtons.length > 0) {
+             for (let i = 0; i < removeButtons.length; i++) {
+                 const button = removeButtons[i];
+                 attributeMap(button, `domainManager-remove-${i}`);
+             }
+         }
+     });
+   });
+
+   // Handle domain management
+   function handleAddDomain(e) {
+     if (!e.target) return;
+     e.preventDefault();
+     addDomain();
+   }
+
+   function handleRemoveDomain(e) {
+     if (!e.target) return;
+     e.preventDefault();
+     removeDomain(Number(e.target.textContent.split('.')[0] || '0'));
+   }
+}

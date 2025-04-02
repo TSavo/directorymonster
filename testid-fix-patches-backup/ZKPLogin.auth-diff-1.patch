@@ -1,0 +1,19 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -107,6 +107,12 @@ function Example() {
+     });
+     
++    <div id="loading-indicator" data-testid="login_loading_indicator" style={{ 
++      position: 'absolute',
++      top: '50%',
++      left: '50%',
++      transform: 'translate(-50%, -50%)'
++    }}>
++      
+     <h2>Authentication Loading...</h2>
++
+   </div>
+ 
+   // Main content goes here

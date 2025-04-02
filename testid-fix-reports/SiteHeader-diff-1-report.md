@@ -1,0 +1,54 @@
+# Test Report for SiteHeader-diff-1.patch
+
+## Summary
+
+- **Patch File**: testid-fix-patches\SiteHeader-diff-1.patch
+- **Target File**: src/components/SiteHeader.tsx
+- **Patch Applied**: No
+- **Changes Kept**: No
+- **Reason**: Failed to apply patch
+
+## Patch Content
+
+```diff
+# Patch for src/components/SiteHeader.tsx
+
+--- a/src/components/SiteHeader.tsx
++++ b/src/components/SiteHeader.tsx
+@@ -8,14 +8,15 @@ interface SiteHeaderProps {
+   import { SiteConfig } from '@/types';
+   import { CategoryLink } from './LinkUtilities';
+   import { SearchBar } from './search';
+
+   interface SiteHeaderProps {
+     site: SiteConfig;
+     categories: Array<{ id: string; name: string; slug: string }>;
+   }
+
+   export default function SiteHeader({ site, categories }: SiteHeaderProps) {
+     return (
+-      <header className="bg-white shadow-sm" data-testid="site-header">
++      <header className="bg-white shadow-sm" data-testid="site-header">
+       ... [rest of the code remains same until the Image component]
+@@ -31,8 +32,9 @@ export default function SiteHeader({ site, categories }: SiteHeaderProps) {
+           </Link>
+         </div>
+         
+         {/* Search Bar */}
+-        <div className="mt-4 sm:mt-0">
++        <div className="mt-4" data-testid="search-bar">
+          <SearchBar siteId={site.id} />
+        </div>
+        
+        {/* SEO-optimized H1 for homepage */}
+@@ -69,7 +71,8 @@ export default function SiteHeader({ site, categories }: SiteHeaderProps) {
+           </Link>
+         </li>
+         {categories.map(category => (
+-            <li key={category.id}>
++            <li key={category.id} data-testid="mocked-category-link">
+              <CategoryLink 
+                category={category}
+                className="text-base font-medium text-gray-600 hover:text-blue-600 transition-colors"
+
+```

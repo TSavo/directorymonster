@@ -2,29 +2,22 @@
 
 ## Overview
 
-- **Total Patches**: 3
-- **Successfully Applied**: 2
+- **Total Patches**: 2
+- **Successfully Applied**: 1
 - **Changes Kept**: 0
 
 ## Patches
 
-### 1. TestCard-1.patch
+### 1. SiteHeader-diff-1.patch
 
-- **Target**: src/components/test/TestCard.tsx
+- **Target**: src/components/SiteHeader.tsx
 - **Applied**: No
 - **Kept**: No
 - **Reason**: Failed to apply patch
 
-### 2. TestComponent-1.patch
+### 2. SiteHeader-fixed.patch
 
-- **Target**: src/components/test/TestComponent.tsx
-- **Applied**: Yes
-- **Kept**: No
-- **Reason**: Success count unchanged (0)
-
-### 3. TestComponent-bad.patch
-
-- **Target**: src/components/test/TestComponent.tsx
+- **Target**: src/components/SiteHeader.tsx
 - **Applied**: Yes
 - **Kept**: No
 - **Reason**: Success count unchanged (0)

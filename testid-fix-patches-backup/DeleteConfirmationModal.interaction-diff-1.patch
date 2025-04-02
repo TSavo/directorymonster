@@ -1,0 +1,36 @@
+# Patch for src/components/DeleteConfirmationModal.tsx
+
+--- a/src/components/DeleteConfirmationModal.tsx
++++ b/src/components/DeleteConfirmationModal.tsx
+@@ -19,7 +19,7 @@ function DeleteConfirmationModal({siteName}) {
+               className="text-lg leading-6 font-medium text-gray-900" 
+               id="modal-title"
+               data-testid="modal-title"
+             >
+               Delete Site
+             </h3>
+             <div className="mt-2">
+@@ -54,7 +54,11 @@ function DeleteConfirmationModal({siteName}) {
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
+            </button>
++           data-testid="delete-modal-confirm"
+            </button>
+            <button
+              type="button"
+              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+@@ -64,11 +68,13 @@ function DeleteConfirmationModal({siteName}) {
+               data-testid="delete-modal-cancel"
+             }
+           >
+             Cancel
+           </button>
+         </div>
++          data-testid="delete-modal.cancel"
+       </div>
+     </div>
+   );
+}

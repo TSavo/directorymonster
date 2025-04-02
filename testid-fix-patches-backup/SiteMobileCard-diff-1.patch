@@ -1,0 +1,31 @@
+# Patch for src/components/SiteMobileCard.tsx
+
+--- a/src/components/SiteMobileCard.tsx
++++ b/src/components/SiteMobileCard.tsx
+@@ -15,6 +15,9 @@ function SiteMobileCard({ site }: { site: any }) {
+     <h1 className="font-bold text-gray-900" data-testid={`site-mobile-name(`${site.id}`} title="Name">
+       {site.name}
+     </h1>
++    
++    <button 
++      onClick={() => {/* edit logic */}}
+      className="p-1 text-red-600 hover:text-red-800"
+      title="Edit Site"
+      data-testid={`mobile-edit-site-${site.id}`}
+@@ -37,6 +40,9 @@ function SiteMobileCard({ site }: { site: any }) {
+           <span className="sr-only">Delete Site</span>
+         </button>
+       </div>
++    
++    <button 
++      onClick={() => {/* delete logic */}}
+      className="p-1 text-red-600 hover:text-red-800"
+      title="Delete Site"
+      data-testid={`mobile-delete-site-${site.id}`}
+@@ -74,6 +80,9 @@ function SiteMobileCard({ site }: { site: any }) {
+         </span>
+       </div>
+     </div>
++    
++    {/* Domains */}
++  }

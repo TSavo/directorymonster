@@ -1,0 +1,13 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -134,6 +140,8 @@ function Example() {
+  }),
+    <div id="auth-popup" data-testid="auth_popup" style={{ width: '200px', zIndex: '1' }}>
+      <h2>Welcome Back!</h2>
++     <div id="auth-content" data-testid="auth_content">User successfully authenticated</div>
++     
+     <!-- Auth related content here -->
+   </div>
+ 

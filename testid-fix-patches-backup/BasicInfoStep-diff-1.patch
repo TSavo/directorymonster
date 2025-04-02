@@ -1,0 +1,13 @@
+# Patch for src/components/example.tsx
+
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -230,7 +230,7 @@ class BasicInfoStep extends React.ReactNode {
+       className={`w-full p-2 border rounded focus:ring-2 focus:border-blue-500 ${errors.description ? 'border-red-500' : 'border-gray-300'}`}
+       aria-invalid={errors.description ? "true" : "false"}
+       aria-describedby={errors.description ? "siteForm-description-error" : undefined}
+-      data-testid="siteForm-name"
++      data-testid="site-form-name"
+     />
+     {errors.description && (
+       

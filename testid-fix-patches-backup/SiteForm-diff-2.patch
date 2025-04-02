@@ -1,0 +1,14 @@
+# Patch for src/components/site-form.tsx
+
+--- a/src/components/site-form.tsx
++++ b/src/components/site-form.tsx
+@@ -301,7 +313,9 @@ function SiteForm({ mode, className, data-testid }) {
+     })
+   </div>
+
+-  <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" data-testid="next-button">
++  <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" 
++    data-testid="next-button">
+     Next
+   </button>
++

@@ -4,7 +4,7 @@ import { StepNavigation } from '@/components/admin/sites/components/StepNavigati
 
 // Mock step definitions
 const mockSteps = [
-  { id: 'basic-info', label: 'Basic Info' },
+  { id: 'basic_info', label: 'Basic Info' },
   { id: 'domains', label: 'Domains' },
   { id: 'theme', label: 'Theme' },
   { id: 'seo', label: 'SEO' }
@@ -17,14 +17,14 @@ describe('StepNavigation Component - Basic Rendering', () => {
     render(
       <StepNavigation 
         steps={mockSteps} 
-        currentStep="basic-info" 
+        activeStep="basic_info" 
         completedSteps={[]} 
         onStepChange={mockOnStepChange} 
       />
     );
     
     // Check if all steps are rendered
-    expect(screen.getByTestId('step-button-basic-info')).toBeInTheDocument();
+    expect(screen.getByTestId('step-button-basic_info')).toBeInTheDocument();
     expect(screen.getByTestId('step-button-domains')).toBeInTheDocument();
     expect(screen.getByTestId('step-button-theme')).toBeInTheDocument();
     expect(screen.getByTestId('step-button-seo')).toBeInTheDocument();
@@ -42,7 +42,7 @@ describe('StepNavigation Component - Basic Rendering', () => {
     render(
       <StepNavigation 
         steps={mockSteps} 
-        currentStep="basic-info" 
+        activeStep="basic_info" 
         completedSteps={[]} 
         onStepChange={mockOnStepChange} 
       />

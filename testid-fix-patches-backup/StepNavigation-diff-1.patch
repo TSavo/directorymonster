@@ -1,0 +1,19 @@
+# Patch for src/components/admin/sites/components/StepNavigation.tsx
+
+--- a/src/components/admin/sites/components/StepNavigation.tsx
++++ b/src/components/admin/sites/components/StepNavigation.tsx
+@@ -72,13 +72,14 @@ export const StepNavigation: React.FC<StepNavigationProps> = ({
+       className={`relative flex-grow px-2 text-center`}
+       data-testid={`step-item-${step.id}`}
+     >
+-      <button
++      <button 
+       type="button"
+       onClick={step.handleClick}
+-      data-testid="step-button-" + step.id
+       className="mb-1"
+-      >
++        >
+         {index + 1}
+       </span>
+       {step.label}
