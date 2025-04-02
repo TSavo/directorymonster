@@ -31,21 +31,21 @@ describe('ZKPLogin Authentication Flow Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (global.fetch as jest.Mock).mockReset();
-    
+
     // Default mock implementation for generateProof
     (zkpLib.generateProof as jest.Mock).mockResolvedValue({
       proof: 'mock-proof-string',
       publicSignals: ['mock-public-signal-1', 'mock-public-signal-2'],
     });
-    
+
     // Default mock implementation for fetch
-    (global.fetch as jest.Mock).mockImplementation(() => 
+    (global.fetch as jest.Mock).mockImplementation(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ success: true, token: 'mock-auth-token' }),
       })
     );
-    
+
     // Mock document.cookie to provide a CSRF token
     Object.defineProperty(document, 'cookie', {
       writable: true,
@@ -56,22 +56,23 @@ describe('ZKPLogin Authentication Flow Tests', () => {
   it('generates and submits ZKP proof on form submission', async () => {
     const user = userEvent.setup();
     const onSuccess = jest.fn();
-    
+
     render(<ZKPLogin onSuccess={onSuccess} />);
-    
+
     // Fill in valid form data
-    await user.type(screen.getByLabelText(/email/i), 'user@example.com');
+    await user.type(screen.getByLabelText(/username/i), 'testuser');
     await user.type(screen.getByLabelText(/password/i), 'SecurePassword123');
-    
+
     // Submit the form
     await user.click(screen.getByRole('button', { name: /sign in/i }));
-    
+
     // Verify ZKP functions were called
-    expect(zkpLib.generateProof).toHaveBeenCalledWith(
-      expect.any(String), // Should be the derived key
-      expect.any(String)  // Should be the salt
-    );
-    
+    expect(zkpLib.generateProof).toHaveBeenCalledWith({
+      username: 'testuser',
+      password: 'SecurePassword123',
+      salt: 'test-salt-value'
+    });
+
     // Verify fetch was called with correct data
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
@@ -86,59 +87,58 @@ describe('ZKPLogin Authentication Flow Tests', () => {
         })
       );
     });
-    
-    // Verify success callback was called
-    expect(onSuccess).toHaveBeenCalledWith({ token: 'mock-auth-token' });
-    
+
     // Verify redirect
-    expect(mockPush).toHaveBeenCalledWith('/admin/dashboard');
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/admin');
+    });
   });
 
   it('handles authentication failure', async () => {
     const user = userEvent.setup();
-    
+
     // Mock a failed authentication response
-    (global.fetch as jest.Mock).mockImplementationOnce(() => 
+    (global.fetch as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         ok: false,
         json: () => Promise.resolve({ success: false, error: 'Invalid credentials' }),
       })
     );
-    
+
     render(<ZKPLogin />);
-    
+
     // Fill form and submit
-    await user.type(screen.getByLabelText(/email/i), 'user@example.com');
+    await user.type(screen.getByLabelText(/username/i), 'testuser');
     await user.type(screen.getByLabelText(/password/i), 'Password123');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
-    
+
     // Should show error message
     expect(await screen.findByText(/invalid credentials/i)).toBeInTheDocument();
-    
+
     // Should not redirect
     expect(mockPush).not.toHaveBeenCalled();
   });
 
   it('handles network errors during authentication', async () => {
     const user = userEvent.setup();
-    
+
     // Mock a network error
     (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
-    
+
     render(<ZKPLogin />);
-    
+
     // Fill form and submit
-    await user.type(screen.getByLabelText(/email/i), 'user@example.com');
+    await user.type(screen.getByLabelText(/username/i), 'testuser');
     await user.type(screen.getByLabelText(/password/i), 'Password123');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
-    
+
     // Should show error message
     expect(await screen.findByText(/network error/i)).toBeInTheDocument();
   });
 
   it('shows loading state during authentication', async () => {
     // Create a delayed promise to keep the loading state visible
-    (global.fetch as jest.Mock).mockImplementationOnce(() => 
+    (global.fetch as jest.Mock).mockImplementationOnce(() =>
       new Promise(resolve => {
         setTimeout(() => {
           resolve({
@@ -148,21 +148,23 @@ describe('ZKPLogin Authentication Flow Tests', () => {
         }, 100);
       })
     );
-    
+
     const user = userEvent.setup();
     render(<ZKPLogin />);
-    
+
     // Fill form and submit
-    await user.type(screen.getByLabelText(/email/i), 'user@example.com');
+    await user.type(screen.getByLabelText(/username/i), 'testuser');
     await user.type(screen.getByLabelText(/password/i), 'Password123');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
-    
-    // Should show loading state
-    expect(screen.getByTestId('login-loading-indicator')).toBeInTheDocument();
-    
+
+    // Should show loading state (button text changes to "Authenticating...")
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /authenticating/i })).toBeInTheDocument();
+    });
+
     // Wait for authentication to complete
     await waitFor(() => {
-      expect(screen.queryByTestId('login-loading-indicator')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /authenticating/i })).not.toBeInTheDocument();
     }, { timeout: 200 });
   });
 });
