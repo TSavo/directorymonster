@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import BasicInfoStep from '@/components/admin/sites/components/BasicInfoStep';
+import { SiteFormProvider } from '@/components/admin/sites/context/SiteFormContext';
 
 describe('BasicInfoStep Component - Basic Rendering', () => {
   // Mock form values
@@ -16,11 +17,13 @@ describe('BasicInfoStep Component - Basic Rendering', () => {
 
   it('renders all form fields correctly', () => {
     render(
-      <BasicInfoStep
-        values={mockValues}
-        onChange={mockOnChange}
-        errors={mockErrors}
-      />
+      <SiteFormProvider>
+        <BasicInfoStep
+          values={mockValues}
+          onValueChange={mockOnChange}
+          errors={mockErrors}
+        />
+      </SiteFormProvider>
     );
 
     // Check if all form fields are rendered
@@ -42,11 +45,13 @@ describe('BasicInfoStep Component - Basic Rendering', () => {
     };
 
     render(
-      <BasicInfoStep
-        values={valuesWithData}
-        onChange={mockOnChange}
-        errors={mockErrors}
-      />
+      <SiteFormProvider>
+        <BasicInfoStep
+          values={valuesWithData}
+          onValueChange={mockOnChange}
+          errors={mockErrors}
+        />
+      </SiteFormProvider>
     );
 
     // Check if values are displayed in form fields
@@ -57,11 +62,13 @@ describe('BasicInfoStep Component - Basic Rendering', () => {
 
   it('shows helper text for form fields', () => {
     render(
-      <BasicInfoStep
-        values={mockValues}
-        onChange={mockOnChange}
-        errors={mockErrors}
-      />
+      <SiteFormProvider>
+        <BasicInfoStep
+          values={mockValues}
+          onValueChange={mockOnChange}
+          errors={mockErrors}
+        />
+      </SiteFormProvider>
     );
 
     // The helper text is now part of the label, not a separate element with a testid
