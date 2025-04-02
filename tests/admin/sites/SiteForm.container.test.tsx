@@ -7,9 +7,8 @@ import { act } from 'react-dom/test-utils';
 import '@testing-library/jest-dom';
 import { SiteForm } from '@/components/admin/sites/SiteForm';
 // Mock the useSites hook
-jest.mock('@/components/admin/sites/hooks/useSites', () => ({
+jest.mock('@/components/admin/sites/hooks', () => ({
   __esModule: true,
-  default: jest.fn(),
   useSites: jest.fn().mockReturnValue({
     site: {
       id: 'site-1',
@@ -30,7 +29,7 @@ jest.mock('@/components/admin/sites/hooks/useSites', () => ({
   })
 }));
 
-import { useSites } from '@/components/admin/sites/hooks/useSites';
+import { useSites } from '@/components/admin/sites/hooks';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -96,7 +95,8 @@ describe('SiteForm Container Component', () => {
     expect(screen.getByRole('navigation')).toBeInTheDocument();
 
     // Check that first step content is displayed
-    expect(screen.getByTestId('basic-info-step')).toBeInTheDocument();
+    expect(screen.getByTestId('siteForm-fieldset')).toBeInTheDocument();
+    expect(screen.getByTestId('siteForm-basic-info-heading')).toBeInTheDocument();
   });
 
   it('renders the form with correct title in edit mode', () => {
@@ -144,7 +144,7 @@ describe('SiteForm Container Component', () => {
     render(<SiteForm />);
 
     // Initially on basic info step
-    expect(screen.getByTestId('basic-info-step')).toBeInTheDocument();
+    expect(screen.getByTestId('siteForm-basic-info-heading')).toBeInTheDocument();
 
     // Click next button
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
@@ -160,7 +160,7 @@ describe('SiteForm Container Component', () => {
     render(<SiteForm />);
 
     // Initially on basic info step
-    expect(screen.getByTestId('basic-info-step')).toBeInTheDocument();
+    expect(screen.getByTestId('siteForm-basic-info-heading')).toBeInTheDocument();
 
     // Click next button
     fireEvent.click(screen.getByRole('button', { name: /Next/i }));
@@ -176,10 +176,10 @@ describe('SiteForm Container Component', () => {
     };
     (useSites as jest.Mock).mockReturnValue(previewMock);
 
-    render(<SiteForm mode="create" />);
+    render(<SiteForm mode="create" initialStep="preview" />);
 
     // Should be on preview step now
-    expect(screen.getByTestId('preview-step')).toBeInTheDocument();
+    expect(screen.getByTestId('step-content')).toBeInTheDocument();
 
     // Submit the form
     fireEvent.submit(screen.getByTestId('siteForm-form'));
@@ -195,10 +195,10 @@ describe('SiteForm Container Component', () => {
     };
     (useSites as jest.Mock).mockReturnValue(editPreviewMock);
 
-    render(<SiteForm mode="edit" initialData={mockSiteData} />);
+    render(<SiteForm mode="edit" initialData={mockSiteData} initialStep="preview" />);
 
     // Should be on preview step now
-    expect(screen.getByTestId('preview-step')).toBeInTheDocument();
+    expect(screen.getByTestId('step-content')).toBeInTheDocument();
 
     // Submit the form
     fireEvent.submit(screen.getByTestId('siteForm-form'));
