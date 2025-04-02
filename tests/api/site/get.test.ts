@@ -32,24 +32,24 @@ describe('Site API - GET', () => {
     // Mock the Redis client to return null for site
     const { kv } = require('../../../src/lib/redis-client');
     (kv.get as jest.Mock).mockResolvedValue(null);
-    
+
     // Create request
     const request = new NextRequest('http://localhost:3000/api/sites/non-existent');
-    
+
     // Execute the route handler
     const response = await GET(request, { params: { siteSlug: 'non-existent' } });
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the response
     expect(response.status).toBe(404);
     expect(data).toEqual({
       error: 'Site not found',
     });
-    
+
     // Verify the Redis client was called correctly
-    expect(kv.get).toHaveBeenCalledWith('site:slug:non-existent');
+    expect(kv.get).toHaveBeenCalledWith('test:site:slug:non-existent');
   });
 
   it('should return site configuration for a valid site', async () => {
@@ -66,25 +66,25 @@ describe('Site API - GET', () => {
       createdAt: 1000,
       updatedAt: 1000,
     };
-    
+
     // Mock the Redis client
     const { kv } = require('../../../src/lib/redis-client');
     (kv.get as jest.Mock).mockResolvedValue(mockSite);
-    
+
     // Create request
     const request = new NextRequest('http://localhost:3000/api/sites/test-site');
-    
+
     // Execute the route handler
     const response = await GET(request, { params: { siteSlug: 'test-site' } });
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the response
     expect(response.status).toBe(200);
     expect(data).toEqual(mockSite);
-    
+
     // Verify the Redis client was called correctly
-    expect(kv.get).toHaveBeenCalledWith('site:slug:test-site');
+    expect(kv.get).toHaveBeenCalledWith('test:site:slug:test-site');
   });
 });
