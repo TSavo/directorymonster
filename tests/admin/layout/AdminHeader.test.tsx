@@ -20,6 +20,14 @@ jest.mock('next/link', () => {
   };
 });
 
+// Mock the icons
+jest.mock('@/components/admin/layout/icons', () => ({
+  __esModule: true,
+  MenuIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="menu-icon" />,
+  BellIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="bell-icon" />,
+  UserIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="user-icon" />
+}));
+
 describe('AdminHeader Component', () => {
   const mockToggleSidebar = jest.fn();
 
