@@ -74,7 +74,9 @@ describe('Tenant Access Middleware', () => {
         get: jest.fn().mockImplementation((name) => headers[name] || null),
       },
       url,
-      clone: jest.fn().mockReturnThis()
+      clone: jest.fn().mockReturnThis(),
+      // Add pathname property to match URL object structure
+      pathname: new URL(url).pathname
     } as unknown as NextRequest;
   };
 
@@ -159,8 +161,10 @@ describe('Tenant Access Middleware', () => {
 
       expect(decode).toHaveBeenCalledWith('valid-token');
       expect(RoleService.hasRoleInTenant).toHaveBeenCalledWith('user-123', 'tenant-123');
+      // Check that the handler was called and returned a success response
       expect(handler).toHaveBeenCalledWith(req);
-      expect(result).toEqual(NextResponse.json(handlerResult));
+      expect(result.status).toBe(200);
+      expect(result.body).toEqual(handlerResult);
     });
 
     it('should handle internal errors gracefully', async () => {
@@ -189,7 +193,7 @@ describe('Tenant Access Middleware', () => {
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer valid-token'
       }, 'http://localhost:3000/api/categories/cat-123');
-      
+
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
       // Mock RoleService for tenant access and permission check
@@ -218,7 +222,7 @@ describe('Tenant Access Middleware', () => {
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer valid-token'
       }, 'http://localhost:3000/api/categories/cat-123');
-      
+
       const handlerResult = { success: true };
       const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));
 
@@ -237,7 +241,10 @@ describe('Tenant Access Middleware', () => {
         'cat-123'
       );
       expect(handler).toHaveBeenCalled();
-      expect(result).toEqual(NextResponse.json(handlerResult));
+      // Check that the handler was called and returned a success response
+      expect(handler).toHaveBeenCalledWith(req);
+      expect(result.status).toBe(200);
+      expect(result.body).toEqual(handlerResult);
     });
 
     it('should respect tenant access rejection', async () => {
@@ -245,7 +252,7 @@ describe('Tenant Access Middleware', () => {
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer valid-token'
       });
-      
+
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
       // Mock RoleService to deny tenant access
@@ -282,18 +289,18 @@ describe('Tenant Access Middleware', () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123'
       });
-      
+
       const handlerResult = { success: true };
       const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));
 
       const result = await withTenantContext(req, handler);
 
       expect(handler).toHaveBeenCalled();
-      
+
       // Check that the request passed to the handler has the tenant ID
       const handlerArg = handler.mock.calls[0][0];
       expect(handlerArg.headers.get('x-tenant-id')).toBe('tenant-123');
-      
+
       expect(result).toEqual(NextResponse.json(handlerResult));
     });
 
@@ -301,7 +308,7 @@ describe('Tenant Access Middleware', () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123'
       });
-      
+
       // Force an error in the handler
       const handler = jest.fn().mockImplementation(() => {
         throw new Error('Handler error');
