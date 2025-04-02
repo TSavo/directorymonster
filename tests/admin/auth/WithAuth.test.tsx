@@ -58,9 +58,12 @@ describe('WithAuth component', () => {
       );
     });
 
-    // Should render default loading component
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    // Should render default loading component and not the protected content
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
+
+    // Check for the loading spinner
+    const loadingSpinner = document.querySelector('.animate-spin');
+    expect(loadingSpinner).toBeInTheDocument();
 
     // Should not redirect yet
     expect(mockRouter.push).not.toHaveBeenCalled();
