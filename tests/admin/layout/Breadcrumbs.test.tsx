@@ -6,7 +6,12 @@ import { Breadcrumbs } from '@/components/admin/layout';
 jest.mock('next/link', () => {
   return ({ href, children, className, 'aria-current': ariaCurrent, ...rest }: any) => {
     return (
-      <a href={href} className={className} aria-current={ariaCurrent} {...rest}>
+      <a
+        href={href}
+        className={className}
+        aria-current={ariaCurrent}
+        data-testid={rest['data-testid']}
+      >
         {children}
       </a>
     );
