@@ -25,7 +25,7 @@ const AdminHeader = jest.fn().mockImplementation(({ toggleSidebar }) => {
   // Create dropdown elements
   const notificationsDropdown = notificationsOpen ?
     React.createElement('div', { key: 'notifications-dropdown', 'data-testid': 'notifications-dropdown' }, [
-      React.createElement('h3', { key: 'notifications-title' }, 'Notifications'),
+      React.createElement('div', { key: 'notifications-title' }, 'Notifications'),
       React.createElement('p', { key: 'no-notifications' }, 'No new notifications')
     ]) : null;
 
@@ -43,7 +43,7 @@ const AdminHeader = jest.fn().mockImplementation(({ toggleSidebar }) => {
           React.createElement('a', { href: '#', onClick: () => setUserMenuOpen(false) }, 'Settings')
         ),
         React.createElement('li', { key: 'logout' },
-          React.createElement('a', { href: '#', onClick: () => setUserMenuOpen(false) }, 'Logout')
+          React.createElement('a', { href: '#', onClick: () => setUserMenuOpen(false) }, 'Sign out')
         )
       ])
     ]) : null;
