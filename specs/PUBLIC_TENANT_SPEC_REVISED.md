@@ -27,13 +27,13 @@ The "Public Tenant" will serve as a default landing space for all new users befo
 
 2. **Automatic User Assignment**
    - On user registration/creation, automatically assign to the public tenant
-   - Assign a default "Public Member" role with minimal permissions
+   - NO ROLES or ACLs needed for the public tenant - it's just a container
    - Use the existing TenantMembershipService for the assignment
 
 3. **Admin Tenant Assignment Interface**
    - Display users in the public tenant via the admin panel
    - Allow tenant admins to assign users to additional tenants
-   - Support role selection during tenant assignment
+   - Support role selection during tenant assignment to non-public tenants
 
 4. **Clear Separation of Responsibilities**
    - PublicTenantService: Responsible ONLY for ensuring public tenant exists and configuring it
@@ -49,7 +49,6 @@ The "Public Tenant" will serve as a default landing space for all new users befo
    // New service file: src/lib/tenant/public-tenant-service.ts
    export class PublicTenantService {
      static PUBLIC_TENANT_ID = 'public';
-     static PUBLIC_MEMBER_ROLE_ID = 'public-member';
      
      /**
       * Ensure the public tenant exists, creating it if necessary
@@ -57,7 +56,7 @@ The "Public Tenant" will serve as a default landing space for all new users befo
      static async ensurePublicTenant(): Promise<TenantConfig>
      
      /**
-      * Add a user to the public tenant with the default role
+      * Add a user to the public tenant
       * Delegates to TenantMembershipService
       */
      static async addUserToPublicTenant(userId: string): Promise<boolean>
@@ -91,6 +90,7 @@ The "Public Tenant" will serve as a default landing space for all new users befo
 ## Implementation Guidelines
 
 1. **Keep It Simple**
+   - NO ROLES or ACLs for the public tenant
    - Reuse existing tenant membership infrastructure
    - Avoid creating new "transfer" or special operations
    - Minimize duplication of logic
@@ -98,7 +98,7 @@ The "Public Tenant" will serve as a default landing space for all new users befo
 2. **Clear Responsibility Boundaries**
    - PublicTenantService: Only responsible for public tenant existence and configuration
    - TenantMembershipService: Handles all user-tenant memberships
-   - RoleService: Manages roles and permissions
+   - RoleService: Not used for public tenant (only for regular tenants)
 
 3. **Essential vs. Nice-to-Have Features**
    - Essential: Public tenant creation and automatic user assignment

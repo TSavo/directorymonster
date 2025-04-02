@@ -8,7 +8,6 @@ import { PublicTenantService } from './public-tenant-service';
 import TenantService from './tenant-service';
 import TenantMembershipService from '@/lib/tenant-membership-service';
 import { redis, kv } from '@/lib/redis-client';
-import RoleService from '@/lib/role';
 
 // Mock the dependencies
 jest.mock('./tenant-service');
@@ -23,7 +22,6 @@ jest.mock('@/lib/redis-client', () => ({
     get: jest.fn(),
   },
 }));
-jest.mock('@/lib/role');
 
 describe('PublicTenantService', () => {
   beforeEach(() => {
@@ -68,12 +66,6 @@ describe('PublicTenantService', () => {
         hostname => hostname
       );
       
-      // Mock the ensurePublicMemberRole method
-      const ensureRoleSpy = jest.spyOn(
-        PublicTenantService as any, 
-        'ensurePublicMemberRole'
-      ).mockResolvedValue(undefined);
-      
       // Call the method
       const result = await PublicTenantService.ensurePublicTenant();
       
@@ -95,9 +87,6 @@ describe('PublicTenantService', () => {
         'hostname:public.directorymonster.local',
         'public'
       );
-      
-      // Check that the public member role was created
-      expect(ensureRoleSpy).toHaveBeenCalled();
       
       // Check the returned tenant
       expect(result).toEqual(
@@ -124,7 +113,7 @@ describe('PublicTenantService', () => {
   });
 
   describe('addUserToPublicTenant', () => {
-    it('should add a user to the public tenant', async () => {
+    it('should add a user to the public tenant without a role', async () => {
       // Mock the dependencies
       const mockEnsureTenant = jest.spyOn(
         PublicTenantService,
@@ -139,11 +128,10 @@ describe('PublicTenantService', () => {
       // Check that the tenant was ensured
       expect(mockEnsureTenant).toHaveBeenCalled();
       
-      // Check that the user was added to the tenant
+      // Check that the user was added to the tenant WITHOUT a role
       expect(TenantMembershipService.addUserToTenant).toHaveBeenCalledWith(
         'user123',
-        'public',
-        'public-member'
+        'public'
       );
       
       // Check the result

@@ -13,7 +13,6 @@
 import { redis, kv } from '@/lib/redis-client';
 import TenantService, { TenantConfig } from './tenant-service';
 import TenantMembershipService from '@/lib/tenant-membership-service';
-import RoleService from '@/lib/role';
 
 /**
  * PublicTenantService provides methods for managing the public tenant.
@@ -21,7 +20,6 @@ import RoleService from '@/lib/role';
 export class PublicTenantService {
   // Constants for the public tenant
   static PUBLIC_TENANT_ID = 'public';
-  static PUBLIC_MEMBER_ROLE_ID = 'public-member';
   
   /**
    * Ensure the public tenant exists, creating it if necessary
@@ -72,9 +70,6 @@ export class PublicTenantService {
         await kv.set(`hostname:${normalizedHostname}`, this.PUBLIC_TENANT_ID);
       }
       
-      // Create the public member role if it doesn't exist
-      await this.ensurePublicMemberRole();
-      
       return tenant;
     } catch (error) {
       console.error('Error ensuring public tenant exists:', error);
@@ -83,46 +78,9 @@ export class PublicTenantService {
   }
   
   /**
-   * Create the public member role if it doesn't exist
-   */
-  private static async ensurePublicMemberRole(): Promise<void> {
-    try {
-      // Check if the role already exists
-      const existingRole = await RoleService.getRole(
-        this.PUBLIC_TENANT_ID,
-        this.PUBLIC_MEMBER_ROLE_ID
-      );
-      
-      if (existingRole) {
-        return;
-      }
-      
-      // Create public member role with minimal permissions
-      await RoleService.createRole({
-        id: this.PUBLIC_MEMBER_ROLE_ID,
-        tenantId: this.PUBLIC_TENANT_ID,
-        name: 'Public Member',
-        description: 'Default role for users in the public tenant',
-        permissions: [
-          {
-            resourceType: 'profile',
-            actions: ['view', 'edit']
-          },
-          {
-            resourceType: 'tenant',
-            actions: ['view']
-          }
-        ]
-      });
-    } catch (error) {
-      console.error('Error ensuring public member role exists:', error);
-      throw new Error('Failed to ensure public member role exists');
-    }
-  }
-  
-  /**
-   * Add a user to the public tenant with the default role
+   * Add a user to the public tenant
    * This delegates to TenantMembershipService for the actual tenant assignment
+   * No roles are assigned since the public tenant doesn't use ACLs
    * 
    * @param userId User ID to add to the public tenant
    * @returns true if successful, false otherwise
@@ -134,10 +92,10 @@ export class PublicTenantService {
       
       // Add user to the public tenant
       // Delegate to TenantMembershipService for the actual tenant assignment
+      // Note: No role is provided - public tenant users don't have specific roles
       const success = await TenantMembershipService.addUserToTenant(
         userId,
-        this.PUBLIC_TENANT_ID,
-        this.PUBLIC_MEMBER_ROLE_ID
+        this.PUBLIC_TENANT_ID
       );
       
       return success;
