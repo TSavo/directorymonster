@@ -117,9 +117,9 @@ const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar, activ
         { key: 'nav' },
         [
           React.createElement('a',
-            { 
-              key: 'dashboard', 
-              href: '/admin', 
+            {
+              key: 'dashboard',
+              href: '/admin',
               'data-testid': 'nav-dashboard',
               className: getLinkClass('/admin'),
               onClick: () => isOpen && closeSidebar()
@@ -127,9 +127,9 @@ const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar, activ
             'Dashboard'
           ),
           React.createElement('a',
-            { 
-              key: 'sites', 
-              href: '/admin/sites', 
+            {
+              key: 'sites',
+              href: '/admin/sites',
               'data-testid': 'nav-sites',
               className: getLinkClass('/admin/sites'),
               onClick: () => isOpen && closeSidebar()
@@ -137,9 +137,9 @@ const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar, activ
             'Sites'
           ),
           React.createElement('a',
-            { 
-              key: 'categories', 
-              href: '/admin/categories', 
+            {
+              key: 'categories',
+              href: '/admin/categories',
               'data-testid': 'nav-categories',
               className: getLinkClass('/admin/categories'),
               onClick: () => isOpen && closeSidebar()
@@ -147,9 +147,9 @@ const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar, activ
             'Categories'
           ),
           React.createElement('a',
-            { 
-              key: 'listings', 
-              href: '/admin/listings', 
+            {
+              key: 'listings',
+              href: '/admin/listings',
               'data-testid': 'nav-listings',
               className: getLinkClass('/admin/listings'),
               onClick: () => isOpen && closeSidebar()
@@ -157,9 +157,9 @@ const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar, activ
             'Listings'
           ),
           React.createElement('a',
-            { 
-              key: 'users', 
-              href: '/admin/users', 
+            {
+              key: 'users',
+              href: '/admin/users',
               'data-testid': 'nav-users',
               className: getLinkClass('/admin/users'),
               onClick: () => isOpen && closeSidebar()
@@ -167,9 +167,9 @@ const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar, activ
             'Users'
           ),
           React.createElement('a',
-            { 
-              key: 'analytics', 
-              href: '/admin/analytics', 
+            {
+              key: 'analytics',
+              href: '/admin/analytics',
               'data-testid': 'nav-analytics',
               className: getLinkClass('/admin/analytics'),
               onClick: () => isOpen && closeSidebar()
@@ -177,9 +177,9 @@ const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar, activ
             'Analytics'
           ),
           React.createElement('a',
-            { 
-              key: 'settings', 
-              href: '/admin/settings', 
+            {
+              key: 'settings',
+              href: '/admin/settings',
               'data-testid': 'nav-settings',
               className: getLinkClass('/admin/settings'),
               onClick: () => isOpen && closeSidebar()
@@ -190,7 +190,7 @@ const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar, activ
       )
     ]
   );
-});ents
+});
 jest.mock('@/components/admin/layout/AdminHeader', () => ({
   __esModule: true,
   AdminHeader,
