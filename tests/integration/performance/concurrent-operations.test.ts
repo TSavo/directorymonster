@@ -1,8 +1,8 @@
 /**
  * @jest-environment node
- * 
+ *
  * Concurrent Operations Integration Tests
- * 
+ *
  * These tests verify that the application correctly handles concurrent operations
  * including parallel reads, simultaneous writes, and proper transaction isolation.
  */
@@ -27,13 +27,21 @@ beforeAll(async () => {
   sites = testData.sites;
   categories = testData.categories;
   listings = testData.listings;
-  
+
   // Make test data available globally for imported modules
   global.__TEST_DATA__ = {
     sites,
     categories,
     listings
   };
+
+  console.log('Test environment setup complete');
+  console.log(`Created ${sites.length} sites, ${categories.length} categories, and ${listings.length} listings`);
+
+  // Log the first site for debugging
+  if (sites.length > 0) {
+    console.log('First test site:', sites[0]);
+  }
 });
 
 afterAll(async () => {
