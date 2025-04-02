@@ -9,6 +9,7 @@
 
 import { setupTestEnvironment, clearTestData } from '../setup';
 import { SiteConfig, Category, Listing } from '../../../src/types';
+import { kv } from '../../../src/lib/redis-client';
 
 // Import test modules
 import './concurrent-operations/parallel-reads.test';
@@ -23,6 +24,9 @@ let listings: Listing[];
 
 // Setup the test environment once for all concurrent operation tests
 beforeAll(async () => {
+  console.log('Setting up test environment for concurrent operations tests...');
+
+  // Clear any existing test data and set up fresh test data
   const testData = await setupTestEnvironment();
   sites = testData.sites;
   categories = testData.categories;
@@ -40,7 +44,15 @@ beforeAll(async () => {
 
   // Log the first site for debugging
   if (sites.length > 0) {
-    console.log('First test site:', sites[0]);
+    console.log('First test site:', JSON.stringify(sites[0]));
+  }
+
+  // Verify that we can access the test data through Redis
+  const firstSiteFromRedis = await kv.get(`test:site:slug:${sites[0].slug}`);
+  console.log('First site from Redis:', firstSiteFromRedis ? 'Found' : 'Not found');
+
+  if (!firstSiteFromRedis) {
+    console.warn('Test site not found in Redis, tests may fail!');
   }
 });
 

@@ -1,6 +1,6 @@
 /**
  * Integration Test Setup Utilities
- * 
+ *
  * This file provides common utilities and setup procedures for integration tests.
  * It includes functions for setting up test environments, mocking multi-tenancy,
  * and managing test data across integration test suites.
@@ -16,16 +16,19 @@ import { SiteConfig, Category, Listing } from '../../src/types';
 export async function setupTestEnvironment() {
   // Clear any existing test data
   await clearTestData();
-  
+
   // Create test sites
   const sites = await createTestSites();
-  
+
   // Create test categories for each site
   const categories = await createTestCategories(sites);
-  
+
   // Create test listings for each category
   const listings = await createTestListings(sites, categories);
-  
+
+  // Verify data was properly stored in Redis
+  await verifyTestData(sites, categories, listings);
+
   return {
     sites,
     categories,
@@ -34,12 +37,99 @@ export async function setupTestEnvironment() {
 }
 
 /**
+ * Verifies that test data was properly stored in Redis
+ */
+async function verifyTestData(sites: SiteConfig[], categories: Category[], listings: Listing[]) {
+  console.log('Verifying test data in Redis...');
+
+  // Verify sites
+  for (const site of sites) {
+    const storedSiteById = await kv.get(`test:site:id:${site.id}`);
+    const storedSiteBySlug = await kv.get(`test:site:slug:${site.slug}`);
+
+    if (!storedSiteById) {
+      console.error(`Site with ID ${site.id} not found in Redis`);
+      // Re-store the site
+      await kv.set(`test:site:id:${site.id}`, JSON.stringify(site));
+    }
+
+    if (!storedSiteBySlug) {
+      console.error(`Site with slug ${site.slug} not found in Redis`);
+      // Re-store the site
+      await kv.set(`test:site:slug:${site.slug}`, JSON.stringify(site));
+    }
+  }
+
+  // Verify categories
+  for (const category of categories) {
+    const storedCategoryById = await kv.get(`test:category:id:${category.id}`);
+    const storedCategoryBySiteAndSlug = await kv.get(`test:category:site:${category.siteId}:${category.slug}`);
+
+    if (!storedCategoryById) {
+      console.error(`Category with ID ${category.id} not found in Redis`);
+      // Re-store the category
+      await kv.set(`test:category:id:${category.id}`, JSON.stringify(category));
+    }
+
+    if (!storedCategoryBySiteAndSlug) {
+      console.error(`Category with site ID ${category.siteId} and slug ${category.slug} not found in Redis`);
+      // Re-store the category
+      await kv.set(`test:category:site:${category.siteId}:${category.slug}`, JSON.stringify(category));
+    }
+  }
+
+  // Verify listings
+  for (const listing of listings) {
+    const storedListingById = await kv.get(`test:listing:id:${listing.id}`);
+    const storedListingBySiteAndSlug = await kv.get(`test:listing:site:${listing.siteId}:${listing.slug}`);
+    const storedListingByCategoryAndSlug = await kv.get(`test:listing:category:${listing.categoryId}:${listing.slug}`);
+
+    if (!storedListingById) {
+      console.error(`Listing with ID ${listing.id} not found in Redis`);
+      // Re-store the listing
+      await kv.set(`test:listing:id:${listing.id}`, JSON.stringify(listing));
+    }
+
+    if (!storedListingBySiteAndSlug) {
+      console.error(`Listing with site ID ${listing.siteId} and slug ${listing.slug} not found in Redis`);
+      // Re-store the listing
+      await kv.set(`test:listing:site:${listing.siteId}:${listing.slug}`, JSON.stringify(listing));
+    }
+
+    if (!storedListingByCategoryAndSlug) {
+      console.error(`Listing with category ID ${listing.categoryId} and slug ${listing.slug} not found in Redis`);
+      // Re-store the listing
+      await kv.set(`test:listing:category:${listing.categoryId}:${listing.slug}`, JSON.stringify(listing));
+    }
+  }
+
+  // Verify Redis has the expected number of keys
+  const allKeys = await kv.keys('test:*');
+  console.log(`Redis has ${allKeys.length} test keys`);
+
+  // Expected number of keys:
+  // - Sites: 2 keys per site (id, slug) + 1 key per domain
+  // - Categories: 2 keys per category (id, site+slug)
+  // - Listings: 3 keys per listing (id, site+slug, category+slug)
+  const expectedKeyCount =
+    sites.length * 2 + sites.filter(s => s.domain).length +
+    categories.length * 2 +
+    listings.length * 3;
+
+  console.log(`Expected ${expectedKeyCount} keys, found ${allKeys.length} keys`);
+
+  if (allKeys.length < expectedKeyCount) {
+    console.warn('Some keys may be missing from Redis');
+  }
+}
+
+/**
  * Clears all test data from Redis
  */
 export async function clearTestData() {
   // Find all test keys
   const testKeys = await kv.keys('test:*');
-  
+
   // Delete all test keys
   if (testKeys.length > 0) {
     const multi = redis.multi();
@@ -54,51 +144,65 @@ export async function clearTestData() {
  * Creates test sites for integration testing
  */
 export async function createTestSites(): Promise<SiteConfig[]> {
+  const timestamp = Date.now();
   const sites: SiteConfig[] = [
     {
-      id: 'test-site-1',
-      name: 'Test Fishing Site',
-      slug: 'test-fishing',
-      domain: 'test-fishing.localhost',
-      primaryKeyword: 'fishing gear',
-      metaDescription: 'Test fishing gear directory for integration testing',
-      headerText: 'Fishing Gear Directory',
+      id: 'site1',
+      name: 'Test Site 1',
+      slug: 'test-site-1',  // This matches the slug used in tests
+      domain: 'test-site-1.localhost',
+      primaryKeyword: 'test site',
+      metaDescription: 'Test site 1 for integration testing',
+      headerText: 'Test Site 1',
       defaultLinkAttributes: 'dofollow',
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: timestamp,
+      updatedAt: timestamp,
     },
     {
-      id: 'test-site-2',
-      name: 'Test Hiking Site',
-      slug: 'test-hiking',
-      domain: 'test-hiking.localhost',
-      primaryKeyword: 'hiking gear',
-      metaDescription: 'Test hiking gear directory for integration testing',
-      headerText: 'Hiking Gear Directory',
+      id: 'site2',
+      name: 'Test Site 2',
+      slug: 'test-site-2',  // This matches the slug used in tests
+      domain: 'test-site-2.localhost',
+      primaryKeyword: 'test site 2',
+      metaDescription: 'Test site 2 for integration testing',
+      headerText: 'Test Site 2',
       defaultLinkAttributes: 'dofollow',
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: timestamp,
+      updatedAt: timestamp,
     }
   ];
-  
+
+  console.log(`Creating ${sites.length} test sites...`);
+
   // Store sites in Redis
   const multi = redis.multi();
-  
+
   sites.forEach(site => {
     // Store by ID
     multi.set(`test:site:id:${site.id}`, JSON.stringify(site));
-    
+
     // Store by slug
     multi.set(`test:site:slug:${site.slug}`, JSON.stringify(site));
-    
+
     // Store by domain
     if (site.domain) {
       multi.set(`test:site:domain:${site.domain}`, JSON.stringify(site));
     }
+
+    // Add to global sites index
+    multi.sadd('test:sites', site.id);
   });
-  
-  await multi.exec();
-  
+
+  const results = await multi.exec();
+
+  // Check for errors in the transaction
+  const errors = results.filter(([err]) => err !== null);
+  if (errors.length > 0) {
+    console.error('Error storing test sites:', errors);
+  } else {
+    console.log(`Successfully stored ${sites.length} test sites in Redis`);
+  }
+
   return sites;
 }
 
@@ -106,60 +210,76 @@ export async function createTestSites(): Promise<SiteConfig[]> {
  * Creates test categories for each test site
  */
 export async function createTestCategories(sites: SiteConfig[]): Promise<Category[]> {
+  const timestamp = Date.now();
   const categories: Category[] = [];
-  
+
+  console.log(`Creating test categories for ${sites.length} sites...`);
+
   // Create categories for each site
   for (const site of sites) {
     const siteCategories: Category[] = [
       {
-        id: `test-category-${site.id}-1`,
+        id: `cat1`,  // Simple ID for first site's first category
         siteId: site.id,
         name: 'Category 1',
         slug: 'category-1',
         metaDescription: 'Test category 1',
         order: 1,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
+        createdAt: timestamp,
+        updatedAt: timestamp,
       },
       {
-        id: `test-category-${site.id}-2`,
+        id: `cat2`,  // Simple ID for first site's second category
         siteId: site.id,
         name: 'Category 2',
         slug: 'category-2',
         metaDescription: 'Test category 2',
         order: 2,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
+        createdAt: timestamp,
+        updatedAt: timestamp,
       },
       {
-        id: `test-category-${site.id}-3`,
+        id: `cat3`,  // Simple ID for first site's third category
         siteId: site.id,
         name: 'Category 3',
         slug: 'category-3',
         metaDescription: 'Test category 3',
-        parentId: `test-category-${site.id}-1`, // Make this a subcategory
+        parentId: `cat1`, // Make this a subcategory
         order: 3,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
+        createdAt: timestamp,
+        updatedAt: timestamp,
       }
     ];
-    
+
     categories.push(...siteCategories);
   }
-  
+
+  console.log(`Created ${categories.length} test categories in memory`);
+
   // Store categories in Redis
   const multi = redis.multi();
-  
+
   categories.forEach(category => {
     // Store by ID
     multi.set(`test:category:id:${category.id}`, JSON.stringify(category));
-    
+
     // Store by site and slug
     multi.set(`test:category:site:${category.siteId}:${category.slug}`, JSON.stringify(category));
+
+    // Add to site categories index
+    multi.sadd(`test:site:${category.siteId}:categories`, category.id);
   });
-  
-  await multi.exec();
-  
+
+  const results = await multi.exec();
+
+  // Check for errors in the transaction
+  const errors = results.filter(([err]) => err !== null);
+  if (errors.length > 0) {
+    console.error('Error storing test categories:', errors);
+  } else {
+    console.log(`Successfully stored ${categories.length} test categories in Redis`);
+  }
+
   return categories;
 }
 
@@ -167,18 +287,21 @@ export async function createTestCategories(sites: SiteConfig[]): Promise<Categor
  * Creates test listings for each category
  */
 export async function createTestListings(sites: SiteConfig[], categories: Category[]): Promise<Listing[]> {
+  const timestamp = Date.now();
   const listings: Listing[] = [];
-  
+
+  console.log(`Creating test listings for ${categories.length} categories...`);
+
   // Create listings for each category
   for (const category of categories) {
     // Create 2 listings per category
     for (let i = 1; i <= 2; i++) {
       const listing: Listing = {
-        id: `test-listing-${category.id}-${i}`,
+        id: `listing_${timestamp}_${category.id}_${i}`,
         siteId: category.siteId,
         categoryId: category.id,
         title: `Test Listing ${i} in ${category.name}`,
-        slug: `test-listing-${i}-${category.slug}`,
+        slug: `test-listing-${i}`,  // Simple slug for easier testing
         metaDescription: `Test listing ${i} in ${category.name}`,
         content: `This is test listing ${i} in ${category.name} for integration testing.`,
         backlinkUrl: `https://example.com/test/${i}`,
@@ -189,30 +312,46 @@ export async function createTestListings(sites: SiteConfig[], categories: Catego
           field1: `Value ${i}`,
           field2: i,
         },
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
+        createdAt: timestamp,
+        updatedAt: timestamp,
       };
-      
+
       listings.push(listing);
     }
   }
-  
+
+  console.log(`Created ${listings.length} test listings in memory`);
+
   // Store listings in Redis
   const multi = redis.multi();
-  
+
   listings.forEach(listing => {
     // Store by ID
     multi.set(`test:listing:id:${listing.id}`, JSON.stringify(listing));
-    
+
     // Store by site and slug
     multi.set(`test:listing:site:${listing.siteId}:${listing.slug}`, JSON.stringify(listing));
-    
+
     // Store by category and slug
     multi.set(`test:listing:category:${listing.categoryId}:${listing.slug}`, JSON.stringify(listing));
+
+    // Add to site listings index
+    multi.sadd(`test:site:${listing.siteId}:listings`, listing.id);
+
+    // Add to category listings index
+    multi.sadd(`test:category:${listing.categoryId}:listings`, listing.id);
   });
-  
-  await multi.exec();
-  
+
+  const results = await multi.exec();
+
+  // Check for errors in the transaction
+  const errors = results.filter(([err]) => err !== null);
+  if (errors.length > 0) {
+    console.error('Error storing test listings:', errors);
+  } else {
+    console.log(`Successfully stored ${listings.length} test listings in Redis`);
+  }
+
   return listings;
 }
 
@@ -231,16 +370,16 @@ export function createMockRequest(url: string, options: {
     host: hostname,
     ...(options.headers || {}),
   };
-  
+
   // Create the request URL
   const requestUrl = new URL(url, `http://${hostname}`);
-  
+
   // Create request options
   const requestInit: RequestInit = {
     method,
     headers,
   };
-  
+
   // Add body if provided
   if (options.body) {
     if (typeof options.body === 'object') {
@@ -250,7 +389,7 @@ export function createMockRequest(url: string, options: {
       requestInit.body = String(options.body);
     }
   }
-  
+
   return new NextRequest(requestUrl, requestInit);
 }
 
