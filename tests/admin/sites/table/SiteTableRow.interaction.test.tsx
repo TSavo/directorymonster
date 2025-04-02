@@ -25,56 +25,61 @@ const mockSite = {
 describe('SiteTableRow Component - Interaction', () => {
   // Setup test user for interactions
   const user = userEvent.setup();
-  
-  it('calls onEdit when edit button is clicked', async () => {
-    const mockOnEdit = jest.fn();
-    const mockOnDelete = jest.fn();
-    
-    render(
-      <TableWrapper>
-        <SiteTableRow 
-          site={mockSite} 
-          onEdit={mockOnEdit} 
-          onDelete={mockOnDelete} 
-        />
-      </TableWrapper>
-    );
-    
-    // Click the edit button
-    const editButton = screen.getByTestId('site-edit-button-site-123');
-    await user.click(editButton);
-    
-    // Verify callback was called with correct site ID
-    expect(mockOnEdit).toHaveBeenCalledTimes(1);
-    expect(mockOnEdit).toHaveBeenCalledWith(mockSite.id);
-    
-    // Delete callback should not be called
-    expect(mockOnDelete).not.toHaveBeenCalled();
-  });
 
   it('calls onDelete when delete button is clicked', async () => {
-    const mockOnEdit = jest.fn();
     const mockOnDelete = jest.fn();
-    
+
     render(
       <TableWrapper>
-        <SiteTableRow 
-          site={mockSite} 
-          onEdit={mockOnEdit} 
-          onDelete={mockOnDelete} 
+        <SiteTableRow
+          site={mockSite}
+          onDelete={mockOnDelete}
         />
       </TableWrapper>
     );
-    
+
     // Click the delete button
-    const deleteButton = screen.getByTestId('site-delete-button-site-123');
+    const deleteButton = screen.getByTestId(`delete-site-${mockSite.id}`);
     await user.click(deleteButton);
-    
+
     // Verify callback was called with correct site ID
     expect(mockOnDelete).toHaveBeenCalledTimes(1);
     expect(mockOnDelete).toHaveBeenCalledWith(mockSite.id);
-    
-    // Edit callback should not be called
-    expect(mockOnEdit).not.toHaveBeenCalled();
+  });
+
+  it('navigates to edit page when edit button is clicked', async () => {
+    // We can't fully test navigation in this unit test, but we can verify the link
+    const mockOnDelete = jest.fn();
+
+    render(
+      <TableWrapper>
+        <SiteTableRow
+          site={mockSite}
+          onDelete={mockOnDelete}
+        />
+      </TableWrapper>
+    );
+
+    // Check that the edit button has the correct href
+    const editButton = screen.getByTestId(`edit-site-${mockSite.id}`);
+    expect(editButton).toHaveAttribute('href', `/admin/sites/${mockSite.id}/edit`);
+  });
+
+  it('navigates to view page when view button is clicked', async () => {
+    // We can't fully test navigation in this unit test, but we can verify the link
+    const mockOnDelete = jest.fn();
+
+    render(
+      <TableWrapper>
+        <SiteTableRow
+          site={mockSite}
+          onDelete={mockOnDelete}
+        />
+      </TableWrapper>
+    );
+
+    // Check that the view button has the correct href
+    const viewButton = screen.getByTestId(`view-site-${mockSite.id}`);
+    expect(viewButton).toHaveAttribute('href', `/admin/sites/${mockSite.id}`);
   });
 });

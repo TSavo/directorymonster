@@ -3,79 +3,87 @@ import { render, screen } from '@testing-library/react';
 import { SiteTablePagination } from '@/components/admin/sites/table/SiteTablePagination';
 
 describe('SiteTablePagination Component - Basic Rendering', () => {
-  // Mock function
+  // Mock functions
   const mockOnPageChange = jest.fn();
-  
+  const mockOnPageSizeChange = jest.fn();
+
   it('renders pagination controls', () => {
     render(
-      <SiteTablePagination 
+      <SiteTablePagination
         currentPage={2}
-        totalPages={5}
+        totalItems={50}
+        pageSize={10}
         onPageChange={mockOnPageChange}
+        onPageSizeChange={mockOnPageSizeChange}
       />
     );
-    
+
     // Check if previous and next buttons are rendered
-    expect(screen.getByTestId('pagination-previous')).toBeInTheDocument();
-    expect(screen.getByTestId('pagination-next')).toBeInTheDocument();
-    
-    // Check if current page indicator is rendered
-    const pageIndicator = screen.getByTestId('pagination-current');
-    expect(pageIndicator).toBeInTheDocument();
-    expect(pageIndicator).toHaveTextContent('2');
-    
-    // Check if total pages indicator is rendered
-    const totalIndicator = screen.getByTestId('pagination-total');
-    expect(totalIndicator).toBeInTheDocument();
-    expect(totalIndicator).toHaveTextContent('5');
+    expect(screen.getByTestId('previous-page-button')).toBeInTheDocument();
+    expect(screen.getByTestId('next-page-button')).toBeInTheDocument();
+
+    // Check if page buttons are rendered
+    expect(screen.getByTestId('page-button-2')).toBeInTheDocument();
+    expect(screen.getByTestId('page-button-2')).toHaveAttribute('aria-current', 'page');
+
+    // Check if page size selector is rendered
+    expect(screen.getByTestId('page-size-select')).toBeInTheDocument();
   });
 
   it('disables previous button on first page', () => {
     render(
-      <SiteTablePagination 
+      <SiteTablePagination
         currentPage={1}
-        totalPages={5}
+        totalItems={50}
+        pageSize={10}
         onPageChange={mockOnPageChange}
+        onPageSizeChange={mockOnPageSizeChange}
       />
     );
-    
+
     // Previous button should be disabled
-    const prevButton = screen.getByTestId('pagination-previous');
+    const prevButton = screen.getByTestId('previous-page-button');
     expect(prevButton).toBeDisabled();
-    
+
     // Next button should be enabled
-    const nextButton = screen.getByTestId('pagination-next');
+    const nextButton = screen.getByTestId('next-page-button');
     expect(nextButton).not.toBeDisabled();
   });
 
   it('disables next button on last page', () => {
     render(
-      <SiteTablePagination 
+      <SiteTablePagination
         currentPage={5}
-        totalPages={5}
+        totalItems={50}
+        pageSize={10}
         onPageChange={mockOnPageChange}
+        onPageSizeChange={mockOnPageSizeChange}
       />
     );
-    
+
     // Next button should be disabled
-    const nextButton = screen.getByTestId('pagination-next');
+    const nextButton = screen.getByTestId('next-page-button');
     expect(nextButton).toBeDisabled();
-    
+
     // Previous button should be enabled
-    const prevButton = screen.getByTestId('pagination-previous');
+    const prevButton = screen.getByTestId('previous-page-button');
     expect(prevButton).not.toBeDisabled();
   });
 
-  it('hides pagination when there is only one page', () => {
+  it('shows correct item range information', () => {
     render(
-      <SiteTablePagination 
-        currentPage={1}
-        totalPages={1}
+      <SiteTablePagination
+        currentPage={2}
+        totalItems={25}
+        pageSize={10}
         onPageChange={mockOnPageChange}
+        onPageSizeChange={mockOnPageSizeChange}
       />
     );
-    
-    // Pagination controls should not be rendered
-    expect(screen.queryByTestId('pagination-controls')).not.toBeInTheDocument();
+
+    // Should show "Showing 11 to 20 of 25 sites"
+    const paginationText = screen.getByText(/showing/i);
+    expect(paginationText).toBeInTheDocument();
+    expect(paginationText.textContent).toMatch(/11.*to.*20.*of.*25/i);
   });
 });

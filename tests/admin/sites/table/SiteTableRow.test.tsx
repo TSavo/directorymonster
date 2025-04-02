@@ -22,47 +22,51 @@ const mockSite = {
 };
 
 // Mock functions
-const mockOnEdit = jest.fn();
 const mockOnDelete = jest.fn();
 
 describe('SiteTableRow Component - Basic Rendering', () => {
   it('renders site data in the correct cells', () => {
     render(
       <TableWrapper>
-        <SiteTableRow 
-          site={mockSite} 
-          onEdit={mockOnEdit} 
-          onDelete={mockOnDelete} 
+        <SiteTableRow
+          site={mockSite}
+          onDelete={mockOnDelete}
         />
       </TableWrapper>
     );
-    
+
     // Check if basic site data is displayed
-    expect(screen.getByTestId('site-name-site-123')).toHaveTextContent('Test Site');
-    expect(screen.getByTestId('site-slug-site-123')).toHaveTextContent('test-site');
-    expect(screen.getByTestId('site-domains-site-123')).toHaveTextContent('example.com');
+    expect(screen.getByTestId(`site-name-${mockSite.id}`)).toHaveTextContent('Test Site');
+    expect(screen.getByTestId(`site-slug-${mockSite.id}`)).toHaveTextContent('test-site');
+
+    // Check for domains list
+    const domainElement = screen.getByTestId(`site-domain-0-${mockSite.id}`);
+    expect(domainElement).toBeInTheDocument();
+    expect(domainElement).toHaveTextContent('example.com');
   });
 
   it('includes action buttons with correct attributes', () => {
     render(
       <TableWrapper>
-        <SiteTableRow 
-          site={mockSite} 
-          onEdit={mockOnEdit} 
-          onDelete={mockOnDelete} 
+        <SiteTableRow
+          site={mockSite}
+          onDelete={mockOnDelete}
         />
       </TableWrapper>
     );
-    
+
     // Verify action buttons
-    const editButton = screen.getByTestId('site-edit-button-site-123');
-    const deleteButton = screen.getByTestId('site-delete-button-site-123');
-    
+    const viewButton = screen.getByTestId(`view-site-${mockSite.id}`);
+    const editButton = screen.getByTestId(`edit-site-${mockSite.id}`);
+    const deleteButton = screen.getByTestId(`delete-site-${mockSite.id}`);
+
+    expect(viewButton).toBeInTheDocument();
     expect(editButton).toBeInTheDocument();
     expect(deleteButton).toBeInTheDocument();
-    
-    // Check for accessible names/labels
-    expect(editButton).toHaveAttribute('aria-label', expect.stringContaining('Edit'));
-    expect(deleteButton).toHaveAttribute('aria-label', expect.stringContaining('Delete'));
+
+    // Check for accessible titles
+    expect(viewButton).toHaveAttribute('title', 'View Site');
+    expect(editButton).toHaveAttribute('title', 'Edit Site');
+    expect(deleteButton).toHaveAttribute('title', 'Delete Site');
   });
 });
