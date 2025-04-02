@@ -29,7 +29,7 @@ const mockStore = configureStore([]);
 
 describe('Integration: Category Filtering and Navigation', () => {
   let store;
-  
+
   beforeEach(() => {
     // Mock router
     (useRouter as jest.Mock).mockReturnValue({
@@ -38,7 +38,7 @@ describe('Integration: Category Filtering and Navigation', () => {
       query: {},
       asPath: '/admin/listings',
     });
-    
+
     // Mock listings hook
     (useListings as jest.Mock).mockReturnValue({
       listings: [
@@ -52,7 +52,7 @@ describe('Integration: Category Filtering and Navigation', () => {
       clearFilters: jest.fn(),
       activeFilters: {},
     });
-    
+
     // Mock categories hook
     (useCategories as jest.Mock).mockReturnValue({
       categories: [
@@ -85,7 +85,7 @@ describe('Integration: Category Filtering and Navigation', () => {
         return [id];
       }),
     });
-    
+
     // Create a mock store
     store = mockStore({
       listings: {
@@ -115,10 +115,18 @@ describe('Integration: Category Filtering and Navigation', () => {
   it('should update URL when navigating through category hierarchy', async () => {
     const { push } = useRouter();
     const { filterByCategory } = useListings();
-    
+
     render(
       <Provider store={store}>
-        <CategoryFilterTree />
+        <CategoryFilterTree
+          categories={[
+            { id: 'cat1', name: 'Category 1', slug: 'category-1', parentId: null },
+            { id: 'cat2', name: 'Category 2', slug: 'category-2', parentId: null },
+            { id: 'cat3', name: 'Subcategory 1', slug: 'subcategory-1', parentId: 'cat1' },
+          ]}
+          selectedCategoryIds={[]}
+          onChange={jest.fn()}
+        />
         <ListingTable />
       </Provider>
     );
@@ -126,13 +134,16 @@ describe('Integration: Category Filtering and Navigation', () => {
     // Verify categories are displayed
     expect(screen.getByText('Category 1')).toBeInTheDocument();
     expect(screen.getByText('Category 2')).toBeInTheDocument();
-    
+
+    // Open the dropdown menu
+    fireEvent.click(screen.getByTestId('category-filter-button'));
+
     // Navigate to a parent category
-    fireEvent.click(screen.getByTestId('category-filter-cat1'));
-    
+    fireEvent.click(screen.getByTestId('category-checkbox-cat1'));
+
     // Verify filterByCategory was called
     expect(filterByCategory).toHaveBeenCalledWith('cat1');
-    
+
     // Verify URL was updated
     expect(push).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -142,7 +153,7 @@ describe('Integration: Category Filtering and Navigation', () => {
       undefined,
       { shallow: true }
     );
-    
+
     // Update listings to show only Category 1 listings
     (useListings as jest.Mock).mockReturnValue({
       listings: [
@@ -157,24 +168,35 @@ describe('Integration: Category Filtering and Navigation', () => {
         categoryId: 'cat1',
       },
     });
-    
+
     // Re-render with filtered listings
     render(
       <Provider store={store}>
-        <CategoryFilterTree />
+        <CategoryFilterTree
+          categories={[
+            { id: 'cat1', name: 'Category 1', slug: 'category-1', parentId: null },
+            { id: 'cat2', name: 'Category 2', slug: 'category-2', parentId: null },
+            { id: 'cat3', name: 'Subcategory 1', slug: 'subcategory-1', parentId: 'cat1' },
+          ]}
+          selectedCategoryIds={['cat1']}
+          onChange={jest.fn()}
+        />
         <ListingTable />
       </Provider>
     );
-    
+
+    // Open the dropdown menu
+    fireEvent.click(screen.getByTestId('category-filter-button'));
+
     // Expand the parent category to show subcategories
-    fireEvent.click(screen.getByTestId('expand-category-cat1'));
-    
+    fireEvent.click(screen.getByTestId('toggle-category-cat1'));
+
     // Navigate to a subcategory
-    fireEvent.click(screen.getByTestId('category-filter-cat3'));
-    
+    fireEvent.click(screen.getByTestId('category-checkbox-cat3'));
+
     // Verify filterByCategory was called
     expect(filterByCategory).toHaveBeenCalledWith('cat3');
-    
+
     // Verify URL was updated to show the full category path
     expect(push).toHaveBeenCalledWith(
       expect.objectContaining({
