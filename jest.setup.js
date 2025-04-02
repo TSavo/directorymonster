@@ -196,13 +196,13 @@ require('./tests/__mocks__/search-indexer-mock');
 const { useSiteMetrics, useAuth } = require('./tests/__mocks__/hooks-mock');
 
 // Mock hooks
-jest.mock('@/hooks/useSiteMetrics', () => ({
+jest.mock('../src/components/admin/dashboard/hooks', () => ({
   __esModule: true,
   useSiteMetrics,
   default: useSiteMetrics
 }));
 
-jest.mock('@/hooks/useAuth', () => ({
+jest.mock('../src/hooks/useAuth', () => ({
   __esModule: true,
   useAuth,
   default: useAuth
