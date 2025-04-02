@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FormActions } from '@/components/admin/sites/components/FormActions';
+import FormActions from '@/components/admin/sites/components/FormActions';
 
 describe('FormActions Component - Interaction', () => {
   // Setup test user for interactions
@@ -23,7 +23,7 @@ describe('FormActions Component - Interaction', () => {
     );
 
     // Click the next button
-    const nextButton = screen.getByTestId('form-next-button');
+    const nextButton = screen.getByTestId('next-button');
     await user.click(nextButton);
 
     // Verify callback was called
@@ -108,7 +108,7 @@ describe('FormActions Component - Interaction', () => {
 
     // Tab to the next button
     await user.tab();
-    expect(screen.getByTestId('form-next-button')).toHaveFocus();
+    expect(screen.getByTestId('next-button')).toHaveFocus();
 
     // Press Space to click
     await user.keyboard(' ');

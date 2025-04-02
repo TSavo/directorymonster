@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BasicInfoStep } from '@/components/admin/sites/components/BasicInfoStep';
+import BasicInfoStep from '@/components/admin/sites/components/BasicInfoStep';
 
 describe('BasicInfoStep Component - Validation', () => {
   // Mock form values
@@ -9,25 +9,25 @@ describe('BasicInfoStep Component - Validation', () => {
     slug: 'test-site',
     description: 'This is a test description'
   };
-  
+
   // Mock functions
   const mockOnChange = jest.fn();
-  
+
   it('displays error message for name field when provided', () => {
     const mockErrors = {
       name: 'Site name is required'
     };
-    
+
     render(
-      <BasicInfoStep 
+      <BasicInfoStep
         values={mockValues}
         onChange={mockOnChange}
         errors={mockErrors}
       />
     );
-    
+
     // Check if error message is displayed
-    const errorElement = screen.getByTestId('site-form-name-error');
+    const errorElement = screen.getByTestId('siteForm-name-error');
     expect(errorElement).toBeInTheDocument();
     expect(errorElement).toHaveTextContent('Site name is required');
   });
@@ -36,17 +36,17 @@ describe('BasicInfoStep Component - Validation', () => {
     const mockErrors = {
       slug: 'Slug must contain only lowercase letters, numbers, and hyphens'
     };
-    
+
     render(
-      <BasicInfoStep 
+      <BasicInfoStep
         values={mockValues}
         onChange={mockOnChange}
         errors={mockErrors}
       />
     );
-    
+
     // Check if error message is displayed
-    const errorElement = screen.getByTestId('site-form-slug-error');
+    const errorElement = screen.getByTestId('siteForm-slug-error');
     expect(errorElement).toBeInTheDocument();
     expect(errorElement).toHaveTextContent('Slug must contain only lowercase letters, numbers, and hyphens');
   });
@@ -56,37 +56,37 @@ describe('BasicInfoStep Component - Validation', () => {
       name: 'Site name is required',
       slug: 'Invalid slug format'
     };
-    
+
     render(
-      <BasicInfoStep 
+      <BasicInfoStep
         values={mockValues}
         onChange={mockOnChange}
         errors={mockErrors}
       />
     );
-    
+
     // Check if input fields have error class
-    const nameInput = screen.getByTestId('site-form-name');
-    const slugInput = screen.getByTestId('site-form-slug');
-    
-    expect(nameInput).toHaveClass('error', { exact: false });
-    expect(slugInput).toHaveClass('error', { exact: false });
+    const nameInput = screen.getByTestId('siteForm-name');
+    const slugInput = screen.getByTestId('siteForm-slug');
+
+    expect(nameInput).toHaveClass('border-red-500', { exact: false });
+    expect(slugInput).toHaveClass('border-red-500', { exact: false });
   });
 
   it('does not show error elements when no errors are provided', () => {
     const mockErrors = {};
-    
+
     render(
-      <BasicInfoStep 
+      <BasicInfoStep
         values={mockValues}
         onChange={mockOnChange}
         errors={mockErrors}
       />
     );
-    
+
     // Error elements should not be in the document
-    expect(screen.queryByTestId('site-form-name-error')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('site-form-slug-error')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('site-form-description-error')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('siteForm-name-error')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('siteForm-slug-error')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('siteForm-description-error')).not.toBeInTheDocument();
   });
 });
