@@ -86,7 +86,25 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
       console.log('Filtered listings:', filteredListings);
     }
 
-    return NextResponse.json(filteredListings);
+    // Parse pagination parameters
+    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+
+    // Apply pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedListings = filteredListings.slice(startIndex, endIndex);
+
+    // Return paginated results with pagination metadata
+    return NextResponse.json({
+      results: paginatedListings,
+      pagination: {
+        totalResults: filteredListings.length,
+        totalPages: Math.ceil(filteredListings.length / limit),
+        currentPage: page,
+        limit,
+      }
+    });
   } catch (error) {
     console.error('Error fetching listings:', error);
     return NextResponse.json(
