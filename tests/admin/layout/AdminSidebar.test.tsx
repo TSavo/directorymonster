@@ -3,8 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { AdminSidebar } from '@/components/admin/layout';
 
 // Mock next/navigation
+const mockUsePathname = jest.fn().mockReturnValue('/admin/listings');
 jest.mock('next/navigation', () => ({
-  usePathname: jest.fn().mockReturnValue('/admin/listings'),
+  usePathname: () => mockUsePathname(),
 }));
 
 // Mock next/link
@@ -58,13 +59,13 @@ describe('AdminSidebar Component', () => {
     const links = screen.getAllByRole('link');
 
     // Find the Listings link which should be active based on our mock pathname
-    const listingsLink = Array.from(links).find(link => link.textContent?.includes('Listings'));
+    const listingsLink = links.find(link => link.textContent?.includes('Listings'));
 
     // Verify it has the active class (bg-gray-900)
     expect(listingsLink).toHaveClass('bg-gray-900');
 
     // Verify at least one link doesn't have active class
-    const settingsLink = Array.from(links).find(link => link.textContent?.includes('Settings'));
+    const settingsLink = links.find(link => link.textContent?.includes('Settings'));
     expect(settingsLink).not.toHaveClass('bg-gray-900');
   });
 
