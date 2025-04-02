@@ -86,30 +86,36 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
       console.log('Filtered listings:', filteredListings);
     }
 
-    // Parse pagination parameters
-    const page = parseInt(url.searchParams.get('page') || '1', 10);
-    const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+    // Parse pagination parameters with validation
+    let page = parseInt(url.searchParams.get('page') || '1', 10);
+    let limit = parseInt(url.searchParams.get('limit') || '10', 10);
+
+    // Validate pagination parameters
+    if (isNaN(page) || page < 1) {
+      page = 1; // Default to page 1 for invalid values
+    }
+
+    if (isNaN(limit) || limit < 1) {
+      limit = 10; // Default to 10 items per page for invalid values
+    } else if (limit > 100) {
+      limit = 100; // Cap at 100 items per page
+    }
 
     // Apply pagination
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const paginatedListings = filteredListings.slice(startIndex, endIndex);
 
-    // For the data-retrieval test, we need to return the listings directly
-    if (isTestMode) {
-      return NextResponse.json(filteredListings);
-    } else {
-      // Return paginated results with pagination metadata for normal operation
-      return NextResponse.json({
-        results: paginatedListings,
-        pagination: {
-          totalResults: filteredListings.length,
-          totalPages: Math.ceil(filteredListings.length / limit),
-          currentPage: page,
-          limit,
-        }
-      });
-    }
+    // Always return paginated results with pagination metadata
+    return NextResponse.json({
+      results: paginatedListings,
+      pagination: {
+        totalResults: filteredListings.length,
+        totalPages: Math.ceil(filteredListings.length / limit),
+        currentPage: page,
+        limit,
+      }
+    });
   } catch (error) {
     console.error('Error fetching listings:', error);
     return NextResponse.json(
