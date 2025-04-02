@@ -13,6 +13,8 @@ jest.mock('../../../src/components/admin/dashboard/hooks', () => ({
 // Get the mocked hook
 const { useSiteMetrics } = jest.requireMock('../../../src/components/admin/dashboard/hooks');
 
+
+
 describe('StatisticCards Component', () => {
   const mockMetrics: SiteMetricsData = {
     id: '123',
