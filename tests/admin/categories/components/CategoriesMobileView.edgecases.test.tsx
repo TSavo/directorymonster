@@ -104,11 +104,16 @@ describe('CategoriesMobileView Edge Cases', () => {
   });
 
   it('handles extremely long category names without breaking layout', () => {
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     render(
       <CategoriesMobileView
         categories={[mockCategoriesWithEdgeCases[0]]}
         showSiteColumn={true}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -130,11 +135,16 @@ describe('CategoriesMobileView Edge Cases', () => {
   });
 
   it('handles empty or blank field values gracefully', () => {
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     render(
       <CategoriesMobileView
         categories={[mockCategoriesWithEdgeCases[1]]}
         showSiteColumn={true}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -163,11 +173,16 @@ describe('CategoriesMobileView Edge Cases', () => {
   });
 
   it('properly escapes and renders special characters', () => {
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     render(
       <CategoriesMobileView
         categories={[mockCategoriesWithEdgeCases[2]]}
         showSiteColumn={true}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -184,11 +199,16 @@ describe('CategoriesMobileView Edge Cases', () => {
   });
 
   it('correctly displays deeply nested category relationships', () => {
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     render(
       <CategoriesMobileView
         categories={[mockCategoriesWithEdgeCases[3]]}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -202,11 +222,16 @@ describe('CategoriesMobileView Edge Cases', () => {
   });
 
   it('handles null fields gracefully without errors', () => {
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     render(
       <CategoriesMobileView
         categories={[mockCategoriesWithEdgeCases[4]]}
         showSiteColumn={true}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -233,11 +258,16 @@ describe('CategoriesMobileView Edge Cases', () => {
   });
 
   it('handles an empty array of categories gracefully', () => {
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     render(
       <CategoriesMobileView
         categories={[]}
         showSiteColumn={true}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -248,23 +278,37 @@ describe('CategoriesMobileView Edge Cases', () => {
   });
 
   it('builds correct URLs with empty or special character slugs', () => {
+    // Mock the view and edit click handlers
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     // Test with category that has empty slug
     render(
       <CategoriesMobileView
         categories={[mockCategoriesWithEdgeCases[1]]}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
         siteSlug="test-site"
       />
     );
 
-    // Even with empty slug, view link should default to ID-based URL
-    const viewLink = screen.getByTestId(`view-link-${mockCategoriesWithEdgeCases[1].id}`);
-    expect(viewLink).toHaveAttribute('href', expect.stringContaining('/admin/sites/test-site/categories/'));
+    // Even with empty slug, view button should be clickable
+    const viewButton = screen.getByTestId(`view-button-${mockCategoriesWithEdgeCases[1].id}`);
+    expect(viewButton).toBeInTheDocument();
+    fireEvent.click(viewButton);
+    expect(mockOnViewClick).toHaveBeenCalledWith(mockCategoriesWithEdgeCases[1].id);
 
-    // Edit link should work with ID based URL
-    const editLink = screen.getByTestId(`edit-link-${mockCategoriesWithEdgeCases[1].id}`);
-    expect(editLink).toHaveAttribute('href', expect.stringContaining('/admin/sites/test-site/categories//edit'));
+    // Edit button should be clickable
+    const editButton = screen.getByTestId(`edit-button-${mockCategoriesWithEdgeCases[1].id}`);
+    expect(editButton).toBeInTheDocument();
+    fireEvent.click(editButton);
+    expect(mockOnEditClick).toHaveBeenCalledWith(mockCategoriesWithEdgeCases[1].id);
+
+    // Reset mocks
+    mockOnViewClick.mockReset();
+    mockOnEditClick.mockReset();
 
     // Now test with special character slug
     render(
@@ -272,13 +316,17 @@ describe('CategoriesMobileView Edge Cases', () => {
         categories={[mockCategoriesWithEdgeCases[2]]}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
         siteSlug="test-site"
       />
     );
 
-    // Special character slug should be used as-is (URL encoding would be handled by browser)
-    const viewLinkSpecial = screen.getByTestId(`view-link-${mockCategoriesWithEdgeCases[2].id}`);
-    expect(viewLinkSpecial).toHaveAttribute('href', '/admin/sites/test-site/categories/special-chars');
+    // Special character slug should have clickable buttons
+    const viewButtonSpecial = screen.getByTestId(`view-button-${mockCategoriesWithEdgeCases[2].id}`);
+    expect(viewButtonSpecial).toBeInTheDocument();
+    fireEvent.click(viewButtonSpecial);
+    expect(mockOnViewClick).toHaveBeenCalledWith(mockCategoriesWithEdgeCases[2].id);
   });
 
   it('handles multiple categories with the same name', () => {
@@ -312,11 +360,16 @@ describe('CategoriesMobileView Edge Cases', () => {
       }
     ];
 
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     render(
       <CategoriesMobileView
         categories={duplicateNameCategories}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -381,11 +434,16 @@ describe('CategoriesMobileView Edge Cases', () => {
       }
     ];
 
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     render(
       <CategoriesMobileView
         categories={childCountCategories}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -404,12 +462,17 @@ describe('CategoriesMobileView Edge Cases', () => {
   });
 
   it('displays correctly when showSiteColumn toggled during component lifecycle', () => {
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     // Test initial render with showSiteColumn = false
     const { rerender } = render(
       <CategoriesMobileView
         categories={[mockCategoriesWithEdgeCases[0]]}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -423,6 +486,8 @@ describe('CategoriesMobileView Edge Cases', () => {
         categories={[mockCategoriesWithEdgeCases[0]]}
         showSiteColumn={true}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -436,6 +501,8 @@ describe('CategoriesMobileView Edge Cases', () => {
         categories={[mockCategoriesWithEdgeCases[0]]}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -445,12 +512,17 @@ describe('CategoriesMobileView Edge Cases', () => {
   });
 
   it('handles dynamic category list changes correctly', () => {
+    const mockOnViewClick = jest.fn();
+    const mockOnEditClick = jest.fn();
+
     // Start with one category
     const { rerender } = render(
       <CategoriesMobileView
         categories={[mockCategoriesWithEdgeCases[0]]}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -467,6 +539,8 @@ describe('CategoriesMobileView Edge Cases', () => {
         ]}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
@@ -479,6 +553,8 @@ describe('CategoriesMobileView Edge Cases', () => {
         categories={[]}
         showSiteColumn={false}
         onDeleteClick={mockOnDeleteClick}
+        onViewClick={mockOnViewClick}
+        onEditClick={mockOnEditClick}
       />
     );
 
