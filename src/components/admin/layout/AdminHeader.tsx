@@ -11,12 +11,12 @@ interface AdminHeaderProps {
 export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  
+
   const toggleUserMenu = () => {
-    setUserMenuOpen(!userMenuOpen);
     if (notificationsOpen) setNotificationsOpen(false);
+    setUserMenuOpen(!userMenuOpen);
   };
-  
+
   const toggleNotifications = () => {
     setNotificationsOpen(!notificationsOpen);
     if (userMenuOpen) setUserMenuOpen(false);
@@ -37,13 +37,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
               >
                 <MenuIcon className="block h-6 w-6" />
               </button>
-              
+
               <div className="ml-4 md:ml-0">
                 <h1 className="text-xl font-semibold text-gray-900">Admin Portal</h1>
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center">
             {/* Notifications dropdown */}
             <div className="relative">
@@ -57,10 +57,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
                 <span className="sr-only">View notifications</span>
                 <BellIcon className="h-6 w-6" />
               </button>
-              
+
               {/* Notification dropdown panel */}
               {notificationsOpen && (
-                <div 
+                <div
                   className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                   role="menu"
                   aria-orientation="vertical"
@@ -75,7 +75,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
                 </div>
               )}
             </div>
-            
+
             {/* Profile dropdown */}
             <div className="ml-3 relative">
               <div>
@@ -93,10 +93,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
                   </div>
                 </button>
               </div>
-              
+
               {/* User dropdown panel */}
               {userMenuOpen && (
-                <div 
+                <div
                   className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                   role="menu"
                   aria-orientation="vertical"
@@ -106,24 +106,24 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
                     <p className="font-medium">Admin User</p>
                     <p className="text-gray-500">admin@example.com</p>
                   </div>
-                  <Link 
-                    href="/admin/profile" 
+                  <Link
+                    href="/admin/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     role="menuitem"
                     onClick={() => setUserMenuOpen(false)}
                   >
                     Your Profile
                   </Link>
-                  <Link 
-                    href="/admin/settings" 
+                  <Link
+                    href="/admin/settings"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     role="menuitem"
                     onClick={() => setUserMenuOpen(false)}
                   >
                     Settings
                   </Link>
-                  <Link 
-                    href="/api/auth/signout" 
+                  <Link
+                    href="/api/auth/signout"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     role="menuitem"
                     onClick={() => setUserMenuOpen(false)}

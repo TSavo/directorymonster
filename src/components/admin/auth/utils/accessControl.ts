@@ -333,14 +333,18 @@ export function detectCrossTenantAccess(
   // Only check ACLs that have entries
   if (!acl.entries.length) return false;
   
-  // Check if any ACL entry references the specified tenant or system tenant
-  const hasTenantOrSystemAccess = acl.entries.some(entry => 
-    entry.resource.tenantId === tenantId || 
-    entry.resource.tenantId === 'system' // System tenant is allowed for super admins
-  );
+  // Get all unique tenant IDs referenced in the ACL
+  const referencedTenantIds = new Set<string>();
+  acl.entries.forEach(entry => {
+    referencedTenantIds.add(entry.resource.tenantId);
+  });
   
-  // Return true if no access to the specified tenant or system
-  return !hasTenantOrSystemAccess;
+  // Filter out the specified tenant and the system tenant (which is allowed)
+  referencedTenantIds.delete(tenantId);
+  referencedTenantIds.delete('system');
+  
+  // If there are any remaining tenant IDs, this indicates cross-tenant access
+  return referencedTenantIds.size > 0;
 }
 
 /**
