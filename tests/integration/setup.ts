@@ -217,9 +217,10 @@ export async function createTestCategories(sites: SiteConfig[]): Promise<Categor
 
   // Create categories for each site
   for (const site of sites) {
+    // Use site-specific category IDs to avoid collisions
     const siteCategories: Category[] = [
       {
-        id: `cat1`,  // Simple ID for first site's first category
+        id: `${site.id}_cat1`,  // Site-specific ID for first category
         siteId: site.id,
         name: 'Category 1',
         slug: 'category-1',
@@ -229,7 +230,7 @@ export async function createTestCategories(sites: SiteConfig[]): Promise<Categor
         updatedAt: timestamp,
       },
       {
-        id: `cat2`,  // Simple ID for first site's second category
+        id: `${site.id}_cat2`,  // Site-specific ID for second category
         siteId: site.id,
         name: 'Category 2',
         slug: 'category-2',
@@ -239,12 +240,12 @@ export async function createTestCategories(sites: SiteConfig[]): Promise<Categor
         updatedAt: timestamp,
       },
       {
-        id: `cat3`,  // Simple ID for first site's third category
+        id: `${site.id}_cat3`,  // Site-specific ID for third category
         siteId: site.id,
         name: 'Category 3',
         slug: 'category-3',
         metaDescription: 'Test category 3',
-        parentId: `cat1`, // Make this a subcategory
+        parentId: `${site.id}_cat1`, // Make this a subcategory with site-specific parent ID
         order: 3,
         createdAt: timestamp,
         updatedAt: timestamp,
