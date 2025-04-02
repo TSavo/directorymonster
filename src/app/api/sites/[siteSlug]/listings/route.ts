@@ -95,21 +95,16 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
     const endIndex = startIndex + limit;
     const paginatedListings = filteredListings.slice(startIndex, endIndex);
 
-    // For the data-retrieval test, we need to return the listings directly
-    if (isTestMode) {
-      return NextResponse.json(filteredListings);
-    } else {
-      // Return paginated results with pagination metadata for normal operation
-      return NextResponse.json({
-        results: paginatedListings,
-        pagination: {
-          totalResults: filteredListings.length,
-          totalPages: Math.ceil(filteredListings.length / limit),
-          currentPage: page,
-          limit,
-        }
-      });
-    }
+    // Always return paginated results with pagination metadata
+    return NextResponse.json({
+      results: paginatedListings,
+      pagination: {
+        totalResults: filteredListings.length,
+        totalPages: Math.ceil(filteredListings.length / limit),
+        currentPage: page,
+        limit,
+      }
+    });
   } catch (error) {
     console.error('Error fetching listings:', error);
     return NextResponse.json(
