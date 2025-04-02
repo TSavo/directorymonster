@@ -13,6 +13,26 @@ interface DropdownMenuItemProps {
   [prop: string]: any;
 }
 
+interface DropdownMenuTriggerProps {
+  children: React.ReactNode;
+  asChild?: boolean;
+  className?: string;
+  [prop: string]: any;
+}
+
+interface DropdownMenuContentProps {
+  children: React.ReactNode;
+  align?: 'start' | 'center' | 'end';
+  className?: string;
+  [prop: string]: any;
+}
+
+interface DropdownMenuLabelProps {
+  children: React.ReactNode;
+  className?: string;
+  [prop: string]: any;
+}
+
 // Mock implementation of DropdownMenu component
 export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   children,
@@ -28,6 +48,65 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       {children}
     </div>
   );
+};
+
+// Mock implementation of DropdownMenuTrigger component
+export const DropdownMenuTrigger: React.FC<DropdownMenuTriggerProps> = ({
+  children,
+  asChild,
+  className = '',
+  ...props
+}) => {
+  return (
+    <div
+      className={`ui-dropdown-trigger ${className}`}
+      data-testid="dropdown-menu-trigger"
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Mock implementation of DropdownMenuContent component
+export const DropdownMenuContent: React.FC<DropdownMenuContentProps> = ({
+  children,
+  align = 'center',
+  className = '',
+  ...props
+}) => {
+  return (
+    <div
+      className={`ui-dropdown-content ${className}`}
+      data-testid="dropdown-menu-content"
+      data-align={align}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Mock implementation of DropdownMenuLabel component
+export const DropdownMenuLabel: React.FC<DropdownMenuLabelProps> = ({
+  children,
+  className = '',
+  ...props
+}) => {
+  return (
+    <div
+      className={`ui-dropdown-label ${className}`}
+      data-testid="dropdown-menu-label"
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Mock implementation of DropdownMenuSeparator component
+export const DropdownMenuSeparator: React.FC = () => {
+  return <hr data-testid="dropdown-menu-separator" />;
 };
 
 // Mock implementation of DropdownMenuItem component
