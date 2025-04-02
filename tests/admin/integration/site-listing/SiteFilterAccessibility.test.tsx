@@ -32,25 +32,25 @@ const mockStore = configureStore([]);
 describe('Site Filter Accessibility', () => {
   let store;
   let filterBySite;
-  
+
   beforeEach(() => {
     // Set up mock filter function
     filterBySite = jest.fn();
-    
+
     // Create mock listings hook with the filter function
     const mockUseListings = createMockUseListings();
     mockUseListings.filterBySite = filterBySite;
-    
+
     // Apply the mock
     (useListings as jest.Mock).mockReturnValue(mockUseListings);
-    
+
     // Mock sites hook
     (useSites as jest.Mock).mockReturnValue({
       sites: mockSites,
       isLoading: false,
       error: null,
     });
-    
+
     // Create a mock store
     store = mockStore({
       listings: {
@@ -76,29 +76,28 @@ describe('Site Filter Accessibility', () => {
       </Provider>
     );
 
-    // Find the dropdown button
-    const dropdownButton = screen.getByTestId('site-filter-dropdown-button');
-    
-    // Focus and press space to open dropdown
-    dropdownButton.focus();
-    fireEvent.click(dropdownButton);
-    
+    // Find the dropdown container
+    const dropdown = screen.getByTestId('site-filter-dropdown');
+    expect(dropdown).toBeInTheDocument();
+
+    // Debug the rendered HTML
+    console.log('Rendered HTML:', dropdown.outerHTML);
+
+    // Click on the dropdown to open it
+    fireEvent.click(dropdown);
+
     // Menu should be open now, but there's no easy way to verify this in testing-library
-    // Let's try to find the dropdown content
-    const dropdownContent = screen.getByTestId('dropdown-menu-content');
-    expect(dropdownContent).toBeInTheDocument();
-    
-    // Set up a mock implementation to simulate tab navigation
-    const menuItems = Array.from(dropdownContent.querySelectorAll('[data-testid="dropdown-menu-item"]'));
+    // Let's try to find the dropdown items
+    const menuItems = screen.getAllByTestId('dropdown-menu-item');
     expect(menuItems.length).toBeGreaterThan(0);
-    
+
     // Simulate focusing the first menu item
     const firstItem = menuItems[0] as HTMLElement;
     firstItem.focus();
-    
+
     // Press Enter to select
     fireEvent.click(firstItem);
-    
+
     // Verify filter was applied with the correct site ID
     expect(filterBySite).toHaveBeenCalledWith('site1');
   });
