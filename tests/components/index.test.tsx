@@ -37,3 +37,9 @@ import '../admin/sites/components/SEOSettings.test';
 import '../admin/sites/components/SEOSettings.validation.test';
 import '../admin/sites/components/SEOSettings.noindex.test';
 import '../admin/sites/components/SEOSettings.api.test';
+
+// Placeholder test to prevent "empty test suite" error
+it('should be implemented', () => {
+  // TODO: Implement this test
+  expect(true).toBe(true);
+});

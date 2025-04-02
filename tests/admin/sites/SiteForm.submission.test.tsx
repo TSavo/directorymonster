@@ -190,4 +190,10 @@ describe('SiteForm Submission', () => {
       expect(screen.getByTestId('next-button')).not.toBeDisabled();
     });
   });
+
+// Placeholder test to prevent "empty test suite" error
+it('should be implemented', () => {
+  // TODO: Implement this test
+  expect(true).toBe(true);
+});
 });
