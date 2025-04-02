@@ -18,6 +18,7 @@ export const TEST_REQUEST_ID = '750e8400-e29b-41d4-a716-446655440002';
 
 // Setup mocks
 jest.mock('uuid', () => ({
+  __esModule: true,
   validate: jest.fn().mockReturnValue(true),
   v4: jest.fn().mockReturnValue('750e8400-e29b-41d4-a716-446655440002')
 }));
@@ -43,7 +44,10 @@ jest.mock('@/components/admin/auth/utils/accessControl', () => ({
 }));
 
 jest.mock('@/lib/audit/audit-service', () => ({
-  logSecurityEvent: jest.fn().mockResolvedValue(undefined)
+  __esModule: true,
+  default: {
+    logSecurityEvent: jest.fn().mockResolvedValue(undefined)
+  }
 }));
 
 jest.mock('@/lib/role-service', () => ({
@@ -56,9 +60,9 @@ jest.mock('@/lib/tenant-membership-service', () => ({
 
 // Define path segments for URL pathname mocking
 export const pathSegments = [
-  'api', 
-  'tenants', 
-  VALID_TENANT_ID, 
+  'api',
+  'tenants',
+  VALID_TENANT_ID,
   'resources'
 ];
 
@@ -95,9 +99,9 @@ export const createMockRequest = (options: any = {}) => {
   const headers = new Map();
   headers.set('x-tenant-id', options.tenantId || VALID_TENANT_ID);
   headers.set('authorization', options.auth || 'Bearer valid-token');
-  
+
   const url = options.url || `https://example.com/api/tenants/${options.tenantId || VALID_TENANT_ID}/resources`;
-  
+
   return {
     headers: {
       get: (name: string) => headers.get(name)

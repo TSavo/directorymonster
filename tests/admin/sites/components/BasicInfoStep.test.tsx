@@ -9,29 +9,29 @@ describe('BasicInfoStep Component - Basic Rendering', () => {
     slug: '',
     description: ''
   };
-  
+
   // Mock functions
   const mockOnChange = jest.fn();
   const mockErrors = {};
-  
+
   it('renders all form fields correctly', () => {
     render(
-      <BasicInfoStep 
+      <BasicInfoStep
         values={mockValues}
         onChange={mockOnChange}
         errors={mockErrors}
       />
     );
-    
+
     // Check if all form fields are rendered
-    expect(screen.getByTestId('site-form-name')).toBeInTheDocument();
-    expect(screen.getByTestId('site-form-slug')).toBeInTheDocument();
-    expect(screen.getByTestId('site-form-description')).toBeInTheDocument();
-    
+    expect(screen.getByTestId('siteForm-name')).toBeInTheDocument();
+    expect(screen.getByTestId('siteForm-slug')).toBeInTheDocument();
+    expect(screen.getByTestId('siteForm-description')).toBeInTheDocument();
+
     // Check if labels are rendered
-    expect(screen.getByText('Site Name')).toBeInTheDocument();
-    expect(screen.getByText('Slug')).toBeInTheDocument();
-    expect(screen.getByText('Description')).toBeInTheDocument();
+    expect(screen.getByText(/Site Name \*/i)).toBeInTheDocument();
+    expect(screen.getByText(/Slug \*/i)).toBeInTheDocument();
+    expect(screen.getByText(/Description/i)).toBeInTheDocument();
   });
 
   it('displays initial values in form fields', () => {
@@ -40,32 +40,32 @@ describe('BasicInfoStep Component - Basic Rendering', () => {
       slug: 'test-site',
       description: 'This is a test site description'
     };
-    
+
     render(
-      <BasicInfoStep 
+      <BasicInfoStep
         values={valuesWithData}
         onChange={mockOnChange}
         errors={mockErrors}
       />
     );
-    
+
     // Check if values are displayed in form fields
-    expect(screen.getByTestId('site-form-name')).toHaveValue('Test Site');
-    expect(screen.getByTestId('site-form-slug')).toHaveValue('test-site');
-    expect(screen.getByTestId('site-form-description')).toHaveValue('This is a test site description');
+    expect(screen.getByTestId('siteForm-name')).toHaveValue('Test Site');
+    expect(screen.getByTestId('siteForm-slug')).toHaveValue('test-site');
+    expect(screen.getByTestId('siteForm-description')).toHaveValue('This is a test site description');
   });
 
   it('shows helper text for form fields', () => {
     render(
-      <BasicInfoStep 
+      <BasicInfoStep
         values={mockValues}
         onChange={mockOnChange}
         errors={mockErrors}
       />
     );
-    
-    // Check if helper text is displayed
-    expect(screen.getByTestId('site-form-slug-helper')).toBeInTheDocument();
-    expect(screen.getByTestId('site-form-slug-helper')).toHaveTextContent(/lowercase.*hyphens/i);
+
+    // The helper text is now part of the label, not a separate element with a testid
+    // Check if the slug label contains the helper text
+    expect(screen.getByText(/URL-friendly name/i)).toBeInTheDocument();
   });
 });
