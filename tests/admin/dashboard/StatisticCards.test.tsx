@@ -4,13 +4,11 @@ import '@testing-library/jest-dom';
 import StatisticCards from '@/components/admin/dashboard/StatisticCards';
 import { SiteMetricsData } from '@/components/admin/dashboard/types';
 
-// Import the mock hooks
-const mockHooks = require('../../../tests/__mocks__/hooks-mock');
-
 // Mock the hook
+const mockUseSiteMetrics = jest.fn();
 jest.mock('../../../src/components/admin/dashboard/hooks', () => ({
   __esModule: true,
-  useSiteMetrics: mockHooks.useSiteMetrics,
+  useSiteMetrics: mockUseSiteMetrics,
 }));
 
 describe('StatisticCards Component', () => {
@@ -70,8 +68,8 @@ describe('StatisticCards Component', () => {
 
   beforeEach(() => {
     // Reset mock and set default return value
-    mockHooks.useSiteMetrics.mockReset();
-    mockHooks.useSiteMetrics.mockReturnValue({
+    mockUseSiteMetrics.mockReset();
+    mockUseSiteMetrics.mockReturnValue({
       metrics: mockMetrics,
       isLoading: false,
       error: null,
@@ -98,7 +96,7 @@ describe('StatisticCards Component', () => {
   });
 
   it('shows loading state when isLoading is true', () => {
-    mockHooks.useSiteMetrics.mockReturnValue({
+    mockUseSiteMetrics.mockReturnValue({
       metrics: null,
       isLoading: true,
       error: null,
@@ -113,7 +111,7 @@ describe('StatisticCards Component', () => {
   });
 
   it('displays error message when there is an error', () => {
-    mockHooks.useSiteMetrics.mockReturnValue({
+    mockUseSiteMetrics.mockReturnValue({
       metrics: null,
       isLoading: false,
       error: new Error('Test error'),
@@ -141,7 +139,7 @@ describe('StatisticCards Component', () => {
     expect(screen.getByText('999')).toBeInTheDocument();
 
     // Should not call the hook with a siteSlug when metrics are provided
-    expect(mockHooks.useSiteMetrics).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockUseSiteMetrics).toHaveBeenCalledWith(expect.objectContaining({
       siteSlug: '',
     }));
   });
