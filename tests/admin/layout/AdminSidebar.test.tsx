@@ -3,10 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { AdminSidebar } from '@/components/admin/layout';
 
 // Mock next/navigation
-const mockUsePathname = jest.fn().mockReturnValue('/admin/listings');
 jest.mock('next/navigation', () => ({
   __esModule: true,
-  usePathname: () => mockUsePathname()
+  usePathname: () => '/admin/listings'
 }));
 
 // Mock next/link
