@@ -3,6 +3,7 @@ import { kv } from '@/lib/redis-client';
 import { generateSalt, generatePublicKey } from '@/lib/zkp';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
+import { PublicTenantService } from '@/lib/tenant';
 
 interface SetupRequestBody {
   username: string;
@@ -107,6 +108,17 @@ export async function POST(request: NextRequest) {
     
     // Add site to default domains map
     await kv.set(`domains:localhost`, siteId);
+    
+    // Create public tenant and add user to it
+    try {
+      // Ensure public tenant exists and add user to it
+      await PublicTenantService.ensurePublicTenant();
+      await PublicTenantService.addUserToPublicTenant(userId);
+      console.log(`First admin user ${userId} added to public tenant`);
+    } catch (publicTenantError) {
+      // Log error but don't fail the entire setup process
+      console.error('Error adding first admin to public tenant:', publicTenantError);
+    }
     
     // Generate JWT token
     const jwtSecret = process.env.JWT_SECRET || 'development-secret';

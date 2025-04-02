@@ -3,6 +3,7 @@ import { getUserFromSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { createSuperAdminACL, createSiteAdminACL } from '@/components/admin/auth/utils/accessControl';
 import { hashPassword } from '@/lib/crypto';
+import { PublicTenantService } from '@/lib/tenant';
 
 // GET handler - fetch all users
 export async function GET(request: Request) {
@@ -217,6 +218,17 @@ export async function POST(request: Request) {
       where: { id: user.id },
       data: { acl: userAcl }
     });
+    
+    // Add user to public tenant
+    try {
+      // Ensure public tenant exists and add user to it
+      await PublicTenantService.ensurePublicTenant();
+      await PublicTenantService.addUserToPublicTenant(user.id);
+      console.log(`User ${user.id} added to public tenant`);
+    } catch (publicTenantError) {
+      // Log error but don't fail the entire user creation process
+      console.error('Error adding user to public tenant:', publicTenantError);
+    }
     
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
