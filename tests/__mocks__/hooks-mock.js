@@ -25,18 +25,8 @@ const useAuth = jest.fn().mockReturnValue({
   register: jest.fn()
 });
 
-// Mock the hooks
-jest.mock('@/hooks/useSiteMetrics', () => ({
-  __esModule: true,
-  useSiteMetrics,
-  default: useSiteMetrics
-}));
-
-jest.mock('@/hooks/useAuth', () => ({
-  __esModule: true,
-  useAuth,
-  default: useAuth
-}));
+// These hooks are exported for use in tests
+// They can be imported directly or used with jest.mock
 
 // Export the mocked hooks for direct access in tests
 module.exports = {

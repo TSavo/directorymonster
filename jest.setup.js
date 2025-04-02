@@ -193,7 +193,20 @@ require('./tests/__mocks__/admin-components-mock');
 require('./tests/__mocks__/search-indexer-mock');
 
 // Import hooks mock
-require('./tests/__mocks__/hooks-mock');
+const { useSiteMetrics, useAuth } = require('./tests/__mocks__/hooks-mock');
+
+// Mock hooks
+jest.mock('@/hooks/useSiteMetrics', () => ({
+  __esModule: true,
+  useSiteMetrics,
+  default: useSiteMetrics
+}));
+
+jest.mock('@/hooks/useAuth', () => ({
+  __esModule: true,
+  useAuth,
+  default: useAuth
+}));
 
 // Import DomainStep mock
 require('./tests/__mocks__/domain-step-mock');
