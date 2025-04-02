@@ -40,24 +40,24 @@ describe('Listings API', () => {
       // Mock the Redis client to return null for site
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockResolvedValue(null);
-      
+
       // Create request
       const request = new NextRequest('http://localhost:3000/api/sites/non-existent/listings');
-      
+
       // Execute the route handler
       const response = await GET(request, { params: { siteSlug: 'non-existent' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(404);
       expect(data).toEqual({
         error: 'Site not found',
       });
-      
+
       // Verify the Redis client was called correctly
-      expect(kv.get).toHaveBeenCalledWith('site:slug:non-existent');
+      expect(kv.get).toHaveBeenCalledWith('test:site:slug:non-existent');
     });
 
     it('should return listings for a valid site', async () => {
@@ -73,7 +73,7 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock listings
       const mockListings = [
         {
@@ -109,42 +109,42 @@ describe('Listings API', () => {
           updatedAt: 2000,
         },
       ];
-      
+
       // Mock the Redis client
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockImplementation((key) => {
-        if (key === 'site:slug:test-site') {
+        if (key === 'test:site:slug:test-site') {
           return Promise.resolve(mockSite);
         }
-        if (key === 'listing:site:site1:test-listing-1') {
+        if (key === 'test:listing:site:site1:test-listing-1') {
           return Promise.resolve(mockListings[0]);
         }
-        if (key === 'listing:site:site1:test-listing-2') {
+        if (key === 'test:listing:site:site1:test-listing-2') {
           return Promise.resolve(mockListings[1]);
         }
         return Promise.resolve(null);
       });
       (kv.keys as jest.Mock).mockResolvedValue([
-        'listing:site:site1:test-listing-1',
-        'listing:site:site1:test-listing-2',
+        'test:listing:site:site1:test-listing-1',
+        'test:listing:site:site1:test-listing-2',
       ]);
-      
+
       // Create request
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings');
-      
+
       // Execute the route handler
       const response = await GET(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(200);
       expect(data).toEqual(mockListings);
-      
+
       // Verify the Redis client was called correctly
-      expect(kv.get).toHaveBeenCalledWith('site:slug:test-site');
-      expect(kv.keys).toHaveBeenCalledWith('listing:site:site1:*');
+      expect(kv.get).toHaveBeenCalledWith('test:site:slug:test-site');
+      expect(kv.keys).toHaveBeenCalledWith('test:listing:site:site1:*');
     });
 
     it('should handle Redis errors gracefully', async () => {
@@ -160,26 +160,26 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock the Redis client
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockImplementation((key) => {
-        if (key === 'site:slug:test-site') {
+        if (key === 'test:site:slug:test-site') {
           return Promise.resolve(mockSite);
         }
         return Promise.resolve(null);
       });
       (kv.keys as jest.Mock).mockRejectedValue(new Error('Redis error'));
-      
+
       // Create request
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings');
-      
+
       // Execute the route handler
       const response = await GET(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(500);
       expect(data).toEqual({
@@ -200,7 +200,7 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock listing
       const mockListing = {
         id: 'listing1',
@@ -218,43 +218,43 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock the Redis client
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockImplementation((key) => {
-        if (key === 'site:slug:test-site') {
+        if (key === 'test:site:slug:test-site') {
           return Promise.resolve(mockSite);
         }
-        if (key === 'listing:site:site1:test-listing-1') {
+        if (key === 'test:listing:site:site1:test-listing-1') {
           return Promise.resolve(mockListing);
         }
-        if (key === 'listing:site:site1:test-listing-2') {
+        if (key === 'test:listing:site:site1:test-listing-2') {
           // This will trigger the error handler in the loop
           return Promise.reject(new Error('Failed to fetch listing'));
         }
         return Promise.resolve(null);
       });
       (kv.keys as jest.Mock).mockResolvedValue([
-        'listing:site:site1:test-listing-1',
-        'listing:site:site1:test-listing-2',
+        'test:listing:site:site1:test-listing-1',
+        'test:listing:site:site1:test-listing-2',
       ]);
-      
+
       // Create request
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings');
-      
+
       // Spy on console.error to verify it's called
       jest.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       // Execute the route handler
       const response = await GET(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response - should still get the successful listing
       expect(response.status).toBe(200);
       expect(data).toEqual([mockListing]);
-      
+
       // Verify error was logged
       expect(console.error).toHaveBeenCalledWith(
         'Error fetching listing at index 1:',
@@ -268,20 +268,20 @@ describe('Listings API', () => {
       // Mock the Redis client to return null for site
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockResolvedValue(null);
-      
+
       // Create request
       const request = new NextRequest('http://localhost:3000/api/sites/non-existent/listings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
       });
-      
+
       // Execute the route handler
       const response = await POST(request, { params: { siteSlug: 'non-existent' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(404);
       expect(data).toEqual({
@@ -302,11 +302,11 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock the Redis client
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockResolvedValue(mockSite);
-      
+
       // Create request with missing fields
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings', {
         method: 'POST',
@@ -320,13 +320,13 @@ describe('Listings API', () => {
           // Missing backlinkUrl
         }),
       });
-      
+
       // Execute the route handler
       const response = await POST(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(400);
       expect(data).toEqual({
@@ -347,19 +347,19 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock the Redis client
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockImplementation((key) => {
-        if (key === 'site:slug:test-site') {
+        if (key === 'test:site:slug:test-site') {
           return Promise.resolve(mockSite);
         }
-        if (key === 'category:id:non-existent-category') {
+        if (key === 'test:category:id:non-existent-category') {
           return Promise.resolve(null);
         }
         return Promise.resolve(null);
       });
-      
+
       // Create request with non-existent category
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings', {
         method: 'POST',
@@ -372,13 +372,13 @@ describe('Listings API', () => {
           backlinkUrl: 'https://example.com',
         }),
       });
-      
+
       // Execute the route handler
       const response = await POST(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(404);
       expect(data).toEqual({
@@ -399,7 +399,7 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock category data
       const mockCategory = {
         id: 'cat1',
@@ -411,17 +411,17 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock the Redis client
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockImplementation((key) => {
-        if (key === 'site:slug:test-site') {
+        if (key === 'test:site:slug:test-site') {
           return Promise.resolve(mockSite);
         }
-        if (key === 'category:id:cat1') {
+        if (key === 'test:category:id:cat1') {
           return Promise.resolve(mockCategory);
         }
-        if (key === 'listing:site:site1:test-listing') {
+        if (key === 'test:listing:site:site1:test-listing') {
           // Slug already exists
           return Promise.resolve({
             id: 'existing-listing',
@@ -442,7 +442,7 @@ describe('Listings API', () => {
         }
         return Promise.resolve(null);
       });
-      
+
       // Create request with a title that generates an existing slug
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings', {
         method: 'POST',
@@ -455,13 +455,13 @@ describe('Listings API', () => {
           backlinkUrl: 'https://example.com',
         }),
       });
-      
+
       // Execute the route handler
       const response = await POST(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(409);
       expect(data).toEqual({
@@ -483,7 +483,7 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock category data
       const mockCategory = {
         id: 'cat1',
@@ -495,20 +495,20 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock the Redis client
       const { kv, redis } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockImplementation((key) => {
-        if (key === 'site:slug:test-site') {
+        if (key === 'test:site:slug:test-site') {
           return Promise.resolve(mockSite);
         }
-        if (key === 'category:id:cat1') {
+        if (key === 'test:category:id:cat1') {
           return Promise.resolve(mockCategory);
         }
         // Slug doesn't exist yet
         return Promise.resolve(null);
       });
-      
+
       // Mock the multi transaction
       const mockMulti = {
         set: jest.fn().mockReturnThis(),
@@ -519,11 +519,11 @@ describe('Listings API', () => {
         ]),
       };
       (redis.multi as jest.Mock).mockReturnValue(mockMulti);
-      
+
       // Mock Date.now for consistent timestamps
       const originalDateNow = Date.now;
       Date.now = jest.fn(() => 1234567890);
-      
+
       // Create request with valid data
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings', {
         method: 'POST',
@@ -544,13 +544,13 @@ describe('Listings API', () => {
           imageUrl: 'https://example.com/image.jpg',
         }),
       });
-      
+
       // Execute the route handler
       const response = await POST(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(201);
       expect(data).toEqual({
@@ -574,31 +574,31 @@ describe('Listings API', () => {
         updatedAt: 1234567890,
         url: 'https://testsite.com/test-category/new-test-listing',
       });
-      
+
       // Verify the Redis client was called correctly
       expect(redis.multi).toHaveBeenCalled();
       expect(mockMulti.set).toHaveBeenCalledTimes(3);
       expect(mockMulti.set).toHaveBeenCalledWith(
-        'listing:id:listing_1234567890',
+        'test:listing:id:listing_1234567890',
         expect.any(String)
       );
       expect(mockMulti.set).toHaveBeenCalledWith(
-        'listing:site:site1:new-test-listing',
+        'test:listing:site:site1:new-test-listing',
         expect.any(String)
       );
       expect(mockMulti.set).toHaveBeenCalledWith(
-        'listing:category:cat1:new-test-listing',
+        'test:listing:category:cat1:new-test-listing',
         expect.any(String)
       );
       expect(mockMulti.exec).toHaveBeenCalled();
-      
+
       // Verify the search indexer was called
       const { searchIndexer } = require('../../src/lib/search-indexer');
       expect(searchIndexer.indexListing).toHaveBeenCalledWith(expect.objectContaining({
         id: 'listing_1234567890',
         title: 'New Test Listing',
       }));
-      
+
       // Restore Date.now
       Date.now = originalDateNow;
     });
@@ -616,7 +616,7 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock category data
       const mockCategory = {
         id: 'cat1',
@@ -628,19 +628,19 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock the Redis client
       const { kv, redis } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockImplementation((key) => {
-        if (key === 'site:slug:test-site') {
+        if (key === 'test:site:slug:test-site') {
           return Promise.resolve(mockSite);
         }
-        if (key === 'category:id:cat1') {
+        if (key === 'test:category:id:cat1') {
           return Promise.resolve(mockCategory);
         }
         return Promise.resolve(null);
       });
-      
+
       // Mock the multi transaction with an error
       const mockMulti = {
         set: jest.fn().mockReturnThis(),
@@ -651,7 +651,7 @@ describe('Listings API', () => {
         ]),
       };
       (redis.multi as jest.Mock).mockReturnValue(mockMulti);
-      
+
       // Create request with valid data
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings', {
         method: 'POST',
@@ -664,22 +664,22 @@ describe('Listings API', () => {
           backlinkUrl: 'https://example.com/new',
         }),
       });
-      
+
       // Spy on console.error
       jest.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       // Execute the route handler
       const response = await POST(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(500);
       expect(data).toEqual({
         error: 'Failed to save listing data',
       });
-      
+
       // Verify error was logged
       expect(console.error).toHaveBeenCalledWith(
         'Transaction errors:',
@@ -701,7 +701,7 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock category data
       const mockCategory = {
         id: 'cat1',
@@ -713,19 +713,19 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock the Redis client
       const { kv, redis } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockImplementation((key) => {
-        if (key === 'site:slug:test-site') {
+        if (key === 'test:site:slug:test-site') {
           return Promise.resolve(mockSite);
         }
-        if (key === 'category:id:cat1') {
+        if (key === 'test:category:id:cat1') {
           return Promise.resolve(mockCategory);
         }
         return Promise.resolve(null);
       });
-      
+
       // Mock the multi transaction
       const mockMulti = {
         set: jest.fn().mockReturnThis(),
@@ -736,18 +736,18 @@ describe('Listings API', () => {
         ]),
       };
       (redis.multi as jest.Mock).mockReturnValue(mockMulti);
-      
+
       // Mock Date.now for consistent timestamps
       const originalDateNow = Date.now;
       Date.now = jest.fn(() => 1234567890);
-      
+
       // Mock the search indexer to throw an error
       const { searchIndexer } = require('../../src/lib/search-indexer');
       (searchIndexer.indexListing as jest.Mock).mockRejectedValue(new Error('Indexing error'));
-      
+
       // Spy on console.error
       jest.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       // Create request with valid data
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings', {
         method: 'POST',
@@ -760,23 +760,23 @@ describe('Listings API', () => {
           backlinkUrl: 'https://example.com/new',
         }),
       });
-      
+
       // Execute the route handler
       const response = await POST(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response - should still be successful
       expect(response.status).toBe(201);
       expect(data).toHaveProperty('id', 'listing_1234567890');
-      
+
       // Verify error was logged
       expect(console.error).toHaveBeenCalledWith(
         'Error indexing listing:',
         expect.any(Error)
       );
-      
+
       // Restore Date.now
       Date.now = originalDateNow;
     });
@@ -794,35 +794,35 @@ describe('Listings API', () => {
         createdAt: 1000,
         updatedAt: 1000,
       };
-      
+
       // Mock the Redis client
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockResolvedValue(mockSite);
-      
+
       // Create a mock request that will throw during JSON parsing
       const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
-      
+
       // Mock request.json to throw an error
       request.json = jest.fn().mockRejectedValue(new Error('Invalid JSON'));
-      
+
       // Spy on console.error
       jest.spyOn(console, 'error').mockImplementation(() => {});
-      
+
       // Execute the route handler
       const response = await POST(request, { params: { siteSlug: 'test-site' } });
-      
+
       // Parse the response
       const data = await response.json();
-      
+
       // Verify the response
       expect(response.status).toBe(500);
       expect(data).toEqual({
         error: 'Internal server error',
       });
-      
+
       // Verify error was logged
       expect(console.error).toHaveBeenCalledWith(
         'Error creating listing:',
