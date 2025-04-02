@@ -1,5 +1,5 @@
 import { redis, kv } from '@/lib/redis-client';
-import { KeyNamespaceService } from '@/lib/key-namespace-service';
+import KeyNamespaceService from '@/lib/key-namespace-service';
 import crypto from 'crypto';
 
 // Define tenant configuration type

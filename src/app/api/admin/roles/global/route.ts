@@ -10,9 +10,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { withPermission } from '@/middleware/withPermission';
-import { RoleService } from '@/lib/role-service';
-import { AuditService } from '@/lib/audit/audit-service';
+import withPermission from '@/middleware/withPermission';
+import RoleService from '@/lib/role-service';
+import AuditService from '@/lib/audit/audit-service';
 import { getTenantFromRequest } from '@/lib/tenant/tenant-resolver';
 import { getUserFromRequest } from '@/lib/auth/user-resolver';
 

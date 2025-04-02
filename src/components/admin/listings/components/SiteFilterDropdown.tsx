@@ -50,7 +50,7 @@ export const SiteFilterDropdown: React.FC<SiteFilterDropdownProps> = ({
       
       <DropdownMenu
         trigger={
-          <Button variant="outline" size="sm" data-testid="site-filter-dropdown-button">
+          <Button variant="outline" size="sm" data-testid="site-filter-dropdown">
             {selectedSiteId ? 'Change Site' : 'Filter by Site'}
           </Button>
         }

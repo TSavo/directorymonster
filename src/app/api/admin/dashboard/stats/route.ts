@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAccess } from '@/middleware/tenant-validation';
-import { withPermission } from '@/middleware/withPermission';
+import withPermission from '@/middleware/withPermission';
 import { DashboardService } from '@/lib/dashboard-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 
