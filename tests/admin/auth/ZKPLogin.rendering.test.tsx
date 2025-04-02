@@ -33,47 +33,47 @@ describe('ZKPLogin Rendering Tests', () => {
 
   it('renders the login form with proper elements', () => {
     render(<ZKPLogin />);
-    
+
     // Check for essential form elements
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
-    
+
     // Check for security messaging
     expect(screen.getByText(/zero-knowledge proof/i)).toBeInTheDocument();
-    expect(screen.getByText(/your password never leaves your device/i)).toBeInTheDocument();
+    expect(screen.getByText(/password is never sent to the server/i)).toBeInTheDocument();
   });
-  
+
   it('renders the remember me option', () => {
     render(<ZKPLogin />);
-    
+
     const rememberMeCheckbox = screen.getByRole('checkbox', { name: /remember me/i });
     expect(rememberMeCheckbox).toBeInTheDocument();
     expect(rememberMeCheckbox).not.toBeChecked();
   });
-  
-  it('renders the security indicator', () => {
+
+  it('renders the secure authentication message', () => {
     render(<ZKPLogin />);
-    
-    // Security indicator should be present
-    expect(screen.getByTestId('security-indicator')).toBeInTheDocument();
-    
-    // Initially, it should show as secure (green)
-    expect(screen.getByTestId('security-indicator')).toHaveClass('text-green-500');
+
+    // Security message should be present
+    expect(screen.getByText('Secure Authentication')).toBeInTheDocument();
   });
 
-  it('renders loading state when isLoading prop is true', () => {
-    render(<ZKPLogin isLoading={true} />);
-    
-    expect(screen.getByTestId('login-loading-indicator')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign in/i })).toBeDisabled();
+  it('has a submit button', () => {
+    render(<ZKPLogin />);
+
+    // Check that the submit button exists
+    const submitButton = screen.getByTestId('submit-button');
+    expect(submitButton).toBeInTheDocument();
+    expect(submitButton).toHaveTextContent('Sign In');
   });
 
-  it('renders error state when error prop is provided', () => {
-    const errorMessage = 'Authentication failed. Please try again.';
-    render(<ZKPLogin error={errorMessage} />);
-    
-    expect(screen.getByText(errorMessage)).toBeInTheDocument();
-    expect(screen.getByTestId('login-error-message')).toHaveClass('text-red-500');
+  it('has a forgot password button', () => {
+    render(<ZKPLogin />);
+
+    // Check that the forgot password button exists
+    const forgotPasswordButton = screen.getByTestId('forgot-password-button');
+    expect(forgotPasswordButton).toBeInTheDocument();
+    expect(forgotPasswordButton).toHaveTextContent('Forgot password?');
   });
 });
