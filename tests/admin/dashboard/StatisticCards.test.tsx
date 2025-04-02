@@ -7,6 +7,7 @@ import { SiteMetricsData } from '../../../src/components/admin/dashboard/types';
 
 // Mock the hook
 jest.mock('../../../src/components/admin/dashboard/hooks', () => ({
+  __esModule: true,
   useSiteMetrics: jest.fn(),
 }));
 
