@@ -3,10 +3,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { AdminSidebar } from '@/components/admin/layout';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  __esModule: true,
-  usePathname: () => '/admin/listings'
-}));
+jest.mock('next/navigation', () => {
+  return {
+    __esModule: true,
+    usePathname: jest.fn().mockReturnValue('/admin/listings')
+  };
+});
 
 // Mock next/link
 jest.mock('next/link', () => {
@@ -25,6 +27,19 @@ jest.mock('next/link', () => {
     );
   };
 });
+
+// Mock the icons
+jest.mock('@/components/admin/layout/icons', () => ({
+  HomeIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="home-icon" />,
+  ListIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="list-icon" />,
+  FolderIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="folder-icon" />,
+  GlobeIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="globe-icon" />,
+  UsersIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="users-icon" />,
+  SettingsIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="settings-icon" />,
+  ChartIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="chart-icon" />,
+  CloseIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="close-icon" />,
+  ChevronRightIcon: ({ className }: { className?: string }) => <svg className={className} data-testid="chevron-right-icon" />
+}));
 
 describe('AdminSidebar Component', () => {
   const mockCloseSidebar = jest.fn();
