@@ -2,6 +2,48 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 
+// Function to find all component files from a barrel file
+function findComponentsFromBarrel(barrelFilePath) {
+  if (!fs.existsSync(barrelFilePath)) {
+    return [];
+  }
+
+  try {
+    const content = fs.readFileSync(barrelFilePath, 'utf8');
+    const componentFiles = [];
+
+    // Match export statements
+    const exportRegex = /export\s+(?:\{[^}]*\}|\*\s+as\s+[^;]+|[^;{]*)\s+from\s+['"]\.\/(.*)['"];?/g;
+    let match;
+
+    while ((match = exportRegex.exec(content)) !== null) {
+      const componentName = match[1];
+      const componentDir = path.dirname(barrelFilePath);
+      const componentPath = path.join(componentDir, componentName);
+
+      // Add extensions if not present
+      if (!path.extname(componentPath)) {
+        const extensions = ['.tsx', '.jsx', '.ts', '.js'];
+
+        for (const ext of extensions) {
+          const pathWithExt = `${componentPath}${ext}`;
+          if (fs.existsSync(pathWithExt)) {
+            componentFiles.push(pathWithExt);
+            break;
+          }
+        }
+      } else if (fs.existsSync(componentPath)) {
+        componentFiles.push(componentPath);
+      }
+    }
+
+    return componentFiles;
+  } catch (error) {
+    console.error(`Error reading barrel file ${barrelFilePath}: ${error.message}`);
+    return [];
+  }
+}
+
 // Function to extract data-testid attributes from component files
 function extractComponentTestIds(filePath) {
   try {
@@ -22,6 +64,17 @@ function extractComponentTestIds(filePath) {
 
     while ((match = dataTestIdRegex.exec(content)) !== null) {
       testIds.add(match[1]);
+    }
+
+    // If this is a barrel file (index.ts/js), also extract test IDs from the files it exports
+    if (path.basename(filePath).startsWith('index.') && content.includes('export')) {
+      const componentFiles = findComponentsFromBarrel(filePath);
+      for (const componentFile of componentFiles) {
+        const componentTestIds = extractComponentTestIds(componentFile).testIds;
+        for (const id of componentTestIds) {
+          testIds.add(id);
+        }
+      }
     }
 
     return {
@@ -72,9 +125,106 @@ function extractTestFileTestIds(filePath) {
   }
 }
 
+// Function to extract import statements from a file
+function extractImports(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const imports = [];
+
+    // Match import statements
+    const importRegex = /import\s+(?:{[^}]*}|\*\s+as\s+[^;]+|[^;{]*)\s+from\s+['"]([@/][^'"]+)['"];?/g;
+    let match;
+
+    while ((match = importRegex.exec(content)) !== null) {
+      const importPath = match[1];
+
+      // Only include imports from the project (not node_modules)
+      if (importPath.startsWith('@/') || importPath.startsWith('./') || importPath.startsWith('../')) {
+        imports.push(importPath);
+      }
+    }
+
+    return imports;
+  } catch (error) {
+    console.error(`Error reading file ${filePath}: ${error.message}`);
+    return [];
+  }
+}
+
+// Function to resolve import path to actual file path
+function resolveImportPath(importPath, fromFile) {
+  // Handle aliased imports (e.g., @/components/...)
+  if (importPath.startsWith('@/')) {
+    // Assuming @/ maps to src/
+    return importPath.replace('@/', 'src/');
+  }
+
+  // Handle relative imports
+  if (importPath.startsWith('./') || importPath.startsWith('../')) {
+    const fromDir = path.dirname(fromFile);
+    return path.join(fromDir, importPath);
+  }
+
+  return importPath;
+}
+
+// Function to find actual file from import path
+function findFileFromImport(importPath) {
+  // Add extensions if not present
+  if (!path.extname(importPath)) {
+    const extensions = ['.tsx', '.jsx', '.ts', '.js'];
+
+    for (const ext of extensions) {
+      const pathWithExt = `${importPath}${ext}`;
+      if (fs.existsSync(pathWithExt)) {
+        return pathWithExt;
+      }
+    }
+
+    // Check for index files
+    for (const ext of extensions) {
+      const indexPath = path.join(importPath, `index${ext}`);
+      if (fs.existsSync(indexPath)) {
+        return indexPath;
+      }
+    }
+  } else if (fs.existsSync(importPath)) {
+    return importPath;
+  }
+
+  return null;
+}
+
 // Function to find the corresponding component file for a test file
 function findCorrespondingComponentFile(testFilePath) {
-  // Extract the component name from the test file path
+  // First try to find component files based on imports
+  const imports = extractImports(testFilePath);
+  const resolvedImports = imports.map(imp => resolveImportPath(imp, testFilePath));
+
+  // Check for barrel files and extract components from them
+  let allComponentFiles = [];
+
+  for (const importPath of resolvedImports) {
+    // First check if it's a direct file import
+    const directFile = findFileFromImport(importPath);
+    if (directFile) {
+      allComponentFiles.push(directFile);
+      continue;
+    }
+
+    // Check if it's a directory import (barrel file)
+    const indexFile = findFileFromImport(path.join(importPath, 'index'));
+    if (indexFile) {
+      const barrelComponents = findComponentsFromBarrel(indexFile);
+      allComponentFiles = [...allComponentFiles, ...barrelComponents];
+    }
+  }
+
+  if (allComponentFiles.length > 0) {
+    return allComponentFiles;
+  }
+
+  // If no imports found, fall back to the original approach
   const testFileName = path.basename(testFilePath);
   const componentName = testFileName.replace(/\.test\.(tsx|jsx|ts|js)$/, '');
 
@@ -180,6 +330,11 @@ function findMismatchedTestIds() {
 
 // Run the analysis
 const mismatches = findMismatchedTestIds();
+
+// Save the mismatches to a file
+const mismatchedTestIdsFile = 'mismatched-testids.json';
+fs.writeFileSync(mismatchedTestIdsFile, JSON.stringify(mismatches, null, 2));
+console.log(`Saved ${mismatches.length} mismatched test IDs to ${mismatchedTestIdsFile}`);
 
 // Output the results
 console.log('\n=== MISMATCHED DATA-TESTID ATTRIBUTES ===');

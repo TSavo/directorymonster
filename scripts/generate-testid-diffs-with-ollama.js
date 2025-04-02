@@ -1,11 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 // Configuration
-const OLLAMA_MODEL = 'deepseek-coder:7b'; // Using deepseek-coder:7b model
+const OLLAMA_MODEL = 'deepseek-r1:7b'; // Using deepseek-r1:7b model
 const OLLAMA_ENDPOINT = 'http://localhost:11434/api/generate';
-const SUGGESTIONS_DIR = 'testid-fix-suggestions';
 const OUTPUT_DIR = 'testid-fix-diffs';
 
 // Create output directory if it doesn't exist
@@ -89,61 +87,7 @@ async function callOllama(prompt) {
   }
 }
 
-// Function to parse the suggestion file
-function parseSuggestionFile(filePath) {
-  const content = readFile(filePath);
-  if (!content) return null;
 
-  const lines = content.split('\n');
-
-  // Extract test file path
-  const testFileLine = lines.find(line => line.startsWith('# Fix Suggestions for'));
-  const testFile = testFileLine ? testFileLine.replace('# Fix Suggestions for', '').trim() : null;
-
-  // Extract missing test IDs
-  const missingTestIds = [];
-  let collectingMissingIds = false;
-
-  for (const line of lines) {
-    if (line.includes('## Missing data-testid attributes')) {
-      collectingMissingIds = true;
-      continue;
-    } else if (line.includes('## Component Files')) {
-      collectingMissingIds = false;
-      break;
-    }
-
-    if (collectingMissingIds && line.trim().startsWith('- `')) {
-      const id = line.trim().replace('- `', '').replace('`', '');
-      missingTestIds.push(id);
-    }
-  }
-
-  // Extract component files
-  const componentFiles = [];
-  let collectingComponentFiles = false;
-
-  for (const line of lines) {
-    if (line.includes('## Component Files')) {
-      collectingComponentFiles = true;
-      continue;
-    } else if (line.includes('## Existing data-testid attributes')) {
-      collectingComponentFiles = false;
-      break;
-    }
-
-    if (collectingComponentFiles && line.trim().startsWith('- ')) {
-      const file = line.trim().replace('- ', '');
-      componentFiles.push(file);
-    }
-  }
-
-  return {
-    testFile,
-    missingTestIds,
-    componentFiles
-  };
-}
 
 // Function to generate a diff using Ollama
 async function generateDiff(suggestion) {
@@ -199,16 +143,22 @@ Please generate a diff that fixes this issue by either:
 2. Updating the test to use existing data-testid attributes in the component
 3. If the test is using mocks, updating the mocks to provide the correct data-testid attributes
 
-For each file that needs to be modified, provide a diff in the following format:
+You MUST output your solution in proper unified diff format like this example:
 
-FILE: path/to/file.tsx
 \`\`\`diff
-@@ -line_number,number_of_lines +line_number,number_of_lines @@
- unchanged line
--removed line
-+added line
- unchanged line
+--- a/src/components/example.tsx
++++ b/src/components/example.tsx
+@@ -10,7 +10,7 @@ function Example() {
+   return (
+     <div>
+-      <button onClick={handleClick}>
++      <button onClick={handleClick} data-testid="example-button">
+         Click me
+       </button>
+     </div>
 \`\`\`
+
+Do not include any other format or explanations outside of the diff blocks. Only output valid diff syntax that could be directly applied with git apply or patch commands. Include proper file paths, line numbers, and context lines.
 
 Focus on the most minimal changes needed to fix the issue. If you need to add data-testid attributes to the component, try to identify the correct elements based on the test's expectations.
 `;
@@ -234,27 +184,32 @@ async function main() {
   // Pull the Ollama model first
   await pullOllamaModel();
 
-  // Get all suggestion files
-  const suggestionFiles = fs.readdirSync(SUGGESTIONS_DIR)
-    .filter(file => file.endsWith('-fix.md'))
-    .map(file => path.join(SUGGESTIONS_DIR, file));
+  // Read the mismatched test IDs file
+  const mismatchedTestIdsFile = 'mismatched-testids.json';
 
-  console.log(`Found ${suggestionFiles.length} suggestion files`);
+  if (!fs.existsSync(mismatchedTestIdsFile)) {
+    console.error(`File ${mismatchedTestIdsFile} not found. Please run find-mismatched-testids.js first.`);
+    return;
+  }
 
-  // Process a limited number of files for testing
-  const filesToProcess = suggestionFiles.slice(0, 5); // Process only 5 files for testing
-  console.log(`Processing ${filesToProcess.length} files for testing`);
+  const mismatchedData = JSON.parse(fs.readFileSync(mismatchedTestIdsFile, 'utf8'));
+  console.log(`Found ${mismatchedData.length} mismatched test files`);
 
-  // Process each suggestion file
+  // Process all files with component files (skip those with errors)
+  const filesToProcess = mismatchedData.filter(item => !item.error && item.componentFiles && item.componentFiles.length > 0);
+  console.log(`Processing ${filesToProcess.length} files with component files`);
+
+  // Process each file
   for (let i = 0; i < filesToProcess.length; i++) {
-    const suggestionFile = suggestionFiles[i];
-    console.log(`Processing ${i+1}/${suggestionFiles.length}: ${suggestionFile}`);
+    const item = filesToProcess[i];
+    console.log(`Processing ${i+1}/${filesToProcess.length}: ${item.testFile}`);
 
-    const suggestion = parseSuggestionFile(suggestionFile);
-    if (!suggestion) {
-      console.log(`Failed to parse suggestion file: ${suggestionFile}`);
-      continue;
-    }
+    const suggestion = {
+      testFile: item.testFile,
+      componentFiles: item.componentFiles,
+      missingTestIds: item.missingTestIds
+    };
+    // No need to check if suggestion is null since we're creating it directly
 
     // Skip suggestions with no component files
     if (!suggestion.componentFiles || suggestion.componentFiles.length === 0) {
@@ -269,7 +224,7 @@ async function main() {
     }
 
     // Save the diff to a file
-    const outputFile = path.join(OUTPUT_DIR, path.basename(suggestionFile, '-fix.md') + '-diff.md');
+    const outputFile = path.join(OUTPUT_DIR, `${path.basename(item.testFile, '.tsx').replace(/\.test$/, '')}-diff.md`);
     const outputContent = `# Diff for ${diffResult.testFile}
 
 ## Missing data-testid attributes

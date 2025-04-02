@@ -1,0 +1,42 @@
+# Test Report for TestCard-1.patch
+
+## Summary
+
+- **Patch File**: testid-fix-patches\TestCard-1.patch
+- **Target File**: src/components/test/TestCard.tsx
+- **Patch Applied**: No
+- **Changes Kept**: No
+- **Reason**: Failed to apply patch
+
+## Patch Content
+
+```diff
+# Patch for src/components/test/TestCard.tsx
+
+--- a/src/components/test/TestCard.tsx
++++ b/src/components/test/TestCard.tsx
+@@ -13,16 +13,16 @@ const TestCard: React.FC<TestCardProps> = ({
+   onCardClick 
+ }) => {
+   return (
+-    <div className="test-card" onClick={onCardClick}>
++    <div className="test-card" data-testid="test-card" onClick={onCardClick}>
+       <div className="card-header">
+-        <h3>{title}</h3>
++        <h3 data-testid="card-title">{title}</h3>
+       </div>
+       <div className="card-body">
+-        <p>{content}</p>
++        <p data-testid="card-content">{content}</p>
+       </div>
+       {footer && (
+-        <div className="card-footer">
+-          <small>{footer}</small>
++        <div className="card-footer" data-testid="card-footer">
++          <small data-testid="footer-text">{footer}</small>
+         </div>
+       )}
+     </div>
+   );
+
+```

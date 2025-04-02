@@ -28,6 +28,17 @@
     ]
   },
   {
+    "testFile": "tests\\test\\TestComponent.test.tsx",
+    "componentFiles": [
+      "src/components/test/TestComponent.tsx"
+    ],
+    "missingTestIds": [
+      "test-title",
+      "test-button",
+      "test-description"
+    ]
+  },
+  {
     "testFile": "tests\\search\\SearchResults.test.tsx",
     "componentFiles": [
       "src\\components\\search\\SearchResults.tsx"
@@ -70,15 +81,17 @@
   },
   {
     "testFile": "tests\\admin\\sites\\SiteForm.validation.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/SiteForm.tsx"
+    ],
+    "missingTestIds": [
       "siteForm-submit"
     ]
   },
   {
     "testFile": "tests\\admin\\sites\\SiteForm.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\SiteForm.tsx"
+      "src/components/admin/sites/SiteForm.tsx"
     ],
     "missingTestIds": [
       "siteForm-basic-info-heading",
@@ -96,8 +109,10 @@
   },
   {
     "testFile": "tests\\admin\\sites\\SiteForm.submission.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/SiteForm.tsx"
+    ],
+    "missingTestIds": [
       "siteForm-name",
       "siteForm-slug",
       "siteForm-description",
@@ -107,26 +122,25 @@
   },
   {
     "testFile": "tests\\admin\\sites\\SiteForm.container.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "siteForm-header",
+    "componentFiles": [
+      "src/components/admin/sites/SiteForm.tsx",
+      "src/components/admin/sites/hooks/useSites.ts"
+    ],
+    "missingTestIds": [
       "basic-info-step",
-      "siteForm-error",
-      "siteForm-success",
       "domain-step",
-      "site-form-preview",
-      "siteForm-form"
+      "site-form-preview"
     ]
   },
   {
     "testFile": "tests\\admin\\sites\\SiteForm.accessibility.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/SiteForm.tsx"
+    ],
+    "missingTestIds": [
       "siteForm-name",
       "siteForm-submit",
       "siteForm-cancel",
-      "siteForm-form",
-      "siteForm-header",
       "siteForm-name-error",
       "siteForm-fieldset",
       "siteForm-add-field",
@@ -137,16 +151,10 @@
     ]
   },
   {
-    "testFile": "tests\\admin\\sites\\DomainManager.validation.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "domainManager-submit"
-    ]
-  },
-  {
     "testFile": "tests\\admin\\sites\\DomainManager.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\DomainManager.tsx"
+      "src/components/admin/sites/DomainManager.tsx",
+      "src/components/admin/sites/hooks/useDomains.ts"
     ],
     "missingTestIds": [
       "domainManager-domain-0",
@@ -156,33 +164,19 @@
     ]
   },
   {
-    "testFile": "tests\\admin\\sites\\DomainManager.submission.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "domainManager-submit",
-      "domainManager-submit-loading"
-    ]
-  },
-  {
     "testFile": "tests\\admin\\sites\\DomainManager.domains.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/DomainManager.tsx"
+    ],
+    "missingTestIds": [
       "domainManager-remove-domain-0",
-      "domainManager-remove-domain-1",
-      "domainManager-domain-input",
-      "domainManager-add-domain",
-      "domainManager-domain-input-error",
-      "domainManager-submit",
-      "domainManager-cancel",
-      "domainManager-submit-loading",
-      "domainManager-error",
-      "domainManager-success"
+      "domainManager-remove-domain-1"
     ]
   },
   {
     "testFile": "tests\\admin\\sites\\table\\SiteTableRow.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\table\\SiteTableRow.tsx"
+      "src/components/admin/sites/table/SiteTableRow.tsx"
     ],
     "missingTestIds": [
       "site-name-site-123",
@@ -194,8 +188,10 @@
   },
   {
     "testFile": "tests\\admin\\sites\\table\\SiteTableRow.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/table/SiteTableRow.tsx"
+    ],
+    "missingTestIds": [
       "site-edit-button-site-123",
       "site-delete-button-site-123"
     ]
@@ -203,7 +199,7 @@
   {
     "testFile": "tests\\admin\\sites\\table\\SiteTablePagination.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\table\\SiteTablePagination.tsx"
+      "src/components/admin/sites/table/SiteTablePagination.tsx"
     ],
     "missingTestIds": [
       "pagination-previous",
@@ -215,8 +211,10 @@
   },
   {
     "testFile": "tests\\admin\\sites\\table\\SiteTablePagination.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/table/SiteTablePagination.tsx"
+    ],
+    "missingTestIds": [
       "pagination-next",
       "pagination-previous"
     ]
@@ -224,7 +222,7 @@
   {
     "testFile": "tests\\admin\\sites\\table\\SiteTableHeader.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\table\\SiteTableHeader.tsx"
+      "src/components/admin/sites/table/SiteTableHeader.tsx"
     ],
     "missingTestIds": [
       "site-table-search",
@@ -234,8 +232,10 @@
   },
   {
     "testFile": "tests\\admin\\sites\\table\\SiteTableHeader.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/table/SiteTableHeader.tsx"
+    ],
+    "missingTestIds": [
       "site-table-search",
       "site-table-create-button",
       "site-table-search-clear"
@@ -244,7 +244,7 @@
   {
     "testFile": "tests\\admin\\sites\\table\\SiteTable.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\table\\SiteTable.tsx"
+      "src/components/admin/sites/table/SiteTable.tsx"
     ],
     "missingTestIds": [
       "site-table-header-name",
@@ -271,8 +271,10 @@
   },
   {
     "testFile": "tests\\admin\\sites\\table\\SiteTable.loading.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/table/SiteTable.tsx"
+    ],
+    "missingTestIds": [
       "site-table-skeleton",
       "site-table-header-name",
       "site-table-header-slug",
@@ -282,9 +284,10 @@
   },
   {
     "testFile": "tests\\admin\\sites\\table\\SiteTable.error.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "site-table-error",
+    "componentFiles": [
+      "src/components/admin/sites/table/SiteTable.tsx"
+    ],
+    "missingTestIds": [
       "site-table-error-retry",
       "site-table-search"
     ]
@@ -292,7 +295,7 @@
   {
     "testFile": "tests\\admin\\sites\\table\\SiteMobileCard.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\table\\SiteMobileCard.tsx"
+      "src/components/admin/sites/table/SiteMobileCard.tsx"
     ],
     "missingTestIds": [
       "mobile-site-name",
@@ -305,8 +308,10 @@
   },
   {
     "testFile": "tests\\admin\\sites\\table\\SiteMobileCard.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/table/SiteMobileCard.tsx"
+    ],
+    "missingTestIds": [
       "mobile-edit-button",
       "mobile-delete-button",
       "mobile-site-details",
@@ -316,9 +321,7 @@
   {
     "testFile": "tests\\admin\\sites\\table\\DeleteConfirmationModal.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\table\\DeleteConfirmationModal.tsx",
-      "src\\components\\admin\\listings\\components\\DeleteConfirmationModal.tsx",
-      "src\\components\\admin\\categories\\components\\DeleteConfirmationModal.tsx"
+      "src/components/admin/sites/table/DeleteConfirmationModal.tsx"
     ],
     "missingTestIds": [
       "delete-modal",
@@ -330,32 +333,28 @@
   },
   {
     "testFile": "tests\\admin\\sites\\table\\DeleteConfirmationModal.keyboard.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/table/DeleteConfirmationModal.tsx"
+    ],
+    "missingTestIds": [
       "delete-modal-cancel",
       "delete-modal-confirm"
     ]
   },
   {
     "testFile": "tests\\admin\\sites\\table\\DeleteConfirmationModal.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/table/DeleteConfirmationModal.tsx"
+    ],
+    "missingTestIds": [
       "delete-modal-confirm",
       "delete-modal-cancel"
     ]
   },
   {
-    "testFile": "tests\\admin\\sites\\components\\ThemeStep.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "siteSettings-theme",
-      "siteSettings-customStyles"
-    ]
-  },
-  {
     "testFile": "tests\\admin\\sites\\components\\StepNavigation.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\components\\StepNavigation.tsx"
+      "src/components/admin/sites/components/StepNavigation.tsx"
     ],
     "missingTestIds": [
       "step-button-basic-info",
@@ -366,8 +365,10 @@
   },
   {
     "testFile": "tests\\admin\\sites\\components\\StepNavigation.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/components/StepNavigation.tsx"
+    ],
+    "missingTestIds": [
       "step-button-domains",
       "step-button-theme",
       "step-button-basic-info"
@@ -375,41 +376,18 @@
   },
   {
     "testFile": "tests\\admin\\sites\\components\\StepNavigation.accessibility.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/components/StepNavigation.tsx"
+    ],
+    "missingTestIds": [
       "step-button-domains",
       "step-button-basic-info"
     ]
   },
   {
-    "testFile": "tests\\admin\\sites\\components\\SiteSettings.validation.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "siteSettings-listingsPerPage",
-      "siteSettings-customStyles",
-      "siteSettings-submit",
-      "siteSettings-contactEmail"
-    ]
-  },
-  {
-    "testFile": "tests\\admin\\sites\\components\\SiteSettings.api.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "siteSettings-maintenanceMode",
-      "siteSettings-listingsPerPage",
-      "siteSettings-theme",
-      "siteSettings-contactEmail",
-      "siteSettings-submit",
-      "siteSettings-success",
-      "siteSettings-error",
-      "siteSettings-submit-loading",
-      "siteSettings-isPublic"
-    ]
-  },
-  {
     "testFile": "tests\\admin\\sites\\components\\SEOStep.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\components\\SEOStep.tsx"
+      "src/components/admin/sites/components/SEOStep.tsx"
     ],
     "missingTestIds": [
       "seo-settings",
@@ -424,60 +402,28 @@
   },
   {
     "testFile": "tests\\admin\\sites\\components\\SEOStep.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/components/SEOStep.tsx"
+    ],
+    "missingTestIds": [
       "meta-title-input",
       "noindex-checkbox"
     ]
   },
   {
-    "testFile": "tests\\admin\\sites\\components\\SEOSettings.validation.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "seoSettings-seoTitle",
-      "seoSettings-submit",
-      "seoSettings-seoDescription",
-      "seoSettings-twitterSite",
-      "seoSettings-structuredData"
-    ]
-  },
-  {
     "testFile": "tests\\admin\\sites\\components\\SEOSettings.noindex.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "seoSettings-newNoindexPage",
-      "seoSettings-addNoindexPage",
+    "componentFiles": [
+      "src/components/admin/sites/SEOSettings.tsx"
+    ],
+    "missingTestIds": [
       "seoSettings-noindexPage-0",
       "seoSettings-noindexPage-1"
     ]
   },
   {
-    "testFile": "tests\\admin\\sites\\components\\SEOSettings.api.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "seoSettings-seoTitle",
-      "seoSettings-seoDescription",
-      "seoSettings-twitterSite",
-      "seoSettings-newNoindexPage",
-      "seoSettings-addNoindexPage",
-      "seoSettings-submit",
-      "seoSettings-success",
-      "seoSettings-error"
-    ]
-  },
-  {
-    "testFile": "tests\\admin\\sites\\components\\FormActions.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "form-next-button",
-      "form-back-button",
-      "cancel-button"
-    ]
-  },
-  {
     "testFile": "tests\\admin\\sites\\components\\DomainStep.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\components\\DomainStep.tsx"
+      "src/components/admin/sites/components/DomainStep.tsx"
     ],
     "missingTestIds": [
       "domain-manager",
@@ -489,16 +435,20 @@
   },
   {
     "testFile": "tests\\admin\\sites\\components\\DomainStep.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/components/DomainStep.tsx"
+    ],
+    "missingTestIds": [
       "add-domain-button",
       "remove-domain-0"
     ]
   },
   {
     "testFile": "tests\\admin\\sites\\components\\BasicInfoStep.validation.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/components/BasicInfoStep.tsx"
+    ],
+    "missingTestIds": [
       "site-form-name-error",
       "site-form-slug-error",
       "site-form-name",
@@ -509,8 +459,7 @@
   {
     "testFile": "tests\\admin\\sites\\components\\BasicInfoStep.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\sites\\components\\BasicInfoStep.tsx",
-      "src\\components\\admin\\listings\\components\\form\\BasicInfoStep.tsx"
+      "src/components/admin/sites/components/BasicInfoStep.tsx"
     ],
     "missingTestIds": [
       "site-form-name",
@@ -521,8 +470,10 @@
   },
   {
     "testFile": "tests\\admin\\sites\\components\\BasicInfoStep.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src/components/admin/sites/components/BasicInfoStep.tsx"
+    ],
+    "missingTestIds": [
       "site-form-name",
       "site-form-slug",
       "site-form-description"
@@ -531,8 +482,7 @@
   {
     "testFile": "tests\\admin\\layout\\WithAuth.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\layout\\WithAuth.tsx",
-      "src\\components\\admin\\auth\\WithAuth.tsx"
+      "src\\components\\admin\\layout\\index.ts"
     ],
     "missingTestIds": [
       "protected-content"
@@ -541,11 +491,9 @@
   {
     "testFile": "tests\\admin\\layout\\AdminLayout.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\layout\\AdminLayout.tsx"
+      "src\\components\\admin\\layout\\index.ts"
     ],
     "missingTestIds": [
-      "admin-sidebar",
-      "admin-header",
       "breadcrumbs"
     ]
   },
@@ -918,8 +866,10 @@
   },
   {
     "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.url.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ],
+    "missingTestIds": [
       "view-link-category_1",
       "edit-link-category_1",
       "view-link-category_2",
@@ -956,8 +906,10 @@
   },
   {
     "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.navigation.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ],
+    "missingTestIds": [
       "view-button-category_1",
       "edit-button-category_1",
       "delete-button-category_1"
@@ -965,21 +917,24 @@
   },
   {
     "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.keyboard.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ],
+    "missingTestIds": [
       "view-button-category_1",
       "edit-button-category_1",
       "delete-button-category_1",
       "edit-button-category_2",
       "view-button-category_2",
-      "categories-mobile-view",
       "delete-button-category_2"
     ]
   },
   {
     "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.interaction.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ],
+    "missingTestIds": [
       "category-card-category_1",
       "view-button-category_1",
       "edit-button-category_1",
@@ -990,11 +945,10 @@
   },
   {
     "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.edgecases.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
-      "parent-label",
-      "site-label",
-      "categories-mobile-view",
+    "componentFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ],
+    "missingTestIds": [
       "category-card-category_1",
       "category-card-category_2",
       "category-name-category_1",
@@ -1008,8 +962,10 @@
   },
   {
     "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.accessibility.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ],
+    "missingTestIds": [
       "view-link-category_1",
       "edit-link-category_1",
       "delete-button-category_1",
@@ -1020,23 +976,24 @@
       "updated-date-category_4",
       "category-name-category_2",
       "category-card-category_3",
-      "parent-label",
-      "parent-name-category_3",
-      "site-label",
-      "categories-mobile-view"
+      "parent-name-category_3"
     ]
   },
   {
     "testFile": "tests\\admin\\auth\\ZKPLogin.validation.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ],
+    "missingTestIds": [
       "security-indicator"
     ]
   },
   {
     "testFile": "tests\\admin\\auth\\ZKPLogin.rendering.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ],
+    "missingTestIds": [
       "security-indicator",
       "login-loading-indicator",
       "login-error-message"
@@ -1044,16 +1001,19 @@
   },
   {
     "testFile": "tests\\admin\\auth\\ZKPLogin.auth.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\auth\\index.ts",
+      "src/lib/zkp.ts"
+    ],
+    "missingTestIds": [
       "login-loading-indicator"
     ]
   },
   {
     "testFile": "tests\\admin\\auth\\WithAuth.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\layout\\WithAuth.tsx",
-      "src\\components\\admin\\auth\\WithAuth.tsx"
+      "src/components/admin/auth/WithAuth.tsx",
+      "src/components/admin/auth/hooks/useAuth.ts"
     ],
     "missingTestIds": [
       "protected-content",
@@ -1062,15 +1022,17 @@
   },
   {
     "testFile": "tests\\admin\\auth\\TokenRefresh.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ],
+    "missingTestIds": [
       "auth-status"
     ]
   },
   {
     "testFile": "tests\\admin\\auth\\SessionManager.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\auth\\SessionManager.tsx"
+      "src\\components\\admin\\auth\\index.ts"
     ],
     "missingTestIds": [
       "auth-status",
@@ -1080,8 +1042,10 @@
   },
   {
     "testFile": "tests\\admin\\auth\\RoleAuthorization.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ],
+    "missingTestIds": [
       "admin-access",
       "editor-access",
       "viewer-access"
@@ -1089,15 +1053,18 @@
   },
   {
     "testFile": "tests\\admin\\auth\\Logout.test.tsx",
-    "error": "No corresponding component file found",
-    "testIds": [
+    "componentFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ],
+    "missingTestIds": [
       "auth-status"
     ]
   },
   {
     "testFile": "tests\\admin\\auth\\ACLGuard.test.tsx",
     "componentFiles": [
-      "src\\components\\admin\\auth\\ACLGuard.tsx"
+      "src/components/admin/auth/ACLGuard.tsx",
+      "src/components/admin/auth/hooks/useAuth.ts"
     ],
     "missingTestIds": [
       "protected-content",

@@ -1,0 +1,4331 @@
+[
+  {
+    "testFile": "tests\\url-construction.test.ts",
+    "imports": [
+      "../src/lib/site-utils",
+      "../src/types"
+    ],
+    "resolvedImports": [
+      "src\\lib\\site-utils",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\lib\\site-utils.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\SiteHeader.test.tsx",
+    "imports": [
+      "../src/components/SiteHeader",
+      "../src/types"
+    ],
+    "resolvedImports": [
+      "src\\components\\SiteHeader",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\components\\SiteHeader.tsx",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\SiteForm.test.tsx",
+    "imports": [
+      "@/components/SiteForm"
+    ],
+    "resolvedImports": [
+      "src/components/SiteForm"
+    ],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\site-utils.test.ts",
+    "imports": [
+      "@/lib/site-utils",
+      "@/types",
+      "@/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src/lib/site-utils",
+      "src/types",
+      "src/lib/redis-client"
+    ],
+    "actualFiles": [
+      "src/lib/site-utils.ts",
+      "src\\types\\index.ts",
+      "src/lib/redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\SideNav.test.tsx",
+    "imports": [
+      "@/components/SideNav"
+    ],
+    "resolvedImports": [
+      "src/components/SideNav"
+    ],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\redis-health.test.ts",
+    "imports": [
+      "../src/lib/redis-health"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis-health"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis-health.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis-fallback.test.ts",
+    "imports": [
+      "../src/lib/redis",
+      "../src/lib/redis/memory-store"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis",
+      "src\\lib\\redis\\memory-store"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis.ts",
+      "src\\lib\\redis\\memory-store.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis-client.test.ts",
+    "imports": [
+      "../src/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis-client"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\page-rendering.test.ts",
+    "imports": [
+      "@/lib/site-utils",
+      "@/types",
+      "@/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src/lib/site-utils",
+      "src/types",
+      "src/lib/redis-client"
+    ],
+    "actualFiles": [
+      "src/lib/site-utils.ts",
+      "src\\types\\index.ts",
+      "src/lib/redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\page-flow-integration.test.ts",
+    "imports": [
+      "@/lib/site-utils",
+      "@/types",
+      "@/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src/lib/site-utils",
+      "src/types",
+      "src/lib/redis-client"
+    ],
+    "actualFiles": [
+      "src/lib/site-utils.ts",
+      "src\\types\\index.ts",
+      "src/lib/redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\NavBar.test.tsx",
+    "imports": [
+      "@/components/NavBar"
+    ],
+    "resolvedImports": [
+      "src/components/NavBar"
+    ],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\multitenant-integration.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\multitenancy-integration.test.ts",
+    "imports": [
+      "@/lib/site-utils",
+      "@/types",
+      "@/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src/lib/site-utils",
+      "src/types",
+      "src/lib/redis-client"
+    ],
+    "actualFiles": [
+      "src/lib/site-utils.ts",
+      "src\\types\\index.ts",
+      "src/lib/redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\ListingCard.test.tsx",
+    "imports": [
+      "../src/components/ListingCard",
+      "../src/types"
+    ],
+    "resolvedImports": [
+      "src\\components\\ListingCard",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\components\\ListingCard.tsx",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\LinkUtilities.test.tsx",
+    "imports": [
+      "../src/components/LinkUtilities",
+      "../src/types"
+    ],
+    "resolvedImports": [
+      "src\\components\\LinkUtilities",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\components\\LinkUtilities.tsx",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\Button.test.tsx",
+    "imports": [
+      "@/components/Button"
+    ],
+    "resolvedImports": [
+      "src/components/Button"
+    ],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\AdminDashboard.test.tsx",
+    "imports": [
+      "../src/app/admin/page"
+    ],
+    "resolvedImports": [
+      "src\\app\\admin\\page"
+    ],
+    "actualFiles": [
+      "src\\app\\admin\\page.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\utils\\access-control.test.ts",
+    "imports": [
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\middleware\\withPermission.test.ts",
+    "imports": [
+      "@/middleware/withPermission",
+      "@/lib/role-service",
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/middleware/withPermission",
+      "src/lib/role-service",
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/middleware/withPermission.ts",
+      "src/lib/role-service.ts",
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\middleware\\tenant-validation.test.ts",
+    "imports": [
+      "@/components/admin/auth/utils/accessControl",
+      "@/middleware/tenant-validation"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/utils/accessControl",
+      "src/middleware/tenant-validation"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/utils/accessControl.ts",
+      "src/middleware/tenant-validation.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\middleware\\tenant-validation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\middleware\\tenant-context.test.ts",
+    "imports": [
+      "@/lib/audit/types",
+      "@/app/api/middleware/secureTenantContext",
+      "@/lib/tenant-membership-service",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/lib/audit/types",
+      "src/app/api/middleware/secureTenantContext",
+      "src/lib/tenant-membership-service",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/lib/audit/types.ts",
+      "src/app/api/middleware/secureTenantContext.ts",
+      "src/lib/tenant-membership-service.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\middleware\\secure-tenant-permission-middleware.test.ts",
+    "imports": [
+      "@/app/api/middleware/secureTenantContext",
+      "@/lib/audit/types",
+      "./secure-tenant-setup",
+      "@/components/admin/auth/utils/accessControl",
+      "@/lib/role-service",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/app/api/middleware/secureTenantContext",
+      "src/lib/audit/types",
+      "tests\\unit\\middleware\\secure-tenant-setup",
+      "src/components/admin/auth/utils/accessControl",
+      "src/lib/role-service",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/app/api/middleware/secureTenantContext.ts",
+      "src/lib/audit/types.ts",
+      "tests\\unit\\middleware\\secure-tenant-setup.ts",
+      "src/components/admin/auth/utils/accessControl.ts",
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\middleware\\secure-tenant-context.test.ts",
+    "imports": [
+      "@/lib/audit/types",
+      "@/app/api/middleware/secureTenantContext"
+    ],
+    "resolvedImports": [
+      "src/lib/audit/types",
+      "src/app/api/middleware/secureTenantContext"
+    ],
+    "actualFiles": [
+      "src/lib/audit/types.ts",
+      "src/app/api/middleware/secureTenantContext.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\middleware\\secure-tenant-context-middleware.test.ts",
+    "imports": [
+      "@/app/api/middleware/secureTenantContext",
+      "@/lib/audit/audit-service",
+      "@/lib/audit/types",
+      "./secure-tenant-setup"
+    ],
+    "resolvedImports": [
+      "src/app/api/middleware/secureTenantContext",
+      "src/lib/audit/audit-service",
+      "src/lib/audit/types",
+      "tests\\unit\\middleware\\secure-tenant-setup"
+    ],
+    "actualFiles": [
+      "src/app/api/middleware/secureTenantContext.ts",
+      "src/lib/audit/audit-service.ts",
+      "src/lib/audit/types.ts",
+      "tests\\unit\\middleware\\secure-tenant-setup.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\middleware\\permissionguard.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\lib\\tenant-membership-service.test.ts",
+    "imports": [
+      "@/lib/tenant-membership-service"
+    ],
+    "resolvedImports": [
+      "src/lib/tenant-membership-service"
+    ],
+    "actualFiles": [
+      "src/lib/tenant-membership-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/components/admin/auth/utils/accessControl",
+      "@/components/admin/auth/utils/roles",
+      "@/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/components/admin/auth/utils/accessControl",
+      "src/components/admin/auth/utils/roles",
+      "src/lib/redis-client"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/components/admin/auth/utils/accessControl.ts",
+      "src/components/admin/auth/utils/roles.ts",
+      "src/lib/redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service-impl.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/redis-client"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\category-service.test.ts",
+    "imports": [
+      "@/lib/category-service",
+      "@/lib/redis-client",
+      "@/types"
+    ],
+    "resolvedImports": [
+      "src/lib/category-service",
+      "src/lib/redis-client",
+      "src/types"
+    ],
+    "actualFiles": [
+      "src/lib/category-service.ts",
+      "src/lib/redis-client.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\user-roles.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "./setup"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "tests\\unit\\lib\\role-service\\setup"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "tests\\unit\\lib\\role-service\\setup.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\tenant-role-audit.test.ts",
+    "imports": [
+      "@/lib/role-service/tenant-role-audit",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service/tenant-role-audit",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/lib/role-service/tenant-role-audit.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\tenant-isolation.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "./setup"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "tests\\unit\\lib\\role-service\\setup"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "tests\\unit\\lib\\role-service\\setup.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\multiple-roles-users.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "./setup"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "tests\\unit\\lib\\role-service\\setup"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "tests\\unit\\lib\\role-service\\setup.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\has-specific-role.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/redis-client",
+      "@/components/admin/auth/utils/roles"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/redis-client",
+      "src/components/admin/auth/utils/roles"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/redis-client.ts",
+      "src/components/admin/auth/utils/roles.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\has-role-in-tenant.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/redis-client",
+      "@/components/admin/auth/utils/roles"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/redis-client",
+      "src/components/admin/auth/utils/roles"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/redis-client.ts",
+      "src/components/admin/auth/utils/roles.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\global-roles.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "./setup"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "tests\\unit\\lib\\role-service\\setup"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "tests\\unit\\lib\\role-service\\setup.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\get-user-roles.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/redis-client",
+      "@/components/admin/auth/utils/roles"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/redis-client",
+      "src/components/admin/auth/utils/roles"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/redis-client.ts",
+      "src/components/admin/auth/utils/roles.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\crud.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "./setup"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "tests\\unit\\lib\\role-service\\setup"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "tests\\unit\\lib\\role-service\\setup.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/audit/audit-service",
+      "./setup"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/audit/audit-service",
+      "tests\\unit\\lib\\role-service\\setup"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts",
+      "tests\\unit\\lib\\role-service\\setup.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit-working.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit-skip.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit-simple.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit-real.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/audit/audit-service",
+      "@/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/audit/audit-service",
+      "src/lib/redis-client"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts",
+      "src/lib/redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit-permissions.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit-operations.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit-mock.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit-integration.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\audit-basic.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/lib/audit/audit-service"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/lib/audit/audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\acl-operations.test.ts",
+    "imports": [
+      "@/lib/audit/audit-service",
+      "@/components/admin/auth/utils/roles",
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/lib/audit/audit-service",
+      "src/components/admin/auth/utils/roles",
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/lib/audit/audit-service.ts",
+      "src/components/admin/auth/utils/roles.ts",
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\lib\\role-service\\acl-operations-simple.test.ts",
+    "imports": [
+      "@/lib/audit/audit-service",
+      "@/components/admin/auth/utils/roles",
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/lib/audit/audit-service",
+      "src/components/admin/auth/utils/roles",
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/lib/audit/audit-service.ts",
+      "src/components/admin/auth/utils/roles.ts",
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\components\\admin\\auth\\utils\\roles.test.ts",
+    "imports": [
+      "@/components/admin/auth/utils/roles",
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/utils/roles",
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/utils/roles.ts",
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\components\\admin\\auth\\utils\\accessControl.test.ts",
+    "imports": [
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\components\\admin\\auth\\utils\\accessControl.fixed.test.ts",
+    "imports": [
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\components\\admin\\auth\\hooks\\useTenantPermission.test.tsx",
+    "imports": [
+      "@/components/admin/auth/hooks/useAuth",
+      "@/lib/tenant/use-tenant",
+      "@/lib/tenant-membership-service",
+      "@/components/admin/auth/utils/tenantAccessControl",
+      "@/components/admin/auth/hooks/useTenantPermission"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/hooks/useAuth",
+      "src/lib/tenant/use-tenant",
+      "src/lib/tenant-membership-service",
+      "src/components/admin/auth/utils/tenantAccessControl",
+      "src/components/admin/auth/hooks/useTenantPermission"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/hooks/useAuth.ts",
+      "src/lib/tenant/use-tenant.ts",
+      "src/lib/tenant-membership-service.ts",
+      "src/components/admin/auth/utils/tenantAccessControl.ts",
+      "src/components/admin/auth/hooks/useTenantPermission.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\components\\admin\\auth\\guards\\TenantGuard.test.tsx",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\components\\admin\\auth\\guards\\TenantGuard.test.jsx",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\components\\admin\\auth\\guards\\PermissionGuard.test.tsx",
+    "imports": [
+      "@/components/admin/auth/guards/PermissionGuard",
+      "@/components/admin/auth/hooks/useAuth",
+      "@/lib/tenant/use-tenant",
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/guards/PermissionGuard",
+      "src/components/admin/auth/hooks/useAuth",
+      "src/lib/tenant/use-tenant",
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/guards/PermissionGuard.tsx",
+      "src/components/admin/auth/hooks/useAuth.ts",
+      "src/lib/tenant/use-tenant.ts",
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\components\\admin\\auth\\guards\\PermissionGuard.test.jsx",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\auth\\acl.test.ts",
+    "imports": [
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\listings\\verify-route.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\listings\\route.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\listings\\permission-middleware.test.ts",
+    "imports": [
+      "@/lib/role-service",
+      "@/components/admin/auth/utils/accessControl",
+      "@/middleware/tenant-validation",
+      "@/middleware/withPermission"
+    ],
+    "resolvedImports": [
+      "src/lib/role-service",
+      "src/components/admin/auth/utils/accessControl",
+      "src/middleware/tenant-validation",
+      "src/middleware/withPermission"
+    ],
+    "actualFiles": [
+      "src/lib/role-service.ts",
+      "src/components/admin/auth/utils/accessControl.ts",
+      "src/middleware/tenant-validation.ts",
+      "src/middleware/withPermission.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\listings\\images-route.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\listings\\id-route.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\listings\\feature-route.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\dashboard\\stats.test.ts",
+    "imports": [
+      "@/lib/dashboard-service",
+      "@/lib/redis-client",
+      "@/components/admin/auth/utils/roles"
+    ],
+    "resolvedImports": [
+      "src/lib/dashboard-service",
+      "src/lib/redis-client",
+      "src/components/admin/auth/utils/roles"
+    ],
+    "actualFiles": [
+      "src/lib/dashboard-service.ts",
+      "src/lib/redis-client.ts",
+      "src/components/admin/auth/utils/roles.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\dashboard\\activity.test.ts",
+    "imports": [
+      "@/lib/redis-client",
+      "@/components/admin/auth/utils/roles"
+    ],
+    "resolvedImports": [
+      "src/lib/redis-client",
+      "src/components/admin/auth/utils/roles"
+    ],
+    "actualFiles": [
+      "src/lib/redis-client.ts",
+      "src/components/admin/auth/utils/roles.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\categories\\route.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\categories\\id-route.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\categories\\[id]\\route.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\categories\\reorder\\route.test.ts",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\unit\\api\\admin\\categories\\reorder\\implementation.test.ts",
+    "imports": [
+      "@/app/api/admin/categories/reorder/route",
+      "@/lib/redis-client",
+      "@/types",
+      "@/lib/audit/audit-service",
+      "@/lib/category-service"
+    ],
+    "resolvedImports": [
+      "src/app/api/admin/categories/reorder/route",
+      "src/lib/redis-client",
+      "src/types",
+      "src/lib/audit/audit-service",
+      "src/lib/category-service"
+    ],
+    "actualFiles": [
+      "src/app/api/admin/categories/reorder/route.ts",
+      "src/lib/redis-client.ts",
+      "src\\types\\index.ts",
+      "src/lib/audit/audit-service.ts",
+      "src/lib/category-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\security\\cross-tenant-isolation.test.ts",
+    "imports": [
+      "../../src/lib/key-namespace-service",
+      "../../src/lib/secure-redis-client",
+      "../../src/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src\\lib\\key-namespace-service",
+      "src\\lib\\secure-redis-client",
+      "src\\lib\\redis-client"
+    ],
+    "actualFiles": [
+      "src\\lib\\key-namespace-service.ts",
+      "src\\lib\\secure-redis-client.ts",
+      "src\\lib\\redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\security\\cross-tenant-isolation.jest.test.ts",
+    "imports": [
+      "../../src/lib/key-namespace-service",
+      "../../src/lib/secure-redis-client",
+      "../../src/lib/redis-client",
+      "../../src/lib/audit/audit-service"
+    ],
+    "resolvedImports": [
+      "src\\lib\\key-namespace-service",
+      "src\\lib\\secure-redis-client",
+      "src\\lib\\redis-client",
+      "src\\lib\\audit\\audit-service"
+    ],
+    "actualFiles": [
+      "src\\lib\\key-namespace-service.ts",
+      "src\\lib\\secure-redis-client.ts",
+      "src\\lib\\redis-client.ts",
+      "src\\lib\\audit\\audit-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\security\\api-tenant-isolation.test.ts",
+    "imports": [
+      "../../src/lib/tenant-membership-service",
+      "../../src/lib/role-service",
+      "../../src/middleware/tenant-validation"
+    ],
+    "resolvedImports": [
+      "src\\lib\\tenant-membership-service",
+      "src\\lib\\role-service",
+      "src\\middleware\\tenant-validation"
+    ],
+    "actualFiles": [
+      "src\\lib\\tenant-membership-service.ts",
+      "src\\lib\\role-service.ts",
+      "src\\middleware\\tenant-validation.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\security\\acl-cross-tenant-detection.test.ts",
+    "imports": [
+      "../../src/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\auth\\utils\\accessControl"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\utils\\accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\search\\SearchResults.test.tsx",
+    "imports": [
+      "../../src/components/search/SearchResults",
+      "../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\components\\search\\SearchResults",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\components\\search\\SearchResults.tsx",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\search\\SearchIcon.test.tsx",
+    "imports": [
+      "../../src/components/search/SearchIcon"
+    ],
+    "resolvedImports": [
+      "src\\components\\search\\SearchIcon"
+    ],
+    "actualFiles": [
+      "src\\components\\search\\SearchIcon.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\search\\SearchForm.test.tsx",
+    "imports": [
+      "../../src/components/search/SearchForm"
+    ],
+    "resolvedImports": [
+      "src\\components\\search\\SearchForm"
+    ],
+    "actualFiles": [
+      "src\\components\\search\\SearchForm.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\search\\SearchFilters.test.tsx",
+    "imports": [
+      "../../src/components/search/filters/SearchFilters",
+      "../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\components\\search\\filters\\SearchFilters",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\components\\search\\filters\\SearchFilters.tsx",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\search\\SearchBar.test.tsx",
+    "imports": [
+      "../../src/components/search/SearchBar"
+    ],
+    "resolvedImports": [
+      "src\\components\\search\\SearchBar"
+    ],
+    "actualFiles": [
+      "src\\components\\search\\SearchBar.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\search\\index.test.ts",
+    "imports": [
+      "../../src/components/search"
+    ],
+    "resolvedImports": [
+      "src\\components\\search"
+    ],
+    "actualFiles": [
+      "src\\components\\search\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\search\\filters\\SearchFilters.test.tsx",
+    "imports": [
+      "../../../src/components/search/filters/SearchFilters",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\components\\search\\filters\\SearchFilters",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\components\\search\\filters\\SearchFilters.tsx",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\role\\role-service.test.ts",
+    "imports": [
+      "../../src/lib/role/role-service",
+      "../../src/lib/role/types"
+    ],
+    "resolvedImports": [
+      "src\\lib\\role\\role-service",
+      "src\\lib\\role\\types"
+    ],
+    "actualFiles": [
+      "src\\lib\\role\\role-service.ts",
+      "src\\lib\\role\\types.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\redis-health.test.ts",
+    "imports": [
+      "../../src/lib/redis-health"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis-health"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis-health.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\redis-cache.test.ts",
+    "imports": [
+      "../../src/lib/redis-cache"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis-cache"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis-cache.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\reconnection.test.ts",
+    "imports": [
+      "../../src/lib/redis/connection-manager"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis\\connection-manager"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis\\connection-manager.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\memory-store.test.ts",
+    "imports": [
+      "../../src/lib/redis/memory-store"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis\\memory-store"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis\\memory-store.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\integration.test.ts",
+    "imports": [
+      "../../src/lib/redis",
+      "../../src/lib/redis/memory-store",
+      "../../src/lib/redis-cache",
+      "../../src/lib/redis-health"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis",
+      "src\\lib\\redis\\memory-store",
+      "src\\lib\\redis-cache",
+      "src\\lib\\redis-health"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis.ts",
+      "src\\lib\\redis\\memory-store.ts",
+      "src\\lib\\redis-cache.ts",
+      "src\\lib\\redis-health.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\integration-hash.test.ts",
+    "imports": [
+      "../../src/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis-client"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\hash-operations.test.ts",
+    "imports": [
+      "../../src/lib/redis/memory-store"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis\\memory-store"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis\\memory-store.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\hash-operations-tdd.test.ts",
+    "imports": [
+      "../../src/lib/redis/memory-store"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis\\memory-store"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis\\memory-store.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\connection-manager.test.ts",
+    "imports": [
+      "../../src/lib/redis/connection-manager",
+      "../../src/lib/redis/memory-store"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis\\connection-manager",
+      "src\\lib\\redis\\memory-store"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis\\connection-manager.ts",
+      "src\\lib\\redis\\memory-store.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\redis\\client.test.ts",
+    "imports": [
+      "../../src/lib/redis/client",
+      "../../src/lib/redis/memory-store"
+    ],
+    "resolvedImports": [
+      "src\\lib\\redis\\client",
+      "src\\lib\\redis\\memory-store"
+    ],
+    "actualFiles": [
+      "src\\lib\\redis\\client.ts",
+      "src\\lib\\redis\\memory-store.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\multitenancy\\tenant-service.test.ts",
+    "imports": [
+      "@/lib/tenant"
+    ],
+    "resolvedImports": [
+      "src/lib/tenant"
+    ],
+    "actualFiles": [
+      "src\\lib\\tenant\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\multitenancy\\middleware.test.ts",
+    "imports": [
+      "@/middleware",
+      "@/lib/tenant"
+    ],
+    "resolvedImports": [
+      "src/middleware",
+      "src/lib/tenant"
+    ],
+    "actualFiles": [
+      "src/middleware.ts",
+      "src\\lib\\tenant\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\middleware\\withRedis.test.ts",
+    "imports": [
+      "../../src/middleware/withRedis",
+      "../../src/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src\\middleware\\withRedis",
+      "src\\lib\\redis-client"
+    ],
+    "actualFiles": [
+      "src\\middleware\\withRedis.ts",
+      "src\\lib\\redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\lib\\crypto.test.ts",
+    "imports": [
+      "@/lib/crypto"
+    ],
+    "resolvedImports": [
+      "src/lib/crypto"
+    ],
+    "actualFiles": [
+      "src/lib/crypto.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\lib\\search\\utils.test.ts",
+    "imports": [
+      "../../../src/lib/search/utils",
+      "../../../src/lib/redis-client",
+      "../../../src/lib/tenant"
+    ],
+    "resolvedImports": [
+      "src\\lib\\search\\utils",
+      "src\\lib\\redis-client",
+      "src\\lib\\tenant"
+    ],
+    "actualFiles": [
+      "src\\lib\\search\\utils.ts",
+      "src\\lib\\redis-client.ts",
+      "src\\lib\\tenant\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\lib\\search\\search-indexer.test.ts",
+    "imports": [
+      "../../../src/lib/search/search-indexer",
+      "../../../src/types",
+      "../../../src/lib/search/category-indexer",
+      "../../../src/lib/search/listing-indexer"
+    ],
+    "resolvedImports": [
+      "src\\lib\\search\\search-indexer",
+      "src\\types",
+      "src\\lib\\search\\category-indexer",
+      "src\\lib\\search\\listing-indexer"
+    ],
+    "actualFiles": [
+      "src\\lib\\search\\search-indexer.ts",
+      "src\\types\\index.ts",
+      "src\\lib\\search\\category-indexer.ts",
+      "src\\lib\\search\\listing-indexer.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\lib\\search\\listing-indexer.test.ts",
+    "imports": [
+      "../../../src/lib/search/listing-indexer",
+      "../../../src/lib/tenant",
+      "../../../src/types",
+      "../../../src/lib/redis-client",
+      "../../../src/lib/search/utils"
+    ],
+    "resolvedImports": [
+      "src\\lib\\search\\listing-indexer",
+      "src\\lib\\tenant",
+      "src\\types",
+      "src\\lib\\redis-client",
+      "src\\lib\\search\\utils"
+    ],
+    "actualFiles": [
+      "src\\lib\\search\\listing-indexer.ts",
+      "src\\lib\\tenant\\index.ts",
+      "src\\types\\index.ts",
+      "src\\lib\\redis-client.ts",
+      "src\\lib\\search\\utils.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\lib\\search\\listing-indexer-no-mocks.test.ts",
+    "imports": [
+      "../../../src/lib/search/listing-indexer",
+      "../../../src/lib/tenant",
+      "../../../src/types",
+      "../../../src/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src\\lib\\search\\listing-indexer",
+      "src\\lib\\tenant",
+      "src\\types",
+      "src\\lib\\redis-client"
+    ],
+    "actualFiles": [
+      "src\\lib\\search\\listing-indexer.ts",
+      "src\\lib\\tenant\\index.ts",
+      "src\\types\\index.ts",
+      "src\\lib\\redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\lib\\search\\category-indexer.test.ts",
+    "imports": [
+      "../../../src/lib/search/category-indexer",
+      "../../../src/lib/tenant",
+      "../../../src/types",
+      "../../../src/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src\\lib\\search\\category-indexer",
+      "src\\lib\\tenant",
+      "src\\types",
+      "src\\lib\\redis-client"
+    ],
+    "actualFiles": [
+      "src\\lib\\search\\category-indexer.ts",
+      "src\\lib\\tenant\\index.ts",
+      "src\\types\\index.ts",
+      "src\\lib\\redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\user-flows\\listing-management.test.ts",
+    "imports": [
+      "../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../setup",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "tests\\integration\\setup",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\user-flows\\error-handling.test.ts",
+    "imports": [
+      "../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../setup",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "tests\\integration\\setup",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\user-flows\\data-retrieval.test.ts",
+    "imports": [
+      "../../../src/app/api/sites/[siteSlug]/route",
+      "../../../src/app/api/sites/[siteSlug]/categories/route",
+      "../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../setup",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\route",
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "tests\\integration\\setup",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\user-flows\\category-management.test.ts",
+    "imports": [
+      "../../../src/app/api/sites/[siteSlug]/categories/route",
+      "../setup",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route",
+      "tests\\integration\\setup",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route.ts",
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\user-flows\\auth.test.ts",
+    "imports": [
+      "../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../setup",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "tests\\integration\\setup",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\search\\search-indexing.test.ts",
+    "imports": [
+      "../../../src/app/api/search/route",
+      "../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../../../src/lib/search-indexer",
+      "../setup",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\search\\route",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "src\\lib\\search-indexer",
+      "tests\\integration\\setup",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\search\\route.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "src\\lib\\search-indexer.ts",
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\performance\\large-dataset.test.ts",
+    "imports": [
+      "../setup",
+      "../../../src/types",
+      "../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../../../src/app/api/search/route",
+      "../../../src/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\setup",
+      "src\\types",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "src\\app\\api\\search\\route",
+      "src\\lib\\redis-client"
+    ],
+    "actualFiles": [
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "src\\app\\api\\search\\route.ts",
+      "src\\lib\\redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\performance\\concurrent-operations.test.ts",
+    "imports": [
+      "../setup",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\setup",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\performance\\concurrent-operations\\transaction-isolation.test.ts",
+    "imports": [
+      "../../setup",
+      "../../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../../../../src/app/api/sites/[siteSlug]/listings/[listingSlug]/route",
+      "../../../../src/lib/redis-client",
+      "../../setup"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\setup",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\[listingSlug]\\route",
+      "src\\lib\\redis-client",
+      "tests\\integration\\setup"
+    ],
+    "actualFiles": [
+      "tests\\integration\\setup.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "src\\lib\\redis-client.ts",
+      "tests\\integration\\setup.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\performance\\concurrent-operations\\simultaneous-writes.test.ts",
+    "imports": [
+      "../../setup",
+      "../../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../../../../src/app/api/sites/[siteSlug]/categories/route",
+      "../../../../src/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\setup",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route",
+      "src\\lib\\redis-client"
+    ],
+    "actualFiles": [
+      "tests\\integration\\setup.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route.ts",
+      "src\\lib\\redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\performance\\concurrent-operations\\race-conditions.test.ts",
+    "imports": [
+      "../../setup",
+      "../../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../../../../src/app/api/sites/[siteSlug]/listings/[listingSlug]/route",
+      "../../../../src/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\setup",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\[listingSlug]\\route",
+      "src\\lib\\redis-client"
+    ],
+    "actualFiles": [
+      "tests\\integration\\setup.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "src\\lib\\redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\performance\\concurrent-operations\\parallel-reads.test.ts",
+    "imports": [
+      "../../setup",
+      "../../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../../../../src/app/api/search/route",
+      "../../../../src/app/api/sites/[siteSlug]/categories/route"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\setup",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "src\\app\\api\\search\\route",
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route"
+    ],
+    "actualFiles": [
+      "tests\\integration\\setup.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "src\\app\\api\\search\\route.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\multitenancy\\site-identity.test.ts",
+    "imports": [
+      "../../../src/app/api/site-info/route",
+      "../setup",
+      "../../../src/lib/site-utils"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\site-info\\route",
+      "tests\\integration\\setup",
+      "src\\lib\\site-utils"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\site-info\\route.ts",
+      "tests\\integration\\setup.ts",
+      "src\\lib\\site-utils.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\multitenancy\\cross-site-isolation.test.ts",
+    "imports": [
+      "../../../src/app/api/sites/[siteSlug]/listings/route",
+      "../../../src/app/api/sites/[siteSlug]/categories/route",
+      "../../../src/app/api/site-info/route",
+      "../../../src/app/api/search/route",
+      "../setup",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route",
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route",
+      "src\\app\\api\\site-info\\route",
+      "src\\app\\api\\search\\route",
+      "tests\\integration\\setup",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts",
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route.ts",
+      "src\\app\\api\\site-info\\route.ts",
+      "src\\app\\api\\search\\route.ts",
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\end-to-end\\page-rendering.test.ts",
+    "imports": [
+      "../setup",
+      "../../../src/types"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\setup",
+      "src\\types"
+    ],
+    "actualFiles": [
+      "tests\\integration\\setup.ts",
+      "src\\types\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\auth\\cross-tenant-detection.test.ts",
+    "imports": [
+      "./acl-test-setup"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\auth\\acl-test-setup"
+    ],
+    "actualFiles": [
+      "tests\\integration\\auth\\acl-test-setup.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\auth\\acl-tenant-isolation.test.ts",
+    "imports": [
+      "./acl-test-setup",
+      "@/middleware/tenant-validation",
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\auth\\acl-test-setup",
+      "src/middleware/tenant-validation",
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "tests\\integration\\auth\\acl-test-setup.ts",
+      "src/middleware/tenant-validation.ts",
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\integration\\auth\\acl-role-permissions.test.ts",
+    "imports": [
+      "./acl-test-setup",
+      "@/lib/role-service",
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "tests\\integration\\auth\\acl-test-setup",
+      "src/lib/role-service",
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "tests\\integration\\auth\\acl-test-setup.ts",
+      "src/lib/role-service.ts",
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\e2e\\smoketest.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\category-management.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\categories.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin-categories.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\login.validation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\login.suite.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\login.rendering.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\login.password-reset.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\login.logout.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\login.authentication.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\first-user\\first-user.validation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\first-user\\first-user.suite.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\first-user\\first-user.setup-page.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\first-user\\first-user.login-flow.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\login\\first-user\\first-user.creation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.suite.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.search.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.responsive.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.rendering.test.ts",
+    "imports": [
+      "./homepage.selectors",
+      "./homepage.utils",
+      "./homepage.setup"
+    ],
+    "resolvedImports": [
+      "tests\\e2e\\homepage\\homepage.selectors",
+      "tests\\e2e\\homepage\\homepage.utils",
+      "tests\\e2e\\homepage\\homepage.setup"
+    ],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.rendering.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.performance.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.navigation.test.ts",
+    "imports": [
+      "../utils/test-utils",
+      "./homepage.utils",
+      "./homepage.setup"
+    ],
+    "resolvedImports": [
+      "tests\\e2e\\utils\\test-utils",
+      "tests\\e2e\\homepage\\homepage.utils",
+      "tests\\e2e\\homepage\\homepage.setup"
+    ],
+    "actualFiles": [
+      "tests\\e2e\\utils\\test-utils.js"
+    ]
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.navigation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.content.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\homepage\\homepage.404.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin-dashboard\\admin-dashboard.suite.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin-dashboard\\admin-dashboard.statistics.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin-dashboard\\admin-dashboard.responsive.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin-dashboard\\admin-dashboard.rendering.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin-dashboard\\admin-dashboard.navigation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin-dashboard\\admin-dashboard.activity.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\sites\\sites.validation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\sites\\sites.suite.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\sites\\sites.management.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\sites\\sites.creation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\listings\\listings.suite.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\listings\\listings.management.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\listings\\listings.creation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\categories\\categories.validation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\categories\\categories.suite.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\categories\\categories.management.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\categories\\categories.hierarchy.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\e2e\\admin\\categories\\categories.creation.test.js",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\components\\index.test.tsx",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\app\\search\\page.test.tsx",
+    "imports": [],
+    "resolvedImports": [],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\app\\search\\loading.test.tsx",
+    "imports": [
+      "../../../src/app/search/loading"
+    ],
+    "resolvedImports": [
+      "src\\app\\search\\loading"
+    ],
+    "actualFiles": [
+      "src\\app\\search\\loading.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\search.test.ts",
+    "imports": [
+      "../../src/app/api/search/route"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\search\\route"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\search\\route.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\listings.test.ts",
+    "imports": [
+      "../../src/app/api/sites/[siteSlug]/listings/route"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\sites\\[siteSlug]\\listings\\route.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\healthcheck.test.ts",
+    "imports": [
+      "../../src/app/api/healthcheck/route"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\healthcheck\\route"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\healthcheck\\route.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\site-info\\get.test.ts",
+    "imports": [
+      "../../../src/app/api/site-info/route"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\site-info\\route"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\site-info\\route.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\site\\get.test.ts",
+    "imports": [
+      "../../../src/app/api/sites/[siteSlug]/route"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\route"
+    ],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\api\\middleware\\withTenantAccess.test.ts",
+    "imports": [
+      "@/app/api/middleware",
+      "@/lib/role-service"
+    ],
+    "resolvedImports": [
+      "src/app/api/middleware",
+      "src/lib/role-service"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\middleware\\index.ts",
+      "src/lib/role-service.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\middleware\\withAuthentication.test.ts",
+    "imports": [
+      "@/app/api/middleware"
+    ],
+    "resolvedImports": [
+      "src/app/api/middleware"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\middleware\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\example\\id.test.ts",
+    "imports": [
+      "@/app/api/example/[id]/route",
+      "@/app/api/middleware"
+    ],
+    "resolvedImports": [
+      "src/app/api/example/[id]/route",
+      "src/app/api/middleware"
+    ],
+    "actualFiles": [
+      "src/app/api/example/[id]/route.ts",
+      "src\\app\\api\\middleware\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\example\\example.test.ts",
+    "imports": [
+      "@/app/api/example/route",
+      "@/app/api/middleware"
+    ],
+    "resolvedImports": [
+      "src/app/api/example/route",
+      "src/app/api/middleware"
+    ],
+    "actualFiles": [
+      "src/app/api/example/route.ts",
+      "src\\app\\api\\middleware\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\categories\\post.test.ts",
+    "imports": [
+      "../../../src/app/api/sites/[siteSlug]/categories/route"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\categories\\get.test.ts",
+    "imports": [
+      "../../../src/app/api/sites/[siteSlug]/categories/route"
+    ],
+    "resolvedImports": [
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route"
+    ],
+    "actualFiles": [
+      "src\\app\\api\\sites\\[siteSlug]\\categories\\route.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\auth\\verify.test.ts",
+    "imports": [
+      "@/app/api/auth/verify/route",
+      "../../integration/setup",
+      "@/lib/zkp",
+      "@/lib/redis-client"
+    ],
+    "resolvedImports": [
+      "src/app/api/auth/verify/route",
+      "tests\\integration\\setup",
+      "src/lib/zkp",
+      "src/lib/redis-client"
+    ],
+    "actualFiles": [
+      "src/app/api/auth/verify/route.ts",
+      "tests\\integration\\setup.ts",
+      "src/lib/zkp.ts",
+      "src/lib/redis-client.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\admin\\users\\route.test.ts",
+    "imports": [
+      "@/app/api/admin/users/route",
+      "@/services/users",
+      "@/lib/auth"
+    ],
+    "resolvedImports": [
+      "src/app/api/admin/users/route",
+      "src/services/users",
+      "src/lib/auth"
+    ],
+    "actualFiles": [
+      "src/app/api/admin/users/route.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\admin\\users\\reset-password.test.ts",
+    "imports": [
+      "@/app/api/admin/users/reset-password/route",
+      "@/services/users",
+      "@/lib/auth",
+      "@/lib/crypto"
+    ],
+    "resolvedImports": [
+      "src/app/api/admin/users/reset-password/route",
+      "src/services/users",
+      "src/lib/auth",
+      "src/lib/crypto"
+    ],
+    "actualFiles": [
+      "src/app/api/admin/users/reset-password/route.ts",
+      "src/lib/crypto.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\api\\admin\\users\\id.route.test.ts",
+    "imports": [
+      "@/app/api/admin/users/[id]/route",
+      "@/services/users",
+      "@/lib/auth"
+    ],
+    "resolvedImports": [
+      "src/app/api/admin/users/[id]/route",
+      "src/services/users",
+      "src/lib/auth"
+    ],
+    "actualFiles": [
+      "src/app/api/admin/users/[id]/route.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\SiteForm.validation.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SiteForm"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SiteForm"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SiteForm.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\SiteForm.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SiteForm",
+      "./__mocks__/nextNavigation.tsx"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SiteForm",
+      "tests\\admin\\sites\\__mocks__\\nextNavigation.tsx"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SiteForm.tsx",
+      "tests\\admin\\sites\\__mocks__\\nextNavigation.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\SiteForm.submission.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SiteForm"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SiteForm"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SiteForm.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\SiteForm.container.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SiteForm",
+      "@/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SiteForm",
+      "src/components/admin/sites/hooks/useSites"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SiteForm.tsx",
+      "src/components/admin/sites/hooks/useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\SiteForm.accessibility.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SiteForm"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SiteForm"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SiteForm.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\DomainManager.validation.test.tsx",
+    "imports": [
+      "@/components/admin/sites/DomainManager"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/DomainManager"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/DomainManager.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\DomainManager.test.tsx",
+    "imports": [
+      "@/components/admin/sites/DomainManager",
+      "@/components/admin/sites/hooks/useDomains",
+      "./__mocks__/nextNavigation.tsx"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/DomainManager",
+      "src/components/admin/sites/hooks/useDomains",
+      "tests\\admin\\sites\\__mocks__\\nextNavigation.tsx"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/DomainManager.tsx",
+      "src/components/admin/sites/hooks/useDomains.ts",
+      "tests\\admin\\sites\\__mocks__\\nextNavigation.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\DomainManager.submission.test.tsx",
+    "imports": [
+      "@/components/admin/sites/DomainManager",
+      "./__mocks__/nextNavigation"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/DomainManager",
+      "tests\\admin\\sites\\__mocks__\\nextNavigation"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/DomainManager.tsx",
+      "tests\\admin\\sites\\__mocks__\\nextNavigation.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\DomainManager.domains.test.tsx",
+    "imports": [
+      "@/components/admin/sites/DomainManager"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/DomainManager"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/DomainManager.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteTableRow.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteTableRow"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteTableRow"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteTableRow.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteTableRow.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteTableRow"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteTableRow"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteTableRow.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteTablePagination.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteTablePagination"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteTablePagination"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteTablePagination.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteTablePagination.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteTablePagination"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteTablePagination"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteTablePagination.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteTableHeader.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteTableHeader"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteTableHeader"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteTableHeader.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteTableHeader.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteTableHeader"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteTableHeader"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteTableHeader.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteTable.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteTable"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteTable"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteTable.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteTable.loading.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteTable"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteTable"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteTable.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteTable.error.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteTable"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteTable"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteTable.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteMobileCard.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteMobileCard"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteMobileCard"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteMobileCard.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\SiteMobileCard.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/SiteMobileCard"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/SiteMobileCard"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/SiteMobileCard.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\DeleteConfirmationModal.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/DeleteConfirmationModal"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/DeleteConfirmationModal"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/DeleteConfirmationModal.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\DeleteConfirmationModal.keyboard.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/DeleteConfirmationModal"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/DeleteConfirmationModal"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/DeleteConfirmationModal.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\table\\DeleteConfirmationModal.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/table/DeleteConfirmationModal"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/table/DeleteConfirmationModal"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/table/DeleteConfirmationModal.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\hooks\\useSites.validation.test.ts",
+    "imports": [
+      "@/components/admin/sites/hooks/useSites/validation",
+      "@/components/admin/sites/hooks/useSites/types"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/hooks/useSites/validation",
+      "src/components/admin/sites/hooks/useSites/types"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/hooks/useSites/validation.ts",
+      "src/components/admin/sites/hooks/useSites/types.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\hooks\\useSites.test.tsx",
+    "imports": [
+      "@/components/admin/sites/hooks/useSites",
+      "@/components/admin/sites/hooks/useSites/types"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/hooks/useSites",
+      "src/components/admin/sites/hooks/useSites/types"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/hooks/useSites.ts",
+      "src/components/admin/sites/hooks/useSites/types.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\hooks\\useSites.api.test.ts",
+    "imports": [
+      "@/components/admin/sites/hooks/useSites/api",
+      "@/components/admin/sites/hooks/useSites/types"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/hooks/useSites/api",
+      "src/components/admin/sites/hooks/useSites/types"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/hooks/useSites/api.ts",
+      "src/components/admin/sites/hooks/useSites/types.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\hooks\\useDomains.test.tsx",
+    "imports": [
+      "@/components/admin/sites/hooks"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/hooks"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\sites\\hooks\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\ThemeStep.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/ThemeStep"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/ThemeStep"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/ThemeStep.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\ThemeStep.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/ThemeStep"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/ThemeStep"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/ThemeStep.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\StepNavigation.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/StepNavigation"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/StepNavigation"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/StepNavigation.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\StepNavigation.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/StepNavigation"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/StepNavigation"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/StepNavigation.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\StepNavigation.accessibility.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/StepNavigation"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/StepNavigation"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/StepNavigation.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\SiteSettings.validation.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SiteSettings"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SiteSettings"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SiteSettings.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\SiteSettings.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SiteSettings"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SiteSettings"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SiteSettings.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\SiteSettings.api.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SiteSettings"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SiteSettings"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SiteSettings.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\SEOStep.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/SEOStep"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/SEOStep"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/SEOStep.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\SEOStep.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/SEOStep"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/SEOStep"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/SEOStep.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\SEOSettings.validation.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SEOSettings"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SEOSettings"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SEOSettings.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\SEOSettings.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SEOSettings"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SEOSettings"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SEOSettings.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\SEOSettings.noindex.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SEOSettings"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SEOSettings"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SEOSettings.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\SEOSettings.api.test.tsx",
+    "imports": [
+      "@/components/admin/sites/SEOSettings"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/SEOSettings"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/SEOSettings.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\FormActions.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/FormActions"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/FormActions"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/FormActions.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\FormActions.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/FormActions"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/FormActions"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/FormActions.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\DomainStep.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/DomainStep"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/DomainStep"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/DomainStep.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\DomainStep.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/DomainStep"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/DomainStep"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/DomainStep.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\BasicInfoStep.validation.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/BasicInfoStep"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/BasicInfoStep"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/BasicInfoStep.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\BasicInfoStep.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/BasicInfoStep"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/BasicInfoStep"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/BasicInfoStep.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\sites\\components\\BasicInfoStep.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/sites/components/BasicInfoStep"
+    ],
+    "resolvedImports": [
+      "src/components/admin/sites/components/BasicInfoStep"
+    ],
+    "actualFiles": [
+      "src/components/admin/sites/components/BasicInfoStep.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\navigation\\SideNav.test.tsx",
+    "imports": [
+      "@/components/admin/navigation/SideNav"
+    ],
+    "resolvedImports": [
+      "src/components/admin/navigation/SideNav"
+    ],
+    "actualFiles": []
+  },
+  {
+    "testFile": "tests\\admin\\listings\\ListingTableRow.test.tsx",
+    "imports": [
+      "../../../src/components/admin/listings/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\listings\\ListingTableHeader.test.tsx",
+    "imports": [
+      "../../../src/components/admin/listings/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\listings\\ListingTable.test.tsx",
+    "imports": [
+      "../../../src/components/admin/listings/ListingTable"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingTable"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingTable.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\layout\\WithAuth.test.tsx",
+    "imports": [
+      "@/components/admin/layout"
+    ],
+    "resolvedImports": [
+      "src/components/admin/layout"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\layout\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\layout\\index.test.tsx",
+    "imports": [
+      "@/components/admin/layout"
+    ],
+    "resolvedImports": [
+      "src/components/admin/layout"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\layout\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\layout\\Breadcrumbs.test.tsx",
+    "imports": [
+      "@/components/admin/layout"
+    ],
+    "resolvedImports": [
+      "src/components/admin/layout"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\layout\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\layout\\AdminSidebar.test.tsx",
+    "imports": [
+      "@/components/admin/layout"
+    ],
+    "resolvedImports": [
+      "src/components/admin/layout"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\layout\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\layout\\AdminLayout.test.tsx",
+    "imports": [
+      "@/components/admin/layout"
+    ],
+    "resolvedImports": [
+      "src/components/admin/layout"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\layout\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\layout\\AdminHeader.test.tsx",
+    "imports": [
+      "@/components/admin/layout"
+    ],
+    "resolvedImports": [
+      "src/components/admin/layout"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\layout\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-management\\SiteSubmission.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/sites/SiteForm",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\sites\\SiteForm",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\sites\\SiteForm.tsx",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-management\\SiteCreationSEO.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/sites/components/SEOStep",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\sites\\components\\SEOStep",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\sites\\components\\SEOStep.tsx",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-management\\SiteCreationDomains.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/sites/SiteForm",
+      "../../../../src/components/admin/sites/components/DomainStep",
+      "../../../../src/components/admin/sites/hooks/useSites",
+      "../../../../src/components/admin/sites/hooks/useDomains"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\sites\\SiteForm",
+      "src\\components\\admin\\sites\\components\\DomainStep",
+      "src\\components\\admin\\sites\\hooks\\useSites",
+      "src\\components\\admin\\sites\\hooks\\useDomains"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\sites\\SiteForm.tsx",
+      "src\\components\\admin\\sites\\components\\DomainStep.tsx",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts",
+      "src\\components\\admin\\sites\\hooks\\useDomains.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-management\\SiteCreationBasicInfo.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/sites/SiteForm",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\sites\\SiteForm",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\sites\\SiteForm.tsx",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\SiteSpecificValidation.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingForm",
+      "../../../../src/contexts/SiteContext",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingForm",
+      "src\\contexts\\SiteContext",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingForm.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\SiteListingLimits.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingForm",
+      "../../../../src/contexts/SiteContext",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingForm",
+      "src\\contexts\\SiteContext",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingForm.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\SiteListingDataLoading.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingTable",
+      "../../../../src/contexts/SiteContext",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingTable",
+      "src\\contexts\\SiteContext",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingTable.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\SiteListingCounts.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/sites/SiteTable",
+      "../../../../src/components/admin/sites/hooks/useSites",
+      "../../../../src/components/admin/listings/hooks/useListings"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\sites\\SiteTable",
+      "src\\components\\admin\\sites\\hooks\\useSites",
+      "src\\components\\admin\\listings\\hooks\\useListings"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\sites\\hooks\\useSites.ts",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\SiteFilterWithSearch.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/components",
+      "../../../../src/components/admin/listings/hooks/useListings.mock",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components",
+      "src\\components\\admin\\listings\\hooks\\useListings.mock",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\components\\index.ts",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\SiteFilterAccessibility.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/components/SiteFilterDropdown",
+      "../../../../src/components/admin/listings/hooks/useListings.mock",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown",
+      "src\\components\\admin\\listings\\hooks\\useListings.mock",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\ListingSiteAssociation.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/components/ListingDetailPanel",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components\\ListingDetailPanel",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\ListingCreationWithSite.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingForm",
+      "../../../../src/components/admin/listings/components/BasicInfoStep",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingForm",
+      "src\\components\\admin\\listings\\components\\BasicInfoStep",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingForm.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\FilterListingsBySite.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/components/SiteFilterDropdown",
+      "../../../../src/components/admin/listings/hooks/useListings.mock",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown",
+      "src\\components\\admin\\listings\\hooks\\useListings.mock",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\EmptySiteListHandling.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/components/SiteFilterDropdown",
+      "../../../../src/components/admin/listings/hooks/useListings.mock",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown",
+      "src\\components\\admin\\listings\\hooks\\useListings.mock",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\CombinedSiteAndCategoryFilter.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingTable",
+      "../../../../src/components/admin/listings/hooks/useListings.mock",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites",
+      "../../../../src/components/admin/categories/hooks/useCategories"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingTable",
+      "src\\components\\admin\\listings\\hooks\\useListings.mock",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites",
+      "src\\components\\admin\\categories\\hooks\\useCategories"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingTable.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts",
+      "src\\components\\admin\\categories\\hooks\\useCategories.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\ClearSiteFilter.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/components/SiteFilterDropdown",
+      "../../../../src/components/admin/listings/hooks/useListings.mock",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown",
+      "src\\components\\admin\\listings\\hooks\\useListings.mock",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\site-listing\\ActiveSiteFilterDisplay.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/components/SiteFilterDropdown",
+      "../../../../src/components/admin/listings/hooks/useListings.mock",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown",
+      "src\\components\\admin\\listings\\hooks\\useListings.mock",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\listing-category\\CategorySelectionInListing.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/components/form/CategorySelectionStep",
+      "../../../../src/components/admin/listings/components/form/useListingForm",
+      "../../../../src/components/admin/categories/hooks/useCategories"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\components\\form\\CategorySelectionStep",
+      "src\\components\\admin\\listings\\components\\form\\useListingForm",
+      "src\\components\\admin\\categories\\hooks\\useCategories"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\components\\form\\CategorySelectionStep.tsx",
+      "src\\components\\admin\\listings\\components\\form\\useListingForm.ts",
+      "src\\components\\admin\\categories\\hooks\\useCategories.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\listing-category\\CategoryFilteringNavigation.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingTable",
+      "../../../../src/components/admin/listings/components/table/CategoryFilterTree",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/categories/hooks/useCategories"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingTable",
+      "src\\components\\admin\\listings\\components\\table\\CategoryFilterTree",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\categories\\hooks\\useCategories"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingTable.tsx",
+      "src\\components\\admin\\listings\\components\\table\\CategoryFilterTree.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\categories\\hooks\\useCategories.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\filtering\\FilterReset.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingTable",
+      "../../../../src/components/admin/listings/components/table/ListingFilterBar",
+      "../../../../src/components/admin/listings/components/table/CategoryFilterTree",
+      "../../../../src/components/admin/listings/components/SiteFilterDropdown",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/categories/hooks/useCategories",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingTable",
+      "src\\components\\admin\\listings\\components\\table\\ListingFilterBar",
+      "src\\components\\admin\\listings\\components\\table\\CategoryFilterTree",
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\categories\\hooks\\useCategories",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingTable.tsx",
+      "src\\components\\admin\\listings\\components\\table\\ListingFilterBar.tsx",
+      "src\\components\\admin\\listings\\components\\table\\CategoryFilterTree.tsx",
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\categories\\hooks\\useCategories.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\filtering\\FilterPersistence.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/hooks/useListings"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\hooks\\useListings"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\hooks\\useListings.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\filtering\\CombinedFilters.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingTable",
+      "../../../../src/components/admin/listings/components/table/ListingFilterBar",
+      "../../../../src/components/admin/listings/components/table/CategoryFilterTree",
+      "../../../../src/components/admin/listings/components/SiteFilterDropdown",
+      "../../../../src/components/admin/listings/components/StatusFilter",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/categories/hooks/useCategories",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingTable",
+      "src\\components\\admin\\listings\\components\\table\\ListingFilterBar",
+      "src\\components\\admin\\listings\\components\\table\\CategoryFilterTree",
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown",
+      "src\\components\\admin\\listings\\components\\StatusFilter",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\categories\\hooks\\useCategories",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingTable.tsx",
+      "src\\components\\admin\\listings\\components\\table\\ListingFilterBar.tsx",
+      "src\\components\\admin\\listings\\components\\table\\CategoryFilterTree.tsx",
+      "src\\components\\admin\\listings\\components\\SiteFilterDropdown.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\categories\\hooks\\useCategories.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\filtering\\CategoryFiltering.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingTable",
+      "../../../../src/components/admin/listings/components/table/CategoryFilterTree",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/categories/hooks/useCategories"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingTable",
+      "src\\components\\admin\\listings\\components\\table\\CategoryFilterTree",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\categories\\hooks\\useCategories"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingTable.tsx",
+      "src\\components\\admin\\listings\\components\\table\\CategoryFilterTree.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\categories\\hooks\\useCategories.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\cross-cutting\\NotificationSystems.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/sites/SiteForm",
+      "../../../../src/components/notifications/NotificationProvider",
+      "../../../../src/components/admin/sites/hooks/useSites",
+      "../../../../src/components/notifications/hooks/useNotifications"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\sites\\SiteForm",
+      "src\\components\\notifications\\NotificationProvider",
+      "src\\components\\admin\\sites\\hooks\\useSites",
+      "src\\components\\notifications\\hooks\\useNotifications"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\sites\\SiteForm.tsx",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\cross-cutting\\ErrorRecovery.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingTable",
+      "../../../../src/components/error/ErrorBoundary",
+      "../../../../src/utils/api",
+      "../../../../src/components/admin/listings/hooks/useListings"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingTable",
+      "src\\components\\error\\ErrorBoundary",
+      "src\\utils\\api",
+      "src\\components\\admin\\listings\\hooks\\useListings"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingTable.tsx",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\cross-cutting\\DataPersistence.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingForm",
+      "../../../../src/components/admin/listings/components/form/useListingForm"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingForm",
+      "src\\components\\admin\\listings\\components\\form\\useListingForm"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingForm.tsx",
+      "src\\components\\admin\\listings\\components\\form\\useListingForm.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\integration\\cross-cutting\\AuthorizationBoundaries.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/listings/ListingTable",
+      "../../../../src/components/admin/sites/table/SiteTable",
+      "../../../../src/components/admin/auth/AuthContainer",
+      "../../../../src/components/admin/layout/WithAuth",
+      "../../../../src/components/admin/auth/hooks/useAuth",
+      "../../../../src/components/admin/listings/hooks/useListings",
+      "../../../../src/components/admin/sites/hooks/useSites"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\listings\\ListingTable",
+      "src\\components\\admin\\sites\\table\\SiteTable",
+      "src\\components\\admin\\auth\\AuthContainer",
+      "src\\components\\admin\\layout\\WithAuth",
+      "src\\components\\admin\\auth\\hooks\\useAuth",
+      "src\\components\\admin\\listings\\hooks\\useListings",
+      "src\\components\\admin\\sites\\hooks\\useSites"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\listings\\ListingTable.tsx",
+      "src\\components\\admin\\sites\\table\\SiteTable.tsx",
+      "src\\components\\admin\\auth\\AuthContainer.tsx",
+      "src\\components\\admin\\layout\\WithAuth.tsx",
+      "src\\components\\admin\\auth\\hooks\\useAuth.ts",
+      "src\\components\\admin\\listings\\hooks\\useListings.ts",
+      "src\\components\\admin\\sites\\hooks\\useSites.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\dashboard\\StatisticCards.test.tsx",
+    "imports": [
+      "../../../src/components/admin/dashboard/StatisticCards",
+      "../../../src/components/admin/dashboard/hooks",
+      "../../../src/components/admin/dashboard/types"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\dashboard\\StatisticCards",
+      "src\\components\\admin\\dashboard\\hooks",
+      "src\\components\\admin\\dashboard\\types"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\dashboard\\StatisticCards.tsx",
+      "src\\components\\admin\\dashboard\\hooks\\index.ts",
+      "src\\components\\admin\\dashboard\\types.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\dashboard\\ActivityFeed.test.tsx",
+    "imports": [
+      "../../../src/components/admin/dashboard/ActivityFeed",
+      "../../../src/components/admin/dashboard/hooks",
+      "../../../src/components/admin/dashboard/types"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\dashboard\\ActivityFeed",
+      "src\\components\\admin\\dashboard\\hooks",
+      "src\\components\\admin\\dashboard\\types"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\dashboard\\ActivityFeed.tsx",
+      "src\\components\\admin\\dashboard\\hooks\\index.ts",
+      "src\\components\\admin\\dashboard\\types.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\dashboard\\hooks\\useSiteMetrics.test.ts",
+    "imports": [
+      "../../../../src/components/admin/dashboard/hooks"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\dashboard\\hooks"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\dashboard\\hooks\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\dashboard\\hooks\\useActivityFeed.test.ts",
+    "imports": [
+      "../../../../src/components/admin/dashboard/hooks"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\dashboard\\hooks"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\dashboard\\hooks\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\dashboard\\components\\StatisticCard.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/dashboard/components/StatisticCard"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\dashboard\\components\\StatisticCard"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\dashboard\\components\\StatisticCard.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\useCategories.test.ts",
+    "imports": [
+      "../../../src/components/admin/categories/hooks"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\hooks"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\hooks\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\CategoryTable.test.tsx",
+    "imports": [
+      "../../../src/components/admin/categories/CategoryTable",
+      "../../../src/components/admin/categories/hooks"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\CategoryTable",
+      "src\\components\\admin\\categories\\hooks"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\CategoryTable.tsx",
+      "src\\components\\admin\\categories\\hooks\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\CategoryTable.pagination.test.tsx",
+    "imports": [
+      "../../../src/components/admin/categories/CategoryTable",
+      "./helpers/categoryTableTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\CategoryTable",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\CategoryTable.tsx",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\CategoryTable.hierarchy.test.tsx",
+    "imports": [
+      "../../../src/components/admin/categories/CategoryTable",
+      "./helpers/categoryTableTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\CategoryTable",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\CategoryTable.tsx",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\CategoryTable.filtering.test.tsx",
+    "imports": [
+      "../../../src/components/admin/categories/CategoryTable",
+      "./helpers/categoryTableTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\CategoryTable",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\CategoryTable.tsx",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\CategoryTable.basic.test.tsx",
+    "imports": [
+      "../../../src/components/admin/categories/CategoryTable",
+      "./helpers/categoryTableTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\CategoryTable",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\CategoryTable.tsx",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\CategoryTable.accessibility.test.tsx",
+    "imports": [
+      "../../../src/components/admin/categories/CategoryTable",
+      "./helpers/categoryTableTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\CategoryTable",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\CategoryTable.tsx",
+      "tests\\admin\\categories\\helpers\\categoryTableTestHelpers.tsx"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\hooks\\useCategories.sorting.test.ts",
+    "imports": [
+      "../../../../src/components/admin/categories/hooks",
+      "./useCategoriesTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\hooks",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\hooks\\index.ts",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\hooks\\useCategories.pagination.test.ts",
+    "imports": [
+      "../../../../src/components/admin/categories/hooks",
+      "./useCategoriesTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\hooks",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\hooks\\index.ts",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\hooks\\useCategories.init.test.ts",
+    "imports": [
+      "../../../utils/testHelpers",
+      "../../../../src/components/admin/categories/hooks",
+      "./useCategoriesTestHelpers"
+    ],
+    "resolvedImports": [
+      "tests\\utils\\testHelpers",
+      "src\\components\\admin\\categories\\hooks",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers"
+    ],
+    "actualFiles": [
+      "tests\\utils\\testHelpers.tsx",
+      "src\\components\\admin\\categories\\hooks\\index.ts",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\hooks\\useCategories.filtering.test.ts",
+    "imports": [
+      "../../../../src/components/admin/categories/hooks",
+      "./useCategoriesTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\hooks",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\hooks\\index.ts",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\hooks\\useCategories.deletion.test.ts",
+    "imports": [
+      "../../../../src/components/admin/categories/hooks",
+      "./useCategoriesTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\hooks",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\hooks\\index.ts",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\hooks\\useCategories.api.test.ts",
+    "imports": [
+      "../../../../src/components/admin/categories/hooks",
+      "./useCategoriesTestHelpers"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\hooks",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\hooks\\index.ts",
+      "tests\\admin\\categories\\hooks\\useCategoriesTestHelpers.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\DeleteConfirmationModal.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableSortHeader.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableSkeleton.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableRow.test.tsx",
+    "imports": [
+      "../../../utils/testHelpers",
+      "../../../fixtures/categoryFixtures",
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "tests\\utils\\testHelpers",
+      "tests\\fixtures\\categoryFixtures",
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "tests\\utils\\testHelpers.tsx",
+      "tests\\fixtures\\categoryFixtures.ts",
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableRow.sorting.test.tsx",
+    "imports": [
+      "../../../utils/testHelpers",
+      "../../../fixtures/categoryFixtures",
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "tests\\utils\\testHelpers",
+      "tests\\fixtures\\categoryFixtures",
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "tests\\utils\\testHelpers.tsx",
+      "tests\\fixtures\\categoryFixtures.ts",
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableRow.hierarchy.test.tsx",
+    "imports": [
+      "../../../utils/testHelpers",
+      "../../../fixtures/categoryFixtures",
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "tests\\utils\\testHelpers",
+      "tests\\fixtures\\categoryFixtures",
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "tests\\utils\\testHelpers.tsx",
+      "tests\\fixtures\\categoryFixtures.ts",
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableRow.actions.test.tsx",
+    "imports": [
+      "../../../utils/testHelpers",
+      "../../../fixtures/categoryFixtures",
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "tests\\utils\\testHelpers",
+      "tests\\fixtures\\categoryFixtures",
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "tests\\utils\\testHelpers.tsx",
+      "tests\\fixtures\\categoryFixtures.ts",
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableRow.accessibility.test.tsx",
+    "imports": [
+      "../../../utils/testHelpers",
+      "../../../fixtures/categoryFixtures",
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "tests\\utils\\testHelpers",
+      "tests\\fixtures\\categoryFixtures",
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "tests\\utils\\testHelpers.tsx",
+      "tests\\fixtures\\categoryFixtures.ts",
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTablePagination.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableHeader.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableError.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoryTableEmptyState.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.url.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.navigation.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.keyboard.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.interaction.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.edgecases.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\categories\\components\\CategoriesMobileView.accessibility.test.tsx",
+    "imports": [
+      "../../../../src/components/admin/categories/components"
+    ],
+    "resolvedImports": [
+      "src\\components\\admin\\categories\\components"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\categories\\components\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\ZKPLogin.validation.test.tsx",
+    "imports": [
+      "@/components/admin/auth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\ZKPLogin.test.tsx",
+    "imports": [
+      "@/components/admin/auth",
+      "@/lib/zkp",
+      "@/lib/zkp"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth",
+      "src/lib/zkp",
+      "src/lib/zkp"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts",
+      "src/lib/zkp.ts",
+      "src/lib/zkp.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\ZKPLogin.rendering.test.tsx",
+    "imports": [
+      "@/components/admin/auth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\ZKPLogin.interaction.test.tsx",
+    "imports": [
+      "@/components/admin/auth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\ZKPLogin.enhanced.test.tsx",
+    "imports": [
+      "@/components/admin/auth",
+      "@/lib/zkp",
+      "@/lib/zkp"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth",
+      "src/lib/zkp",
+      "src/lib/zkp"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts",
+      "src/lib/zkp.ts",
+      "src/lib/zkp.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\ZKPLogin.auth.test.tsx",
+    "imports": [
+      "@/components/admin/auth",
+      "@/lib/zkp"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth",
+      "src/lib/zkp"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts",
+      "src/lib/zkp.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\WithAuth.test.tsx",
+    "imports": [
+      "@/components/admin/auth/WithAuth",
+      "@/components/admin/auth/hooks/useAuth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/WithAuth",
+      "src/components/admin/auth/hooks/useAuth"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/WithAuth.tsx",
+      "src/components/admin/auth/hooks/useAuth.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\TokenRefresh.test.tsx",
+    "imports": [
+      "@/components/admin/auth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\SessionManager.test.tsx",
+    "imports": [
+      "@/components/admin/auth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\RoleAuthorization.test.tsx",
+    "imports": [
+      "@/components/admin/auth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\PasswordReset.test.tsx",
+    "imports": [
+      "@/components/admin/auth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\Logout.test.tsx",
+    "imports": [
+      "@/components/admin/auth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth"
+    ],
+    "actualFiles": [
+      "src\\components\\admin\\auth\\index.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\ACLGuard.test.tsx",
+    "imports": [
+      "@/components/admin/auth/ACLGuard",
+      "@/components/admin/auth/hooks/useAuth"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/ACLGuard",
+      "src/components/admin/auth/hooks/useAuth"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/ACLGuard.tsx",
+      "src/components/admin/auth/hooks/useAuth.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\utils\\accessControl.test.ts",
+    "imports": [
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  },
+  {
+    "testFile": "tests\\admin\\auth\\hooks\\useAuth.test.ts",
+    "imports": [
+      "@/components/admin/auth/hooks/useAuth",
+      "@/components/admin/auth/utils/accessControl"
+    ],
+    "resolvedImports": [
+      "src/components/admin/auth/hooks/useAuth",
+      "src/components/admin/auth/utils/accessControl"
+    ],
+    "actualFiles": [
+      "src/components/admin/auth/hooks/useAuth.ts",
+      "src/components/admin/auth/utils/accessControl.ts"
+    ]
+  }
+]
