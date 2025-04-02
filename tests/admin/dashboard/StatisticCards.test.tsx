@@ -2,13 +2,15 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import StatisticCards from '@/components/admin/dashboard/StatisticCards';
-import { useSiteMetrics } from '@/components/admin/dashboard/hooks';
 import { SiteMetricsData } from '@/components/admin/dashboard/types';
+
+// Import the mock hooks
+const mockHooks = require('../../../tests/__mocks__/hooks-mock');
 
 // Mock the hook
 jest.mock('../../../src/components/admin/dashboard/hooks', () => ({
   __esModule: true,
-  useSiteMetrics: jest.fn(),
+  useSiteMetrics: mockHooks.useSiteMetrics,
 }));
 
 describe('StatisticCards Component', () => {
@@ -68,8 +70,8 @@ describe('StatisticCards Component', () => {
 
   beforeEach(() => {
     // Reset mock and set default return value
-    (useSiteMetrics as jest.Mock).mockReset();
-    (useSiteMetrics as jest.Mock).mockReturnValue({
+    mockHooks.useSiteMetrics.mockReset();
+    mockHooks.useSiteMetrics.mockReturnValue({
       metrics: mockMetrics,
       isLoading: false,
       error: null,
@@ -96,7 +98,7 @@ describe('StatisticCards Component', () => {
   });
 
   it('shows loading state when isLoading is true', () => {
-    (useSiteMetrics as jest.Mock).mockReturnValue({
+    mockHooks.useSiteMetrics.mockReturnValue({
       metrics: null,
       isLoading: true,
       error: null,
@@ -111,7 +113,7 @@ describe('StatisticCards Component', () => {
   });
 
   it('displays error message when there is an error', () => {
-    (useSiteMetrics as jest.Mock).mockReturnValue({
+    mockHooks.useSiteMetrics.mockReturnValue({
       metrics: null,
       isLoading: false,
       error: new Error('Test error'),
@@ -139,7 +141,7 @@ describe('StatisticCards Component', () => {
     expect(screen.getByText('999')).toBeInTheDocument();
 
     // Should not call the hook with a siteSlug when metrics are provided
-    expect(useSiteMetrics).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockHooks.useSiteMetrics).toHaveBeenCalledWith(expect.objectContaining({
       siteSlug: '',
     }));
   });
