@@ -4,9 +4,11 @@ interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>
   label?: string;
   checked?: boolean;
   onChange?: (checked: boolean) => void;
+  onCheckedChange?: (checked: boolean) => void;
   className?: string;
   error?: string;
   id?: string;
+  'data-testid'?: string;
 }
 
 // Simple mock implementation of a Checkbox component
@@ -14,13 +16,16 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   label,
   checked = false,
   onChange,
+  onCheckedChange,
   className = '',
   error,
   id,
+  'data-testid': testId,
   ...props
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(e.target.checked);
+    onCheckedChange?.(e.target.checked);
   };
 
   return (
@@ -31,7 +36,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
           checked={checked}
           onChange={handleChange}
           className={`ui-checkbox ${error ? 'ui-checkbox-error' : ''}`}
-          data-testid="ui-checkbox"
+          data-testid={testId || `category-checkbox-${id || 'default'}`}
           id={id}
           {...props}
         />

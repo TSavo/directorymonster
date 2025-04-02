@@ -8,6 +8,7 @@ interface ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   type?: 'button' | 'submit' | 'reset';
+  'data-testid'?: string;
   [prop: string]: any;
 }
 
@@ -20,6 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
   disabled = false,
   type = 'button',
+  'data-testid': testId = 'category-filter-button',
   ...props
 }) => {
   return (
@@ -28,7 +30,7 @@ export const Button: React.FC<ButtonProps> = ({
       className={`ui-button ui-button-${variant} ui-button-${size} ${className}`}
       onClick={onClick}
       disabled={disabled}
-      data-testid="ui-button"
+      data-testid={testId}
       {...props}
     >
       {children}
