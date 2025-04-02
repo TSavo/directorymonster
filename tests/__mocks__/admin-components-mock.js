@@ -86,11 +86,22 @@ const AdminHeader = jest.fn().mockImplementation(({ toggleSidebar }) => {
 });
 
 // Create a mock AdminSidebar component
-const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar }) => {
+const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar, activePath = '' }) => {
+  // Function to determine if a link is active
+  const isActive = (path) => {
+    if (!activePath) return false;
+    return activePath === path || activePath.startsWith(path + '/');
+  };
+
+  // Function to get the appropriate class for a link
+  const getLinkClass = (path) => {
+    return isActive(path) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white';
+  };
+
   return React.createElement('aside',
     {
       'data-testid': 'admin-sidebar',
-      className: `admin-sidebar ${isOpen ? 'open' : 'closed'}`
+      className: `admin-sidebar ${isOpen ? 'open' : 'closed'} ${!isOpen ? 'transform -translate-x-full' : ''}`
     },
     [
       React.createElement('button',
@@ -106,28 +117,80 @@ const AdminSidebar = jest.fn().mockImplementation(({ isOpen, closeSidebar }) => 
         { key: 'nav' },
         [
           React.createElement('a',
-            { key: 'dashboard', href: '/admin', 'data-testid': 'nav-dashboard' },
+            {
+              key: 'dashboard',
+              href: '/admin',
+              'data-testid': 'nav-dashboard',
+              className: getLinkClass('/admin'),
+              onClick: () => isOpen && closeSidebar()
+            },
             'Dashboard'
           ),
           React.createElement('a',
-            { key: 'sites', href: '/admin/sites', 'data-testid': 'nav-sites' },
+            {
+              key: 'sites',
+              href: '/admin/sites',
+              'data-testid': 'nav-sites',
+              className: getLinkClass('/admin/sites'),
+              onClick: () => isOpen && closeSidebar()
+            },
             'Sites'
           ),
           React.createElement('a',
-            { key: 'categories', href: '/admin/categories', 'data-testid': 'nav-categories' },
+            {
+              key: 'categories',
+              href: '/admin/categories',
+              'data-testid': 'nav-categories',
+              className: getLinkClass('/admin/categories'),
+              onClick: () => isOpen && closeSidebar()
+            },
             'Categories'
           ),
           React.createElement('a',
-            { key: 'listings', href: '/admin/listings', 'data-testid': 'nav-listings' },
+            {
+              key: 'listings',
+              href: '/admin/listings',
+              'data-testid': 'nav-listings',
+              className: getLinkClass('/admin/listings'),
+              onClick: () => isOpen && closeSidebar()
+            },
             'Listings'
+          ),
+          React.createElement('a',
+            {
+              key: 'users',
+              href: '/admin/users',
+              'data-testid': 'nav-users',
+              className: getLinkClass('/admin/users'),
+              onClick: () => isOpen && closeSidebar()
+            },
+            'Users'
+          ),
+          React.createElement('a',
+            {
+              key: 'analytics',
+              href: '/admin/analytics',
+              'data-testid': 'nav-analytics',
+              className: getLinkClass('/admin/analytics'),
+              onClick: () => isOpen && closeSidebar()
+            },
+            'Analytics'
+          ),
+          React.createElement('a',
+            {
+              key: 'settings',
+              href: '/admin/settings',
+              'data-testid': 'nav-settings',
+              className: getLinkClass('/admin/settings'),
+              onClick: () => isOpen && closeSidebar()
+            },
+            'Settings'
           )
         ]
       )
     ]
   );
 });
-
-// Mock the components
 jest.mock('@/components/admin/layout/AdminHeader', () => ({
   __esModule: true,
   AdminHeader,

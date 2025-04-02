@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAccess } from '@/middleware/tenant-validation';
-import { withPermission } from '@/middleware/withPermission';
+import withPermission from '@/middleware/withPermission';
 import { AuditService } from '@/lib/audit-service';
-import { RoleService } from '@/lib/role-service';
+import RoleService from '@/lib/role-service';
 import { verify } from 'jsonwebtoken';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 

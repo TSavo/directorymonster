@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAccess } from '@/middleware/tenant-validation';
-import { withPermission } from '@/middleware/withPermission';
+import withPermission from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
 import { CategoryService } from '@/lib/category-service';
 

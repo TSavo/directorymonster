@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAccess } from '@/middleware/tenant-validation';
-import { withPermission } from '@/middleware/withPermission';
+import withPermission from '@/middleware/withPermission';
 import { ResourceType, Permission } from '@/types/permissions';
 import { redis, kv } from '@/lib/redis-client';
 import { Category } from '@/types';
-import { AuditService } from '@/lib/audit/audit-service';
+import AuditService from '@/lib/audit/audit-service';
 import { CategoryService } from '@/lib/category-service';
 
 /**

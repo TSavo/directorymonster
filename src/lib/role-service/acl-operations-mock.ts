@@ -7,7 +7,7 @@
 
 import { Role, TenantACE } from '@/components/admin/auth/utils/roles';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
-import { AuditService } from '@/lib/audit/audit-service';
+import AuditService from '@/lib/audit/audit-service';
 import { kv } from '@/lib/redis-client';
 
 /**

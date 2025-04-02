@@ -46,7 +46,7 @@ describe('FormActions Component - Interaction', () => {
     );
 
     // Click the back button
-    const backButton = screen.getByTestId('form-back-button');
+    const backButton = screen.getByTestId('back-button');
     await user.click(backButton);
 
     // Verify callback was called
@@ -69,7 +69,7 @@ describe('FormActions Component - Interaction', () => {
     );
 
     // Try to click the submit button
-    const submitButton = screen.getByTestId('form-next-button');
+    const submitButton = screen.getByTestId('next-button');
     await user.click(submitButton);
 
     // Verify callback was not called because button is disabled
@@ -93,7 +93,7 @@ describe('FormActions Component - Interaction', () => {
 
     // Tab to the back button
     await user.tab();
-    expect(screen.getByTestId('form-back-button')).toHaveFocus();
+    expect(screen.getByTestId('back-button')).toHaveFocus();
 
     // Press Enter to click
     await user.keyboard('{Enter}');

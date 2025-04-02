@@ -55,7 +55,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
             type="button"
             onClick={onPrevious}
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded focus:outline-none focus:ring-2"
-            data-testid="form-back-button"
+            data-testid="back-button"
             disabled={isLoading}
           >
             ← Back
@@ -78,7 +78,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded focus:outline-none focus:ring-2 disabled:opacity-50"
-            data-testid="form-next-button"
+            data-testid="next-button"
             disabled={isLoading}
           >
             {isLoading ? (

@@ -7,7 +7,7 @@
  * Part of the Cross-Tenant Attack Prevention implementation (Issue #58)
  */
 
-import { AuditService } from '@/lib/audit/audit-service';
+import AuditService from '@/lib/audit/audit-service';
 import crypto from 'crypto';
 
 // Delimiter character used to separate namespace components

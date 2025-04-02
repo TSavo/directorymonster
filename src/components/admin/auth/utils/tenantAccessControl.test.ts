@@ -6,8 +6,8 @@ import {
   getAccessibleResourcesInTenant,
   hasGlobalPermissionInTenant
 } from './tenantAccessControl';
-import { TenantMembershipService } from '@/lib/tenant-membership-service';
-import { RoleService } from '@/lib/role-service';
+import TenantMembershipService from '@/lib/tenant-membership-service';
+import RoleService from '@/lib/role-service';
 import { Role } from './roles';
 import { ResourceType, Permission } from './accessControl';
 

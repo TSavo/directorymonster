@@ -4,8 +4,8 @@
  */
 
 import { ResourceType, Permission } from './accessControl';
-import { TenantMembershipService } from '@/lib/tenant-membership-service';
-import { RoleService } from '@/lib/role-service';
+import TenantMembershipService from '@/lib/tenant-membership-service';
+import RoleService from '@/lib/role-service';
 
 /**
  * Check if a user has permission for a resource in a specific tenant context

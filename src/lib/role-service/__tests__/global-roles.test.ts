@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect } from '@jest/globals';
-import { RoleService } from '@/lib/role-service';
+import RoleService from '@/lib/role-service';
 
 describe('RoleService - Global Roles', () => {
 // Mock dependencies for testing

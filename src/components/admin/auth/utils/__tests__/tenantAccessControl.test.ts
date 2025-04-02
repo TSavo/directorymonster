@@ -20,8 +20,8 @@ jest.mock('@/lib/role-service', () => ({
   }
 }));
 
-import { TenantMembershipService } from '@/lib/tenant-membership-service';
-import { RoleService } from '@/lib/role-service';
+import TenantMembershipService from '@/lib/tenant-membership-service';
+import RoleService from '@/lib/role-service';
 import { ResourceType, Permission } from '../accessControl';
 
 describe('Tenant Access Control', () => {

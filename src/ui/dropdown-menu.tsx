@@ -38,7 +38,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       {isOpen && (
         <div
           className={`ui-dropdown-content ui-dropdown-${align}`}
-          data-testid="dropdown-menu-content"
+          data-testid="dropdown-menu"
         >
           {children}
         </div>
