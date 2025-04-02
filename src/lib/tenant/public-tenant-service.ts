@@ -4,17 +4,19 @@
  * Implements a "Public Tenant" system to support the user onboarding flow.
  * The Public Tenant serves as a default landing space for all new users before
  * they are explicitly assigned to specific tenants.
+ * 
+ * This service is ONLY responsible for:
+ * 1. Ensuring the public tenant exists with the correct configuration
+ * 2. Adding new users to the public tenant (delegating to TenantMembershipService)
  */
 
 import { redis, kv } from '@/lib/redis-client';
 import TenantService, { TenantConfig } from './tenant-service';
 import TenantMembershipService from '@/lib/tenant-membership-service';
 import RoleService from '@/lib/role';
-import { getUserRolesKey } from '@/components/admin/auth/utils/roles';
 
 /**
- * PublicTenantService provides methods for managing the public tenant
- * and the assignment of users to it.
+ * PublicTenantService provides methods for managing the public tenant.
  */
 export class PublicTenantService {
   // Constants for the public tenant
@@ -120,6 +122,8 @@ export class PublicTenantService {
   
   /**
    * Add a user to the public tenant with the default role
+   * This delegates to TenantMembershipService for the actual tenant assignment
+   * 
    * @param userId User ID to add to the public tenant
    * @returns true if successful, false otherwise
    */
@@ -129,6 +133,7 @@ export class PublicTenantService {
       await this.ensurePublicTenant();
       
       // Add user to the public tenant
+      // Delegate to TenantMembershipService for the actual tenant assignment
       const success = await TenantMembershipService.addUserToTenant(
         userId,
         this.PUBLIC_TENANT_ID,
@@ -139,125 +144,6 @@ export class PublicTenantService {
     } catch (error) {
       console.error(`Error adding user ${userId} to public tenant:`, error);
       return false;
-    }
-  }
-  
-  /**
-   * Check if a user is only in the public tenant (not assigned to other tenants)
-   * @param userId User ID to check
-   * @returns true if the user is only in the public tenant
-   */
-  static async isOnlyInPublicTenant(userId: string): Promise<boolean> {
-    try {
-      // Get all tenants the user is a member of
-      const userTenants = await TenantMembershipService.getUserTenants(userId);
-      
-      // If the user is only in one tenant and it's the public tenant
-      return userTenants.length === 1 && 
-             userTenants[0].id === this.PUBLIC_TENANT_ID;
-    } catch (error) {
-      console.error(`Error checking if user ${userId} is only in public tenant:`, error);
-      return false;
-    }
-  }
-  
-  /**
-   * Get all users who are only in the public tenant
-   * @returns Array of user IDs
-   */
-  static async getPublicOnlyUsers(): Promise<string[]> {
-    try {
-      // Get all users in the public tenant
-      const allPublicUsers = await TenantMembershipService.getTenantUsers(
-        this.PUBLIC_TENANT_ID
-      );
-      
-      // Filter to only include users who are only in the public tenant
-      const publicOnlyUsers: string[] = [];
-      
-      for (const userId of allPublicUsers) {
-        if (await this.isOnlyInPublicTenant(userId)) {
-          publicOnlyUsers.push(userId);
-        }
-      }
-      
-      return publicOnlyUsers;
-    } catch (error) {
-      console.error('Error getting users who are only in public tenant:', error);
-      return [];
-    }
-  }
-  
-  /**
-   * Transfer a user from public tenant to a specific tenant
-   * @param userId User ID to transfer
-   * @param targetTenantId Tenant ID to transfer to
-   * @param roleId Role ID to assign in the target tenant
-   * @param removeFromPublic Whether to remove from public tenant
-   * @returns true if successful, false otherwise
-   */
-  static async transferUserToTenant(
-    userId: string,
-    targetTenantId: string,
-    roleId: string,
-    removeFromPublic: boolean = false
-  ): Promise<boolean> {
-    try {
-      // Add user to the target tenant with the specified role
-      const addSuccess = await TenantMembershipService.addUserToTenant(
-        userId,
-        targetTenantId,
-        roleId
-      );
-      
-      if (!addSuccess) {
-        return false;
-      }
-      
-      // If requested, remove from the public tenant
-      if (removeFromPublic) {
-        return await TenantMembershipService.removeUserFromTenant(
-          userId,
-          this.PUBLIC_TENANT_ID
-        );
-      }
-      
-      return true;
-    } catch (error) {
-      console.error(`Error transferring user ${userId} to tenant ${targetTenantId}:`, error);
-      return false;
-    }
-  }
-  
-  /**
-   * Get a user's primary tenant, prioritizing non-public tenants
-   * @param userId User ID to check
-   * @returns The primary tenant ID or null if not found
-   */
-  static async getUserPrimaryTenant(userId: string): Promise<string | null> {
-    try {
-      // Get all tenants the user is a member of
-      const userTenants = await TenantMembershipService.getUserTenants(userId);
-      
-      if (userTenants.length === 0) {
-        return null;
-      }
-      
-      // Prioritize non-public tenants
-      const nonPublicTenants = userTenants.filter(
-        tenant => tenant.id !== this.PUBLIC_TENANT_ID
-      );
-      
-      // If there are non-public tenants, return the first one
-      if (nonPublicTenants.length > 0) {
-        return nonPublicTenants[0].id;
-      }
-      
-      // Otherwise, return the public tenant
-      return this.PUBLIC_TENANT_ID;
-    } catch (error) {
-      console.error(`Error getting primary tenant for user ${userId}:`, error);
-      return null;
     }
   }
 }
