@@ -30,7 +30,7 @@ export const useAuth = () => {
       try {
         // Check authentication status
         const response = await fetch('/api/auth/session');
-        
+
         if (!response.ok) {
           setAuthState({
             user: null,
@@ -40,9 +40,9 @@ export const useAuth = () => {
           });
           return;
         }
-        
+
         const data = await response.json();
-        
+
         if (data.authenticated && data.user) {
           setAuthState({
             user: data.user,
@@ -68,7 +68,7 @@ export const useAuth = () => {
         });
       }
     };
-    
+
     checkAuthStatus();
   }, []);
 
@@ -78,7 +78,7 @@ export const useAuth = () => {
   const login = useCallback(async (email: string, password: string) => {
     try {
       setAuthState(prev => ({ ...prev, isLoading: true }));
-      
+
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -86,31 +86,31 @@ export const useAuth = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Login failed');
       }
-      
+
       const data = await response.json();
-      
+
       setAuthState({
         user: data.user,
         isAuthenticated: true,
         isLoading: false,
         error: null,
       });
-      
+
       return true;
     } catch (error) {
       console.error('Login error:', error);
-      
+
       setAuthState(prev => ({
         ...prev,
         isLoading: false,
         error: error instanceof Error ? error.message : 'Login failed',
       }));
-      
+
       return false;
     }
   }, []);
@@ -121,31 +121,31 @@ export const useAuth = () => {
   const logout = useCallback(async () => {
     try {
       setAuthState(prev => ({ ...prev, isLoading: true }));
-      
+
       await fetch('/api/auth/logout', {
         method: 'POST',
       });
-      
+
       setAuthState({
         user: null,
         isAuthenticated: false,
         isLoading: false,
         error: null,
       });
-      
+
       // Redirect to login page
       router.push('/login');
-      
+
       return true;
     } catch (error) {
       console.error('Logout error:', error);
-      
+
       setAuthState(prev => ({
         ...prev,
         isLoading: false,
         error: 'Logout failed',
       }));
-      
+
       return false;
     }
   }, [router]);
@@ -160,12 +160,41 @@ export const useAuth = () => {
     siteId?: string
   ): boolean => {
     const { user, isAuthenticated } = authState;
-    
+
     if (!isAuthenticated || !user || !user.acl) {
       return false;
     }
-    
-    return checkPermission(user.acl, resourceType, permission, resourceId, siteId);
+
+    // Find the tenant ID for this specific resource/site if possible
+    let tenantId = 'default';
+
+    if (resourceId) {
+      // Try to find the tenant ID for this specific resource
+      const resourceEntry = user.acl.entries.find(entry =>
+        entry.resource.type === resourceType &&
+        entry.resource.id === resourceId
+      );
+
+      if (resourceEntry) {
+        tenantId = resourceEntry.resource.tenantId;
+      }
+    } else if (siteId) {
+      // Try to find the tenant ID for this site
+      const siteEntry = user.acl.entries.find(entry =>
+        entry.resource.siteId === siteId
+      );
+
+      if (siteEntry) {
+        tenantId = siteEntry.resource.tenantId;
+      }
+    } else {
+      // Use the first tenant ID from the user's ACL entries if no specific resource/site
+      if (user.acl.entries.length > 0) {
+        tenantId = user.acl.entries[0].resource.tenantId;
+      }
+    }
+
+    return checkPermission(user.acl, resourceType, permission, tenantId, resourceId, siteId);
   }, [authState]);
 
   // Return the auth state and methods
