@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SiteForm } from '@/components/admin/sites/SiteForm';
+import SiteForm from '@/components/admin/sites/SiteForm';
 
 // Mock the Next.js router
 jest.mock('next/navigation', () => ({

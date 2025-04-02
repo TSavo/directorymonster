@@ -5,7 +5,7 @@ import React from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import { CategoryTableError } from '../../../../src/components/admin/categories/components';
+import { CategoryTableError } from '@/components/admin/categories/components';
 
 /**
  * Test suite for the CategoryTableError component

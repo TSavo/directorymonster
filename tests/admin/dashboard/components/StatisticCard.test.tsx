@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import StatisticCard from '../../../../src/components/admin/dashboard/components/StatisticCard';
+import StatisticCard from '@/components/admin/dashboard/components/StatisticCard';
 
 describe('StatisticCard Component', () => {
   const mockIcon = (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SEOStep } from '@/components/admin/sites/components/SEOStep';
+import SEOStep from '@/components/admin/sites/components/SEOStep';
 
 // Mock the SEOSettings component that's used by SEOStep
 jest.mock('@/components/admin/sites/SEOSettings', () => ({

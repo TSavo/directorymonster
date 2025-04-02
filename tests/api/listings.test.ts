@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import { NextRequest } from 'next/server';
-import { GET, POST } from '../../src/app/api/sites/[siteSlug]/listings/route';
+import { GET, POST } from '@/app/api/sites/[siteSlug]/listings/route';
 
 // Mock the Redis client
 jest.mock('../../src/lib/redis-client', () => ({

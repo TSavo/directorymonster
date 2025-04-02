@@ -3,10 +3,10 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { SiteFilterDropdown } from '../../../../src/components/admin/listings/components/SiteFilterDropdown';
+import { SiteFilterDropdown } from '@/components/admin/listings/components/SiteFilterDropdown';
 
 // Import the mock creator utility
-import createMockUseListings from '../../../../src/components/admin/listings/hooks/useListings.mock';
+import createMockUseListings from '@/components/admin/listings/hooks/useListings.mock';
 
 // Mock the hooks
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
@@ -24,8 +24,8 @@ const mockSites = [
 ];
 
 // Mock the hooks implementation
-import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
-import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
+import { useListings } from '@/components/admin/listings/hooks/useListings';
+import { useSites } from '@/components/admin/sites/hooks/useSites';
 
 const mockStore = configureStore([]);
 

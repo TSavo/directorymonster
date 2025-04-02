@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
-import { StepNavigation } from '@/components/admin/sites/components/StepNavigation';
+import StepNavigation from '@/components/admin/sites/components/StepNavigation';
 
 // Add jest-axe matcher
 expect.extend(toHaveNoViolations);

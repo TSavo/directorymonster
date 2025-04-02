@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SEOStep } from '@/components/admin/sites/components/SEOStep';
+import SEOStep from '@/components/admin/sites/components/SEOStep';
 import { SEOSettings } from '@/components/admin/sites/SEOSettings';
 
 // Mock the SEOSettings component that's used by SEOStep

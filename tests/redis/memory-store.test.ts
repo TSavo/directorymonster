@@ -1,4 +1,4 @@
-import { MemoryRedis } from '../../src/lib/redis/memory-store';
+import { MemoryRedis } from '@/lib/redis/memory-store';
 
 describe('MemoryRedis Implementation', () => {
   let memoryRedis: MemoryRedis;

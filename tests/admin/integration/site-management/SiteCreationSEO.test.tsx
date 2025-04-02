@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { SEOStep } from '../../../../src/components/admin/sites/components/SEOStep';
+import SEOStep from '@/components/admin/sites/components/SEOStep';
 
 // Mock the hooks and API calls
 jest.mock('../../../../src/components/admin/sites/hooks/useSites', () => ({
@@ -11,7 +11,7 @@ jest.mock('../../../../src/components/admin/sites/hooks/useSites', () => ({
 }));
 
 // Mock hooks implementation
-import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
+import { useSites } from '@/components/admin/sites/hooks/useSites';
 
 const mockStore = configureStore([]);
 

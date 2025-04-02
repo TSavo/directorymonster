@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { AdminSidebar } from '@/components/admin/layout';
+import AdminSidebar from '@/components/admin/layout/AdminSidebar';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { StepNavigation } from '@/components/admin/sites/components/StepNavigation';
+import StepNavigation from '@/components/admin/sites/components/StepNavigation';
 
 // Mock step definitions
 const mockSteps = [

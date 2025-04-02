@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ActivityFeed from '../../../src/components/admin/dashboard/ActivityFeed';
-import { useActivityFeed } from '../../../src/components/admin/dashboard/hooks';
-import { ActivityItem } from '../../../src/components/admin/dashboard/types';
+import ActivityFeed from '@/components/admin/dashboard/ActivityFeed';
+import { useActivityFeed } from '@/components/admin/dashboard/hooks';
+import { ActivityItem } from '@/components/admin/dashboard/types';
 
 // Mock the hook
 jest.mock('../../../src/components/admin/dashboard/hooks', () => ({

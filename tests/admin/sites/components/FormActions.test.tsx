@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { FormActions } from '@/components/admin/sites/components/FormActions';
+import FormActions from '@/components/admin/sites/components/FormActions';
 
 describe('FormActions Component - Basic Rendering', () => {
   it('renders next and back buttons correctly', () => {

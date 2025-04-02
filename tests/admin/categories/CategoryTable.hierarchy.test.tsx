@@ -6,7 +6,7 @@ import { render, screen, waitForElementToBeRemoved, waitFor } from '@testing-lib
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import CategoryTable from '../../../src/components/admin/categories/CategoryTable';
+import CategoryTable from '@/components/admin/categories/CategoryTable';
 import { mockHierarchicalCategories } from './helpers/categoryTableTestHelpers';
 
 // Mock the CategoryTableSkeleton component to avoid loading state

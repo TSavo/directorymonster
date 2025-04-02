@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import CategoryTable from '../../../src/components/admin/categories/CategoryTable';
-import * as hooks from '../../../src/components/admin/categories/hooks/useCategories';
+import CategoryTable from '@/components/admin/categories/CategoryTable';
+import * as hooks from '@/components/admin/categories/hooks/useCategories';
 
 // Mock the useCategories hook
 jest.mock('../../../src/components/admin/categories/hooks/useCategories');

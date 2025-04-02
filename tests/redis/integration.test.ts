@@ -5,10 +5,10 @@ import {
   forceRedisReconnect, 
   getRedisConnectionState, 
   onRedisConnectionStateChange 
-} from '../../src/lib/redis';
-import { MemoryRedis } from '../../src/lib/redis/memory-store';
-import { redisCache } from '../../src/lib/redis-cache';
-import { checkRedisConnection } from '../../src/lib/redis-health';
+} from '@/lib/redis';
+import { MemoryRedis } from '@/lib/redis/memory-store';
+import { redisCache } from '@/lib/redis-cache';
+import { checkRedisConnection } from '@/lib/redis-health';
 
 describe('Redis Integration Tests', () => {
   test('redis client should be available', () => {

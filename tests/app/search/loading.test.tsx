@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import SearchLoading from '../../../src/app/search/loading';
+import SearchLoading from '@/app/search/loading';
 import '@testing-library/jest-dom';
 
 describe('SearchLoading Component', () => {

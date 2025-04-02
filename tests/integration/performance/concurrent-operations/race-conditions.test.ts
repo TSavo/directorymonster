@@ -6,9 +6,9 @@
  */
 
 import { createMockRequest } from '../../setup';
-import { POST as createListing } from '../../../../src/app/api/sites/[siteSlug]/listings/route';
-import { PUT as updateListing } from '../../../../src/app/api/sites/[siteSlug]/listings/[listingSlug]/route';
-import { kv, redis } from '../../../../src/lib/redis-client';
+import { POST as createListing } from '@/app/api/sites/[siteSlug]/listings/route';
+import { PUT as updateListing } from '@/app/api/sites/[siteSlug]/listings/[listingSlug]/route';
+import { kv, redis } from '@/lib/redis-client';
 
 // Constants for race condition tests
 const CONCURRENT_OPERATIONS = 5;

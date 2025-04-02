@@ -3,8 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingForm } from '../../../../src/components/admin/listings/ListingForm';
-import { BasicInfoStep } from '../../../../src/components/admin/listings/components/BasicInfoStep';
+import ListingForm from '@/components/admin/listings/ListingForm';
+import BasicInfoStep from '@/components/admin/listings/components/BasicInfoStep';
 
 // Mock the hooks and API calls
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
@@ -22,8 +22,8 @@ const mockSites = [
 ];
 
 // Mock the hooks implementation
-import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
-import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
+import { useListings } from '@/components/admin/listings/hooks/useListings';
+import { useSites } from '@/components/admin/sites/hooks/useSites';
 
 const mockStore = configureStore([]);
 

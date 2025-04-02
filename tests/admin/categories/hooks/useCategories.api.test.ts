@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { renderHook, waitFor, act } from '@testing-library/react';
-import { useCategories } from '../../../../src/components/admin/categories/hooks';
+import { useCategories } from '@/components/admin/categories/hooks';
 import {
   mockCategories,
   mockSites,

@@ -3,8 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { SiteForm } from '../../../../src/components/admin/sites/SiteForm';
-import { NotificationProvider } from '../../../../src/components/notifications/NotificationProvider';
+import SiteForm from '@/components/admin/sites/SiteForm';
+import { NotificationProvider } from '@/components/notifications/NotificationProvider';
 
 // Mock the hooks and API calls
 jest.mock('../../../../src/components/admin/sites/hooks/useSites', () => ({
@@ -16,8 +16,8 @@ jest.mock('../../../../src/components/notifications/hooks/useNotifications', () 
 }));
 
 // Mock hooks implementation
-import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
-import { useNotifications } from '../../../../src/components/notifications/hooks/useNotifications';
+import { useSites } from '@/components/admin/sites/hooks/useSites';
+import { useNotifications } from '@/components/notifications/hooks/useNotifications';
 
 const mockStore = configureStore([]);
 

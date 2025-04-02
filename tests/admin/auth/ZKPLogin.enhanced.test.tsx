@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ZKPLogin } from '@/components/admin/auth';
+import ZKPLogin from '@/components/admin/auth/ZKPLogin';
 import { generateProof, verifyProof } from '@/lib/zkp';
 import * as zkpLib from '@/lib/zkp';
 

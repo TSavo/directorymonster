@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import SearchIcon from '../../src/components/search/SearchIcon';
+import SearchIcon from '@/components/search/SearchIcon';
 import '@testing-library/jest-dom';
 
 describe('SearchIcon Component', () => {

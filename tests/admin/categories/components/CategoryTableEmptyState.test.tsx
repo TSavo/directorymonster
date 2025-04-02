@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Import the component
-import { CategoryTableEmptyState } from '../../../../src/components/admin/categories/components';
+import { CategoryTableEmptyState } from '@/components/admin/categories/components';
 
 // Mock next/link
 jest.mock('next/link', () => {

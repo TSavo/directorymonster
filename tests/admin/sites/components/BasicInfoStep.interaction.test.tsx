@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BasicInfoStep } from '@/components/admin/sites/components';
+import BasicInfoStep from '@/components/admin/sites/components/BasicInfoStep';
 import { SiteFormProvider } from '@/components/admin/sites/context/SiteFormContext';
 
 describe('BasicInfoStep Component - Interaction', () => {

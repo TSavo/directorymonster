@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { ListingTableRow } from '../../../src/components/admin/listings/components';
+import { ListingTableRow } from '@/components/admin/listings/components';
 import '@testing-library/jest-dom';
 
 // Mock next/link

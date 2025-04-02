@@ -5,7 +5,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import { DeleteConfirmationModal } from '../../../../src/components/admin/categories/components';
+import { DeleteConfirmationModal } from '@/components/admin/categories/components';
 
 /**
  * Test suite for the DeleteConfirmationModal component

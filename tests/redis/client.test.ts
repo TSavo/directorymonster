@@ -5,8 +5,8 @@ import {
   isRedisConnected,
   forceRedisReconnect,
   getRedisConnectionState
-} from '../../src/lib/redis/client';
-import { MemoryRedis } from '../../src/lib/redis/memory-store';
+} from '@/lib/redis/client';
+import { MemoryRedis } from '@/lib/redis/memory-store';
 
 // Mock Redis global instance
 jest.mock('../../src/lib/redis/connection-manager', () => {

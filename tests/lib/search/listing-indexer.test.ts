@@ -1,11 +1,11 @@
 /**
  * @jest-environment node
  */
-import { ListingIndexer } from '../../../src/lib/search/listing-indexer';
-import { searchKeys } from '../../../src/lib/tenant';
-import { Listing } from '../../../src/types';
-import { redis, kv } from '../../../src/lib/redis-client';
-import * as utils from '../../../src/lib/search/utils';
+import { ListingIndexer } from '@/lib/search/listing-indexer';
+import { searchKeys } from '@/lib/tenant';
+import { Listing } from '@/types';
+import { redis, kv } from '@/lib/redis-client';
+import * as utils from '@/lib/search/utils';
 
 // Mock Redis and KV store
 jest.mock('../../../src/lib/redis-client', () => ({

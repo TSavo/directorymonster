@@ -1,10 +1,10 @@
 /**
  * @jest-environment node
  */
-import { CategoryIndexer } from '../../../src/lib/search/category-indexer';
-import { searchKeys } from '../../../src/lib/tenant';
-import { Category } from '../../../src/types';
-import { redis, kv } from '../../../src/lib/redis-client';
+import { CategoryIndexer } from '@/lib/search/category-indexer';
+import { searchKeys } from '@/lib/tenant';
+import { Category } from '@/types';
+import { redis, kv } from '@/lib/redis-client';
 
 // Mock Redis and KV store
 jest.mock('../../../src/lib/redis-client', () => ({

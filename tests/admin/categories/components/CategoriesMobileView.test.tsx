@@ -6,7 +6,7 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Import the component
-import { CategoriesMobileView } from '../../../../src/components/admin/categories/components';
+import { CategoriesMobileView } from '@/components/admin/categories/components';
 
 // Mock data
 const mockCategories = [

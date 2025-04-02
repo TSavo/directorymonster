@@ -4,7 +4,7 @@
  * This test defines the expected behavior of Redis hash operations
  * before implementing them in the in-memory Redis store.
  */
-import { MemoryRedis } from '../../src/lib/redis/memory-store';
+import { MemoryRedis } from '@/lib/redis/memory-store';
 
 describe('Redis Hash Operations (TDD)', () => {
   let memoryRedis: MemoryRedis;

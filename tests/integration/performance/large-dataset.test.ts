@@ -10,10 +10,10 @@
 
 import { NextRequest } from 'next/server';
 import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
-import { SiteConfig, Category, Listing } from '../../../src/types';
-import { GET as getListings } from '../../../src/app/api/sites/[siteSlug]/listings/route';
-import { GET as getSearchResults } from '../../../src/app/api/search/route';
-import { kv, redis } from '../../../src/lib/redis-client';
+import { SiteConfig, Category, Listing } from '@/types';
+import { GET as getListings } from '@/app/api/sites/[siteSlug]/listings/route';
+import { GET as getSearchResults } from '@/app/api/search/route';
+import { kv, redis } from '@/lib/redis-client';
 
 // Constants for large dataset tests
 const DATASET_SIZES = {

@@ -6,7 +6,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Import the component
-import { CategoryTableHeader } from '../../../../src/components/admin/categories/components';
+import { CategoryTableHeader } from '@/components/admin/categories/components';
 
 // Mock data
 const mockCategories = [

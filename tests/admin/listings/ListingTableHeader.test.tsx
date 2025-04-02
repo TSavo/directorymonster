@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ListingTableHeader } from '../../../src/components/admin/listings/components';
+import { ListingTableHeader } from '@/components/admin/listings/components';
 import '@testing-library/jest-dom';
 
 // Mock data

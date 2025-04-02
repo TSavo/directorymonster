@@ -1,10 +1,10 @@
 /**
  * @jest-environment node
  */
-import { searchIndexer } from '../../../src/lib/search/search-indexer';
-import { Category, Listing } from '../../../src/types';
-import { CategoryIndexer } from '../../../src/lib/search/category-indexer';
-import { ListingIndexer } from '../../../src/lib/search/listing-indexer';
+import { searchIndexer } from '@/lib/search/search-indexer';
+import { Category, Listing } from '@/types';
+import { CategoryIndexer } from '@/lib/search/category-indexer';
+import { ListingIndexer } from '@/lib/search/listing-indexer';
 
 // Mock category and listing indexers using spyOn instead of jest.mock
 jest.mock('../../../src/lib/search/category-indexer');

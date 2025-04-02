@@ -4,7 +4,7 @@
 import { JSDOM } from 'jsdom';
 import fetch from 'node-fetch';
 import { setupTestEnvironment, clearTestData } from '../setup';
-import { SiteConfig } from '../../../src/types';
+import { SiteConfig } from '@/types';
 
 // Create a mock implementation for fetch
 jest.mock('node-fetch', () => jest.fn());

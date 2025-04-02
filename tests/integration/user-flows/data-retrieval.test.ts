@@ -1,11 +1,11 @@
 /**
  * @jest-environment node
  */
-import { GET as getSite } from '../../../src/app/api/sites/[siteSlug]/route';
-import { GET as getCategories } from '../../../src/app/api/sites/[siteSlug]/categories/route';
-import { GET as getListings } from '../../../src/app/api/sites/[siteSlug]/listings/route';
+import { GET as getSite } from '@/app/api/sites/[siteSlug]/route';
+import { GET as getCategories } from '@/app/api/sites/[siteSlug]/categories/route';
+import { GET as getListings } from '@/app/api/sites/[siteSlug]/listings/route';
 import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
-import { SiteConfig, Category, Listing } from '../../../src/types';
+import { SiteConfig, Category, Listing } from '@/types';
 
 describe('Data Retrieval User Flow', () => {
   // Store test data references
