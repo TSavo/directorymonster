@@ -24,22 +24,21 @@ describe('SiteForm Submission', () => {
       ok: true,
       json: jest.fn().mockResolvedValueOnce({ id: '123', slug: 'test-site' })
     });
-    
+
     const user = userEvent.setup();
     const onSuccess = jest.fn();
-    
+
     render(<SiteForm onSuccess={onSuccess} />);
-    
+
     // Fill in form with valid data
-    await user.type(screen.getByLabelText(/name/i), 'Test Site');
-    await user.type(screen.getByLabelText(/slug/i), 'test-site');
-    await user.type(screen.getByLabelText(/description/i), 'This is a test site');
-    await user.type(screen.getByPlaceholderText(/enter domain/i), 'test.com');
-    await user.click(screen.getByText(/\\+ add/i));
-    
-    // Submit the form
-    await user.click(screen.getByTestId('siteForm-submit'));
-    
+    await user.type(screen.getByTestId('siteForm-name'), 'Test Site');
+    await user.type(screen.getByTestId('siteForm-slug'), 'test-site');
+    await user.type(screen.getByTestId('siteForm-description'), 'This is a test site');
+    // Skip domain and add button as they don't exist in the current component
+
+    // Submit the form using the next button
+    await user.click(screen.getByTestId('next-button'));
+
     // Verify fetch was called with correct data
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
@@ -58,16 +57,16 @@ describe('SiteForm Submission', () => {
         })
       );
     });
-    
+
     // Check success callback was called
     expect(onSuccess).toHaveBeenCalledWith(expect.objectContaining({
       id: '123',
       slug: 'test-site'
     }));
-    
+
     // Check success message is displayed
     expect(await screen.findByText(/site created successfully/i)).toBeInTheDocument();
-    
+
     // Verify that router.push was called after timeout
     await waitFor(() => {
       expect(mockRouter.push).toHaveBeenCalledWith('/admin/sites/test-site');
@@ -79,20 +78,19 @@ describe('SiteForm Submission', () => {
       ok: false,
       json: jest.fn().mockResolvedValueOnce({ error: 'API error message' })
     });
-    
+
     const user = userEvent.setup();
-    
+
     render(<SiteForm />);
-    
+
     // Fill in form with valid data
-    await user.type(screen.getByLabelText(/name/i), 'Test Site');
-    await user.type(screen.getByLabelText(/slug/i), 'test-site');
-    await user.type(screen.getByPlaceholderText(/enter domain/i), 'test.com');
-    await user.click(screen.getByText(/\\+ add/i));
-    
-    // Submit the form
-    await user.click(screen.getByTestId('siteForm-submit'));
-    
+    await user.type(screen.getByTestId('siteForm-name'), 'Test Site');
+    await user.type(screen.getByTestId('siteForm-slug'), 'test-site');
+    // Skip domain and add button as they don't exist in the current component
+
+    // Submit the form using the next button
+    await user.click(screen.getByTestId('next-button'));
+
     // Check error message is displayed
     expect(await screen.findByText(/API error message/i)).toBeInTheDocument();
   });
@@ -102,7 +100,7 @@ describe('SiteForm Submission', () => {
       ok: true,
       json: jest.fn().mockResolvedValueOnce({ id: '123', slug: 'test-site' })
     });
-    
+
     const user = userEvent.setup();
     const initialData = {
       id: '123',
@@ -111,16 +109,16 @@ describe('SiteForm Submission', () => {
       description: 'Initial description',
       domains: ['initial.com']
     };
-    
+
     render(<SiteForm mode="edit" initialData={initialData} />);
-    
+
     // Update some fields
-    await user.clear(screen.getByLabelText(/name/i));
-    await user.type(screen.getByLabelText(/name/i), 'Updated Name');
-    
-    // Submit the form
-    await user.click(screen.getByTestId('siteForm-submit'));
-    
+    await user.clear(screen.getByTestId('siteForm-name'));
+    await user.type(screen.getByTestId('siteForm-name'), 'Updated Name');
+
+    // Submit the form using the next button
+    await user.click(screen.getByTestId('next-button'));
+
     // Verify fetch was called with PUT method and correct URL
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
@@ -130,34 +128,33 @@ describe('SiteForm Submission', () => {
         })
       );
     });
-    
+
     // Check success message for edit mode
     expect(await screen.findByText(/site updated successfully/i)).toBeInTheDocument();
   });
 
   it('handles network errors during submission', async () => {
     global.fetch = jest.fn().mockRejectedValueOnce(new Error('Network error'));
-    
+
     const user = userEvent.setup();
-    
+
     render(<SiteForm />);
-    
+
     // Fill in form with valid data
-    await user.type(screen.getByLabelText(/name/i), 'Test Site');
-    await user.type(screen.getByLabelText(/slug/i), 'test-site');
-    await user.type(screen.getByPlaceholderText(/enter domain/i), 'test.com');
-    await user.click(screen.getByText(/\\+ add/i));
-    
-    // Submit the form
-    await user.click(screen.getByTestId('siteForm-submit'));
-    
+    await user.type(screen.getByTestId('siteForm-name'), 'Test Site');
+    await user.type(screen.getByTestId('siteForm-slug'), 'test-site');
+    // Skip domain and add button as they don't exist in the current component
+
+    // Submit the form using the next button
+    await user.click(screen.getByTestId('next-button'));
+
     // Check error message is displayed
     expect(await screen.findByText(/network error/i)).toBeInTheDocument();
   });
 
   it('shows loading state during submission', async () => {
     // Create a delayed promise to keep the loading state visible
-    global.fetch = jest.fn().mockImplementationOnce(() => 
+    global.fetch = jest.fn().mockImplementationOnce(() =>
       new Promise(resolve => {
         setTimeout(() => {
           resolve({
@@ -167,23 +164,22 @@ describe('SiteForm Submission', () => {
         }, 100);
       })
     );
-    
+
     const user = userEvent.setup();
-    
+
     render(<SiteForm />);
-    
+
     // Fill in form with valid data
-    await user.type(screen.getByLabelText(/name/i), 'Test Site');
-    await user.type(screen.getByLabelText(/slug/i), 'test-site');
-    await user.type(screen.getByPlaceholderText(/enter domain/i), 'test.com');
-    await user.click(screen.getByText(/\\+ add/i));
-    
-    // Submit the form
-    await user.click(screen.getByTestId('siteForm-submit'));
-    
+    await user.type(screen.getByTestId('siteForm-name'), 'Test Site');
+    await user.type(screen.getByTestId('siteForm-slug'), 'test-site');
+    // Skip domain and add button as they don't exist in the current component
+
+    // Submit the form using the next button
+    await user.click(screen.getByTestId('next-button'));
+
     // Check loading state is displayed
     expect(screen.getByTestId('siteForm-submit-loading')).toBeInTheDocument();
-    
+
     // Wait for completion
     await waitFor(() => {
       expect(screen.queryByTestId('siteForm-submit-loading')).not.toBeInTheDocument();

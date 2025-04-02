@@ -78,13 +78,13 @@ describe('StatisticCards Component', () => {
 
   it('renders all statistic cards correctly with hook data', () => {
     render(<StatisticCards siteSlug="test-site" />);
-    
-    expect(screen.getByTestId('statistic-cards')).toBeInTheDocument();
-    
+
+    expect(screen.getByTestId('statistics-section')).toBeInTheDocument();
+
     // Check for all expected cards
     const cardTitles = screen.getAllByTestId('statistic-card-title');
     expect(cardTitles).toHaveLength(6); // Default + search + interactions
-    
+
     // Verify some specific values
     expect(screen.getByText('100')).toBeInTheDocument(); // Total Listings
     expect(screen.getByText('20')).toBeInTheDocument(); // Active Categories
@@ -103,7 +103,7 @@ describe('StatisticCards Component', () => {
     });
 
     render(<StatisticCards siteSlug="test-site" />);
-    
+
     // Check for loading indicators
     const skeletons = screen.getAllByTestId('statistic-card-skeleton');
     expect(skeletons.length).toBeGreaterThan(0);
@@ -118,7 +118,7 @@ describe('StatisticCards Component', () => {
     });
 
     render(<StatisticCards siteSlug="test-site" />);
-    
+
     expect(screen.getByTestId('metrics-error')).toBeInTheDocument();
     expect(screen.getByText('Failed to load metrics: Test error')).toBeInTheDocument();
   });
@@ -133,10 +133,10 @@ describe('StatisticCards Component', () => {
     };
 
     render(<StatisticCards metrics={customMetrics} />);
-    
+
     // Should use the custom metrics value
     expect(screen.getByText('999')).toBeInTheDocument();
-    
+
     // Should not call the hook with a siteSlug when metrics are provided
     expect(useSiteMetrics).toHaveBeenCalledWith(expect.objectContaining({
       siteSlug: '',
@@ -145,7 +145,7 @@ describe('StatisticCards Component', () => {
 
   it('does not show search metrics when showSearchMetrics is false', () => {
     render(<StatisticCards siteSlug="test-site" showSearchMetrics={false} />);
-    
+
     const cardTitles = screen.getAllByTestId('statistic-card-title');
     expect(cardTitles).toHaveLength(5); // One less than default
     expect(screen.queryByText('Total Searches')).not.toBeInTheDocument();
@@ -153,7 +153,7 @@ describe('StatisticCards Component', () => {
 
   it('does not show interaction metrics when showInteractionMetrics is false', () => {
     render(<StatisticCards siteSlug="test-site" showInteractionMetrics={false} />);
-    
+
     const cardTitles = screen.getAllByTestId('statistic-card-title');
     expect(cardTitles).toHaveLength(5); // One less than default
     expect(screen.queryByText('Interactions')).not.toBeInTheDocument();
