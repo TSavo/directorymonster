@@ -36,7 +36,7 @@ describe('Listings API', () => {
   });
 
   describe('GET /api/sites/[siteSlug]/listings', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock the Redis client to return null for site
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockResolvedValue(null);
@@ -60,7 +60,7 @@ describe('Listings API', () => {
       expect(kv.get).toHaveBeenCalledWith('test:site:slug:non-existent');
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock site data
       const mockSite = {
         id: 'site1',
@@ -149,7 +149,7 @@ describe('Listings API', () => {
       expect(kv.keys).toHaveBeenCalledWith('test:listing:site:site1:*');
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock site data
       const mockSite = {
         id: 'site1',
@@ -189,7 +189,7 @@ describe('Listings API', () => {
       });
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock site data
       const mockSite = {
         id: 'site1',
@@ -268,7 +268,7 @@ describe('Listings API', () => {
   });
 
   describe('POST /api/sites/[siteSlug]/listings', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock the Redis client to return null for site
       const { kv } = require('../../src/lib/redis-client');
       (kv.get as jest.Mock).mockResolvedValue(null);
@@ -338,7 +338,7 @@ describe('Listings API', () => {
       });
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock site data
       const mockSite = {
         id: 'site1',
@@ -390,7 +390,7 @@ describe('Listings API', () => {
       });
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock site data
       const mockSite = {
         id: 'site1',
@@ -473,7 +473,7 @@ describe('Listings API', () => {
       });
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock site data
       const mockSite = {
         id: 'site1',
@@ -607,7 +607,7 @@ describe('Listings API', () => {
       Date.now = originalDateNow;
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock site data
       const mockSite = {
         id: 'site1',
@@ -691,7 +691,7 @@ describe('Listings API', () => {
       );
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Mock site data
       const mockSite = {
         id: 'site1',

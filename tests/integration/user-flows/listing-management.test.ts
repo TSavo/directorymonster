@@ -29,7 +29,7 @@ describe('Listing Management', () => {
     await clearTestData();
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     
@@ -97,7 +97,7 @@ describe('Listing Management', () => {
     expect(foundListing.content).toBe(newListingData.content);
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     
@@ -124,7 +124,7 @@ describe('Listing Management', () => {
     });
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     
@@ -164,7 +164,7 @@ describe('Listing Management', () => {
     expect(responseData.error).toContain('already exists');
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     

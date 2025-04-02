@@ -21,7 +21,7 @@ describe('DomainManager Submission', () => {
     (global.fetch as jest.Mock).mockReset();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: jest.fn().mockResolvedValueOnce({ id: '123', slug: 'test-site' })
@@ -76,7 +76,7 @@ describe('DomainManager Submission', () => {
     }, { timeout: 2000 });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: false,
       json: jest.fn().mockResolvedValueOnce({ error: 'API error message' })
@@ -99,7 +99,7 @@ describe('DomainManager Submission', () => {
     expect(await screen.findByText(/API error message/i)).toBeInTheDocument();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: jest.fn().mockResolvedValueOnce({ id: '123', slug: 'test-site' })
@@ -137,7 +137,7 @@ describe('DomainManager Submission', () => {
     expect(await screen.findByText(/site updated successfully/i)).toBeInTheDocument();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     global.fetch = jest.fn().mockRejectedValueOnce(new Error('Network error'));
     
     const user = userEvent.setup();
@@ -157,7 +157,7 @@ describe('DomainManager Submission', () => {
     expect(await screen.findByText(/network error/i)).toBeInTheDocument();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Create a delayed promise to keep the loading state visible
     global.fetch = jest.fn().mockImplementationOnce(() => 
       new Promise(resolve => {

@@ -93,7 +93,7 @@ describe('Authentication and Authorization', () => {
     await clearTestData();
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     
@@ -132,7 +132,7 @@ describe('Authentication and Authorization', () => {
     expect(data.error).toContain('Unauthorized');
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     
@@ -174,7 +174,7 @@ describe('Authentication and Authorization', () => {
     expect(data.title).toBe(listingData.title);
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     

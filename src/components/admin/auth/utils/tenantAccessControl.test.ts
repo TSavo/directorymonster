@@ -37,7 +37,7 @@ describe('Tenant Access Control', () => {
   });
 
   describe('hasPermissionInTenant', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
 
@@ -50,7 +50,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(false);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock).mockResolvedValue(true);
@@ -66,7 +66,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(true);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockRejectedValue(new Error('Test error'));
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -84,7 +84,7 @@ describe('Tenant Access Control', () => {
   });
 
   describe('hasAnyPermissionInTenant', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
 
@@ -99,7 +99,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(false);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock)
@@ -116,7 +116,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(true);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock).mockResolvedValue(false);
@@ -133,7 +133,7 @@ describe('Tenant Access Control', () => {
   });
 
   describe('hasAllPermissionsInTenant', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
 
@@ -148,7 +148,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(false);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock).mockResolvedValue(true);
@@ -163,7 +163,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(true);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock)
@@ -182,7 +182,7 @@ describe('Tenant Access Control', () => {
   });
 
   describe('getAccessibleResourcesInTenant', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
 
@@ -195,7 +195,7 @@ describe('Tenant Access Control', () => {
       expect(result).toEqual([]);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
 
@@ -281,7 +281,7 @@ describe('Tenant Access Control', () => {
   });
 
   describe('hasGlobalPermissionInTenant', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
 
@@ -294,7 +294,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(false);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
 
@@ -349,7 +349,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(true);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       // Setup
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
 

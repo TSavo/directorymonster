@@ -44,7 +44,7 @@ describe('DomainStep Component - Interaction', () => {
     domains: ['example.com', 'test.org']
   };
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const mockOnChange = jest.fn();
     const mockErrors = {};
     
@@ -69,7 +69,7 @@ describe('DomainStep Component - Interaction', () => {
     ]);
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const mockOnChange = jest.fn();
     const mockErrors = {};
     

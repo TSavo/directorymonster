@@ -36,7 +36,7 @@ describe('CategoryTable Basic Rendering', () => {
     resetMocks();
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     setupCategoryTableTest();
 
     render(<CategoryTable />);
@@ -74,7 +74,7 @@ describe('CategoryTable Basic Rendering', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     const errorMessage = 'Failed to fetch categories';
     setupCategoryTableTest({ error: errorMessage });
 
@@ -102,7 +102,7 @@ describe('CategoryTable Basic Rendering', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     setupCategoryTableTest({
       categories: [],
       filteredCategories: [],
@@ -133,7 +133,7 @@ describe('CategoryTable Basic Rendering', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     setupCategoryTableTest();
 
     render(<CategoryTable />);
@@ -165,7 +165,7 @@ describe('CategoryTable Basic Rendering', () => {
     expect(category3Elements[0]).toHaveTextContent('Child Category');
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     // Multi-site mode
     setupCategoryTableTest();
 
@@ -196,7 +196,7 @@ describe('CategoryTable Basic Rendering', () => {
     expect(screen.queryByText('Site')).not.toBeInTheDocument();
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     setupCategoryTableTest();
 
     render(<CategoryTable />);
@@ -220,7 +220,7 @@ describe('CategoryTable Basic Rendering', () => {
     });
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     setupCategoryTableTest();
 
     render(<CategoryTable />);

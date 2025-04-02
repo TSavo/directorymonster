@@ -369,7 +369,7 @@ describe('Dashboard Stats Route Implementation', () => {
     jest.clearAllMocks();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Import the route handler after mocking
     const { GET } = require('@/app/api/admin/dashboard/stats/route');
 
@@ -391,7 +391,7 @@ describe('Dashboard Stats Route Implementation', () => {
     expect(withTenantAccessSpy).toHaveBeenCalledWith(req);
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Import the route handler after mocking
     const { GET } = require('@/app/api/admin/dashboard/stats/route');
 

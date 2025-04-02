@@ -27,7 +27,7 @@ describe('DomainStep Component - Basic Rendering', () => {
     expect(screen.getByTestId('domainStep-heading')).toBeInTheDocument();
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     render(
       <DomainStep
         domains={mockDomains}
@@ -43,7 +43,7 @@ describe('DomainStep Component - Basic Rendering', () => {
     expect(screen.getByTestId('domainStep-domain-1')).toHaveTextContent('test.org');
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     render(
       <DomainStep
         domains={mockDomains}
@@ -60,7 +60,7 @@ describe('DomainStep Component - Basic Rendering', () => {
     expect(screen.getByTestId('domainStep-description')).toBeInTheDocument();
   });
 
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     const mockErrorsWithDomains = {
       domains: 'At least one domain is required'
     };

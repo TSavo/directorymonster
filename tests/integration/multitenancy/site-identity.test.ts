@@ -16,7 +16,7 @@ describe('Site Identity Resolution', () => {
     await clearTestData();
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Test with the first test site's domain
     const hostname = 'test-fishing.localhost';
     
@@ -29,7 +29,7 @@ describe('Site Identity Resolution', () => {
     expect(site?.domain).toBe(hostname);
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Test with the second test site's domain
     const hostname = 'test-hiking.localhost';
     
@@ -76,7 +76,7 @@ describe('Site Identity Resolution', () => {
     expect(data.lookupInfo.subdomain.slug).toBe('test-fishing');
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Test with different hostnames in parameter and header
     const headerHostname = 'test-fishing.localhost';
     const paramHostname = 'test-hiking.localhost';
@@ -101,7 +101,7 @@ describe('Site Identity Resolution', () => {
     expect(data.site.slug).toBe('test-hiking');
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Test with an unknown hostname
     const hostname = 'unknown.localhost';
     

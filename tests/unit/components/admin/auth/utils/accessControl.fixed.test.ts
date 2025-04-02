@@ -20,7 +20,7 @@ import {
 
 describe('Access Control Utilities', () => {
   describe('detectCrossTenantAccess', () => {
-    it.skip($2, () => {
+    it.skip('should be implemented', () => {
       // Arrange
       const acl: ACL = {
         userId: 'user-123',

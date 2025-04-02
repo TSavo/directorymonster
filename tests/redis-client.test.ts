@@ -190,12 +190,12 @@ describe('Redis Client', () => {
       expect(retrieved).toBe('plain-string');
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const value = await kv.get('non-existent-key');
       expect(value).toBeNull();
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       await kv.set('delete-me', 'value');
       expect(await kv.get('delete-me')).not.toBeNull();
       

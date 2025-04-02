@@ -112,7 +112,7 @@ describe('Integration: Category Filtering and Navigation', () => {
     });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const { push } = useRouter();
     const { filterByCategory } = useListings();
 

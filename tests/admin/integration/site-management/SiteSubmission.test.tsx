@@ -71,7 +71,7 @@ describe('Integration: Site Creation - Submission', () => {
     });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const { submitSite } = useSites();
     const { push } = useRouter();
     

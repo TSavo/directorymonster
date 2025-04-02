@@ -77,7 +77,7 @@ describe('Integration: Category Selection in Listing Creation', () => {
     });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const { updateFormField } = useListingForm();
     
     render(

@@ -63,7 +63,7 @@ describe('Integration: Site Creation - Basic Info Step', () => {
     });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const { updateSiteData, validateSiteData, setCurrentStep } = useSites();
     
     render(
@@ -98,7 +98,7 @@ describe('Integration: Site Creation - Basic Info Step', () => {
     expect(setCurrentStep).toHaveBeenCalledWith(1);
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Mock validation errors
     (useSites as jest.Mock).mockReturnValue({
       sites: [],
@@ -138,7 +138,7 @@ describe('Integration: Site Creation - Basic Info Step', () => {
     expect(useSites().setCurrentStep).not.toHaveBeenCalled();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const { updateSiteData } = useSites();
     
     render(

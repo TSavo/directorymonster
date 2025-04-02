@@ -76,7 +76,7 @@ describe('Cross-Site Data Isolation', () => {
     (searchIndexer as any).clearIndex();
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get two different test sites
     const site1 = sites[0];
     const site2 = sites[1];
@@ -122,7 +122,7 @@ describe('Cross-Site Data Isolation', () => {
     expect(intersection.length).toBe(0);
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get two different test sites
     const site1 = sites[0];
     const site2 = sites[1];
@@ -168,7 +168,7 @@ describe('Cross-Site Data Isolation', () => {
     expect(intersection.length).toBe(0);
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get two different test sites
     const site1 = sites[0];
     const site2 = sites[1];
@@ -234,7 +234,7 @@ describe('Cross-Site Data Isolation', () => {
     expect(site2Results.length).toBeGreaterThan(0);
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get two different test sites
     const site1 = sites[0];
     const site2 = sites[1];

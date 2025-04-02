@@ -48,7 +48,7 @@ describe('TenantGuard', () => {
     jest.clearAllMocks();
   });
   
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     setupMocks({ isAuthenticated: true, isMember: true });
     
     render(

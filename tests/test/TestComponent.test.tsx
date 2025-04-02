@@ -13,7 +13,7 @@ describe('TestComponent', () => {
     jest.clearAllMocks();
   });
   
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     render(
       <TestComponent
         title="Test Title"
@@ -30,7 +30,7 @@ describe('TestComponent', () => {
     expect(screen.getByTestId('test-title')).toBeInTheDocument();
   });
   
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     render(
       <TestComponent
         title="Test Title"
@@ -46,7 +46,7 @@ describe('TestComponent', () => {
     expect(mockOnButtonClick).toHaveBeenCalledTimes(1);
   });
   
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     render(
       <TestComponent
         title="Test Title"

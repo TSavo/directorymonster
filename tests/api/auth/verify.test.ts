@@ -113,7 +113,7 @@ describe('Auth Verification API', () => {
     });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Create request without required fields
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
@@ -134,7 +134,7 @@ describe('Auth Verification API', () => {
     expect(data.error).toContain('Missing required fields');
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Create request for non-existent user
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
@@ -159,7 +159,7 @@ describe('Auth Verification API', () => {
     expect(data.error).toContain('Invalid credentials');
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Create request for a locked user
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
@@ -184,7 +184,7 @@ describe('Auth Verification API', () => {
     expect(data.error).toContain('Account locked');
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Force verifyProof to return false for this test
     (verifyProof as jest.Mock).mockResolvedValueOnce(false);
     
@@ -212,7 +212,7 @@ describe('Auth Verification API', () => {
     expect(data.error).toContain('Invalid credentials');
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Create request with valid credentials
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
@@ -252,7 +252,7 @@ describe('Auth Verification API', () => {
     );
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Mock Redis to simulate rate limiting
     const { kv } = require('@/lib/redis-client');
     (kv.get as jest.Mock).mockImplementationOnce(async (key: string) => {
@@ -321,7 +321,7 @@ describe('Auth Verification API', () => {
     expect(data.error).toContain('CSRF token');
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Force verifyProof to throw an error
     (verifyProof as jest.Mock).mockRejectedValueOnce(new Error('ZKP verification error'));
     

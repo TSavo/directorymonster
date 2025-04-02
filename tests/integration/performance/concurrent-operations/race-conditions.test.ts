@@ -51,7 +51,7 @@ describe('Race Conditions', () => {
   // Access test data from global setup
   const { sites, categories } = global.__TEST_DATA__;
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     
@@ -152,7 +152,7 @@ describe('Race Conditions', () => {
     expect(finalListing.categoryId).toBe(category.id);
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     

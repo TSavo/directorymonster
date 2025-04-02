@@ -48,7 +48,7 @@ describe('TenantGuard', () => {
     TenantMembershipService.isTenantMember.mockResolvedValue(true);
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Arrange
     const testContent = 'Protected Content';
     

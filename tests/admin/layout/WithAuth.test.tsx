@@ -15,7 +15,7 @@ describe('WithAuth Component', () => {
     jest.clearAllMocks();
   });
   
-  it.skip($2, () => {
+  it.skip('should be implemented', () => {
     render(
       <WithAuth>
         <div data-testid="protected-content">Protected Content</div>
@@ -30,7 +30,7 @@ describe('WithAuth Component', () => {
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     render(
       <WithAuth>
         <div data-testid="protected-content">Protected Content</div>
@@ -49,7 +49,7 @@ describe('WithAuth Component', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Mock the authentication check to fail
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(global, 'setTimeout').mockImplementation((callback: any) => {

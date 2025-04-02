@@ -64,7 +64,7 @@ describe('Integration: Site Creation - Domain Management Step', () => {
     });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const { addDomain, validateDomain } = useDomains();
     const { updateSiteData } = useSites();
     
@@ -115,7 +115,7 @@ describe('Integration: Site Creation - Domain Management Step', () => {
     );
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Mock a validation error
     (useDomains as jest.Mock).mockReturnValue({
       domains: [],
@@ -148,7 +148,7 @@ describe('Integration: Site Creation - Domain Management Step', () => {
     expect(useDomains().addDomain).not.toHaveBeenCalled();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const { removeDomain } = useDomains();
     const { updateSiteData } = useSites();
     
@@ -207,7 +207,7 @@ describe('Integration: Site Creation - Domain Management Step', () => {
     );
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const { setPrimaryDomain } = useDomains();
     
     // Start with multiple domains

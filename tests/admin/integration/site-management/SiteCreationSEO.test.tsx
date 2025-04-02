@@ -54,7 +54,7 @@ describe('Integration: Site Creation - SEO Settings Step', () => {
     });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const { updateSiteData } = useSites();
     
     render(

@@ -22,7 +22,7 @@ describe('Category Management', () => {
     await clearTestData();
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get the first test site
     const site = sites[0];
     

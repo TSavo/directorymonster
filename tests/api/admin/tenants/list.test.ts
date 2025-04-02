@@ -248,7 +248,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Super admin can retrieve all tenants
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for super admin
     const token = createToken(superAdminId);
     
@@ -287,7 +287,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Regular admin cannot access tenant list
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for regular admin
     const token = createToken(regularAdminId);
     
@@ -313,7 +313,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Unauthenticated request is rejected
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a Next.js request without auth token
     const req = createNextRequest('GET', 'http://example.com/api/admin/tenants', {
       'x-tenant-id': systemTenantId
@@ -335,7 +335,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Filtering by status
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for super admin
     const token = createToken(superAdminId);
     
@@ -372,7 +372,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Filtering by subscription type
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for super admin
     const token = createToken(superAdminId);
     
@@ -407,7 +407,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Filtering by date range
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for super admin
     const token = createToken(superAdminId);
     
@@ -446,7 +446,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Search functionality
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for super admin
     const token = createToken(superAdminId);
     
@@ -484,7 +484,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Pagination
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for super admin
     const token = createToken(superAdminId);
     
@@ -530,7 +530,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Sorting
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for super admin
     const token = createToken(superAdminId);
     
@@ -568,7 +568,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Server error handling
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for super admin
     const token = createToken(superAdminId);
     
@@ -594,7 +594,7 @@ describe('GET /api/admin/tenants', () => {
   /**
    * Test: Empty result set
    */
-  test.skip($2, async () => {
+  test.skip('should be implemented', async () => {
     // Create a valid token for super admin
     const token = createToken(superAdminId);
     

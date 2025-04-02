@@ -83,7 +83,7 @@ describe('Integration: Site Listing Data Loading', () => {
     });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Set up the initial component with no site selected
     const { rerender } = render(
       <Provider store={store}>
@@ -144,7 +144,7 @@ describe('Integration: Site Listing Data Loading', () => {
     expect(screen.getByText('Listing 2')).toBeInTheDocument();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Mock the error state
     const loadListingsWithErrorMock = jest.fn().mockRejectedValue(new Error('Failed to load listings'));
     
@@ -178,7 +178,7 @@ describe('Integration: Site Listing Data Loading', () => {
     expect(loadListingsWithErrorMock).toHaveBeenCalledTimes(2);
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Set up a mock for the setCurrentSite function
     const setCurrentSiteMock = jest.fn();
     

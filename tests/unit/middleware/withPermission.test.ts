@@ -36,7 +36,7 @@ describe('withPermission middleware', () => {
     (RoleService.hasPermission as jest.Mock).mockResolvedValue(true);
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Arrange
     const req = new NextRequest('https://example.com/api/test', {
       headers: {
@@ -66,7 +66,7 @@ describe('withPermission middleware', () => {
     expect(mockHandler).toHaveBeenCalledWith(req);
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Arrange
     const req = new NextRequest('https://example.com/api/test', {
       headers: {
@@ -126,7 +126,7 @@ describe('withPermission middleware', () => {
     expect(mockHandler).not.toHaveBeenCalled();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Arrange
     const req = new NextRequest('https://example.com/api/test', {
       headers: {

@@ -81,7 +81,7 @@ describe('Tenant Access Middleware', () => {
   };
 
   describe('withTenantAccess', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({});
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
@@ -94,7 +94,7 @@ describe('Tenant Access Middleware', () => {
       expect(handler).not.toHaveBeenCalled();
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({ 'x-tenant-id': 'tenant-123' });
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
@@ -107,7 +107,7 @@ describe('Tenant Access Middleware', () => {
       expect(handler).not.toHaveBeenCalled();
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer invalid-token'
@@ -125,7 +125,7 @@ describe('Tenant Access Middleware', () => {
       expect(handler).not.toHaveBeenCalled();
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer valid-token'
@@ -146,7 +146,7 @@ describe('Tenant Access Middleware', () => {
       expect(handler).not.toHaveBeenCalled();
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer valid-token'
@@ -167,7 +167,7 @@ describe('Tenant Access Middleware', () => {
       expect(result.body).toEqual(handlerResult);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer valid-token'
@@ -188,7 +188,7 @@ describe('Tenant Access Middleware', () => {
   });
 
   describe('withPermission', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer valid-token'
@@ -217,7 +217,7 @@ describe('Tenant Access Middleware', () => {
       expect(handler).not.toHaveBeenCalled();
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer valid-token'
@@ -247,7 +247,7 @@ describe('Tenant Access Middleware', () => {
       expect(result.body).toEqual(handlerResult);
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123',
         'authorization': 'Bearer valid-token'
@@ -272,7 +272,7 @@ describe('Tenant Access Middleware', () => {
 
   // Skip this section for now as it requires additional mocking
   describe.skip('withTenantContext', () => {
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({});
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
@@ -304,7 +304,7 @@ describe('Tenant Access Middleware', () => {
       expect(result).toEqual(NextResponse.json(handlerResult));
     });
 
-    it.skip($2, async () => {
+    it.skip('should be implemented', async () => {
       const req = createMockRequest({
         'x-tenant-id': 'tenant-123'
       });

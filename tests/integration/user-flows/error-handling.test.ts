@@ -61,7 +61,7 @@ describe('API Error Handling', () => {
     });
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Create a request with a non-existent site slug
     const request = createMockRequest('/api/sites/non-existent-site/listings');
     
@@ -79,7 +79,7 @@ describe('API Error Handling', () => {
     expect(data.error).toBe('Site not found');
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get a valid site
     const site = sites[0];
     
@@ -111,7 +111,7 @@ describe('API Error Handling', () => {
     expect(data.error).toBe('Missing required fields');
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Get a valid site
     const site = sites[0];
     

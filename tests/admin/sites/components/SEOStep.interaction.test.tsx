@@ -40,7 +40,7 @@ describe('SEOStep Component - Interaction', () => {
     }
   };
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const mockOnChange = jest.fn();
     
     render(
@@ -63,7 +63,7 @@ describe('SEOStep Component - Interaction', () => {
     });
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     const mockOnChange = jest.fn();
     
     render(

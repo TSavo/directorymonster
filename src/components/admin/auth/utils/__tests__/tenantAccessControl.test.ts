@@ -37,7 +37,7 @@ describe('Tenant Access Control', () => {
   });
   
   describe('hasPermissionInTenant', () => {
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
       
@@ -56,7 +56,7 @@ describe('Tenant Access Control', () => {
       expect(RoleService.hasPermission).not.toHaveBeenCalled();
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock).mockResolvedValue(true);
@@ -82,7 +82,7 @@ describe('Tenant Access Control', () => {
       );
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockRejectedValue(new Error('Test error'));
       
@@ -101,7 +101,7 @@ describe('Tenant Access Control', () => {
   });
   
   describe('hasAnyPermissionInTenant', () => {
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
       
@@ -119,7 +119,7 @@ describe('Tenant Access Control', () => {
       expect(RoleService.hasPermission).not.toHaveBeenCalled();
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock)
@@ -139,7 +139,7 @@ describe('Tenant Access Control', () => {
       expect(RoleService.hasPermission).toHaveBeenCalledTimes(2);
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock).mockResolvedValue(false);
@@ -159,7 +159,7 @@ describe('Tenant Access Control', () => {
   });
   
   describe('hasAllPermissionsInTenant', () => {
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
       
@@ -177,7 +177,7 @@ describe('Tenant Access Control', () => {
       expect(RoleService.hasPermission).not.toHaveBeenCalled();
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock).mockResolvedValue(true);
@@ -195,7 +195,7 @@ describe('Tenant Access Control', () => {
       expect(RoleService.hasPermission).toHaveBeenCalledTimes(2);
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.hasPermission as jest.Mock)
@@ -247,7 +247,7 @@ describe('Tenant Access Control', () => {
       }
     ];
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
       
@@ -265,7 +265,7 @@ describe('Tenant Access Control', () => {
       expect(RoleService.getUserRoles).not.toHaveBeenCalled();
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.getUserRoles as jest.Mock).mockResolvedValue(mockRoles);
@@ -284,7 +284,7 @@ describe('Tenant Access Control', () => {
       expect(RoleService.getUserRoles).toHaveBeenCalledWith(userId, tenantId);
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       const mixedRoles = [
         {
@@ -325,7 +325,7 @@ describe('Tenant Access Control', () => {
       expect(result).toEqual(['resource1']);
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       const crossTenantRoles = [
         {
@@ -366,7 +366,7 @@ describe('Tenant Access Control', () => {
       expect(result).toEqual(['resource1']);
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       const globalRoles = [
         {
@@ -430,7 +430,7 @@ describe('Tenant Access Control', () => {
       }
     ];
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
       
@@ -448,7 +448,7 @@ describe('Tenant Access Control', () => {
       expect(RoleService.getUserRoles).not.toHaveBeenCalled();
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
       (RoleService.getUserRoles as jest.Mock).mockResolvedValue(mockRoles);
@@ -467,7 +467,7 @@ describe('Tenant Access Control', () => {
       expect(RoleService.getUserRoles).toHaveBeenCalledWith(userId, tenantId);
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       const specificRoles = [
         {
@@ -500,7 +500,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(false);
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       const globalRoles = [
         {
@@ -538,7 +538,7 @@ describe('Tenant Access Control', () => {
       expect(result).toBe(true);
     });
     
-    test.skip($2, async () => {
+    test.skip('should be implemented', async () => {
       // Arrange
       const mixedPermissionRoles = [
         {

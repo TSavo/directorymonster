@@ -28,7 +28,7 @@ describe('Categories API - GET', () => {
     jest.clearAllMocks();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Mock the Redis client to return null for site
     const { kv } = require('../../../src/lib/redis-client');
     (kv.get as jest.Mock).mockResolvedValue(null);
@@ -52,7 +52,7 @@ describe('Categories API - GET', () => {
     expect(kv.get).toHaveBeenCalledWith('test:site:slug:non-existent');
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Mock site data
     const mockSite = {
       id: 'site1',
@@ -127,7 +127,7 @@ describe('Categories API - GET', () => {
     expect(kv.keys).toHaveBeenCalledWith('test:category:site:site1:*');
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Mock site data
     const mockSite = {
       id: 'site1',
@@ -176,7 +176,7 @@ describe('Categories API - GET', () => {
     );
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Mock site data
     const mockSite = {
       id: 'site1',

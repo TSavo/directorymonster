@@ -15,7 +15,7 @@ describe('RoleService › getUserRoles', () => {
     jest.clearAllMocks();
   });
 
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Arrange
     const roleIds = ['role-1', 'role-2', 'role-3'];
     const mockRoles = [
@@ -53,7 +53,7 @@ describe('RoleService › getUserRoles', () => {
     expect(result).toEqual([]);
   });
   
-  it.skip($2, async () => {
+  it.skip('should be implemented', async () => {
     // Arrange
     const roleIds = ['role-1', 'role-2', 'role-3'];
     const mockRoles = [
