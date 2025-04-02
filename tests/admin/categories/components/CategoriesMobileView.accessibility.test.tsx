@@ -111,8 +111,8 @@ describe('CategoriesMobileView Accessibility Tests', () => {
     render(<CategoriesMobileView {...defaultProps} />);
 
     // Get all the action buttons for the first category
-    const viewButton = screen.getByTestId('view-link-category_1');
-    const editButton = screen.getByTestId('edit-link-category_1');
+    const viewButton = screen.getByTestId('view-button-category_1');
+    const editButton = screen.getByTestId('edit-button-category_1');
     const deleteButton = screen.getByTestId('delete-button-category_1');
 
     // Focus and activate the delete button with keyboard
@@ -150,17 +150,17 @@ describe('CategoriesMobileView Accessibility Tests', () => {
 
     // Tab through all interactive elements sequentially
     const expectedFocusOrder = [
-      'view-link-category_1',
-      'edit-link-category_1',
+      'view-button-category_1',
+      'edit-button-category_1',
       'delete-button-category_1',
-      'view-link-category_2',
-      'edit-link-category_2',
+      'view-button-category_2',
+      'edit-button-category_2',
       'delete-button-category_2',
-      'view-link-category_3',
-      'edit-link-category_3',
+      'view-button-category_3',
+      'edit-button-category_3',
       'delete-button-category_3',
-      'view-link-category_4',
-      'edit-link-category_4',
+      'view-button-category_4',
+      'edit-button-category_4',
       'delete-button-category_4'
     ];
 
@@ -293,8 +293,8 @@ describe('CategoriesMobileView Accessibility Tests', () => {
     render(<CategoriesMobileView {...defaultProps} />);
 
     // Get one of each action button type
-    const viewButton = screen.getByTestId('view-link-category_1');
-    const editButton = screen.getByTestId('edit-link-category_1');
+    const viewButton = screen.getByTestId('view-button-category_1');
+    const editButton = screen.getByTestId('edit-button-category_1');
     const deleteButton = screen.getByTestId('delete-button-category_1');
 
     // Verify buttons have different colors for action differentiation

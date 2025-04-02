@@ -201,7 +201,7 @@ describe('CategoryTable Component', () => {
 
     // Should show empty state
     expect(screen.getByText('No categories found.')).toBeInTheDocument();
-    expect(screen.getByText('Create your first category')).toBeInTheDocument();
+    expect(screen.getByText('Add New Category')).toBeInTheDocument();
   });
 
   it('renders the table with correct columns', () => {

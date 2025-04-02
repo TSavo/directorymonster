@@ -19,7 +19,7 @@ export function CategoryTableEmptyState({ siteSlug, onCreateClick }: CategoryTab
         data-testid="create-category-button"
       >
         <PlusCircle size={16} />
-        <span>Create your first category</span>
+        <span>Add New Category</span>
       </Link>
     </div>
   );

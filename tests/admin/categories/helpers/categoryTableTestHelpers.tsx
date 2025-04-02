@@ -185,6 +185,68 @@ export const mockHierarchicalCategories: CategoryWithRelations[] = [
 ];
 
 /**
+ * Enhanced mock implementation for useCategories hook
+ */
+export const mockUseCategories = (overrides = {}) => {
+  // Create mock functions with proper implementations
+  const mockSetItemsPerPage = jest.fn().mockImplementation((value) => {
+    console.log(`Setting items per page to ${value}`);
+    return value;
+  });
+
+  const mockGoToPage = jest.fn().mockImplementation((page) => {
+    console.log(`Going to page ${page}`);
+    return page;
+  });
+
+  const mockConfirmDelete = jest.fn().mockImplementation((id, name) => {
+    console.log(`Confirming delete for ${id}, ${name}`);
+    return { id, name };
+  });
+
+  const mockCancelDelete = jest.fn().mockImplementation(() => {
+    console.log('Cancelling delete');
+    return true;
+  });
+
+  const mockHandleDelete = jest.fn().mockImplementation((id) => {
+    console.log(`Handling delete for category ID: ${id}`);
+    return id;
+  });
+
+  return {
+    categories: mockCategories,
+    filteredCategories: mockCategories,
+    currentCategories: mockCategories,
+    isLoading: false,
+    error: null,
+    searchTerm: '',
+    setSearchTerm: jest.fn(),
+    parentFilter: '',
+    setParentFilter: jest.fn(),
+    siteFilter: '',
+    setSiteFilter: jest.fn(),
+    sites: mockSites,
+    currentPage: 1,
+    totalPages: 1,
+    itemsPerPage: 10,
+    setItemsPerPage: mockSetItemsPerPage,
+    goToPage: mockGoToPage,
+    isDeleteModalOpen: false,
+    categoryToDelete: null,
+    confirmDelete: mockConfirmDelete,
+    cancelDelete: mockCancelDelete,
+    handleDelete: mockHandleDelete,
+    showHierarchy: false,
+    toggleHierarchy: jest.fn(),
+    viewMode: 'table',
+    toggleViewMode: jest.fn(),
+    fetchCategories: jest.fn(),
+    ...overrides
+  };
+};
+
+/**
  * Default mock implementation for useCategories hook
  */
 export const createMockCategoriesHook = (overrides = {}) => {
@@ -242,12 +304,18 @@ export const createMockCategoriesHook = (overrides = {}) => {
  */
 export const setupCategoryTableTest = (overrides = {}) => {
   // Make sure loading is explicitly set to false unless overridden
-  const mockHook = createMockCategoriesHook({
+  // If isDeleteModalOpen is true, ensure categoryToDelete is set
+  const finalOverrides = {
     isLoading: false,
     ...overrides
-  });
+  };
 
-  // Mock both hooks to ensure consistent behavior
+  // Ensure categoryToDelete is set if isDeleteModalOpen is true
+  if (finalOverrides.isDeleteModalOpen === true && !finalOverrides.categoryToDelete) {
+    finalOverrides.categoryToDelete = { id: 'category_1', name: 'Test Category 1' };
+  }
+
+  const mockHook = createMockCategoriesHook(finalOverrides);
   (hooks.useCategories as jest.Mock).mockReturnValue(mockHook);
   (hooks.useCategoryTable as jest.Mock).mockReturnValue({
     ...mockHook,

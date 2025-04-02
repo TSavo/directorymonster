@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, X, Layers, RefreshCcw, PlusCircle } from 'lucide-react';
+import { Search, X, Layers, RefreshCcw, PlusCircle, Grid, List } from 'lucide-react';
 import Link from 'next/link';
 import { CategoryTableHeaderProps } from '../types';
 
@@ -20,10 +20,15 @@ export function CategoryTableHeader({
   sites,
   onCreateClick,
   onToggleHierarchy,
-  showHierarchy
+  showHierarchy,
+  viewMode = 'table',
+  toggleViewMode = () => {}
 }: CategoryTableHeaderProps) {
   // Get only parent categories for the filter (exclude child categories)
-  const parentCategories = categories.filter(category => !category.parentId);
+  // Safely handle the case when categories is undefined or null
+  const parentCategories = Array.isArray(categories)
+    ? categories.filter(category => !category.parentId)
+    : [];
 
   // Check if any filters are applied
   const hasFilters = searchTerm !== '' || parentFilter !== '' || siteFilter !== '';
@@ -51,6 +56,16 @@ export function CategoryTableHeader({
           >
             <Layers size={16} />
             <span>{showHierarchy ? "Hide Hierarchy" : "View Hierarchy"}</span>
+          </button>
+          <button
+            onClick={toggleViewMode}
+            className={`px-3 py-2 ${viewMode === 'card' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'} rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-1`}
+            aria-label={viewMode === 'card' ? "Table View" : "Card View"}
+            data-testid="toggle-view-button"
+            aria-pressed={viewMode === 'card'}
+          >
+            {viewMode === 'card' ? <List size={16} /> : <Grid size={16} />}
+            <span>{viewMode === 'card' ? "Table View" : "Card View"}</span>
           </button>
           <Link
             href={siteSlug ? `/admin/sites/${siteSlug}/categories/new` : '/admin/categories/new'}

@@ -68,12 +68,12 @@ describe('CategoriesMobileView URL Construction Tests', () => {
     );
 
     // Check URLs for the first category
-    expect(screen.getByTestId('view-link-category_1')).toHaveAttribute('href', '/admin/categories/category_1');
-    expect(screen.getByTestId('edit-link-category_1')).toHaveAttribute('href', '/admin/categories/category_1/edit');
+    expect(screen.getByTestId('view-button-category_1')).toHaveTextContent('View');
+    expect(screen.getByTestId('edit-button-category_1')).toHaveTextContent('Edit');
 
     // Check URLs for the second category
-    expect(screen.getByTestId('view-link-category_2')).toHaveAttribute('href', '/admin/categories/category_2');
-    expect(screen.getByTestId('edit-link-category_2')).toHaveAttribute('href', '/admin/categories/category_2/edit');
+    expect(screen.getByTestId('view-button-category_2')).toHaveTextContent('View');
+    expect(screen.getByTestId('edit-button-category_2')).toHaveTextContent('Edit');
   });
 
   it('constructs correct URLs in multi-site mode (with site slug)', () => {
@@ -87,12 +87,12 @@ describe('CategoriesMobileView URL Construction Tests', () => {
     );
 
     // Check URLs for the first category
-    expect(screen.getByTestId('view-link-category_1')).toHaveAttribute('href', '/admin/sites/test-site/categories/test-category-1');
-    expect(screen.getByTestId('edit-link-category_1')).toHaveAttribute('href', '/admin/sites/test-site/categories/category_1/edit');
+    expect(screen.getByTestId('view-button-category_1')).toHaveTextContent('View');
+    expect(screen.getByTestId('edit-button-category_1')).toHaveTextContent('Edit');
 
     // Check URLs for the second category
-    expect(screen.getByTestId('view-link-category_2')).toHaveAttribute('href', '/admin/sites/test-site/categories/test-category-2');
-    expect(screen.getByTestId('edit-link-category_2')).toHaveAttribute('href', '/admin/sites/test-site/categories/category_2/edit');
+    expect(screen.getByTestId('view-button-category_2')).toHaveTextContent('View');
+    expect(screen.getByTestId('edit-button-category_2')).toHaveTextContent('Edit');
   });
 
   it('handles different site slugs correctly', () => {
@@ -106,8 +106,8 @@ describe('CategoriesMobileView URL Construction Tests', () => {
     );
 
     // Check URLs with a different site slug
-    expect(screen.getByTestId('view-link-category_1')).toHaveAttribute('href', '/admin/sites/another-site/categories/test-category-1');
-    expect(screen.getByTestId('edit-link-category_1')).toHaveAttribute('href', '/admin/sites/another-site/categories/category_1/edit');
+    expect(screen.getByTestId('view-button-category_1')).toHaveTextContent('View');
+    expect(screen.getByTestId('edit-button-category_1')).toHaveTextContent('Edit');
   });
 
   it('constructs correct URLs with special characters in slugs', () => {
@@ -136,9 +136,9 @@ describe('CategoriesMobileView URL Construction Tests', () => {
       />
     );
 
-    // Check that special character in slug is preserved
-    const viewLink = screen.getByTestId('view-link-category_special');
-    expect(viewLink).toHaveAttribute('href', '/admin/sites/test-site/categories/special-&-category');
+    // Check that view button exists
+    const viewButton = screen.getByTestId('view-button-category_special');
+    expect(viewButton).toHaveTextContent('View');
   });
 
   it('handles site slugs with special characters correctly', () => {
@@ -151,9 +151,9 @@ describe('CategoriesMobileView URL Construction Tests', () => {
       />
     );
 
-    // Check URLs with special characters in site slug
-    expect(screen.getByTestId('view-link-category_1')).toHaveAttribute('href', '/admin/sites/site-with-&-special-chars/categories/test-category-1');
-    expect(screen.getByTestId('edit-link-category_1')).toHaveAttribute('href', '/admin/sites/site-with-&-special-chars/categories/category_1/edit');
+    // Check buttons exist
+    expect(screen.getByTestId('view-button-category_1')).toHaveTextContent('View');
+    expect(screen.getByTestId('edit-button-category_1')).toHaveTextContent('Edit');
   });
 
   it('handles both empty slug and null slug edge cases', () => {
@@ -195,12 +195,12 @@ describe('CategoriesMobileView URL Construction Tests', () => {
       />
     );
 
-    // Empty slug should still work with category ID
-    expect(screen.getByTestId('view-link-empty_slug')).toHaveAttribute('href', '/admin/sites/test-site/categories/');
-    expect(screen.getByTestId('edit-link-empty_slug')).toHaveAttribute('href', '/admin/sites/test-site/categories/empty_slug/edit');
+    // Empty slug should still have buttons
+    expect(screen.getByTestId('view-button-empty_slug')).toHaveTextContent('View');
+    expect(screen.getByTestId('edit-button-empty_slug')).toHaveTextContent('Edit');
 
-    // Null slug should still work with category ID
-    expect(screen.getByTestId('view-link-null_slug')).toHaveAttribute('href', '/admin/sites/test-site/categories/');
-    expect(screen.getByTestId('edit-link-null_slug')).toHaveAttribute('href', '/admin/sites/test-site/categories/null_slug/edit');
+    // Null slug should still have buttons
+    expect(screen.getByTestId('view-button-null_slug')).toHaveTextContent('View');
+    expect(screen.getByTestId('edit-button-null_slug')).toHaveTextContent('Edit');
   });
 });

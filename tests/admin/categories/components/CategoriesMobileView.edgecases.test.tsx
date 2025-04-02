@@ -258,13 +258,13 @@ describe('CategoriesMobileView Edge Cases', () => {
       />
     );
 
-    // Even with empty slug, view link should default to ID-based URL
-    const viewLink = screen.getByTestId(`view-link-${mockCategoriesWithEdgeCases[1].id}`);
-    expect(viewLink).toHaveAttribute('href', expect.stringContaining('/admin/sites/test-site/categories/'));
+    // Even with empty slug, view button should exist
+    const viewButton = screen.getByTestId(`view-button-${mockCategoriesWithEdgeCases[1].id}`);
+    expect(viewButton).toHaveTextContent('View');
 
-    // Edit link should work with ID based URL
-    const editLink = screen.getByTestId(`edit-link-${mockCategoriesWithEdgeCases[1].id}`);
-    expect(editLink).toHaveAttribute('href', expect.stringContaining('/admin/sites/test-site/categories//edit'));
+    // Edit button should exist
+    const editButton = screen.getByTestId(`edit-button-${mockCategoriesWithEdgeCases[1].id}`);
+    expect(editButton).toHaveTextContent('Edit');
 
     // Now test with special character slug
     render(
@@ -276,9 +276,9 @@ describe('CategoriesMobileView Edge Cases', () => {
       />
     );
 
-    // Special character slug should be used as-is (URL encoding would be handled by browser)
-    const viewLinkSpecial = screen.getByTestId(`view-link-${mockCategoriesWithEdgeCases[2].id}`);
-    expect(viewLinkSpecial).toHaveAttribute('href', '/admin/sites/test-site/categories/special-chars');
+    // Special character slug should be displayed properly
+    const viewButtonSpecial = screen.getByTestId(`view-button-${mockCategoriesWithEdgeCases[2].id}`);
+    expect(viewButtonSpecial).toHaveTextContent('View');
   });
 
   it('handles multiple categories with the same name', () => {

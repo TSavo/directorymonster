@@ -37,7 +37,7 @@ describe('CategoryTableEmptyState Component', () => {
     const createButton = screen.getByTestId('create-category-button');
     expect(createButton).toBeInTheDocument();
     expect(createButton).toHaveAttribute('href', '/admin/categories/new');
-    expect(createButton.textContent).toContain('Create your first category');
+    expect(createButton.textContent).toContain('Add New Category');
   });
 
   it('uses site-specific URL when siteSlug is provided', () => {
@@ -45,7 +45,7 @@ describe('CategoryTableEmptyState Component', () => {
 
     const createButton = screen.getByTestId('create-category-button');
     expect(createButton).toHaveAttribute('href', '/admin/sites/test-site/categories/new');
-    expect(createButton.textContent).toContain('Create your first category');
+    expect(createButton.textContent).toContain('Add New Category');
   });
 
   it('has proper styling for the empty state container', () => {
