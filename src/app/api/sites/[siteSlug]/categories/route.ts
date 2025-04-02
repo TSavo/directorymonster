@@ -93,9 +93,22 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
       }
     }
 
-    console.log(`Retrieved ${categories.length} categories for site ${site.id}:`, categories);
+    // Parse any categories that are still strings
+    const parsedCategories = categories.map(category => {
+      if (typeof category === 'string') {
+        try {
+          return JSON.parse(category);
+        } catch (e) {
+          console.error('Error parsing category JSON:', e);
+          return null;
+        }
+      }
+      return category;
+    }).filter(Boolean);
 
-    return NextResponse.json(categories);
+    console.log(`Retrieved ${parsedCategories.length} categories for site ${site.id}:`, parsedCategories);
+
+    return NextResponse.json(parsedCategories);
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json(
