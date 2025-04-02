@@ -1,159 +1,141 @@
 # DirectoryMonster API Documentation
 
-This document outlines the API endpoints available for programmatic interaction with the DirectoryMonster platform.
+This document outlines the API architecture and endpoints available for programmatic interaction with the DirectoryMonster platform.
 
-## Authentication
+## API Architecture
 
-All API requests require an API key. API keys are scoped to specific sites and have specific permissions.
+DirectoryMonster implements a three-tier API architecture:
 
-Include the API key in the Authorization header:
+1. **Public API** (`/api/*`): Read-only endpoints for public consumption of directory data
+2. **Submission API** (`/api/submit/*`): Authenticated endpoints for content contribution
+3. **Admin API** (`/api/admin/*`): Administrative endpoints for system management
+
+This separation provides clear boundaries between different types of operations and security models.
+
+## Public API
+
+The Public API provides read-only access to published directory content. These endpoints do not require authentication and are designed for high-performance content delivery.
+
+### Authentication
+
+No authentication is required for Public API endpoints.
+
+### Caching
+
+Public API responses include appropriate cache headers for CDN compatibility and improved performance.
+
+### Rate Limiting
+
+Public API endpoints implement rate limiting to prevent abuse. Requests exceeding the rate limit will receive a 429 Too Many Requests response.
+
+## Submission API
+
+The Submission API allows authenticated users to submit content for review. These endpoints require authentication and implement a workflow where submissions are reviewed by administrators before publication.
+
+### Authentication
+
+All Submission API requests require a JWT token. Include the token in the Authorization header:
 
 ```
-Authorization: Bearer YOUR_API_KEY
+Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
-## Endpoints
+### Workflow
 
-### Sites
+1. Users submit content through the Submission API
+2. Administrators review submissions through the Admin API
+3. Approved submissions become visible through the Public API
 
-#### GET /api/sites
+## Admin API
 
-List all sites you have access to.
+The Admin API provides comprehensive management capabilities for administrators. These endpoints require authentication with administrative privileges.
 
-**Response:**
-```json
-[
-  {
-    "id": "site_1234567890",
-    "name": "Fishing Gear Reviews",
-    "slug": "fishing-gear",
-    "domain": "fishinggearreviews.com",
-    "primaryKeyword": "fishing equipment reviews",
-    "metaDescription": "Expert reviews of the best fishing gear",
-    "headerText": "Expert Fishing Gear Reviews",
-    "defaultLinkAttributes": "dofollow",
-    "createdAt": 1615482366000,
-    "updatedAt": 1632145677000
-  }
-]
+### Authentication
+
+All Admin API requests require a JWT token with administrative permissions. Include the token in the Authorization header:
+
+```
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN
 ```
 
-#### POST /api/sites
+### Tenant Context
 
-Create a new site.
+Admin API requests require a tenant context header:
 
-**Request Body:**
-```json
-{
-  "name": "Fishing Gear Reviews",
-  "slug": "fishing-gear",
-  "domain": "fishinggearreviews.com",
-  "primaryKeyword": "fishing equipment reviews",
-  "metaDescription": "Expert reviews of the best fishing gear",
-  "headerText": "Expert Fishing Gear Reviews",
-  "defaultLinkAttributes": "dofollow"
-}
+```
+X-Tenant-ID: YOUR_TENANT_ID
 ```
 
-**Response:**
-```json
-{
-  "id": "site_1234567890",
-  "name": "Fishing Gear Reviews",
-  "slug": "fishing-gear",
-  "domain": "fishinggearreviews.com",
-  "primaryKeyword": "fishing equipment reviews",
-  "metaDescription": "Expert reviews of the best fishing gear",
-  "headerText": "Expert Fishing Gear Reviews",
-  "defaultLinkAttributes": "dofollow",
-  "createdAt": 1615482366000,
-  "updatedAt": 1615482366000
-}
-```
+## API Endpoints
 
-### Listings
+### Public API
 
-#### POST /api/sites/{siteSlug}/listings
+#### Sites
 
-Create a new listing with backlink.
+- `GET /api/sites`: List all published sites
+- `GET /api/sites/{slug}`: Get details of a specific site
 
-**Request Body:**
-```json
-{
-  "title": "Shimano Stradic FL Spinning Reel Review",
-  "metaDescription": "In-depth review of the Shimano Stradic FL spinning reel",
-  "content": "The Shimano Stradic FL spinning reel offers exceptional performance...",
-  "categoryId": "category_123456",
-  "imageUrl": "https://example.com/images/shimano-stradic.jpg",
-  "backlinkUrl": "https://fishingprostore.com/products/shimano-stradic",
-  "backlinkAnchorText": "Shimano Stradic FL Spinning Reel",
-  "backlinkPosition": "prominent",
-  "backlinkType": "dofollow",
-  "customFields": {
-    "product_name": "Shimano Stradic FL Spinning Reel",
-    "brand": "Shimano",
-    "rating": 4.8,
-    "product_type": "spinning-reel"
-  }
-}
-```
+#### Categories
 
-**Response:**
-```json
-{
-  "id": "listing_7890123",
-  "siteId": "site_1234567890",
-  "categoryId": "category_123456",
-  "title": "Shimano Stradic FL Spinning Reel Review",
-  "slug": "shimano-stradic-fl-spinning-reel-review",
-  "metaDescription": "In-depth review of the Shimano Stradic FL spinning reel",
-  "content": "The Shimano Stradic FL spinning reel offers exceptional performance...",
-  "imageUrl": "https://example.com/images/shimano-stradic.jpg",
-  "backlinkUrl": "https://fishingprostore.com/products/shimano-stradic",
-  "backlinkAnchorText": "Shimano Stradic FL Spinning Reel",
-  "backlinkPosition": "prominent",
-  "backlinkType": "dofollow",
-  "backlinkVerifiedAt": null,
-  "customFields": {
-    "product_name": "Shimano Stradic FL Spinning Reel",
-    "brand": "Shimano",
-    "rating": 4.8,
-    "product_type": "spinning-reel"
-  },
-  "createdAt": 1615482366000,
-  "updatedAt": 1615482366000
-}
-```
+- `GET /api/sites/{siteSlug}/categories`: List all categories for a site
+- `GET /api/sites/{siteSlug}/categories/{slug}`: Get details of a specific category
 
-#### GET /api/sites/{siteSlug}/listings
+#### Listings
 
-List all listings for a site.
+- `GET /api/sites/{siteSlug}/listings`: List all listings for a site
+- `GET /api/sites/{siteSlug}/listings/{slug}`: Get details of a specific listing
+- `GET /api/sites/{siteSlug}/categories/{categorySlug}/listings`: List listings in a category
 
-**Response:**
-```json
-[
-  {
-    "id": "listing_7890123",
-    "siteId": "site_1234567890",
-    "categoryId": "category_123456",
-    "title": "Shimano Stradic FL Spinning Reel Review",
-    "slug": "shimano-stradic-fl-spinning-reel-review",
-    "metaDescription": "In-depth review of the Shimano Stradic FL spinning reel",
-    "content": "The Shimano Stradic FL spinning reel offers exceptional performance...",
-    "imageUrl": "https://example.com/images/shimano-stradic.jpg",
-    "backlinkUrl": "https://fishingprostore.com/products/shimano-stradic",
-    "backlinkAnchorText": "Shimano Stradic FL Spinning Reel",
-    "backlinkPosition": "prominent",
-    "backlinkType": "dofollow",
-    "backlinkVerifiedAt": null,
-    "customFields": {
-      "product_name": "Shimano Stradic FL Spinning Reel",
-      "brand": "Shimano",
-      "rating": 4.8,
-      "product_type": "spinning-reel"
-    },
-    "createdAt": 1615482366000,
-    "updatedAt": 1615482366000
-  }
-]
-```
+#### Search
+
+- `GET /api/search`: Search across all sites and listings
+
+### Submission API
+
+#### Listings Submission
+
+- `POST /api/submit/listings`: Create a new listing submission
+- `GET /api/submit/listings`: Retrieve user's listing submissions
+- `GET /api/submit/listings/{submissionId}`: Get details of a specific submission
+- `PUT /api/submit/listings/{submissionId}`: Update a pending submission
+- `DELETE /api/submit/listings/{submissionId}`: Withdraw a submission
+
+### Admin API
+
+#### User Management
+
+- `GET /api/admin/users`: List all users
+- `POST /api/admin/users`: Create a new user
+- `GET /api/admin/users/{id}`: Get user details
+- `PUT /api/admin/users/{id}`: Update a user
+- `DELETE /api/admin/users/{id}`: Delete a user
+
+#### Site Management
+
+- `GET /api/admin/sites`: List all sites
+- `POST /api/admin/sites`: Create a new site
+- `GET /api/admin/sites/{id}`: Get site details
+- `PUT /api/admin/sites/{id}`: Update a site
+- `DELETE /api/admin/sites/{id}`: Delete a site
+
+#### Content Management
+
+- `GET /api/admin/categories`: List all categories
+- `POST /api/admin/categories`: Create a new category
+- `GET /api/admin/listings`: List all listings
+- `POST /api/admin/listings`: Create a new listing
+
+#### Submission Management
+
+- `GET /api/admin/submissions`: List all submissions
+- `PUT /api/admin/submissions/{id}/approve`: Approve a submission
+- `PUT /api/admin/submissions/{id}/reject`: Reject a submission
+- `PUT /api/admin/submissions/{id}/feedback`: Provide feedback on a submission
+
+## Detailed Documentation
+
+For detailed specifications of each endpoint, refer to the individual API documentation files in the respective directories:
+
+- [Public API Documentation](./README.md)
+- [Submission API Documentation](./submit/README.md)
+- [Admin API Documentation](./admin/README.md)
