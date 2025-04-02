@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import StatisticCards from '@/components/admin/dashboard/StatisticCards';
-import { useSiteMetrics } from '@/components/admin/dashboard/hooks';
 import { SiteMetricsData } from '@/components/admin/dashboard/types';
 
 // Mock the hook
@@ -10,6 +9,9 @@ jest.mock('../../../src/components/admin/dashboard/hooks', () => ({
   __esModule: true,
   useSiteMetrics: jest.fn(),
 }));
+
+// Get the mocked hook
+const { useSiteMetrics } = jest.requireMock('../../../src/components/admin/dashboard/hooks');
 
 describe('StatisticCards Component', () => {
   const mockMetrics: SiteMetricsData = {

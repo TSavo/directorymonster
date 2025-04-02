@@ -67,14 +67,14 @@ describe('AdminHeader Component', () => {
     render(<AdminHeader toggleSidebar={mockToggleSidebar} />);
 
     // Initially, the notifications dropdown shouldn't be visible
-    expect(screen.queryByText('Notifications')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('notifications-dropdown')).not.toBeInTheDocument();
 
     // Find and click the notifications button
     const notificationsButton = screen.getByRole('button', { name: 'View notifications' });
     fireEvent.click(notificationsButton);
 
     // Now the notifications dropdown should be visible
-    expect(screen.getByText('Notifications')).toBeInTheDocument();
+    expect(screen.getByTestId('notifications-dropdown')).toBeInTheDocument();
     expect(screen.getByText('No new notifications')).toBeInTheDocument();
   });
 
@@ -122,7 +122,7 @@ describe('AdminHeader Component', () => {
     fireEvent.click(notificationsButton);
 
     // Verify notifications are visible
-    expect(screen.getByText('Notifications')).toBeInTheDocument();
+    expect(screen.getByTestId('notifications-dropdown')).toBeInTheDocument();
 
     // Now open the user menu
     const userMenuButton = screen.getByRole('button', { name: 'Open user menu' });

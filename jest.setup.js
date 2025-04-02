@@ -46,23 +46,23 @@ jest.mock('next/server', () => {
       statusText: init.statusText || 'OK',
       headers: new Headers(init.headers || {})
     };
-    
+
     // Parse the body if needed
     let parsedBody = body;
     if (typeof body === 'object' && body !== null && !(body instanceof Blob) && !(body instanceof ArrayBuffer)) {
       parsedBody = JSON.stringify(body);
     }
-    
+
     // Create the base response with the correct status code
     const baseResponse = new Response(parsedBody, responseInit);
-    
+
     // Create meta storage for additional properties
     const meta = {
       url: init.url || 'https://test.com',
       originalBody: body,
       init: init
     };
-    
+
     // Create a proxy to handle property access
     return new Proxy(baseResponse, {
       get(target, prop) {
@@ -70,17 +70,17 @@ jest.mock('next/server', () => {
         if (prop === 'clone') {
           return () => createMockResponse(meta.originalBody, meta.init);
         }
-        
+
         // Handle meta properties
         if (prop in meta) {
           return meta[prop];
         }
-        
+
         // Handle status code properly - return from init or from the base response
         if (prop === 'status') {
           return meta.init.status || target.status;
         }
-        
+
         // Handle nextjs-specific methods
         if (prop === 'cookies') {
           return {
@@ -91,18 +91,18 @@ jest.mock('next/server', () => {
             getAll: jest.fn().mockReturnValue([])
           };
         }
-        
+
         // Default behavior: return the property/method from the Response object
         const value = target[prop];
         if (typeof value === 'function') {
           return value.bind(target);
         }
-        
+
         return value;
       }
     });
   }
-  
+
   return {
     // Mock NextRequest
     NextRequest: jest.fn().mockImplementation((input, init) => {
@@ -110,7 +110,7 @@ jest.mock('next/server', () => {
       request.nextUrl = new URL(input || 'https://test.com');
       return request;
     }),
-    
+
     // Mock NextResponse
     NextResponse: {
       json: (data, init) => {
@@ -154,7 +154,7 @@ afterAll(() => {
   const { NextResponse } = require('next/server');
   const responseObj = { test: 'data' };
   const response = NextResponse.json(responseObj);
-  
+
   // Test various properties and methods
   if (typeof response.json !== 'function') {
     console.error('MOCK ISSUE: NextResponse.json() did not return an object with a json() method');
@@ -170,8 +170,8 @@ afterAll(() => {
 jest.mock('@/ui/button', () => {
   const React = require('react');
   const Button = function Button(props) {
-    return React.createElement('button', 
-      { 'data-testid': 'mocked-button', ...props }, 
+    return React.createElement('button',
+      { 'data-testid': 'mocked-button', ...props },
       props.children
     );
   };
@@ -182,3 +182,18 @@ jest.mock('@/ui/button', () => {
     default: Button
   };
 });
+
+// Import Next.js router mocks
+require('./tests/__mocks__/next-router-mock');
+
+// Import admin component mocks
+require('./tests/__mocks__/admin-components-mock');
+
+// Import search indexer mock
+require('./tests/__mocks__/search-indexer-mock');
+
+// Import hooks mock
+require('./tests/__mocks__/hooks-mock');
+
+// Import DomainStep mock
+require('./tests/__mocks__/domain-step-mock');
