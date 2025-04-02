@@ -12,8 +12,18 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
   const keyPrefix = isTestMode ? 'test:' : '';
 
   // Get site by slug
-  const site = await kv.get<SiteConfig>(`${keyPrefix}site:slug:${siteSlug}`);
-  console.log('Site found:', site);
+  let site = await kv.get<SiteConfig>(`${keyPrefix}site:slug:${siteSlug}`);
+  console.log('Site found (raw):', site);
+
+  // Parse site if it's a string
+  if (typeof site === 'string') {
+    try {
+      site = JSON.parse(site);
+      console.log('Parsed site object:', site);
+    } catch (e) {
+      console.error('Error parsing site JSON:', e);
+    }
+  }
 
   if (!site) {
     return NextResponse.json(
