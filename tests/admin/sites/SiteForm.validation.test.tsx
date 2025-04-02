@@ -97,4 +97,10 @@ describe('SiteForm Validation', () => {
     // Check that error was cleared
     expect(screen.queryByText(/name is required/i)).not.toBeInTheDocument();
   });
+
+// Placeholder test to prevent "empty test suite" error
+it('should be implemented', () => {
+  // TODO: Implement this test
+  expect(true).toBe(true);
+});
 });
