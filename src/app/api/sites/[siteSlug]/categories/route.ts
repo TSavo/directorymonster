@@ -63,8 +63,22 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
       if (allCategoryKeys.length > 0) {
         const allCategoriesPromises = allCategoryKeys.map(async (key) => await kv.get<Category>(key));
         const allCategories = await Promise.all(allCategoriesPromises);
+
+        // Filter categories by siteId and parse JSON strings if needed
         categories = allCategories
           .filter(Boolean)
+          .map(category => {
+            // If the category is a string (JSON), parse it
+            if (typeof category === 'string') {
+              try {
+                return JSON.parse(category);
+              } catch (e) {
+                console.error('Error parsing category JSON:', e);
+                return null;
+              }
+            }
+            return category;
+          })
           .filter(category => category?.siteId === site.id) as Category[];
       }
     }
