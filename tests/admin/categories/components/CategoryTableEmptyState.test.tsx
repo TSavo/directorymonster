@@ -11,15 +11,17 @@ import { CategoryTableEmptyState } from '../../../../src/components/admin/catego
 // Mock next/link
 jest.mock('next/link', () => {
   // eslint-disable-next-line react/display-name
-  return ({ children, href, className, 'data-testid': dataTestId, onClick }: {
+  return function MockLink({ children, href, className, 'data-testid': dataTestId, onClick }: {
     children: React.ReactNode;
     href: string;
     className?: string;
     'data-testid'?: string;
     onClick?: () => void;
-  }) => (
-    <a href={href} className={className} data-testid={dataTestId || 'create-category-button'} onClick={onClick}>{children}</a>
-  );
+  }) {
+    return (
+      <a href={href} className={className} data-testid={dataTestId} onClick={onClick}>{children}</a>
+    );
+  };
 });
 
 describe('CategoryTableEmptyState Component', () => {
