@@ -5,7 +5,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import '@testing-library/jest-dom';
-import { SiteForm } from '@/components/admin/sites/SiteForm';
+import SiteForm from '@/components/admin/sites/SiteForm';
 // Mock the useSites hook
 jest.mock('@/components/admin/sites/hooks', () => ({
   __esModule: true,

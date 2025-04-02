@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { StepNavigation } from '@/components/admin/sites/components/StepNavigation';
+import StepNavigation from '@/components/admin/sites/components/StepNavigation';
 
 // Mock step definitions
 const mockSteps = [
@@ -14,23 +14,23 @@ const mockSteps = [
 describe('StepNavigation Component - Interaction', () => {
   // Setup test user for interactions
   const user = userEvent.setup();
-  
-  it('calls onStepChange when a step button is clicked', async () => {
+
+  it('calls onStepChange when a completed step button is clicked', async () => {
     const mockOnStepChange = jest.fn();
-    
+
     render(
-      <StepNavigation 
-        steps={mockSteps} 
-        currentStep="basic-info" 
-        completedSteps={[]} 
-        onStepChange={mockOnStepChange} 
+      <StepNavigation
+        steps={mockSteps}
+        activeStep="basic-info"
+        completedSteps={['domains']}
+        onStepChange={mockOnStepChange}
       />
     );
-    
-    // Click on a different step
+
+    // Click on a completed step
     const domainsStepButton = screen.getByTestId('step-button-domains');
     await user.click(domainsStepButton);
-    
+
     // Verify callback was called with correct step ID
     expect(mockOnStepChange).toHaveBeenCalledTimes(1);
     expect(mockOnStepChange).toHaveBeenCalledWith('domains');
@@ -38,41 +38,40 @@ describe('StepNavigation Component - Interaction', () => {
 
   it('prevents clicking steps that are disabled', async () => {
     const mockOnStepChange = jest.fn();
-    
+
     render(
-      <StepNavigation 
-        steps={mockSteps} 
-        currentStep="basic-info" 
-        completedSteps={[]} 
+      <StepNavigation
+        steps={mockSteps}
+        activeStep="basic-info"
+        completedSteps={[]}
         onStepChange={mockOnStepChange}
-        disabledSteps={['theme', 'seo']} 
       />
     );
-    
+
     // Try to click on a disabled step
     const themeStepButton = screen.getByTestId('step-button-theme');
     await user.click(themeStepButton);
-    
+
     // Verify callback was not called
     expect(mockOnStepChange).not.toHaveBeenCalled();
   });
 
   it('allows navigation to completed steps', async () => {
     const mockOnStepChange = jest.fn();
-    
+
     render(
-      <StepNavigation 
-        steps={mockSteps} 
-        currentStep="domains" 
-        completedSteps={['basic-info']} 
-        onStepChange={mockOnStepChange} 
+      <StepNavigation
+        steps={mockSteps}
+        activeStep="domains"
+        completedSteps={['basic-info']}
+        onStepChange={mockOnStepChange}
       />
     );
-    
+
     // Click on a completed step
     const basicInfoStepButton = screen.getByTestId('step-button-basic-info');
     await user.click(basicInfoStepButton);
-    
+
     // Verify callback was called
     expect(mockOnStepChange).toHaveBeenCalledTimes(1);
     expect(mockOnStepChange).toHaveBeenCalledWith('basic-info');
