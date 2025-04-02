@@ -1,4 +1,4 @@
-# Checkpoint: API E2E Testing Specifications - April 2, 2025
+# Checkpoint: API E2E Testing Specifications and Implementation Plan - April 2, 2025
 
 ## Current Progress
 
@@ -97,3 +97,35 @@ We've also set up the foundational components for E2E API testing:
 ## Conclusion
 
 The API testing specification work is approximately 70% complete. The remaining specifications should follow the same pattern established in the existing ones. Once specifications are complete, implementation of actual tests can begin, focusing first on auth endpoints which are prerequisites for testing most other endpoints.
+
+## Implementation Plan for Next Phase
+
+For the next phase of this project, we will begin implementation of API tests following these steps:
+
+1. **Set up standardized test utilities**:
+   - Enhance `api-test-base.js` with more robust error handling
+   - Create Redis mock factories for different testing scenarios
+   - Build fixture generators for sites, categories, and listings
+   - Implement authentication testing helpers with various permission sets
+
+2. **Implement core auth tests first**:
+   - Set up tests for /api/auth/setup (first user creation)
+   - Implement token acquisition and validation tests
+   - Create test suite for token refresh and expiration
+
+3. **Create site and category foundation tests**:
+   - Implement site creation and retrieval test suites
+   - Build category hierarchy test suites
+   - Set up cross-referencing validation tests
+
+4. **Implement listing and search tests**:
+   - Create listing CRUD test suite with Redis validation
+   - Implement search indexing validation tests
+   - Build pagination and filtering test cases
+
+5. **Add multi-tenant security tests**:
+   - Implement cross-tenant isolation test cases
+   - Create permission-based access control tests
+   - Add tenant context validation tests
+
+This phased approach ensures we build from the foundational APIs up to the more complex listing and search functionality, with a focus on security and data integrity throughout.
