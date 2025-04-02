@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import BasicInfoStep from '@/components/admin/sites/components/BasicInfoStep';
+import { SiteFormProvider } from '@/components/admin/sites/context/SiteFormContext';
 
 describe('BasicInfoStep Component - Validation', () => {
   // Mock form values
@@ -19,11 +20,13 @@ describe('BasicInfoStep Component - Validation', () => {
     };
 
     render(
-      <BasicInfoStep
-        values={mockValues}
-        onChange={mockOnChange}
-        errors={mockErrors}
-      />
+      <SiteFormProvider>
+        <BasicInfoStep
+          values={mockValues}
+          onValueChange={mockOnChange}
+          errors={mockErrors}
+        />
+      </SiteFormProvider>
     );
 
     // Check if error message is displayed
@@ -38,11 +41,13 @@ describe('BasicInfoStep Component - Validation', () => {
     };
 
     render(
-      <BasicInfoStep
-        values={mockValues}
-        onChange={mockOnChange}
-        errors={mockErrors}
-      />
+      <SiteFormProvider>
+        <BasicInfoStep
+          values={mockValues}
+          onValueChange={mockOnChange}
+          errors={mockErrors}
+        />
+      </SiteFormProvider>
     );
 
     // Check if error message is displayed
@@ -58,11 +63,13 @@ describe('BasicInfoStep Component - Validation', () => {
     };
 
     render(
-      <BasicInfoStep
-        values={mockValues}
-        onChange={mockOnChange}
-        errors={mockErrors}
-      />
+      <SiteFormProvider>
+        <BasicInfoStep
+          values={mockValues}
+          onValueChange={mockOnChange}
+          errors={mockErrors}
+        />
+      </SiteFormProvider>
     );
 
     // Check if input fields have error class
@@ -77,11 +84,13 @@ describe('BasicInfoStep Component - Validation', () => {
     const mockErrors = {};
 
     render(
-      <BasicInfoStep
-        values={mockValues}
-        onChange={mockOnChange}
-        errors={mockErrors}
-      />
+      <SiteFormProvider>
+        <BasicInfoStep
+          values={mockValues}
+          onValueChange={mockOnChange}
+          errors={mockErrors}
+        />
+      </SiteFormProvider>
     );
 
     // Error elements should not be in the document
