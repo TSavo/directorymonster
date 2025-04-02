@@ -11,7 +11,7 @@ import { renderWithTableContext } from '../../../utils/testHelpers';
 import { mockCategory, mockCategoryWithSiteSlug, mockDeleteClick } from '../../../fixtures/categoryFixtures';
 
 // Import the component
-import { CategoryTableRow } from '../../../../src/components/admin/categories/components';
+import { CategoryTableRow } from '@/components/admin/categories/components';
 
 // Mock next/link
 jest.mock('next/link', () => {

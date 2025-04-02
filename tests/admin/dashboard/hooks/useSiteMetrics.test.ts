@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useSiteMetrics } from '../../../../src/components/admin/dashboard/hooks';
+import { useSiteMetrics } from '@/components/admin/dashboard/hooks';
 
 // Mock the fetch function or API call
 global.fetch = jest.fn();

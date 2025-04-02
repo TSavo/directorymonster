@@ -5,7 +5,7 @@ import { renderHook } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { waitFor } from '@testing-library/react';
 import { useState, useEffect } from 'react';
-import { useCategories } from '../../../../src/components/admin/categories/hooks';
+import { useCategories } from '@/components/admin/categories/hooks';
 import {
   createPaginatedCategories,
   resetMocks

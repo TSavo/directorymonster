@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import { NextRequest } from 'next/server';
-import { GET } from '../../src/app/api/search/route';
+import { GET } from '@/app/api/search/route';
 
 // Mock the searchIndexer
 jest.mock('../../src/lib/search', () => ({

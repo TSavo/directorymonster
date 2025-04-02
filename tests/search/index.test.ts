@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import * as searchExports from '../../src/components/search';
+import * as searchExports from '@/components/search';
 
 describe('Search Component Exports', () => {
   it('exports all search components correctly', () => {

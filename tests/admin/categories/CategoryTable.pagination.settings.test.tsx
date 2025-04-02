@@ -6,8 +6,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import CategoryTable from '../../../src/components/admin/categories/CategoryTable';
-import * as useCategoriesModule from '../../../src/components/admin/categories/hooks/useCategories';
+import CategoryTable from '@/components/admin/categories/CategoryTable';
+import * as useCategoriesModule from '@/components/admin/categories/hooks/useCategories';
 import {
   resetMocks,
   mockUseCategories

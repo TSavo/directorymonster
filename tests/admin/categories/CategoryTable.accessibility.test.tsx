@@ -6,7 +6,7 @@ import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import CategoryTable from '../../../src/components/admin/categories/CategoryTable';
+import CategoryTable from '@/components/admin/categories/CategoryTable';
 import {
   mockCategories,
   setupCategoryTableTest,

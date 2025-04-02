@@ -1,4 +1,4 @@
-import { checkRedisConnection } from '../../src/lib/redis-health';
+import { checkRedisConnection } from '@/lib/redis-health';
 
 // Mock Redis with connection state tracking
 jest.mock('../../src/lib/redis', () => {

@@ -3,8 +3,8 @@
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SearchResults from '../../src/components/search/SearchResults';
-import { SiteConfig, Listing, Category } from '../../src/types';
+import SearchResults from '@/components/search/SearchResults';
+import { SiteConfig, Listing, Category } from '@/types';
 import '@testing-library/jest-dom';
 
 // Mock the ListingCard component

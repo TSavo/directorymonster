@@ -84,7 +84,7 @@ const mockListings = [
 ];
 
 // Import the hooks for mocking
-import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
+import { useListings } from '@/components/admin/listings/hooks/useListings';
 import { useRouter } from 'next/router';
 
 const mockStore = configureStore([]);

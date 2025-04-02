@@ -1,5 +1,5 @@
-import { ConnectionState } from '../../src/lib/redis/connection-manager';
-import { MemoryRedis } from '../../src/lib/redis/memory-store';
+import { ConnectionState } from '@/lib/redis/connection-manager';
+import { MemoryRedis } from '@/lib/redis/memory-store';
 
 // Create mock functions
 const mockRedisInstance = {

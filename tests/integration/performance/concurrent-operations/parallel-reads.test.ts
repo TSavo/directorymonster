@@ -6,9 +6,9 @@
  */
 
 import { createMockRequest } from '../../setup';
-import { GET as getListings } from '../../../../src/app/api/sites/[siteSlug]/listings/route';
-import { GET as getSearchResults } from '../../../../src/app/api/search/route';
-import { GET as getCategories } from '../../../../src/app/api/sites/[siteSlug]/categories/route';
+import { GET as getListings } from '@/app/api/sites/[siteSlug]/listings/route';
+import { GET as getSearchResults } from '@/app/api/search/route';
+import { GET as getCategories } from '@/app/api/sites/[siteSlug]/categories/route';
 
 // Constants for parallel read tests
 const PARALLEL_OPERATIONS = 10;

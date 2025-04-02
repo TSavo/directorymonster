@@ -5,10 +5,10 @@
  * prevent cross-tenant data access across a variety of scenarios.
  */
 
-import { KeyNamespaceService, KeyResourceType } from '../../src/lib/key-namespace-service';
-import { createSecureRedisClient, TenantRedisContext } from '../../src/lib/secure-redis-client';
-import { redis } from '../../src/lib/redis-client';
-import { AuditService } from '../../src/lib/audit/audit-service';
+import { KeyNamespaceService, KeyResourceType } from '@/lib/key-namespace-service';
+import { createSecureRedisClient, TenantRedisContext } from '@/lib/secure-redis-client';
+import { redis } from '@/lib/redis-client';
+import { AuditService } from '@/lib/audit/audit-service';
 
 // Mock the audit service to capture security events
 jest.mock('../../src/lib/audit/audit-service', () => ({

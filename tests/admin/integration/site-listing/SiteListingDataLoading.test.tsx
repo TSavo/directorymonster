@@ -3,8 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingTable } from '../../../../src/components/admin/listings/ListingTable';
-import { SiteContext } from '../../../../src/contexts/SiteContext';
+import ListingTable from '@/components/admin/listings/ListingTable';
+import { SiteContext } from '@/contexts/SiteContext';
 
 // Mock the hooks
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
@@ -31,8 +31,8 @@ const site2Listings = [
 ];
 
 // Mock the hooks implementation
-import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
-import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
+import { useListings } from '@/components/admin/listings/hooks/useListings';
+import { useSites } from '@/components/admin/sites/hooks/useSites';
 
 const mockStore = configureStore([]);
 

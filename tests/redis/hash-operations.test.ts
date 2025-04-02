@@ -4,7 +4,7 @@
  * This test verifies that the hash operations (hset, hget, hdel, hkeys)
  * work correctly in the in-memory Redis implementation.
  */
-import { MemoryRedis } from '../../src/lib/redis/memory-store';
+import { MemoryRedis } from '@/lib/redis/memory-store';
 
 // Import hash operations
 import '../../src/lib/redis/hash-operations';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DomainStep } from '@/components/admin/sites/components/DomainStep';
+import DomainStep from '@/components/admin/sites/components/DomainStep';
 
 // Mock the DomainManager component that's used by DomainStep
 jest.mock('@/components/admin/sites/DomainManager', () => ({

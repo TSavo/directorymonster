@@ -6,15 +6,15 @@
  * This test uses the in-memory Redis store with the hash operations
  * (hset, hget, hdel, hkeys) to test the ListingIndexer without mocking Redis.
  */
-import { ListingIndexer } from '../../../src/lib/search/listing-indexer';
-import { searchKeys } from '../../../src/lib/tenant';
-import { Listing } from '../../../src/types';
+import { ListingIndexer } from '@/lib/search/listing-indexer';
+import { searchKeys } from '@/lib/tenant';
+import { Listing } from '@/types';
 
 // Set NODE_ENV to test to ensure in-memory Redis is used
 process.env.NODE_ENV = 'test';
 
 // Import Redis client after setting NODE_ENV
-import { redis, kv } from '../../../src/lib/redis-client';
+import { redis, kv } from '@/lib/redis-client';
 
 describe('ListingIndexer with In-Memory Redis', () => {
   let listingIndexer: ListingIndexer;

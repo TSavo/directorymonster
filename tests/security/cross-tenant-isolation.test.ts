@@ -5,9 +5,9 @@
  * to verify that our security measures prevent cross-tenant data access.
  */
 
-import { KeyNamespaceService, KeyResourceType } from '../../src/lib/key-namespace-service';
-import { createSecureRedisClient, TenantRedisContext } from '../../src/lib/secure-redis-client';
-import { redis } from '../../src/lib/redis-client';
+import { KeyNamespaceService, KeyResourceType } from '@/lib/key-namespace-service';
+import { createSecureRedisClient, TenantRedisContext } from '@/lib/secure-redis-client';
+import { redis } from '@/lib/redis-client';
 
 // Use jest test framework
 describe('Cross-Tenant Attack Prevention', () => {

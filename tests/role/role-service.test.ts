@@ -1,8 +1,8 @@
 /**
  * @jest-environment node
  */
-import { RoleService } from '../../src/lib/role/role-service';
-import { Role, ACE, ResourceType, Permission } from '../../src/lib/role/types';
+import { RoleService } from '@/lib/role/role-service';
+import { Role, ACE, ResourceType, Permission } from '@/lib/role/types';
 
 // Mock the Redis client
 jest.mock('../../src/lib/redis-client', () => ({

@@ -3,7 +3,7 @@
  */
 import { renderHook, act } from '@testing-library/react';
 import { delay } from '../../../utils/testHelpers';
-import { useCategories } from '../../../../src/components/admin/categories/hooks';
+import { useCategories } from '@/components/admin/categories/hooks';
 import {
   mockCategories,
   mockSites,

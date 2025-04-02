@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SiteForm } from '@/components/admin/sites/SiteForm';
+import SiteForm from '@/components/admin/sites/SiteForm';
 
 // Import our custom mock router
 import { useRouter, resetMocks } from './__mocks__/nextNavigation.tsx';

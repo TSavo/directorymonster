@@ -4,10 +4,10 @@ import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 // Import components directly without using the @ alias
-import { ListingTable } from '../../../../src/components/admin/listings/ListingTable';
-import { SiteTable } from '../../../../src/components/admin/sites/table/SiteTable';
-import { SessionManager as AuthProvider } from '../../../../src/components/admin/auth';
-import { WithAuth } from '../../../../src/components/admin/auth/WithAuth';
+import ListingTable from '@/components/admin/listings/ListingTable';
+import { SiteTable } from '@/components/admin/sites/table/SiteTable';
+import { SessionManager as AuthProvider } from '@/components/admin/auth';
+import { WithAuth } from '@/components/admin/auth/WithAuth';
 
 // Mock the hooks and API calls
 const mockUseAuth = jest.fn();
@@ -36,9 +36,9 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Import hooks
-import { useAuth } from '../../../../src/components/admin/auth/hooks/useAuth';
-import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
-import { useSites } from '../../../../src/components/admin/sites/hooks';
+import { useAuth } from '@/components/admin/auth/hooks/useAuth';
+import { useListings } from '@/components/admin/listings/hooks/useListings';
+import { useSites } from '@/components/admin/sites/hooks';
 import { useRouter } from 'next/navigation';
 
 const mockStore = configureStore([]);

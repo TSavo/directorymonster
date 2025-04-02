@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-import { getIntersection, getUnion, calculateSearchScore } from '../../../src/lib/search/utils';
-import { redis } from '../../../src/lib/redis-client';
-import { searchKeys } from '../../../src/lib/tenant';
+import { getIntersection, getUnion, calculateSearchScore } from '@/lib/search/utils';
+import { redis } from '@/lib/redis-client';
+import { searchKeys } from '@/lib/tenant';
 
 // Mock the Redis client
 jest.mock('../../../src/lib/redis-client', () => ({

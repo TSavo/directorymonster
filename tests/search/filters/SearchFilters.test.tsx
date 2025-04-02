@@ -3,8 +3,8 @@
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import SearchFilters from '../../../src/components/search/filters/SearchFilters';
-import { Category } from '../../../src/types';
+import SearchFilters from '@/components/search/filters/SearchFilters';
+import { Category } from '@/types';
 import '@testing-library/jest-dom';
 
 describe('SearchFilters Component', () => {

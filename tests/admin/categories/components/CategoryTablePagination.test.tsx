@@ -6,7 +6,7 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Import the component
-import { CategoryTablePagination } from '../../../../src/components/admin/categories/components';
+import { CategoryTablePagination } from '@/components/admin/categories/components';
 
 describe('CategoryTablePagination Component', () => {
   const defaultProps = {

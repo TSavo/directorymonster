@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import StatisticCards from '../../../src/components/admin/dashboard/StatisticCards';
-import { useSiteMetrics } from '../../../src/components/admin/dashboard/hooks';
-import { SiteMetricsData } from '../../../src/components/admin/dashboard/types';
+import StatisticCards from '@/components/admin/dashboard/StatisticCards';
+import { useSiteMetrics } from '@/components/admin/dashboard/hooks';
+import { SiteMetricsData } from '@/components/admin/dashboard/types';
 
 // Mock the hook
 jest.mock('../../../src/components/admin/dashboard/hooks', () => ({

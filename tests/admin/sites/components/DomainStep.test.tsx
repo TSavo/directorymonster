@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { DomainStep } from '@/components/admin/sites/components/DomainStep';
+import DomainStep from '@/components/admin/sites/components/DomainStep';
 
 describe('DomainStep Component - Basic Rendering', () => {
   // Mock props

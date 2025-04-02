@@ -1,4 +1,4 @@
-import { redisCache } from '../../src/lib/redis-cache';
+import { redisCache } from '@/lib/redis-cache';
 
 // Mock Redis client
 jest.mock('../../src/lib/redis', () => {

@@ -12,7 +12,7 @@ import {
   createTenantAdminACL,
   createSiteAdminACL,
   createSuperAdminACL
-} from '../../src/components/admin/auth/utils/accessControl';
+} from '@/components/admin/auth/utils/accessControl';
 
 describe('ACL Cross-Tenant Detection', () => {
   // Test data

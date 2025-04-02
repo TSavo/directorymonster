@@ -8,8 +8,8 @@
  */
 
 import { setupTestEnvironment, clearTestData } from '../setup';
-import { SiteConfig, Category, Listing } from '../../../src/types';
-import { kv } from '../../../src/lib/redis-client';
+import { SiteConfig, Category, Listing } from '@/types';
+import { kv } from '@/lib/redis-client';
 
 // Import test modules
 import './concurrent-operations/parallel-reads.test';

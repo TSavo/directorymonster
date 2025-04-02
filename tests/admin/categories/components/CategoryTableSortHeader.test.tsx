@@ -6,7 +6,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Import the component
-import { CategoryTableSortHeader } from '../../../../src/components/admin/categories/components';
+import { CategoryTableSortHeader } from '@/components/admin/categories/components';
 
 describe('CategoryTableSortHeader Component', () => {
   const mockOnSort = jest.fn();

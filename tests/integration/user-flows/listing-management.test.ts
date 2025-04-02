@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-import { GET as getListings, POST as createListing } from '../../../src/app/api/sites/[siteSlug]/listings/route';
+import { GET as getListings, POST as createListing } from '@/app/api/sites/[siteSlug]/listings/route';
 import { setupTestEnvironment, clearTestData, createMockRequest, wait } from '../setup';
-import { SiteConfig, Category, Listing } from '../../../src/types';
+import { SiteConfig, Category, Listing } from '@/types';
 
 // Mock the search indexer
 jest.mock('../../../src/lib/search-indexer', () => ({

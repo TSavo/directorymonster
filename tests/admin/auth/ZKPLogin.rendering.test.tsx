@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ZKPLogin } from '@/components/admin/auth';
+import ZKPLogin from '@/components/admin/auth/ZKPLogin';
 
 // Mock the Next.js router
 const mockRouter = {

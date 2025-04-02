@@ -6,10 +6,10 @@
  */
 
 import { createMockRequest, setupTestEnvironment, clearTestData } from '../../setup';
-import { POST as createListing } from '../../../../src/app/api/sites/[siteSlug]/listings/route';
-import { DELETE as deleteListing } from '../../../../src/app/api/sites/[siteSlug]/listings/[listingSlug]/route';
-import { kv, redis } from '../../../../src/lib/redis-client';
-import { SiteConfig, Category, Listing } from '../../../../src/types';
+import { POST as createListing } from '@/app/api/sites/[siteSlug]/listings/route';
+import { DELETE as deleteListing } from '@/app/api/sites/[siteSlug]/listings/[listingSlug]/route';
+import { kv, redis } from '@/lib/redis-client';
+import { SiteConfig, Category, Listing } from '@/types';
 import { wait } from '../../setup';
 
 // Constants for transaction isolation tests

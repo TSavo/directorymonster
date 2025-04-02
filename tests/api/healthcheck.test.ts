@@ -9,7 +9,7 @@ jest.mock('../../src/lib/redis-health', () => ({
 }));
 
 // Now import the route after the mocks are set up
-import { GET } from '../../src/app/api/healthcheck/route';
+import { GET } from '@/app/api/healthcheck/route';
 
 // Get a reference to the mocked module
 const redisHealth = require('../../src/lib/redis-health');

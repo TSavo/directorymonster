@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import SearchPage, { generateMetadata } from '../../../src/app/search/page';
+import SearchPage, { generateMetadata } from '@/app/search/page';
 import '@testing-library/jest-dom';
 
 // Mock the search components

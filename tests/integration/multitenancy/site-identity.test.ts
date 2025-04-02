@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-import { GET as getSiteInfo } from '../../../src/app/api/site-info/route';
+import { GET as getSiteInfo } from '@/app/api/site-info/route';
 import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
-import { getSiteByHostname } from '../../../src/lib/site-utils';
+import { getSiteByHostname } from '@/lib/site-utils';
 
 describe('Site Identity Resolution', () => {
   beforeAll(async () => {

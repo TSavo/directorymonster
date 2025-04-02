@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-import { GET as getCategories, POST as createCategory } from '../../../src/app/api/sites/[siteSlug]/categories/route';
+import { GET as getCategories, POST as createCategory } from '@/app/api/sites/[siteSlug]/categories/route';
 import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
-import { SiteConfig, Category } from '../../../src/types';
+import { SiteConfig, Category } from '@/types';
 
 describe('Category Management', () => {
   // Store test data references

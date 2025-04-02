@@ -24,7 +24,7 @@ jest.mock('next/navigation', () => ({
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CategoryTable from '../../../src/components/admin/categories/CategoryTable';
+import CategoryTable from '@/components/admin/categories/CategoryTable';
 import {
   mockCategories,
   setupCategoryTableTest,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BasicInfoStep } from '@/components/admin/sites/components/BasicInfoStep';
+import BasicInfoStep from '@/components/admin/sites/components/BasicInfoStep';
 
 describe('BasicInfoStep Component - Basic Rendering', () => {
   // Mock form values

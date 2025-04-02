@@ -3,10 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingTable } from '../../../../src/components/admin/listings/ListingTable';
-import { ListingFilterBar } from '../../../../src/components/admin/listings/components/table/ListingFilterBar';
-import { CategoryFilterTree } from '../../../../src/components/admin/listings/components/table/CategoryFilterTree';
-import SiteFilterDropdown from '../../../../src/components/admin/listings/components/SiteFilterDropdown';
+import ListingTable from '@/components/admin/listings/ListingTable';
+import { ListingFilterBar } from '@/components/admin/listings/components/table/ListingFilterBar';
+import { CategoryFilterTree } from '@/components/admin/listings/components/table/CategoryFilterTree';
+import SiteFilterDropdown from '@/components/admin/listings/components/SiteFilterDropdown';
 
 // Mock the hooks and API calls
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
@@ -39,9 +39,9 @@ const mockListings = [
 ];
 
 // Mock the hooks implementation
-import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
-import { useCategories } from '../../../../src/components/admin/categories/hooks/useCategories';
-import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
+import { useListings } from '@/components/admin/listings/hooks/useListings';
+import { useCategories } from '@/components/admin/categories/hooks/useCategories';
+import { useSites } from '@/components/admin/sites/hooks/useSites';
 
 const mockStore = configureStore([]);
 

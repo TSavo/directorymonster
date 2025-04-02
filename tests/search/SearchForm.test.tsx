@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SearchForm from '../../src/components/search/SearchForm';
+import SearchForm from '@/components/search/SearchForm';
 import '@testing-library/jest-dom';
 
 // Mock the useRouter hook

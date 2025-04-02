@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import SearchBar from '../../src/components/search/SearchBar';
+import SearchBar from '@/components/search/SearchBar';
 import '@testing-library/jest-dom';
 
 // Mock SearchIcon component

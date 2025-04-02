@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingDetailPanel } from '../../../../src/components/admin/listings/components/ListingDetailPanel';
+import { ListingDetailPanel } from '@/components/admin/listings/components/ListingDetailPanel';
 
 // Mock the hooks
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
@@ -28,8 +28,8 @@ const mockListing = {
 };
 
 // Mock the hooks implementation
-import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
-import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
+import { useListings } from '@/components/admin/listings/hooks/useListings';
+import { useSites } from '@/components/admin/sites/hooks/useSites';
 
 const mockStore = configureStore([]);
 

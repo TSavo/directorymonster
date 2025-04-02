@@ -1,12 +1,12 @@
 /**
  * @jest-environment node
  */
-import { GET as getSiteListings } from '../../../src/app/api/sites/[siteSlug]/listings/route';
-import { GET as getSiteCategories } from '../../../src/app/api/sites/[siteSlug]/categories/route';
-import { GET as getSiteInfo } from '../../../src/app/api/site-info/route';
-import { GET as getSearch } from '../../../src/app/api/search/route';
+import { GET as getSiteListings } from '@/app/api/sites/[siteSlug]/listings/route';
+import { GET as getSiteCategories } from '@/app/api/sites/[siteSlug]/categories/route';
+import { GET as getSiteInfo } from '@/app/api/site-info/route';
+import { GET as getSearch } from '@/app/api/search/route';
 import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
-import { SiteConfig, Category, Listing } from '../../../src/types';
+import { SiteConfig, Category, Listing } from '@/types';
 
 // Mock the search-indexer module
 jest.mock('../../../src/lib/search-indexer', () => {

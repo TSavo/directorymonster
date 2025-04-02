@@ -4,7 +4,7 @@
  * This test verifies that the hash operations are available in the Redis client
  * and work correctly in a real application.
  */
-import { redis } from '../../src/lib/redis-client';
+import { redis } from '@/lib/redis-client';
 
 describe('Redis Hash Operations Integration', () => {
   beforeEach(() => {

@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingForm } from '../../../../src/components/admin/listings/ListingForm';
+import ListingForm from '@/components/admin/listings/ListingForm';
 
 // Mock the hooks and API calls
 jest.mock('../../../../src/components/admin/listings/components/form', () => ({
@@ -44,7 +44,7 @@ jest.mock('next/router', () => ({
 }));
 
 // Mock hooks implementation
-import { useListingForm } from '../../../../src/components/admin/listings/components/form';
+import { useListingForm } from '@/components/admin/listings/components/form';
 import { useRouter } from 'next/router';
 
 const mockStore = configureStore([]);

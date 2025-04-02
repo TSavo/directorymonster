@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import { ZKPLogin } from '@/components/admin/auth';
+import ZKPLogin from '@/components/admin/auth/ZKPLogin';
 
 // Mock TextEncoder and crypto.subtle for Jest environment
 global.TextEncoder = class TextEncoder {

@@ -4,8 +4,8 @@
  * Integration test for Redis middleware
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { withRedis } from '../../src/middleware/withRedis';
-import { redis } from '../../src/lib/redis-client';
+import { withRedis } from '@/middleware/withRedis';
+import { redis } from '@/lib/redis-client';
 
 // Mock the redis client properly as an ES module
 jest.mock('../../src/lib/redis-client', () => ({

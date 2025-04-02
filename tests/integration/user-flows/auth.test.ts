@@ -1,9 +1,9 @@
 /**
  * @jest-environment node
  */
-import { POST as createListing } from '../../../src/app/api/sites/[siteSlug]/listings/route';
+import { POST as createListing } from '@/app/api/sites/[siteSlug]/listings/route';
 import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
-import { SiteConfig, Category, ApiKey } from '../../../src/types';
+import { SiteConfig, Category, ApiKey } from '@/types';
 
 // Mock the Redis client
 jest.mock('../../../src/lib/redis-client', () => {

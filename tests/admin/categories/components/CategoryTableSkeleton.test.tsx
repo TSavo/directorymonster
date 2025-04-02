@@ -4,7 +4,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { CategoryTableSkeleton } from '../../../../src/components/admin/categories/components';
+import { CategoryTableSkeleton } from '@/components/admin/categories/components';
 
 describe('CategoryTableSkeleton Component', () => {
   it('renders the skeleton UI with loading text', () => {

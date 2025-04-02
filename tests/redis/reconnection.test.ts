@@ -1,4 +1,4 @@
-import { ConnectionState } from '../../src/lib/redis/connection-manager';
+import { ConnectionState } from '@/lib/redis/connection-manager';
 
 // Mock timers for testing reconnection timeouts
 jest.useFakeTimers();

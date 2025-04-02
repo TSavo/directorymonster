@@ -40,9 +40,9 @@ jest.mock('next/server', () => {
 });
 
 // Import services and middleware after mocking
-import TenantMembershipService from '../../src/lib/tenant-membership-service';
-import RoleService from '../../src/lib/role-service';
-import { withTenantAccess } from '../../src/middleware/tenant-validation';
+import TenantMembershipService from '@/lib/tenant-membership-service';
+import RoleService from '@/lib/role-service';
+import { withTenantAccess } from '@/middleware/tenant-validation';
 
 // Test data
 const tenant1Id = 'tenant-1';

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import { ZKPLogin } from '@/components/admin/auth';
+import ZKPLogin from '@/components/admin/auth/ZKPLogin';
 
 // Mock the Next.js router
 const mockPush = jest.fn();

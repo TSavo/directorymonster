@@ -1,11 +1,11 @@
 /**
  * @jest-environment node
  */
-import { GET as getSearch } from '../../../src/app/api/search/route';
-import { POST as createListing } from '../../../src/app/api/sites/[siteSlug]/listings/route';
-import { searchIndexer } from '../../../src/lib/search-indexer';
+import { GET as getSearch } from '@/app/api/search/route';
+import { POST as createListing } from '@/app/api/sites/[siteSlug]/listings/route';
+import { searchIndexer } from '@/lib/search-indexer';
 import { setupTestEnvironment, clearTestData, createMockRequest, wait } from '../setup';
-import { SiteConfig, Category, Listing } from '../../../src/types';
+import { SiteConfig, Category, Listing } from '@/types';
 
 // Mock the search-indexer module
 jest.mock('../../../src/lib/search-indexer', () => {

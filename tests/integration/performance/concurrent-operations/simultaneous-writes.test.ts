@@ -6,9 +6,9 @@
  */
 
 import { createMockRequest } from '../../setup';
-import { POST as createListing } from '../../../../src/app/api/sites/[siteSlug]/listings/route';
-import { POST as createCategory } from '../../../../src/app/api/sites/[siteSlug]/categories/route';
-import { kv } from '../../../../src/lib/redis-client';
+import { POST as createListing } from '@/app/api/sites/[siteSlug]/listings/route';
+import { POST as createCategory } from '@/app/api/sites/[siteSlug]/categories/route';
+import { kv } from '@/lib/redis-client';
 
 // Constants for simultaneous write tests
 const PARALLEL_WRITES = 5;

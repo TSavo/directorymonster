@@ -3,10 +3,10 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingTable } from '../../../../src/components/admin/listings/ListingTable';
+import ListingTable from '@/components/admin/listings/ListingTable';
 
 // Import the mock creator utility
-import createMockUseListings from '../../../../src/components/admin/listings/hooks/useListings.mock';
+import createMockUseListings from '@/components/admin/listings/hooks/useListings.mock';
 
 // Mock the hooks
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
@@ -33,9 +33,9 @@ const mockCategories = [
 ];
 
 // Mock the hooks implementation
-import { useListings } from '../../../../src/components/admin/listings/hooks/useListings';
-import { useSites } from '../../../../src/components/admin/sites/hooks/useSites';
-import { useCategories } from '../../../../src/components/admin/categories/hooks/useCategories';
+import { useListings } from '@/components/admin/listings/hooks/useListings';
+import { useSites } from '@/components/admin/sites/hooks/useSites';
+import { useCategories } from '@/components/admin/categories/hooks/useCategories';
 
 const mockStore = configureStore([]);
 
