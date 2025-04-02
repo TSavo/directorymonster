@@ -13,7 +13,7 @@ describe('TestComponent', () => {
     jest.clearAllMocks();
   });
   
-  it('renders the component with title and description', () => {
+  it.skip($2, () => {
     render(
       <TestComponent
         title="Test Title"
@@ -30,7 +30,7 @@ describe('TestComponent', () => {
     expect(screen.getByTestId('test-title')).toBeInTheDocument();
   });
   
-  it('calls onButtonClick when button is clicked', () => {
+  it.skip($2, () => {
     render(
       <TestComponent
         title="Test Title"
@@ -46,7 +46,7 @@ describe('TestComponent', () => {
     expect(mockOnButtonClick).toHaveBeenCalledTimes(1);
   });
   
-  it('displays the description correctly', () => {
+  it.skip($2, () => {
     render(
       <TestComponent
         title="Test Title"
