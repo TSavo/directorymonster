@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Breadcrumbs } from '@/components/admin/layout';
+import Breadcrumbs from '@/components/admin/layout/Breadcrumbs';
 
 // Mock next/link
 jest.mock('next/link', () => {

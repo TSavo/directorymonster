@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { AdminHeader } from '@/components/admin/layout';
+import AdminHeader from '@/components/admin/layout/AdminHeader';
 
 // Mock next/link
 jest.mock('next/link', () => {

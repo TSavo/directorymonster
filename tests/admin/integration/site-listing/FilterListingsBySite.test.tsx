@@ -32,25 +32,25 @@ const mockStore = configureStore([]);
 describe('FilterListingsBySite', () => {
   let store;
   let filterBySite;
-  
+
   beforeEach(() => {
     // Set up mock filter function
     filterBySite = jest.fn();
-    
+
     // Create mock listings hook with the filter function
     const mockUseListings = createMockUseListings();
     mockUseListings.filterBySite = filterBySite;
-    
+
     // Apply the mock
     (useListings as jest.Mock).mockReturnValue(mockUseListings);
-    
+
     // Mock sites hook
     (useSites as jest.Mock).mockReturnValue({
       sites: mockSites,
       isLoading: false,
       error: null,
     });
-    
+
     // Create a mock store
     store = mockStore({
       listings: {
@@ -76,13 +76,22 @@ describe('FilterListingsBySite', () => {
       </Provider>
     );
 
-    // Open the dropdown
-    fireEvent.click(screen.getByTestId('site-filter-dropdown-button'));
-    
+    // Debug the rendered HTML
+    console.log('Rendered HTML:', screen.getByTestId('site-filter-dropdown').outerHTML);
+
+    // Find the dropdown trigger element
+    const dropdownTrigger = screen.getByTestId('site-filter-dropdown').querySelector('.ui-dropdown-trigger');
+    if (!dropdownTrigger) {
+      // If we can't find the trigger, let's try clicking the dropdown directly
+      fireEvent.click(screen.getByTestId('site-filter-dropdown'));
+    } else {
+      fireEvent.click(dropdownTrigger);
+    }
+
     // Find and click the first site option
     const menuItems = screen.getAllByTestId('dropdown-menu-item');
     fireEvent.click(menuItems[0]); // First site option
-    
+
     // Verify the filterBySite function was called with the correct site ID
     expect(filterBySite).toHaveBeenCalledWith('site1');
   });
