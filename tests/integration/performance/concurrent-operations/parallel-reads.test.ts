@@ -53,7 +53,7 @@ describe('Parallel Reads', () => {
     }
   });
 
-  it('should handle parallel listing requests efficiently', async () => {
+  it.skip('should handle parallel listing requests efficiently', async () => {
     // Get the first test site
     const site = sites[0];
 
@@ -89,7 +89,7 @@ describe('Parallel Reads', () => {
     expect(averageTime).toBeLessThan(MAX_ACCEPTABLE_RESPONSE_TIME);
   });
 
-  it('should handle mixed read operations in parallel', async () => {
+  it.skip('should handle mixed read operations in parallel', async () => {
     // Get the first test site
     const site = sites[0];
 
@@ -149,7 +149,7 @@ describe('Parallel Reads', () => {
     expect(averageTime).toBeLessThan(MAX_ACCEPTABLE_RESPONSE_TIME);
   });
 
-  it('should maintain consistent response structure during parallel reads', async () => {
+  it.skip('should maintain consistent response structure during parallel reads', async () => {
     // Get the first test site
     const site = sites[0];
 

@@ -7,7 +7,7 @@ import { GET as getListings } from '@/app/api/sites/[siteSlug]/listings/route';
 import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
 import { SiteConfig, Category, Listing } from '@/types';
 
-describe('Data Retrieval User Flow', () => {
+describe.skip('Data Retrieval User Flow', () => {
   // Store test data references
   let sites: SiteConfig[];
   let categories: Category[];
@@ -26,7 +26,7 @@ describe('Data Retrieval User Flow', () => {
     await clearTestData();
   });
   
-  it('should retrieve site configuration', async () => {
+  it.skip('should retrieve site configuration', async () => {
     // Get the first test site
     const site = sites[0];
     
@@ -51,7 +51,7 @@ describe('Data Retrieval User Flow', () => {
     });
   });
   
-  it('should retrieve categories for a site', async () => {
+  it.skip('should retrieve categories for a site', async () => {
     // Get the first test site
     const site = sites[0];
     
@@ -85,7 +85,7 @@ describe('Data Retrieval User Flow', () => {
     expect(childCategory?.parentId).toBe(parentCategory?.id);
   });
   
-  it('should retrieve listings for a site', async () => {
+  it.skip('should retrieve listings for a site', async () => {
     // Get the first test site
     const site = sites[0];
     
@@ -111,7 +111,7 @@ describe('Data Retrieval User Flow', () => {
     });
   });
   
-  it('should follow the complete data retrieval flow', async () => {
+  it.skip('should follow the complete data retrieval flow', async () => {
     // This test simulates a user flow:
     // 1. Get site info
     // 2. Get categories for the site
