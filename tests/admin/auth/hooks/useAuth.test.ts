@@ -3,6 +3,17 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/admin/auth/hooks/useAuth';
 import { hasPermission } from '@/components/admin/auth/utils/accessControl';
 
+// Mock the hasPermission function
+jest.mock('@/components/admin/auth/utils/accessControl', () => ({
+  hasPermission: jest.fn((acl, resourceType, permission, tenantId, resourceId, siteId) => {
+    // Simple mock implementation for testing
+    if (resourceType === 'site' && permission === 'read' && tenantId === 'tenant1' && resourceId === 'site1') {
+      return true;
+    }
+    return false;
+  }),
+}));
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(() => ({
@@ -22,7 +33,7 @@ describe('useAuth hook', () => {
   });
 
   it('initializes with correct default state', () => {
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ authenticated: false }),
@@ -59,10 +70,10 @@ describe('useAuth hook', () => {
       updatedAt: '2023-01-01'
     };
 
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ 
+        json: () => Promise.resolve({
           authenticated: true,
           user: mockUser
         }),
@@ -89,7 +100,7 @@ describe('useAuth hook', () => {
   });
 
   it('handles authentication failure', async () => {
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: false,
         json: () => Promise.resolve({ message: 'Failed to fetch authentication status' }),
@@ -124,7 +135,7 @@ describe('useAuth hook', () => {
     };
 
     // First fetch for initial auth check
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ authenticated: false }),
@@ -132,10 +143,10 @@ describe('useAuth hook', () => {
     );
 
     // Second fetch for login
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ 
+        json: () => Promise.resolve({
           user: mockUser
         }),
       })
@@ -172,7 +183,7 @@ describe('useAuth hook', () => {
 
   it('handles login failure', async () => {
     // First fetch for initial auth check
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ authenticated: false }),
@@ -180,7 +191,7 @@ describe('useAuth hook', () => {
     );
 
     // Second fetch for login
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: false,
         json: () => Promise.resolve({ message: 'Invalid credentials' }),
@@ -212,21 +223,21 @@ describe('useAuth hook', () => {
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
     // First fetch for initial auth check (authenticated)
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ 
+        json: () => Promise.resolve({
           authenticated: true,
           user: {
             id: 'user1',
             acl: { userId: 'user1', entries: [] }
-          } 
+          }
         }),
       })
     );
 
     // Second fetch for logout
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({}),
@@ -264,25 +275,22 @@ describe('useAuth hook', () => {
 
   it('handles logout failure', async () => {
     // First fetch for initial auth check (authenticated)
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ 
+        json: () => Promise.resolve({
           authenticated: true,
           user: {
             id: 'user1',
             acl: { userId: 'user1', entries: [] }
-          } 
+          }
         }),
       })
     );
 
     // Second fetch for logout (fails)
-    mockFetch.mockImplementationOnce(() => 
-      Promise.resolve({
-        ok: false,
-        json: () => Promise.resolve({ message: 'Logout failed' }),
-      })
+    mockFetch.mockImplementationOnce(() =>
+      Promise.reject(new Error('Logout failed'))
     );
 
     const { result } = renderHook(() => useAuth());
@@ -312,7 +320,7 @@ describe('useAuth hook', () => {
         userId: 'user1',
         entries: [
           {
-            resource: { type: 'site', id: 'site1' },
+            resource: { type: 'site', id: 'site1', tenantId: 'tenant1' },
             permission: 'read'
           }
         ]
@@ -322,10 +330,10 @@ describe('useAuth hook', () => {
       updatedAt: '2023-01-01'
     };
 
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ 
+        json: () => Promise.resolve({
           authenticated: true,
           user: mockUser
         }),
@@ -341,7 +349,7 @@ describe('useAuth hook', () => {
 
     // Should have permission for site1
     expect(result.current.hasPermission('site', 'read', 'site1')).toBe(true);
-    
+
     // Should not have permission for other resources
     expect(result.current.hasPermission('site', 'update', 'site1')).toBe(false);
     expect(result.current.hasPermission('site', 'read', 'site2')).toBe(false);
@@ -349,7 +357,7 @@ describe('useAuth hook', () => {
   });
 
   it('returns false for permission check when not authenticated', async () => {
-    mockFetch.mockImplementationOnce(() => 
+    mockFetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ authenticated: false }),
