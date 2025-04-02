@@ -4,7 +4,7 @@ import { SiteData, SiteErrors } from './types';
 
 /**
  * Validates site data based on the specified section
- * 
+ *
  * @param site - Site data to validate
  * @param section - Optional section to validate (basic, domains, theme, seo, settings)
  * @returns Object with errors and isValid flag
@@ -12,7 +12,7 @@ import { SiteData, SiteErrors } from './types';
 export const validateSite = (site: SiteData, section?: string): { errors: SiteErrors; isValid: boolean } => {
   const errors: SiteErrors = {};
   let isValid = true;
-  
+
   // Basic Info validation
   if (!section || section === 'basic') {
     if (!site.name?.trim()) {
@@ -22,7 +22,7 @@ export const validateSite = (site: SiteData, section?: string): { errors: SiteEr
       errors.name = 'Name cannot exceed 50 characters';
       isValid = false;
     }
-    
+
     if (!site.slug?.trim()) {
       errors.slug = 'Slug is required';
       isValid = false;
@@ -33,13 +33,13 @@ export const validateSite = (site: SiteData, section?: string): { errors: SiteEr
       errors.slug = 'Slug cannot exceed 50 characters';
       isValid = false;
     }
-    
+
     if (site.description && site.description.length > 500) {
       errors.description = 'Description cannot exceed 500 characters';
       isValid = false;
     }
   }
-  
+
   // Domain validation
   if (!section || section === 'domains') {
     if (!site.domains || site.domains.length === 0) {
@@ -47,7 +47,7 @@ export const validateSite = (site: SiteData, section?: string): { errors: SiteEr
       isValid = false;
     }
   }
-  
+
   // Theme validation
   if (!section || section === 'theme') {
     if (site.customStyles) {
@@ -55,7 +55,7 @@ export const validateSite = (site: SiteData, section?: string): { errors: SiteEr
         // Simple check for balanced braces
         const openBraces = (site.customStyles.match(/{/g) || []).length;
         const closeBraces = (site.customStyles.match(/}/g) || []).length;
-        
+
         if (openBraces !== closeBraces) {
           errors.customStyles = 'CSS syntax error: unbalanced braces';
           isValid = false;
@@ -66,32 +66,32 @@ export const validateSite = (site: SiteData, section?: string): { errors: SiteEr
       }
     }
   }
-  
+
   // SEO validation
   if (!section || section === 'seo') {
     if (site.seoTitle && site.seoTitle.length > 60) {
       errors.seoTitle = 'SEO title should be 60 characters or less';
       isValid = false;
     }
-    
+
     if (site.seoDescription && site.seoDescription.length > 160) {
       errors.seoDescription = 'SEO description should be 160 characters or less';
       isValid = false;
     }
   }
-  
+
   // Settings validation
   if (!section || section === 'settings') {
-    if (site.listingsPerPage && (site.listingsPerPage <= 0 || site.listingsPerPage > 100)) {
+    if (site.listingsPerPage !== undefined && (site.listingsPerPage <= 0 || site.listingsPerPage > 100)) {
       errors.listingsPerPage = 'Listings per page must be between 1 and 100';
       isValid = false;
     }
-    
+
     if (site.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(site.contactEmail)) {
       errors.contactEmail = 'Please enter a valid email address';
       isValid = false;
     }
   }
-  
+
   return { errors, isValid };
 };
