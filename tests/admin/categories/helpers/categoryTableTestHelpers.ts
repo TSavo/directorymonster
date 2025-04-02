@@ -77,15 +77,40 @@ export const setupCategoryTableTest = (overrides = {}) => {
     })
   }));
 
-  // Mock the useCategories hook if it's been mocked
-  try {
-    const useCategories = require('../../../../src/components/admin/categories/hooks/useCategories').default;
-    if (typeof useCategories === 'function' && jest.isMockFunction(useCategories)) {
-      useCategories.mockImplementation(() => mockUseCategories(overrides));
-    }
-  } catch (error) {
-    // useCategories might not be mocked in all tests
-  }
+  // Mock next/navigation as well for components that use it
+  jest.mock('next/navigation', () => ({
+    useRouter: () => ({
+      push: jest.fn(),
+      replace: jest.fn(),
+      back: jest.fn()
+    }),
+    usePathname: () => '/admin/categories',
+    useSearchParams: () => new URLSearchParams()
+  }));
+
+  // Mock the useCategories hook
+  jest.mock('../../../../src/components/admin/categories/hooks/useCategories', () => ({
+    useCategories: jest.fn().mockImplementation(() => mockUseCategories(overrides))
+  }));
+
+  // Mock the useCategoryTable hook
+  jest.mock('../../../../src/components/admin/categories/hooks/useCategoryTable', () => ({
+    useCategoryTable: jest.fn().mockImplementation(() => ({
+      ...mockUseCategories(overrides),
+      showHierarchy: false,
+      formModalOpen: false,
+      selectedCategoryId: undefined,
+      showSiteColumn: !overrides.siteSlug,
+      toggleHierarchy: jest.fn(),
+      handleEditCategory: jest.fn(),
+      handleCreateCategory: jest.fn(),
+      handleCloseFormModal: jest.fn(),
+      handleCategorySaved: jest.fn(),
+      handleViewCategory: jest.fn(),
+      viewMode: 'table',
+      toggleViewMode: jest.fn()
+    }))
+  }));
 };
 
 // Reset mocks after tests
