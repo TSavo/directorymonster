@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { 
+import { describe, it, expect, beforeEach } from '@jest/globals';
+import {
   hasPermissionInTenant,
   hasAnyPermissionInTenant,
   hasAllPermissionsInTenant,
@@ -12,16 +12,16 @@ import { Role } from './roles';
 import { ResourceType, Permission } from './accessControl';
 
 // Mock dependencies
-vi.mock('@/lib/tenant-membership-service', () => ({
+jest.mock('@/lib/tenant-membership-service', () => ({
   TenantMembershipService: {
-    isTenantMember: vi.fn()
+    isTenantMember: jest.fn()
   }
 }));
 
-vi.mock('@/lib/role-service', () => ({
+jest.mock('@/lib/role-service', () => ({
   RoleService: {
-    hasPermission: vi.fn(),
-    getUserRoles: vi.fn()
+    hasPermission: jest.fn(),
+    getUserRoles: jest.fn()
   }
 }));
 
@@ -33,17 +33,17 @@ describe('Tenant Access Control', () => {
   const resourceId = 'resource789';
 
   beforeEach(() => {
-    vi.resetAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('hasPermissionInTenant', () => {
     it('should return false if user is not a tenant member', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(false);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
+
       // Execute
       const result = await hasPermissionInTenant(userId, tenantId, resourceType, permission);
-      
+
       // Verify
       expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(userId, tenantId);
       expect(RoleService.hasPermission).not.toHaveBeenCalled();
@@ -52,12 +52,12 @@ describe('Tenant Access Control', () => {
 
     it('should check permissions using RoleService if user is a tenant member', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(true);
-      vi.mocked(RoleService.hasPermission).mockResolvedValue(true);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
+      (RoleService.hasPermission as jest.Mock).mockResolvedValue(true);
+
       // Execute
       const result = await hasPermissionInTenant(userId, tenantId, resourceType, permission, resourceId);
-      
+
       // Verify
       expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(userId, tenantId);
       expect(RoleService.hasPermission).toHaveBeenCalledWith(
@@ -68,16 +68,16 @@ describe('Tenant Access Control', () => {
 
     it('should handle errors and return false', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockRejectedValue(new Error('Test error'));
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockRejectedValue(new Error('Test error'));
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
       // Execute
       const result = await hasPermissionInTenant(userId, tenantId, resourceType, permission);
-      
+
       // Verify
       expect(consoleSpy).toHaveBeenCalled();
       expect(result).toBe(false);
-      
+
       // Cleanup
       consoleSpy.mockRestore();
     });
@@ -86,13 +86,13 @@ describe('Tenant Access Control', () => {
   describe('hasAnyPermissionInTenant', () => {
     it('should return false if user is not a tenant member', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(false);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
+
       // Execute
       const result = await hasAnyPermissionInTenant(
         userId, tenantId, resourceType, ['read', 'update']
       );
-      
+
       // Verify
       expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(userId, tenantId);
       expect(RoleService.hasPermission).not.toHaveBeenCalled();
@@ -101,16 +101,16 @@ describe('Tenant Access Control', () => {
 
     it('should return true if user has at least one permission', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(true);
-      vi.mocked(RoleService.hasPermission)
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
+      (RoleService.hasPermission as jest.Mock)
         .mockResolvedValueOnce(false)  // First permission check fails
         .mockResolvedValueOnce(true);  // Second permission check succeeds
-      
+
       // Execute
       const result = await hasAnyPermissionInTenant(
         userId, tenantId, resourceType, ['create', 'read']
       );
-      
+
       // Verify
       expect(RoleService.hasPermission).toHaveBeenCalledTimes(2);
       expect(result).toBe(true);
@@ -118,14 +118,14 @@ describe('Tenant Access Control', () => {
 
     it('should return false if user has none of the permissions', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(true);
-      vi.mocked(RoleService.hasPermission).mockResolvedValue(false);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
+      (RoleService.hasPermission as jest.Mock).mockResolvedValue(false);
+
       // Execute
       const result = await hasAnyPermissionInTenant(
         userId, tenantId, resourceType, ['create', 'update']
       );
-      
+
       // Verify
       expect(RoleService.hasPermission).toHaveBeenCalledTimes(2);
       expect(result).toBe(false);
@@ -135,13 +135,13 @@ describe('Tenant Access Control', () => {
   describe('hasAllPermissionsInTenant', () => {
     it('should return false if user is not a tenant member', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(false);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
+
       // Execute
       const result = await hasAllPermissionsInTenant(
         userId, tenantId, resourceType, ['read', 'update']
       );
-      
+
       // Verify
       expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(userId, tenantId);
       expect(RoleService.hasPermission).not.toHaveBeenCalled();
@@ -150,14 +150,14 @@ describe('Tenant Access Control', () => {
 
     it('should return true if user has all permissions', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(true);
-      vi.mocked(RoleService.hasPermission).mockResolvedValue(true);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
+      (RoleService.hasPermission as jest.Mock).mockResolvedValue(true);
+
       // Execute
       const result = await hasAllPermissionsInTenant(
         userId, tenantId, resourceType, ['create', 'read']
       );
-      
+
       // Verify
       expect(RoleService.hasPermission).toHaveBeenCalledTimes(2);
       expect(result).toBe(true);
@@ -165,16 +165,16 @@ describe('Tenant Access Control', () => {
 
     it('should return false if user is missing any permission', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(true);
-      vi.mocked(RoleService.hasPermission)
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
+      (RoleService.hasPermission as jest.Mock)
         .mockResolvedValueOnce(true)   // First permission check succeeds
         .mockResolvedValueOnce(false); // Second permission check fails
-      
+
       // Execute
       const result = await hasAllPermissionsInTenant(
         userId, tenantId, resourceType, ['create', 'update']
       );
-      
+
       // Verify
       expect(RoleService.hasPermission).toHaveBeenCalledTimes(2);
       expect(result).toBe(false);
@@ -184,11 +184,11 @@ describe('Tenant Access Control', () => {
   describe('getAccessibleResourcesInTenant', () => {
     it('should return empty array if user is not a tenant member', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(false);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
+
       // Execute
       const result = await getAccessibleResourcesInTenant(userId, tenantId, resourceType, permission);
-      
+
       // Verify
       expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(userId, tenantId);
       expect(RoleService.getUserRoles).not.toHaveBeenCalled();
@@ -197,8 +197,8 @@ describe('Tenant Access Control', () => {
 
     it('should return resources from matching ACL entries', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(true);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
+
       // Create mock roles with ACL entries
       const mockRoles: Role[] = [
         {
@@ -264,12 +264,12 @@ describe('Tenant Access Control', () => {
           updatedAt: '2023-01-01'
         }
       ];
-      
-      vi.mocked(RoleService.getUserRoles).mockResolvedValue(mockRoles);
-      
+
+      (RoleService.getUserRoles as jest.Mock).mockResolvedValue(mockRoles);
+
       // Execute
       const result = await getAccessibleResourcesInTenant(userId, tenantId, resourceType, permission);
-      
+
       // Verify
       expect(RoleService.getUserRoles).toHaveBeenCalledWith(userId, tenantId);
       expect(result).toHaveLength(3);
@@ -283,11 +283,11 @@ describe('Tenant Access Control', () => {
   describe('hasGlobalPermissionInTenant', () => {
     it('should return false if user is not a tenant member', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(false);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(false);
+
       // Execute
       const result = await hasGlobalPermissionInTenant(userId, tenantId, resourceType, permission);
-      
+
       // Verify
       expect(TenantMembershipService.isTenantMember).toHaveBeenCalledWith(userId, tenantId);
       expect(RoleService.getUserRoles).not.toHaveBeenCalled();
@@ -296,8 +296,8 @@ describe('Tenant Access Control', () => {
 
     it('should return true if user has global permission', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(true);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
+
       // Create mock roles with ACL entries
       const mockRoles: Role[] = [
         {
@@ -338,12 +338,12 @@ describe('Tenant Access Control', () => {
           updatedAt: '2023-01-01'
         }
       ];
-      
-      vi.mocked(RoleService.getUserRoles).mockResolvedValue(mockRoles);
-      
+
+      (RoleService.getUserRoles as jest.Mock).mockResolvedValue(mockRoles);
+
       // Execute
       const result = await hasGlobalPermissionInTenant(userId, tenantId, resourceType, permission);
-      
+
       // Verify
       expect(RoleService.getUserRoles).toHaveBeenCalledWith(userId, tenantId);
       expect(result).toBe(true);
@@ -351,8 +351,8 @@ describe('Tenant Access Control', () => {
 
     it('should return false if user has no global permission', async () => {
       // Setup
-      vi.mocked(TenantMembershipService.isTenantMember).mockResolvedValue(true);
-      
+      (TenantMembershipService.isTenantMember as jest.Mock).mockResolvedValue(true);
+
       // Create mock roles with only specific resource permissions
       const mockRoles: Role[] = [
         {
@@ -375,12 +375,12 @@ describe('Tenant Access Control', () => {
           updatedAt: '2023-01-01'
         }
       ];
-      
-      vi.mocked(RoleService.getUserRoles).mockResolvedValue(mockRoles);
-      
+
+      (RoleService.getUserRoles as jest.Mock).mockResolvedValue(mockRoles);
+
       // Execute
       const result = await hasGlobalPermissionInTenant(userId, tenantId, resourceType, permission);
-      
+
       // Verify
       expect(RoleService.getUserRoles).toHaveBeenCalledWith(userId, tenantId);
       expect(result).toBe(false);
