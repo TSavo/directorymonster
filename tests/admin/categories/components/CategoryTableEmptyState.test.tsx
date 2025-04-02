@@ -11,15 +11,17 @@ import { CategoryTableEmptyState } from '../../../../src/components/admin/catego
 // Mock next/link
 jest.mock('next/link', () => {
   // eslint-disable-next-line react/display-name
-  return ({ children, href, className, 'data-testid': dataTestId, onClick }: {
+  return function MockLink({ children, href, className, 'data-testid': dataTestId, onClick }: {
     children: React.ReactNode;
     href: string;
     className?: string;
     'data-testid'?: string;
     onClick?: () => void;
-  }) => (
-    <a href={href} className={className} data-testid={dataTestId || 'create-category-button'} onClick={onClick}>{children}</a>
-  );
+  }) {
+    return (
+      <a href={href} className={className} data-testid={dataTestId} onClick={onClick}>{children}</a>
+    );
+  };
 });
 
 describe('CategoryTableEmptyState Component', () => {
@@ -37,7 +39,7 @@ describe('CategoryTableEmptyState Component', () => {
     const createButton = screen.getByTestId('create-category-button');
     expect(createButton).toBeInTheDocument();
     expect(createButton).toHaveAttribute('href', '/admin/categories/new');
-    expect(createButton.textContent).toContain('Create your first category');
+    expect(createButton.textContent).toContain('Add New Category');
   });
 
   it('uses site-specific URL when siteSlug is provided', () => {
@@ -45,7 +47,7 @@ describe('CategoryTableEmptyState Component', () => {
 
     const createButton = screen.getByTestId('create-category-button');
     expect(createButton).toHaveAttribute('href', '/admin/sites/test-site/categories/new');
-    expect(createButton.textContent).toContain('Create your first category');
+    expect(createButton.textContent).toContain('Add New Category');
   });
 
   it('has proper styling for the empty state container', () => {

@@ -28,6 +28,8 @@ export interface CategoryTableHeaderProps {
   onCreateClick: () => void;
   onToggleHierarchy: () => void;
   showHierarchy: boolean;
+  viewMode: 'table' | 'card';
+  toggleViewMode: () => void;
 }
 
 export interface CategoryTableSortHeaderProps {
@@ -95,6 +97,7 @@ export interface CategoriesMobileViewProps {
   onEditClick: (id: string) => void;
   onViewClick: (id: string) => void;
   siteSlug?: string;
+  'data-testid'?: string;
 }
 
 export interface CategoryHierarchyManagerProps {

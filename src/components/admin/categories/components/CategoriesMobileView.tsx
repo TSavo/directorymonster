@@ -5,13 +5,14 @@ import { CategoriesMobileViewProps } from '../types';
 /**
  * Mobile-friendly view of categories that replaces the table for smaller screens
  */
-export function CategoriesMobileView({ 
-  categories, 
-  showSiteColumn, 
+export function CategoriesMobileView({
+  categories,
+  showSiteColumn,
   onDeleteClick,
   onEditClick,
   onViewClick,
-  siteSlug 
+  siteSlug,
+  'data-testid': dataTestId = 'categories-mobile-view'
 }: CategoriesMobileViewProps) {
   // Format date for display
   const formatDate = (timestamp: number) => {
@@ -23,10 +24,10 @@ export function CategoriesMobileView({
   };
 
   return (
-    <div className="md:hidden space-y-4" data-testid="categories-mobile-view">
+    <div className="md:hidden space-y-4" data-testid={dataTestId}>
       {categories.map((category) => (
-        <article 
-          key={category.id} 
+        <article
+          key={category.id}
           className="border rounded-lg p-4 space-y-3"
           data-testid={`category-card-${category.id}`}
         >
@@ -35,7 +36,7 @@ export function CategoriesMobileView({
               {category.name}
             </h3>
             {category.childCount > 0 && (
-              <div 
+              <div
                 className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
                 data-testid={`child-count-${category.id}`}
               >
@@ -43,7 +44,7 @@ export function CategoriesMobileView({
               </div>
             )}
           </div>
-          
+
           <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-500">
             {category.parentName && (
               <>
@@ -51,30 +52,30 @@ export function CategoriesMobileView({
                 <div data-testid={`parent-name-${category.id}`}>{category.parentName}</div>
               </>
             )}
-            
+
             <div>Order:</div>
             <div data-testid={`order-value-${category.id}`}>{category.order}</div>
-            
+
             {showSiteColumn && (
               <>
                 <div data-testid="site-label">Site:</div>
                 <div data-testid={`site-name-${category.id}`}>{category.siteName}</div>
               </>
             )}
-            
+
             <div>Last Updated:</div>
             <div data-testid={`updated-date-${category.id}`}>{formatDate(category.updatedAt)}</div>
           </div>
-          
+
           <div className="flex justify-end space-x-3 pt-2 border-t">
-            <button 
+            <button
               onClick={() => onViewClick(category.id)}
               className="text-blue-600 hover:text-blue-900 text-sm font-medium"
               data-testid={`view-button-${category.id}`}
             >
               View
             </button>
-            <button 
+            <button
               onClick={() => onEditClick(category.id)}
               className="text-amber-600 hover:text-amber-900 text-sm font-medium"
               data-testid={`edit-button-${category.id}`}

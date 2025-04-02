@@ -297,12 +297,14 @@ describe('CategoriesMobileView Edge Cases', () => {
     // Even with empty slug, view button should be clickable
     const viewButton = screen.getByTestId(`view-button-${mockCategoriesWithEdgeCases[1].id}`);
     expect(viewButton).toBeInTheDocument();
+    expect(viewButton).toHaveTextContent('View');
     fireEvent.click(viewButton);
     expect(mockOnViewClick).toHaveBeenCalledWith(mockCategoriesWithEdgeCases[1].id);
 
     // Edit button should be clickable
     const editButton = screen.getByTestId(`edit-button-${mockCategoriesWithEdgeCases[1].id}`);
     expect(editButton).toBeInTheDocument();
+    expect(editButton).toHaveTextContent('Edit');
     fireEvent.click(editButton);
     expect(mockOnEditClick).toHaveBeenCalledWith(mockCategoriesWithEdgeCases[1].id);
 
@@ -325,6 +327,7 @@ describe('CategoriesMobileView Edge Cases', () => {
     // Special character slug should have clickable buttons
     const viewButtonSpecial = screen.getByTestId(`view-button-${mockCategoriesWithEdgeCases[2].id}`);
     expect(viewButtonSpecial).toBeInTheDocument();
+    expect(viewButtonSpecial).toHaveTextContent('View');
     fireEvent.click(viewButtonSpecial);
     expect(mockOnViewClick).toHaveBeenCalledWith(mockCategoriesWithEdgeCases[2].id);
   });

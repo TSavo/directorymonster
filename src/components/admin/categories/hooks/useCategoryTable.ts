@@ -12,13 +12,19 @@ export function useCategoryTable(siteSlug?: string, initialCategories?: Category
   const [showHierarchy, setShowHierarchy] = useState(false);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(undefined);
-  
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+
   // Use the categories hook for data management
   const categoriesState = useCategories(siteSlug, initialCategories);
-  
+
   // Handle showing hierarchy view
   const toggleHierarchy = useCallback(() => {
     setShowHierarchy(prev => !prev);
+  }, []);
+
+  // Toggle between table and card view modes
+  const toggleViewMode = useCallback(() => {
+    setViewMode(prev => prev === 'table' ? 'card' : 'table');
   }, []);
 
   // Handle opening the form modal for editing
@@ -52,20 +58,20 @@ export function useCategoryTable(siteSlug?: string, initialCategories?: Category
     // Could navigate to the category page or toggle a view mode
     console.log(`View category: ${id}`);
   }, []);
-  
+
   // Determine if the site column should be visible (multi-tenant mode)
   const showSiteColumn = !siteSlug && categoriesState.sites.length > 0;
-  
+
   return {
     // UI state
     showHierarchy,
     formModalOpen,
     selectedCategoryId,
     showSiteColumn,
-    
+
     // Categories state from useCategories
     ...categoriesState,
-    
+
     // UI actions
     toggleHierarchy,
     handleEditCategory,
