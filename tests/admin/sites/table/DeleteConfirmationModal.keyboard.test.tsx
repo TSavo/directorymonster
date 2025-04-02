@@ -6,70 +6,70 @@ import { DeleteConfirmationModal } from '@/components/admin/sites/table/DeleteCo
 describe('DeleteConfirmationModal Component - Keyboard Accessibility', () => {
   // Setup test user for interactions
   const user = userEvent.setup();
-  
+
   it('supports keyboard navigation between buttons', async () => {
     const mockOnConfirm = jest.fn();
     const mockOnCancel = jest.fn();
-    
+
     render(
-      <DeleteConfirmationModal 
+      <DeleteConfirmationModal
         isOpen={true}
-        siteId="site-123"
         siteName="Test Site"
+        isLoading={false}
         onConfirm={mockOnConfirm}
         onCancel={mockOnCancel}
       />
     );
-    
-    // First focusable element should be the cancel button
+
+    // First focusable element should be the confirm button
     await user.tab();
-    expect(screen.getByTestId('delete-modal-cancel')).toHaveFocus();
-    
-    // Tab again to focus on confirm button
+    expect(screen.getByTestId('confirm-delete-button')).toHaveFocus();
+
+    // Tab again to focus on cancel button
     await user.tab();
-    expect(screen.getByTestId('delete-modal-confirm')).toHaveFocus();
+    expect(screen.getByTestId('cancel-delete-button')).toHaveFocus();
   });
 
   it('responds to Enter key on focused buttons', async () => {
     const mockOnConfirm = jest.fn();
     const mockOnCancel = jest.fn();
-    
+
     render(
-      <DeleteConfirmationModal 
+      <DeleteConfirmationModal
         isOpen={true}
-        siteId="site-123"
         siteName="Test Site"
+        isLoading={false}
         onConfirm={mockOnConfirm}
         onCancel={mockOnCancel}
       />
     );
-    
-    // Tab to the cancel button
+
+    // Tab to the confirm button
     await user.tab();
-    expect(screen.getByTestId('delete-modal-cancel')).toHaveFocus();
-    
+    expect(screen.getByTestId('confirm-delete-button')).toHaveFocus();
+
     // Press Enter to trigger the button
     await user.keyboard('{Enter}');
-    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+    expect(mockOnConfirm).toHaveBeenCalledTimes(1);
   });
 
   it('closes on Escape key press', async () => {
     const mockOnConfirm = jest.fn();
     const mockOnCancel = jest.fn();
-    
+
     render(
-      <DeleteConfirmationModal 
+      <DeleteConfirmationModal
         isOpen={true}
-        siteId="site-123"
         siteName="Test Site"
+        isLoading={false}
         onConfirm={mockOnConfirm}
         onCancel={mockOnCancel}
       />
     );
-    
+
     // Press Escape key
     await user.keyboard('{Escape}');
-    
+
     // Cancel should be called
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
