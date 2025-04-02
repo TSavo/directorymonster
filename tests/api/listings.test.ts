@@ -140,7 +140,9 @@ describe('Listings API', () => {
 
       // Verify the response
       expect(response.status).toBe(200);
-      expect(data).toEqual(mockListings);
+      expect(data.results).toEqual(mockListings);
+      expect(data.pagination).toBeDefined();
+      expect(data.pagination.totalResults).toBe(mockListings.length);
 
       // Verify the Redis client was called correctly
       expect(kv.get).toHaveBeenCalledWith('test:site:slug:test-site');
@@ -253,7 +255,9 @@ describe('Listings API', () => {
 
       // Verify the response - should still get the successful listing
       expect(response.status).toBe(200);
-      expect(data).toEqual([mockListing]);
+      expect(data.results).toEqual([mockListing]);
+      expect(data.pagination).toBeDefined();
+      expect(data.pagination.totalResults).toBe(1);
 
       // Verify error was logged
       expect(console.error).toHaveBeenCalledWith(
