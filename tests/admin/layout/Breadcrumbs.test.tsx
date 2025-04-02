@@ -18,6 +18,13 @@ jest.mock('next/link', () => {
   };
 });
 
+// Mock the ChevronRightIcon component
+jest.mock('@/components/admin/layout/icons', () => ({
+  ChevronRightIcon: ({ className }: { className: string }) => (
+    <svg className={className} data-testid="chevron-right-icon" />
+  ),
+}));
+
 describe('Breadcrumbs Component', () => {
   it('renders nothing when on admin root path', () => {
     const { container } = render(<Breadcrumbs pathname="/admin" />);
