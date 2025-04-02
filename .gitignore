@@ -85,6 +85,8 @@ seo_data/processed/*.json
 
 # Log files
 *.log
+/logs/
+logs/*.log
 
 # Test output files
 *_test_output.log
@@ -94,6 +96,18 @@ build.log
 cleanup.log
 restart.log
 seed*.log
+/test-results/
+test-results/*.log
+test-results/*.txt
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+/backups/
+backups/*.bak
 
 # Temporary files
 check-ci-workflow.bat
@@ -104,6 +118,13 @@ test-local-ci.bat
 run_pythondev.*
 run-tests.sh
 commit-message.txt
+*.swp
+*.swo
+*~
+.~*
+/temp-files/
+temp-files/*
+cleanup-files.bat
 
 # Screenshots and debugging assets
 admin-*.png
@@ -121,7 +142,4 @@ after-*.png
 
 # Coverage reports
 /coverage*/
-
-# Checkpoint files
-checkpoint.md
-debug-logs/
+coverage_summary.txt
