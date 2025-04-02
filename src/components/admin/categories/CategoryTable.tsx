@@ -30,11 +30,11 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
     currentCategories,
     allCategories,
     sites,
-    
+
     // Loading and error states
     isLoading,
     error,
-    
+
     // Filtering
     searchTerm,
     setSearchTerm,
@@ -42,32 +42,34 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
     setParentFilter,
     siteFilter,
     setSiteFilter,
-    
+
     // Sorting
     sortField,
     sortOrder,
     handleSort,
-    
+
     // Pagination
     currentPage,
     totalPages,
     itemsPerPage,
     setItemsPerPage,
     goToPage,
-    
+
     // UI state
     showHierarchy,
     formModalOpen,
     selectedCategoryId,
     showSiteColumn,
-    
+    viewMode,
+    toggleViewMode,
+
     // Delete handling
     isDeleteModalOpen,
     categoryToDelete,
     confirmDelete,
     handleDelete,
     cancelDelete,
-    
+
     // UI actions
     toggleHierarchy,
     handleEditCategory,
@@ -75,7 +77,7 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
     handleCloseFormModal,
     handleCategorySaved,
     handleViewCategory,
-    
+
     // Data operations
     fetchCategories
   } = useCategoryTable(siteSlug, initialCategories);
@@ -87,12 +89,12 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
 
   // Loading state
   if (isLoading) {
-    return <CategoryTableSkeleton data-testid="category-table-loading" />;
+    return <CategoryTableSkeleton data-testid="category-table-skeleton" />;
   }
 
   // Error state
   if (error) {
-    return <CategoryTableError error={error} onRetry={handleRetry} data-testid="category-table-error" />;
+    return <CategoryTableError error={error} onRetry={handleRetry} data-testid="error-message" />;
   }
 
   // Empty state
@@ -101,7 +103,7 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
   }
 
   return (
-    <div className="overflow-hidden" data-testid="category-table-container">
+    <div className="overflow-hidden" data-testid="category-table-content">
       {/* Header with search and filters */}
       <CategoryTableHeader
         totalCategories={filteredCategories.length}
@@ -117,53 +119,61 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
         onCreateClick={handleCreateCategory}
         onToggleHierarchy={toggleHierarchy}
         showHierarchy={showHierarchy}
+        viewMode={viewMode}
+        toggleViewMode={toggleViewMode}
       />
-      
-      {/* Table for desktop */}
-      <CategoryTableContainer>
-        <thead className="bg-gray-50">
-          <CategoryTableColumns
-            showSiteColumn={showSiteColumn}
-            sortField={sortField}
-            sortOrder={sortOrder}
-            onSort={handleSort}
-          />
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          <CategoryErrorBoundary
-            fallback={
-              <tr>
-                <td colSpan={showSiteColumn ? 5 : 4} className="px-4 py-3 text-center text-red-500">
-                  Error rendering category hierarchy. Please try disabling hierarchy view or contact support.
-                </td>
-              </tr>
-            }
-          >
-            <CategoryHierarchyManager
-              currentCategories={currentCategories}
-              showHierarchy={showHierarchy}
-              showSiteColumn={showSiteColumn}
-              sortField={sortField}
-              sortOrder={sortOrder}
-              onDeleteClick={confirmDelete}
-              onEditClick={handleEditCategory}
-              onViewClick={handleViewCategory}
-            />
-          </CategoryErrorBoundary>
-        </tbody>
-      </CategoryTableContainer>
-      
-      {/* Mobile view */}
-      <CategoriesMobileView
-        categories={currentCategories}
-        showSiteColumn={showSiteColumn}
-        onDeleteClick={confirmDelete}
-        siteSlug={siteSlug}
-        onEditClick={handleEditCategory}
-        onViewClick={handleViewCategory}
-        data-testid="category-table-mobile"
-      />
-      
+
+      {/* Table view */}
+      {viewMode === 'table' && (
+        <div data-testid="category-table-desktop">
+          <CategoryTableContainer>
+            <thead className="bg-gray-50">
+              <CategoryTableColumns
+                showSiteColumn={showSiteColumn}
+                sortField={sortField}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+              />
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              <CategoryErrorBoundary
+                fallback={
+                  <tr>
+                    <td colSpan={showSiteColumn ? 5 : 4} className="px-4 py-3 text-center text-red-500">
+                      Error rendering category hierarchy. Please try disabling hierarchy view or contact support.
+                    </td>
+                  </tr>
+                }
+              >
+                <CategoryHierarchyManager
+                  currentCategories={currentCategories}
+                  showHierarchy={showHierarchy}
+                  showSiteColumn={showSiteColumn}
+                  sortField={sortField}
+                  sortOrder={sortOrder}
+                  onDeleteClick={confirmDelete}
+                  onEditClick={handleEditCategory}
+                  onViewClick={handleViewCategory}
+                />
+              </CategoryErrorBoundary>
+            </tbody>
+          </CategoryTableContainer>
+        </div>
+      )}
+
+      {/* Card view */}
+      {viewMode === 'card' && (
+        <CategoriesMobileView
+          categories={currentCategories}
+          showSiteColumn={showSiteColumn}
+          onDeleteClick={confirmDelete}
+          siteSlug={siteSlug}
+          onEditClick={handleEditCategory}
+          onViewClick={handleViewCategory}
+          data-testid="category-table-mobile"
+        />
+      )}
+
       {/* Pagination */}
       <CategoryTablePagination
         currentPage={currentPage}
@@ -174,7 +184,7 @@ export function CategoryTable({ siteSlug, initialCategories }: CategoryTableProp
         totalItems={filteredCategories.length}
         data-testid="category-table-pagination"
       />
-      
+
       {/* Delete confirmation modal */}
       {categoryToDelete && (
         <DeleteConfirmationModal
