@@ -1,4 +1,68 @@
-# Checkpoint: Resolution of PR Conflicts - April 1, 2025
+# Checkpoint: Sites API Authentication Fix - April 1, 2025
+
+## Identified Issue
+
+After reviewing the codebase, I found a security issue in the `/api/sites/route.ts` file. The GET and POST endpoints are not properly secured with authentication middleware:
+
+```typescript
+export const GET = withRedis(async (request: NextRequest) => {
+  // TODO: Add authentication
+  
+  const sites = await kv.keys('site:slug:*');
+  // ...
+});
+
+export const POST = withRedis(async (request: NextRequest) => {
+  // TODO: Add authentication
+  
+  try {
+    const data = await request.json();
+    // ...
+  }
+});
+```
+
+These endpoints are only using the `withRedis` middleware, which handles Redis connectivity, but not authentication or tenant validation. This is a security vulnerability as it allows unauthenticated access to site data.
+
+Based on the patterns used in other parts of the application, these endpoints should be secured using one of the following security middleware:
+1. `withTenantAccess` - For basic tenant authorization
+2. `withPermission` - For specific permission checks
+
+## Plan
+
+1. Create a new branch: `fix/sites-api-authentication`
+2. Update both API endpoints to use proper security middleware
+3. Use the `withPermission` middleware to ensure users have the appropriate permissions:
+   - For GET: Require 'site' resource type with 'read' permission
+   - For POST: Require 'site' resource type with 'create' permission
+4. Test the API endpoints to ensure they work correctly with authentication
+5. Commit changes and create a PR
+
+## Implementation
+
+I've successfully added proper authentication to the sites API endpoints:
+
+1. Created branch `fix/sites-api-authentication`
+2. Added security middleware to both API endpoints:
+   - Wrapped the GET handler with `withPermission` requiring 'site' resource type and 'read' permission
+   - Wrapped the POST handler with `withPermission` requiring 'site' resource type and 'create' permission
+3. Added proper JSDoc comments to the functions to document security requirements
+4. Updated request parameter to use the validated request from the middleware
+
+### Changes made:
+
+- Added imports for `withPermission` middleware and necessary types
+- Wrapped the GET handler logic in a `withPermission` call
+- Wrapped the POST handler logic in a `withPermission` call
+- Added JSDoc comments to document security requirements
+
+These changes ensure that only authenticated users with the proper permissions can access or create site data, which is critical for maintaining proper multi-tenant security in the application.
+
+## Next Steps
+
+1. Commit the changes
+2. Push the branch
+3. Create a PR for review
 
 ## Current Status
 - ✅ PR #99 has been successfully merged to main
