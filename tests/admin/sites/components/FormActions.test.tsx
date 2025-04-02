@@ -20,10 +20,10 @@ describe('FormActions Component - Basic Rendering', () => {
 
     // Check if both buttons are rendered
     expect(screen.getByTestId('form-back-button')).toBeInTheDocument();
-    expect(screen.getByTestId('form-next-button')).toBeInTheDocument();
+    expect(screen.getByTestId('next-button')).toBeInTheDocument();
 
     // Next button should say "Next" not "Submit"
-    expect(screen.getByTestId('form-next-button')).toHaveTextContent('Next');
+    expect(screen.getByTestId('next-button')).toHaveTextContent('Next');
   });
 
   it('renders submit button on last step', () => {
@@ -45,8 +45,8 @@ describe('FormActions Component - Basic Rendering', () => {
     expect(screen.getByTestId('form-back-button')).toBeInTheDocument();
     expect(screen.getByTestId('form-next-button')).toBeInTheDocument();
 
-    // Next button should say "Submit" on last step
-    expect(screen.getByTestId('form-next-button')).toHaveTextContent(/Submit|Create Site|Update Site/);
+    // Next button should say "Create Site" on last step
+    expect(screen.getByTestId('form-next-button')).toHaveTextContent('Create Site');
   });
 
   it('hides back button on first step', () => {
@@ -68,7 +68,7 @@ describe('FormActions Component - Basic Rendering', () => {
     expect(screen.queryByTestId('form-back-button')).not.toBeInTheDocument();
 
     // Next button should be visible
-    expect(screen.getByTestId('form-next-button')).toBeInTheDocument();
+    expect(screen.getByTestId('next-button')).toBeInTheDocument();
   });
 
   it('shows loading state when submitting', () => {
@@ -92,5 +92,6 @@ describe('FormActions Component - Basic Rendering', () => {
 
     // Should show loading indicator/text
     expect(submitButton).toHaveTextContent(/loading/i);
+    expect(screen.getByTestId('submit-loading')).toBeInTheDocument();
   });
 });
