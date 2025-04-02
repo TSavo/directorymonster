@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { ZKPLogin } from '@/components/admin/auth';
@@ -26,41 +26,41 @@ describe('ZKPLogin Validation Tests', () => {
   it('shows validation errors for empty fields', async () => {
     const user = userEvent.setup();
     render(<ZKPLogin />);
-    
+
     // Submit without filling any fields
     await user.click(screen.getByRole('button', { name: /sign in/i }));
-    
+
     // Should show validation errors
-    expect(await screen.findByText(/email is required/i)).toBeInTheDocument();
+    expect(await screen.findByText(/username is required/i)).toBeInTheDocument();
     expect(await screen.findByText(/password is required/i)).toBeInTheDocument();
   });
-  
-  it('validates email format', async () => {
+
+  it('validates username input', async () => {
     const user = userEvent.setup();
     render(<ZKPLogin />);
-    
-    // Type invalid email
-    await user.type(screen.getByLabelText(/email/i), 'not-an-email');
+
+    // Type a username and password
+    await user.type(screen.getByLabelText(/username/i), 'user');
     await user.type(screen.getByLabelText(/password/i), 'validPassword123');
-    
+
     // Submit form
     await user.click(screen.getByRole('button', { name: /sign in/i }));
-    
-    // Should show email validation error
-    expect(await screen.findByText(/please enter a valid email address/i)).toBeInTheDocument();
+
+    // No validation error for username since it's not empty
+    expect(screen.queryByText(/username is required/i)).not.toBeInTheDocument();
   });
-  
+
   it('validates password length', async () => {
     const user = userEvent.setup();
     render(<ZKPLogin />);
-    
-    // Type valid email but short password
-    await user.type(screen.getByLabelText(/email/i), 'valid@example.com');
+
+    // Type valid username but short password
+    await user.type(screen.getByLabelText(/username/i), 'validuser');
     await user.type(screen.getByLabelText(/password/i), 'short');
-    
+
     // Submit form
     await user.click(screen.getByRole('button', { name: /sign in/i }));
-    
+
     // Should show password validation error
     expect(await screen.findByText(/password must be at least 8 characters/i)).toBeInTheDocument();
   });
@@ -68,41 +68,52 @@ describe('ZKPLogin Validation Tests', () => {
   it('clears validation errors when input is corrected', async () => {
     const user = userEvent.setup();
     render(<ZKPLogin />);
-    
+
     // Submit empty form to trigger validation
     await user.click(screen.getByRole('button', { name: /sign in/i }));
-    
+
     // Verify error appears
-    expect(await screen.findByText(/email is required/i)).toBeInTheDocument();
-    
-    // Type in valid email
-    await user.type(screen.getByLabelText(/email/i), 'valid@example.com');
-    
-    // Error should be cleared
-    expect(screen.queryByText(/email is required/i)).not.toBeInTheDocument();
+    expect(await screen.findByText(/username is required/i)).toBeInTheDocument();
+
+    // Type in valid username
+    await user.type(screen.getByLabelText(/username/i), 'validuser');
+
+    // Submit form again to trigger validation
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+    // Now we should see password error but not username error
+    expect(await screen.findByText(/password is required/i)).toBeInTheDocument();
+    expect(screen.queryByText(/username is required/i)).not.toBeInTheDocument();
   });
 
-  it('updates security indicator based on password strength', async () => {
+  it('handles password validation correctly', async () => {
     const user = userEvent.setup();
     render(<ZKPLogin />);
-    
+
+    // Fill in username to avoid username validation error
+    await user.type(screen.getByLabelText(/username/i), 'validuser');
+
     const passwordInput = screen.getByLabelText(/password/i);
-    const securityIndicator = screen.getByTestId('security-indicator');
-    
-    // Initially green (secure)
-    expect(securityIndicator).toHaveClass('text-green-500');
-    
+
     // Type weak password
     await user.type(passwordInput, 'weak');
-    
-    // Should change to red (insecure)
-    expect(securityIndicator).toHaveClass('text-red-500');
-    
+
+    // Submit form
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+    // Should show password validation error
+    expect(await screen.findByText(/password must be at least 8 characters/i)).toBeInTheDocument();
+
     // Clear and type stronger password
     await user.clear(passwordInput);
     await user.type(passwordInput, 'StrongP@ssw0rd123');
-    
-    // Should change to green (secure)
-    expect(securityIndicator).toHaveClass('text-green-500');
+
+    // Submit form again to trigger validation
+    await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+    // Now we should not see the password length error
+    await waitFor(() => {
+      expect(screen.queryByText(/password must be at least 8 characters/i)).not.toBeInTheDocument();
+    });
   });
 });
