@@ -12,11 +12,17 @@ DirectoryMonster is a comprehensive platform combining:
    - Multi-tenant directory sites with custom domains
    - Redis-based data storage
    - SEO optimization with backlink management
+   - Secure Zero-Knowledge Proof (ZKP) authentication
 
 2. **AI-Powered Python Scraper**
    - Selenium-based web scraping with LLM analysis
    - Automated data extraction and categorization
    - Flexible data export options
+
+3. **Zero-Knowledge Proof Authentication**
+   - Cryptographically secure authentication without password transmission
+   - Multi-round hashing with domain separation
+   - Docker-ready deployment for production environments
 
 ## Quick Start
 
@@ -197,6 +203,41 @@ The project documentation is organized into implementation guides and specificat
 - [TDD Testing Specification](specs/TDD_TESTING_SPEC.md)
 - [Cross-Tenant Security Specification](specs/CROSS_TENANT_SECURITY_SPEC.md)
 - [Multi-Tenant ACL Specification](specs/MULTI_TENANT_ACL_SPEC.md)
+- [ZKP Authentication Specification](docs/zkp-authentication.md)
+
+## Zero-Knowledge Proof Authentication
+
+DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) authentication system that allows users to prove they know their password without revealing it.
+
+### Features
+
+- **Secure Authentication**: Users can authenticate without transmitting passwords
+- **Cryptographic Security**: Uses multi-round hashing with domain separation
+- **Docker Integration**: Ready for production deployment with Docker
+
+### Usage
+
+```javascript
+const zkp = require('./src/lib/zkp');
+
+// Generate a proof
+const { proof, publicSignals } = await zkp.generateProof('username', 'password', 'salt');
+
+// Verify a proof
+const isValid = await zkp.verifyProof(proof, publicSignals);
+```
+
+### Setup
+
+```bash
+# Set up the ZKP authentication system
+npm run zkp:setup
+
+# Run the ZKP authentication system in Docker
+npm run zkp:docker
+```
+
+For more information, see the [Production Deployment Guide](docs/production-deployment.md).
 
 ## Troubleshooting
 
