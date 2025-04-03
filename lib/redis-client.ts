@@ -231,4 +231,37 @@ class Transaction {
 // Create a singleton instance
 export const kv = new RedisClient();
 
+// Export a redis-compatible interface for backward compatibility
+export const redis = {
+  set: async (key: string, value: any) => kv.set(key, value),
+  get: async (key: string) => kv.get(key),
+  del: async (key: string) => kv.del(key),
+  keys: async (pattern: string) => kv.keys(pattern),
+  sadd: async () => 1, // Mock implementation
+  srem: async () => 1, // Mock implementation
+  smembers: async () => [], // Mock implementation
+  sismember: async () => 0, // Mock implementation
+  zadd: async (key: string, score: number, member: string) => {
+    // Store the member with its score in a special key format
+    await kv.set(`${key}:${member}`, { score, member });
+    return 1;
+  },
+  zrem: async (key: string, member: string) => {
+    await kv.del(`${key}:${member}`);
+    return 1;
+  },
+  zrangebyscore: async (key: string) => {
+    // Get all keys that match the pattern
+    const keys = await kv.keys(`${key}:*`);
+    // Extract the members from the keys
+    return keys.map(k => k.split(':').pop());
+  },
+  setex: async (key: string, seconds: number, value: any) => {
+    await kv.set(key, value, seconds);
+    return 'OK';
+  },
+  expire: async () => 1, // Mock implementation
+  multi: () => kv.multi(),
+};
+
 export default kv;
