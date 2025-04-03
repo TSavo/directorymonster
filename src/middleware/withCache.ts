@@ -18,7 +18,7 @@ interface CacheOptions {
  * @returns A wrapped handler that adds caching headers
  */
 export function withCache(
-  handler: (request: NextRequest, context: any) => Promise<NextResponse>,
+  handler: (request: NextRequest, context: { params: Record<string, string | string[]> }) => Promise<NextResponse>,
   options?: CacheOptions
 ) {
   const {
@@ -28,12 +28,24 @@ export function withCache(
     isPublic = true
   } = options || {};
 
-  return async (request: NextRequest, context: any) => {
+  return async (request: NextRequest, context: { params: Record<string, string | string[]> }) => {
     // Call the original handler
     const response = await handler(request, context);
 
     // Add caching headers
     if (response?.headers?.set) {
+      // Skip caching for error responses
+      if (response.status >= 400) {
+        response.headers.set('Cache-Control', 'no-store');
+        return response;
+      }
+
+      // Skip caching for non-GET requests
+      if (request.method !== 'GET') {
+        response.headers.set('Cache-Control', 'no-store');
+        return response;
+      }
+
       // Set cache control headers for endpoints
       const directive = isPublic ? 'public' : 'private';
       response.headers.set(

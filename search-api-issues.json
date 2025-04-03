@@ -1,0 +1,6 @@
+[
+  {
+    "title": "Implement GET /api/search API",
+    "body": "## Description\nImplement the GET /api/search API endpoint according to the specification in `specs/api/search/GET_search.md`.\n\n## Requirements\n- Search listings based on text query and/or filters\n- Support filtering by category ID, featured status, and listing status\n- Implement pagination with configurable page size\n- Sort results by relevance or other criteria\n- Return comprehensive result object with pagination metadata\n- Ensure cross-tenant isolation (results only from specified site)\n- Optimize search indexing for quick retrieval\n\n## Acceptance Criteria\n- API endpoint follows the specification exactly\n- Search results are accurate and relevant\n- All filter parameters work correctly\n- Pagination is implemented correctly\n- Sorting options work as expected\n- Cross-tenant isolation is enforced\n- Response time is < 500ms for typical queries\n- Proper error handling is implemented\n- Unit tests cover all scenarios in the specification\n- Integration tests verify the API works end-to-end\n\n## Related Specifications\n- `specs/api/search/GET_search.md`"
+  }
+]

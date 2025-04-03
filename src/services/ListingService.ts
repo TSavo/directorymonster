@@ -46,7 +46,7 @@ export class ListingService {
    * @returns Paginated listings response or array of listings if no pagination options provided
    */
   static async getListingsBySiteId(siteId: string, options: ListingFilterOptions = {}): Promise<Listing[] | PaginatedListingsResponse> {
-    return this.getListings(siteId, options);
+    return ListingService.getListings(siteId, options);
   }
 
   /**
@@ -62,7 +62,7 @@ export class ListingService {
     categoryId: string,
     options: Omit<ListingFilterOptions, 'categoryId'> = {}
   ): Promise<Listing[] | PaginatedListingsResponse> {
-    return this.getListings(siteId, { ...options, categoryId });
+    return ListingService.getListings(siteId, { ...options, categoryId });
   }
 
   /**
@@ -160,6 +160,17 @@ export class ListingService {
    */
   static async getListingBySlug(siteId: string, slug: string): Promise<Listing | null> {
     try {
+      // Validate input parameters
+      if (!siteId || typeof siteId !== 'string') {
+        console.error('Invalid siteId parameter:', siteId);
+        return null;
+      }
+
+      if (!slug || typeof slug !== 'string') {
+        console.error('Invalid slug parameter:', slug);
+        return null;
+      }
+
       // Determine if we're in test mode
       const isTestMode = process.env.NODE_ENV === 'test';
       const keyPrefix = isTestMode ? 'test:' : '';
@@ -194,6 +205,38 @@ export class ListingService {
     customFields?: Record<string, any>;
   }): Promise<Listing | null> {
     try {
+      // Validate input parameters
+      if (!siteId || typeof siteId !== 'string') {
+        console.error('Invalid siteId parameter:', siteId);
+        return null;
+      }
+
+      // Validate required data fields
+      if (!data.title || typeof data.title !== 'string') {
+        console.error('Invalid title parameter:', data.title);
+        return null;
+      }
+
+      if (!data.categoryId || typeof data.categoryId !== 'string') {
+        console.error('Invalid categoryId parameter:', data.categoryId);
+        return null;
+      }
+
+      if (!data.metaDescription || typeof data.metaDescription !== 'string') {
+        console.error('Invalid metaDescription parameter:', data.metaDescription);
+        return null;
+      }
+
+      if (!data.content || typeof data.content !== 'string') {
+        console.error('Invalid content parameter:', data.content);
+        return null;
+      }
+
+      if (!data.backlinkUrl || typeof data.backlinkUrl !== 'string') {
+        console.error('Invalid backlinkUrl parameter:', data.backlinkUrl);
+        return null;
+      }
+
       // Determine if we're in test mode
       const isTestMode = process.env.NODE_ENV === 'test';
       const keyPrefix = isTestMode ? 'test:' : '';

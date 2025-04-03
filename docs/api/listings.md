@@ -19,18 +19,22 @@ The API supports multiple ways to access listings:
 1. **Domain-based access**:
    - `https://example.com/categories/category-name/listings`
    - `https://example.com/listings`
+   - Rewritten to: `/api/sites/example/categories/category-name/listings`
 
 2. **Subdomain-based access**:
    - `https://site-name.example.com/categories/category-name/listings`
    - `https://site-name.example.com/listings`
+   - Rewritten to: `/api/sites/site-name/categories/category-name/listings`
 
 3. **Path-based access**:
    - `/site/site-name/categories/category-name/listings`
    - `/site/site-name/listings`
+   - Rewritten to: `/api/sites/site-name/categories/category-name/listings`
 
 4. **Query parameter-based access**:
    - `/categories/category-name/listings?site=site-name`
    - `/listings?site=site-name`
+   - Rewritten to: `/api/sites/site-name/categories/category-name/listings`
 
 All these URL patterns are automatically rewritten to the canonical API endpoints by the edge middleware.
 
@@ -78,6 +82,8 @@ Retrieves all listings for a site, with optional filtering, sorting, and paginat
 }
 ```
 
+> Note: `createdAt` and `updatedAt` are Unix timestamps in milliseconds.
+
 ### GET /api/sites/[siteSlug]/listings/[listingSlug]
 
 Retrieves a specific listing by its slug.
@@ -100,6 +106,8 @@ Retrieves a specific listing by its slug.
   "updatedAt": 1632145677000
 }
 ```
+
+> Note: `createdAt` and `updatedAt` are Unix timestamps in milliseconds.
 
 ### GET /api/sites/[siteSlug]/categories/[categorySlug]/listings
 
@@ -155,3 +163,13 @@ This means:
 - Responses are considered fresh for 60 seconds in browsers
 - Responses are considered fresh for 300 seconds (5 minutes) in CDNs
 - Stale responses can be used for up to 3600 seconds (1 hour) while revalidating in the background
+
+### Cache Invalidation
+
+The API implements the following cache invalidation strategies:
+
+1. **Time-based expiration**: Cached responses automatically expire based on the cache control headers.
+2. **Conditional requests**: Clients can use `If-Modified-Since` and `If-None-Match` headers to validate cached responses.
+3. **Manual invalidation**: When a listing is updated or deleted, related cache entries are automatically purged.
+
+Error responses (4xx and 5xx status codes) and non-GET requests are never cached.

@@ -1,0 +1,10 @@
+[
+  {
+    "title": "Implement GET /api/sites/[siteSlug]/listings API",
+    "body": "## Description\nImplement the GET /api/sites/[siteSlug]/listings API endpoint according to the specification in `specs/api/listings/GET_listings.md`.\n\n## Requirements\n- Retrieve all listings for a given site slug\n- Support filtering by category ID\n- Implement pagination with configurable page size\n- Handle test environment by using appropriate key prefixes\n- Parse and validate JSON data from Redis\n- Implement resilient fetching that doesn't fail if one listing is corrupted\n- Optimize pagination for large listing sets\n\n## Acceptance Criteria\n- API endpoint follows the specification exactly\n- Listings are returned with correct pagination\n- Category filtering works correctly\n- Proper error handling is implemented\n- Tenant isolation is enforced\n- Corrupted listings are handled gracefully\n- Unit tests cover all scenarios in the specification\n- Integration tests verify the API works end-to-end\n\n## Related Specifications\n- `specs/api/listings/GET_listings.md`"
+  },
+  {
+    "title": "Implement GET /api/sites/[siteSlug]/listings/[listingId] API",
+    "body": "## Description\nImplement the GET /api/sites/[siteSlug]/listings/[listingId] API endpoint according to the specification in `specs/api/listings/GET_listing_by_id.md`.\n\n## Requirements\n- Retrieve a single listing by ID\n- Validate the listing belongs to the specified site\n- Include category information with the listing\n- Generate and include the listing's public URL\n- Properly handle non-existent listings\n- Implement tenant isolation\n- Validate site exists before attempting to fetch listing\n\n## Acceptance Criteria\n- API endpoint follows the specification exactly\n- Listing data is returned correctly with category information\n- Public URL is generated correctly\n- Site-listing relationship is validated\n- Proper error handling is implemented\n- Tenant isolation is enforced\n- Unit tests cover all scenarios in the specification\n- Integration tests verify the API works end-to-end\n\n## Related Specifications\n- `specs/api/listings/GET_listing_by_id.md`"
+  }
+]
