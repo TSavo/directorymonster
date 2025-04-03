@@ -19,6 +19,13 @@ if (process.env.NODE_ENV === 'production' &&
  * `userId` claim and has not expired. If the token is invalid, missing required claims, or expired, an error is logged
  * and the function returns null.
  *
+ * Enhanced security features:
+ * - Rejects tokens without expiration claims
+ * - Rejects tokens without issued-at claims
+ * - Validates token algorithm to prevent algorithm downgrade attacks
+ * - Checks for suspiciously long token lifetimes
+ * - Checks for tokens that are too old (potential replay attacks)
+ *
  * @param token - The JWT token to verify.
  * @returns The decoded token payload if valid, otherwise null.
  */
@@ -34,20 +41,46 @@ export function verifyAuthToken(token: string): JwtPayload | null {
       algorithms: ['HS256']
     }) as JwtPayload;
 
-    // Validate the required claims
+    // Validate required claims
     if (!decoded.userId) {
       console.error('Invalid token: missing userId claim');
       return null;
     }
 
-    // Additional validation for recommended claims
-    // Note: We don't strictly require iat claim, but it's a good practice to have it
-    if (!decoded.iat) {
-      console.warn('Warning: Token missing iat claim');
+    // Reject tokens without expiration claim
+    if (!decoded.exp) {
+      console.error('Invalid token: missing expiration claim');
+      return null;
     }
 
-    // Note: We don't need to manually check expiration here anymore
-    // as the verify function will do it for us with ignoreExpiration: false
+    // Reject tokens without issued-at claim
+    if (!decoded.iat) {
+      console.error('Invalid token: missing issued-at claim');
+      return null;
+    }
+
+    // Maximum allowed token lifetime in seconds (default: 24 hours)
+    const MAX_TOKEN_LIFETIME = parseInt(process.env.MAX_TOKEN_LIFETIME || '86400', 10);
+
+    // Check for suspiciously long token lifetime
+    // This helps detect tampering with expiration time
+    const tokenLifetime = decoded.exp - decoded.iat;
+    if (tokenLifetime > MAX_TOKEN_LIFETIME) {
+      console.error(`Invalid token: suspiciously long lifetime (${tokenLifetime}s)`);
+      return null;
+    }
+
+    // Additional check for token tampering: verify the token's age
+    // If the token was issued too long ago, it might be tampered
+    const currentTime = Math.floor(Date.now() / 1000);
+    const tokenAge = currentTime - decoded.iat;
+
+    // If the token is older than MAX_TOKEN_LIFETIME, reject it
+    // This helps detect tokens with tampered expiration times
+    if (tokenAge > MAX_TOKEN_LIFETIME) {
+      console.error(`Invalid token: token is too old (${tokenAge}s)`);
+      return null;
+    }
 
     return decoded;
   } catch (error) {

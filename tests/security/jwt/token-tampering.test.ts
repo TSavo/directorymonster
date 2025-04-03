@@ -77,12 +77,8 @@ describe('JWT Token Tampering Detection', () => {
       // Re-encode the header and payload
       const parts = validToken.split('.');
       const header = parts[0];
-      // Use a more reliable Base64URL encoding approach
-      const tamperedPayload = Buffer.from(JSON.stringify(decoded))
-        .toString('base64')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
+      // Use the base64UrlEncode utility function
+      const tamperedPayload = jwtUtils.base64UrlEncode(JSON.stringify(decoded));
 
       // Create tampered token with original signature
       const tamperedToken = `${header}.${tamperedPayload}.${parts[2]}`;
@@ -108,12 +104,8 @@ describe('JWT Token Tampering Detection', () => {
       header.alg = 'none';
 
       // Re-encode the header
-      // Use a more reliable Base64URL encoding approach
-      const tamperedHeader = Buffer.from(JSON.stringify(header))
-        .toString('base64')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
+      // Use the base64UrlEncode utility function
+      const tamperedHeader = jwtUtils.base64UrlEncode(JSON.stringify(header));
 
       // Create tampered token
       const tamperedToken = `${tamperedHeader}.${parts[1]}.${parts[2]}`;
@@ -149,12 +141,8 @@ describe('JWT Token Tampering Detection', () => {
         header.alg = 'HS512';
 
         // Re-encode the header
-        // Use a more reliable Base64URL encoding approach
-        const tamperedHeader = Buffer.from(JSON.stringify(header))
-          .toString('base64')
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_')
-          .replace(/=+$/, '');
+        // Use the base64UrlEncode utility function
+        const tamperedHeader = jwtUtils.base64UrlEncode(JSON.stringify(header));
 
         tamperedToken = `${tamperedHeader}.${parts[1]}.${parts[2]}`;
       }

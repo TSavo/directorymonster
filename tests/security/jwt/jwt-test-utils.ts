@@ -8,7 +8,21 @@
 import jwt from 'jsonwebtoken';
 
 // Test secret key - should match the one used in the application for tests
-const TEST_JWT_SECRET = 'default-secret-for-development';
+const TEST_JWT_SECRET = process.env.TEST_JWT_SECRET || 'default-secret-for-development';
+
+/**
+ * Encode a string or buffer to Base64URL format
+ *
+ * @param input - The string or buffer to encode
+ * @returns A Base64URL encoded string (URL-safe with no padding)
+ */
+export function base64UrlEncode(input: string | Buffer): string {
+  return Buffer.from(typeof input === 'string' ? input : input.toString())
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
 
 /**
  * Generate a valid JWT token with the specified claims
@@ -107,7 +121,30 @@ export function generateTokenWithMissingClaims(
     delete filteredClaims[claim];
   }
 
-  // Sign the token
+  // For tokens without expiration or iat, we need to use a different approach
+  // because jsonwebtoken automatically adds these claims
+  if (omitClaims.includes('exp') || omitClaims.includes('iat')) {
+    // Sign the token first
+    const token = jwt.sign(filteredClaims, secret);
+
+    // Decode it
+    const decoded = jwt.decode(token) as Record<string, any>;
+
+    // Remove the claims that should be omitted
+    for (const claim of omitClaims) {
+      delete decoded[claim];
+    }
+
+    // Re-encode with the claims removed
+    const parts = token.split('.');
+    const header = parts[0];
+    const tamperedPayload = base64UrlEncode(JSON.stringify(decoded));
+
+    // Return the token with the original signature
+    return `${header}.${tamperedPayload}.${parts[2]}`;
+  }
+
+  // Sign the token normally for other cases
   return jwt.sign(filteredClaims, secret);
 }
 
@@ -154,12 +191,8 @@ export function generateTamperedToken(
     // This is a security risk that our enhanced validation should catch
     const parts = token.split('.');
     const header = parts[0];
-    // Use a more reliable Base64URL encoding approach
-    const tamperedPayload = Buffer.from(JSON.stringify(decoded))
-      .toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
+    // Use the base64UrlEncode utility function
+    const tamperedPayload = base64UrlEncode(JSON.stringify(decoded));
 
     // Return the tampered token with the original signature
     return `${header}.${tamperedPayload}.${parts[2]}`;

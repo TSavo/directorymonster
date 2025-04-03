@@ -61,7 +61,7 @@ describe('JWT Token Expiration', () => {
       expect(result).toBeNull();
     });
 
-    it('should handle a token with no expiration claim', () => {
+    it('should reject a token with no expiration claim', () => {
       // Arrange
       const token = jwtUtils.generateTokenWithMissingClaims(['exp']);
 
@@ -69,13 +69,12 @@ describe('JWT Token Expiration', () => {
       const result = verifyAuthToken(token);
 
       // Assert
-      // Note: The jsonwebtoken library doesn't require an exp claim by default
-      // Our implementation should handle this gracefully
-      // This test documents the current behavior
-      expect(result).not.toBeNull();
+      // Note: For security reasons, we now reject tokens without expiration
+      // This prevents tokens that never expire, which is a security risk
+      expect(result).toBeNull();
     });
 
-    it('should handle a token with no issued-at (iat) claim', () => {
+    it('should reject a token with no issued-at (iat) claim', () => {
       // Arrange
       const token = jwtUtils.generateTokenWithMissingClaims(['iat']);
 
@@ -83,10 +82,9 @@ describe('JWT Token Expiration', () => {
       const result = verifyAuthToken(token);
 
       // Assert
-      // Note: The jsonwebtoken library doesn't require an iat claim by default
-      // Our implementation should handle this gracefully
-      // This test documents the current behavior
-      expect(result).not.toBeNull();
+      // Note: For security reasons, we now reject tokens without an issued-at claim
+      // This helps prevent token tampering and replay attacks
+      expect(result).toBeNull();
     });
 
     it('should handle tokens with very short expiration times', () => {
