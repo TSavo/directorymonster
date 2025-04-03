@@ -1,54 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verify, JwtPayload } from 'jsonwebtoken';
 import RoleService from '@/lib/role-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
-
-// JWT secret should be stored in environment variables
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
-
-// Throw an error if JWT_SECRET is not set in production
-if (process.env.NODE_ENV === 'production' && 
-    (process.env.JWT_SECRET === undefined || process.env.JWT_SECRET === 'default-secret-for-development')) {
-  throw new Error('FATAL: JWT_SECRET environment variable must be set in production.');
-}
+import { verifyTokenSync, verifyAuthHeaderSync, EnhancedJwtPayload } from '@/lib/auth/token-validation';
 
 /**
  * Verifies a JWT token and returns its decoded payload.
  *
- * The function validates the provided token using the configured secret by ensuring that it contains a mandatory
- * `userId` claim and has not expired. If the token is invalid, missing required claims, or expired, an error is logged
- * and the function returns null.
+ * The function validates the provided token using the consolidated token validation module.
+ * This is a wrapper around verifyTokenSync for backward compatibility.
+ *
+ * Enhanced security features:
+ * - Rejects tokens without required claims (userId, exp, iat, jti)
+ * - Validates token algorithm to prevent algorithm downgrade attacks
+ * - Checks for suspiciously long token lifetimes
+ * - Checks for tokens that are too old (potential replay attacks)
  *
  * @param token - The JWT token to verify.
  * @returns The decoded token payload if valid, otherwise null.
  */
-export function verifyAuthToken(token: string): JwtPayload | null {
-  try {
-    // Verify the token using the JWT secret
-    const decoded = verify(token, JWT_SECRET) as JwtPayload;
-    
-    // Validate the required claims
-    if (!decoded.userId) {
-      console.error('Invalid token: missing userId claim');
-      return null;
-    }
-    
-    // Check token expiration
-    if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
-      console.error('Token expired');
-      return null;
-    }
-    
-    return decoded;
-  } catch (error) {
-    console.error('Token verification failed:', error);
-    return null;
-  }
+export function verifyAuthToken(token: string): EnhancedJwtPayload | null {
+  return verifyTokenSync(token);
 }
 
 /**
  * Helper function to handle common permission validation logic
- * 
+ *
  * @param req NextRequest object
  * @returns Object containing validation results or error response
  */
@@ -56,31 +32,37 @@ async function validatePermissionRequest(req: NextRequest): Promise<
   | { success: true; userId: string; tenantId: string }
   | { success: false; response: NextResponse }
 > {
-  // Extract the token from the Authorization header
+  // Extract and verify the token from the Authorization header
   const authHeader = req.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'Authentication required' },
+        {
+          error: 'Authentication required',
+          message: 'No valid authorization header found'
+        },
         { status: 401 }
       )
     };
   }
-  
-  const token = authHeader.replace('Bearer ', '');
-  const decoded = verifyAuthToken(token);
-  
+
+  // Use the new token validation module
+  const decoded = verifyAuthHeaderSync(authHeader);
+
   if (!decoded) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'Invalid authentication token' },
+        {
+          error: 'Invalid authentication token',
+          message: 'The provided authentication token is invalid or expired'
+        },
         { status: 401 }
       )
     };
   }
-  
+
   // Extract tenant ID from the request headers
   const tenantId = req.headers.get('x-tenant-id');
   if (!tenantId) {
@@ -92,7 +74,7 @@ async function validatePermissionRequest(req: NextRequest): Promise<
       )
     };
   }
-  
+
   return {
     success: true,
     userId: decoded.userId,
@@ -102,7 +84,7 @@ async function validatePermissionRequest(req: NextRequest): Promise<
 
 /**
  * Middleware to handle API-level permission checks
- * 
+ *
  * @param req NextRequest object
  * @param resourceType Type of resource being accessed
  * @param permission Permission needed for the operation
@@ -124,9 +106,9 @@ export async function withPermission(
     if (!validation.success) {
       return validation.response;
     }
-    
+
     const { userId, tenantId } = validation;
-    
+
     // Check if user has the required permission
     const hasPermission = await RoleService.hasPermission(
       userId,
@@ -136,17 +118,17 @@ export async function withPermission(
       permission,
       resourceId
     );
-    
+
     if (!hasPermission) {
       // Generate a meaningful error message
       let errorMessage = `Permission denied: Required '${permission}' permission for ${resourceType}`;
       if (resourceId) {
         errorMessage += ` with ID ${resourceId}`;
       }
-      
+
       return NextResponse.json(
-        { 
-          error: 'Permission denied', 
+        {
+          error: 'Permission denied',
           message: errorMessage,
           details: {
             resourceType,
@@ -157,15 +139,15 @@ export async function withPermission(
         { status: 403 }
       );
     }
-    
+
     // If permission check passes, proceed with the handler
     return await handler(req);
   } catch (error) {
     console.error('Permission validation error:', error);
     return NextResponse.json(
-      { 
-        error: 'Permission validation failed', 
-        message: 'An error occurred during permission validation' 
+      {
+        error: 'Permission validation failed',
+        message: 'An error occurred during permission validation'
       },
       { status: 500 }
     );
@@ -202,10 +184,10 @@ export async function withAnyPermission(
     if (!validation.success) {
       return validation.response;
     }
-    
+
     const { userId, tenantId } = validation;
 
-    
+
     // Check each permission
     for (const permission of permissions) {
       const hasPermission = await RoleService.hasPermission(
@@ -215,23 +197,23 @@ export async function withAnyPermission(
         permission,
         resourceId
       );
-      
+
       if (hasPermission) {
         // User has at least one required permission, proceed with the request
         return await handler(req);
       }
     }
-    
+
     // User doesn't have any of the required permissions
     const permissionList = permissions.join("', '");
     let errorMessage = `Permission denied: Required one of '${permissionList}' permissions for ${resourceType}`;
     if (resourceId) {
       errorMessage += ` with ID ${resourceId}`;
     }
-    
+
     return NextResponse.json(
-      { 
-        error: 'Permission denied', 
+      {
+        error: 'Permission denied',
         message: errorMessage,
         details: {
           resourceType,
@@ -244,9 +226,9 @@ export async function withAnyPermission(
   } catch (error) {
     console.error('Permission validation error:', error);
     return NextResponse.json(
-      { 
-        error: 'Permission validation failed', 
-        message: 'An error occurred during permission validation' 
+      {
+        error: 'Permission validation failed',
+        message: 'An error occurred during permission validation'
       },
       { status: 500 }
     );
@@ -284,13 +266,13 @@ export async function withAllPermissions(
     if (!validation.success) {
       return validation.response;
     }
-    
+
     const { userId, tenantId } = validation;
 
-    
+
     // Create an array to track all missing permissions
     const missingPermissions: Permission[] = [];
-    
+
     // Check each permission
     for (const permission of permissions) {
       const hasPermission = await RoleService.hasPermission(
@@ -300,12 +282,12 @@ export async function withAllPermissions(
         permission,
         resourceId
       );
-      
+
       if (!hasPermission) {
         missingPermissions.push(permission);
       }
     }
-    
+
     // If any permissions are missing, return an error
     if (missingPermissions.length > 0) {
       const missingPermissionsList = missingPermissions.join("', '");
@@ -313,10 +295,10 @@ export async function withAllPermissions(
       if (resourceId) {
         errorMessage += ` with ID ${resourceId}`;
       }
-      
+
       return NextResponse.json(
-        { 
-          error: 'Permission denied', 
+        {
+          error: 'Permission denied',
           message: errorMessage,
           details: {
             resourceType,
@@ -327,15 +309,15 @@ export async function withAllPermissions(
         { status: 403 }
       );
     }
-    
+
     // User has all required permissions, proceed with the request
     return await handler(req);
   } catch (error) {
     console.error('Permission validation error:', error);
     return NextResponse.json(
-      { 
-        error: 'Permission validation failed', 
-        message: 'An error occurred during permission validation' 
+      {
+        error: 'Permission validation failed',
+        message: 'An error occurred during permission validation'
       },
       { status: 500 }
     );
@@ -377,14 +359,14 @@ export async function withResourcePermission(
     let resourceId: string | undefined;
     const url = new URL(req.url);
     resourceId = url.searchParams.get(idParam) || undefined;
-    
+
     // If not in URL params and this is a POST/PUT/PATCH request, try from request body
     if (!resourceId && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
       try {
         // Try to clone the request to read the body
         const clonedReq = req.clone();
         const body = await clonedReq.json();
-        
+
         if (body && typeof body === 'object') {
           resourceId = body[idParam];
         } else {
@@ -395,7 +377,7 @@ export async function withResourcePermission(
         // Continue without body-based resource ID, but log for debugging
       }
     }
-    
+
     // If not in URL params and not in body, try from the URL path
     if (!resourceId) {
       // Extract from path (e.g., /api/categories/123 => '123')
@@ -408,7 +390,7 @@ export async function withResourcePermission(
         }
       }
     }
-    
+
     // If resource ID extraction fails in a context where it should succeed, return error
     const requireResourceId = req.headers.get('x-require-resource-id') === 'true';
     if (requireResourceId && !resourceId) {
@@ -435,9 +417,9 @@ export async function withResourcePermission(
     if (!validation.success) {
       return validation.response;
     }
-    
+
     const { userId, tenantId } = validation;
-    
+
     // Check permission with the extracted resource ID
     const hasPermission = await RoleService.hasPermission(
       userId,
@@ -446,17 +428,17 @@ export async function withResourcePermission(
       permission,
       resourceId
     );
-    
+
     if (!hasPermission) {
       // Generate a meaningful error message
       let errorMessage = `Permission denied: Required '${permission}' permission for ${resourceType}`;
       if (resourceId) {
         errorMessage += ` with ID ${resourceId}`;
       }
-      
+
       return NextResponse.json(
-        { 
-          error: 'Permission denied', 
+        {
+          error: 'Permission denied',
           message: errorMessage,
           details: {
             resourceType,
@@ -467,14 +449,14 @@ export async function withResourcePermission(
         { status: 403 }
       );
     }
-    
+
     // If permission check passes, proceed with the handler
     return await handler(req);
   } catch (error) {
     console.error('Resource permission validation error:', error);
     return NextResponse.json(
-      { 
-        error: 'Permission validation failed', 
+      {
+        error: 'Permission validation failed',
         message: 'An error occurred during resource permission validation',
         details: {
           originalError: process.env.NODE_ENV === 'development' ? String(error) : undefined
