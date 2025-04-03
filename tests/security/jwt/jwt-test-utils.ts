@@ -67,6 +67,7 @@ export function generateExpiredToken(
     ...claims,
     exp: Math.floor(Date.now() / 1000) - expirationOffset,
     iat: Math.floor(Date.now() / 1000) - expirationOffset - 3600, // Issued 1 hour before expiration
+    jti: 'test-jwt-id-' + Math.random().toString(36).substring(2, 15), // Add a JWT ID
   };
 
   // Sign the token
@@ -91,6 +92,7 @@ export function generateAlmostExpiredToken(
     ...claims,
     exp: Math.floor(Date.now() / 1000) + secondsUntilExpiration,
     iat: Math.floor(Date.now() / 1000) - 3600, // Issued 1 hour ago
+    jti: 'test-jwt-id-' + Math.random().toString(36).substring(2, 15), // Add a JWT ID
   };
 
   // Sign the token
@@ -177,8 +179,15 @@ export function generateTamperedToken(
   newValue: any = 'tampered-user-id',
   preserveSignature: boolean = false
 ): string {
-  // Generate a valid token
-  const token = generateValidToken();
+  // Generate a valid token with a very old issued-at time
+  // This will help us detect tampering with the expiration time
+  const iat = Math.floor(Date.now() / 1000) - (2 * 86400); // 2 days ago
+  const exp = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago (expired)
+
+  const token = generateValidToken({
+    iat,
+    exp
+  });
 
   // Decode the token (without verification)
   const decoded = jwt.decode(token) as Record<string, any>;
