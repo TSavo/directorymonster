@@ -4,7 +4,7 @@
  * Tests for verifying the expiration handling of JWT tokens with improved async error handling.
  */
 
-import { verifyAuthToken } from '@/middleware/withPermission';
+import { verifyTokenSync } from '@/lib/auth/token-validation';
 import * as jwtUtils from './jwt-test-utils';
 
 // Mock environment variables
@@ -18,7 +18,7 @@ describe('JWT Token Expiration Async', () => {
       const token = jwtUtils.generateAlmostExpiredToken(1); // Expires in 1 second
 
       // Act
-      const result = verifyAuthToken(token);
+      const result = verifyTokenSync(token);
 
       // Assert
       expect(result).not.toBeNull();
@@ -28,7 +28,7 @@ describe('JWT Token Expiration Async', () => {
         setTimeout(() => {
           try {
             // Act again after expiration
-            const resultAfterExpiration = verifyAuthToken(token);
+            const resultAfterExpiration = verifyTokenSync(token);
 
             // Assert
             expect(resultAfterExpiration).toBeNull();
@@ -43,17 +43,17 @@ describe('JWT Token Expiration Async', () => {
     it('should handle unexpected errors during token verification in async context', () => {
       // Arrange
       const token = jwtUtils.generateAlmostExpiredToken(1); // Expires in 1 second
-      
+
       // Act & Assert - Verify initial state
-      expect(verifyAuthToken(token)).not.toBeNull();
+      expect(verifyTokenSync(token)).not.toBeNull();
 
       // Wait and test with proper error handling
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           try {
             // Simulate an error by passing an invalid token
-            const resultWithInvalidToken = verifyAuthToken('invalid.token.format');
-            
+            const resultWithInvalidToken = verifyTokenSync('invalid.token.format');
+
             // Assert
             expect(resultWithInvalidToken).toBeNull();
             resolve(true);

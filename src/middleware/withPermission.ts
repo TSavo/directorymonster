@@ -1,27 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verify, JwtPayload } from 'jsonwebtoken';
 import RoleService from '@/lib/role-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
-
-// JWT secret should be stored in environment variables
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-for-development';
-
-// Throw an error if JWT_SECRET is not set in production
-if (process.env.NODE_ENV === 'production' &&
-    (process.env.JWT_SECRET === undefined || process.env.JWT_SECRET === 'default-secret-for-development')) {
-  throw new Error('FATAL: JWT_SECRET environment variable must be set in production.');
-}
+import { verifyTokenSync, verifyAuthHeaderSync, EnhancedJwtPayload } from '@/lib/auth/token-validation';
 
 /**
  * Verifies a JWT token and returns its decoded payload.
  *
- * The function validates the provided token using the configured secret by ensuring that it contains a mandatory
- * `userId` claim and has not expired. If the token is invalid, missing required claims, or expired, an error is logged
- * and the function returns null.
+ * The function validates the provided token using the consolidated token validation module.
+ * This is a wrapper around verifyTokenSync for backward compatibility.
  *
  * Enhanced security features:
- * - Rejects tokens without expiration claims
- * - Rejects tokens without issued-at claims
+ * - Rejects tokens without required claims (userId, exp, iat, jti)
  * - Validates token algorithm to prevent algorithm downgrade attacks
  * - Checks for suspiciously long token lifetimes
  * - Checks for tokens that are too old (potential replay attacks)
@@ -29,64 +18,8 @@ if (process.env.NODE_ENV === 'production' &&
  * @param token - The JWT token to verify.
  * @returns The decoded token payload if valid, otherwise null.
  */
-export function verifyAuthToken(token: string): JwtPayload | null {
-  try {
-    // Verify the token using the JWT secret with enhanced security options
-    const decoded = verify(token, JWT_SECRET, {
-      // Explicitly tell the library to check expiration
-      ignoreExpiration: false,
-      // Only accept tokens signed with the algorithm we expect
-      // Note: In a production system, RS256 would be preferred over HS256
-      // as it uses asymmetric keys (public/private) instead of a shared secret
-      algorithms: ['HS256']
-    }) as JwtPayload;
-
-    // Validate required claims
-    if (!decoded.userId) {
-      console.error('Invalid token: missing userId claim');
-      return null;
-    }
-
-    // Reject tokens without expiration claim
-    if (!decoded.exp) {
-      console.error('Invalid token: missing expiration claim');
-      return null;
-    }
-
-    // Reject tokens without issued-at claim
-    if (!decoded.iat) {
-      console.error('Invalid token: missing issued-at claim');
-      return null;
-    }
-
-    // Maximum allowed token lifetime in seconds (default: 24 hours)
-    const MAX_TOKEN_LIFETIME = parseInt(process.env.MAX_TOKEN_LIFETIME || '86400', 10);
-
-    // Check for suspiciously long token lifetime
-    // This helps detect tampering with expiration time
-    const tokenLifetime = decoded.exp - decoded.iat;
-    if (tokenLifetime > MAX_TOKEN_LIFETIME) {
-      console.error(`Invalid token: suspiciously long lifetime (${tokenLifetime}s)`);
-      return null;
-    }
-
-    // Additional check for token tampering: verify the token's age
-    // If the token was issued too long ago, it might be tampered
-    const currentTime = Math.floor(Date.now() / 1000);
-    const tokenAge = currentTime - decoded.iat;
-
-    // If the token is older than MAX_TOKEN_LIFETIME, reject it
-    // This helps detect tokens with tampered expiration times
-    if (tokenAge > MAX_TOKEN_LIFETIME) {
-      console.error(`Invalid token: token is too old (${tokenAge}s)`);
-      return null;
-    }
-
-    return decoded;
-  } catch (error) {
-    console.error('Token verification failed:', error);
-    return null;
-  }
+export function verifyAuthToken(token: string): EnhancedJwtPayload | null {
+  return verifyTokenSync(token);
 }
 
 /**
@@ -99,26 +32,32 @@ async function validatePermissionRequest(req: NextRequest): Promise<
   | { success: true; userId: string; tenantId: string }
   | { success: false; response: NextResponse }
 > {
-  // Extract the token from the Authorization header
+  // Extract and verify the token from the Authorization header
   const authHeader = req.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'Authentication required' },
+        {
+          error: 'Authentication required',
+          message: 'No valid authorization header found'
+        },
         { status: 401 }
       )
     };
   }
 
-  const token = authHeader.replace('Bearer ', '');
-  const decoded = verifyAuthToken(token);
+  // Use the new token validation module
+  const decoded = verifyAuthHeaderSync(authHeader);
 
   if (!decoded) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'Invalid authentication token' },
+        {
+          error: 'Invalid authentication token',
+          message: 'The provided authentication token is invalid or expired'
+        },
         { status: 401 }
       )
     };

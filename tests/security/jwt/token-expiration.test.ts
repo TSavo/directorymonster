@@ -5,7 +5,7 @@
  * Focuses on tokens that are valid, about to expire, or already expired.
  */
 
-import { verifyAuthToken } from '@/middleware/withPermission';
+import { verifyTokenSync } from '@/lib/auth/token-validation';
 import * as jwtUtils from './jwt-test-utils';
 
 // Mock environment variables
@@ -21,7 +21,7 @@ describe('JWT Token Expiration', () => {
       const token = jwtUtils.generateValidToken({ userId: 'test-user-123' });
 
       // Act
-      const result = verifyAuthToken(token);
+      const result = verifyTokenSync(token);
 
       // Assert
       expect(result).not.toBeNull();
@@ -33,7 +33,7 @@ describe('JWT Token Expiration', () => {
       const token = jwtUtils.generateExpiredToken(60); // Expired 1 minute ago
 
       // Act
-      const result = verifyAuthToken(token);
+      const result = verifyTokenSync(token);
 
       // Assert
       expect(result).toBeNull();
@@ -44,7 +44,7 @@ describe('JWT Token Expiration', () => {
       const token = jwtUtils.generateAlmostExpiredToken(30); // Expires in 30 seconds
 
       // Act
-      const result = verifyAuthToken(token);
+      const result = verifyTokenSync(token);
 
       // Assert
       expect(result).not.toBeNull();
@@ -55,7 +55,7 @@ describe('JWT Token Expiration', () => {
       const token = jwtUtils.generateExpiredToken(86400); // Expired 1 day ago
 
       // Act
-      const result = verifyAuthToken(token);
+      const result = verifyTokenSync(token);
 
       // Assert
       expect(result).toBeNull();
@@ -66,7 +66,7 @@ describe('JWT Token Expiration', () => {
       const token = jwtUtils.generateTokenWithMissingClaims(['exp']);
 
       // Act
-      const result = verifyAuthToken(token);
+      const result = verifyTokenSync(token);
 
       // Assert
       // Note: For security reasons, we now reject tokens without expiration
@@ -79,7 +79,7 @@ describe('JWT Token Expiration', () => {
       const token = jwtUtils.generateTokenWithMissingClaims(['iat']);
 
       // Act
-      const result = verifyAuthToken(token);
+      const result = verifyTokenSync(token);
 
       // Assert
       // Note: For security reasons, we now reject tokens without an issued-at claim
@@ -92,7 +92,7 @@ describe('JWT Token Expiration', () => {
       const token = jwtUtils.generateAlmostExpiredToken(1); // Expires in 1 second
 
       // Act
-      const result = verifyAuthToken(token);
+      const result = verifyTokenSync(token);
 
       // Assert
       expect(result).not.toBeNull();
@@ -102,7 +102,7 @@ describe('JWT Token Expiration', () => {
         setTimeout(() => {
           try {
             // Act again after expiration
-            const resultAfterExpiration = verifyAuthToken(token);
+            const resultAfterExpiration = verifyTokenSync(token);
 
             // Assert
             expect(resultAfterExpiration).toBeNull();

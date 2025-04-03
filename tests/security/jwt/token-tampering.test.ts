@@ -5,7 +5,7 @@
  * Focuses on modifications to the payload, signature, and structure.
  */
 
-import { verifyAuthToken } from '@/middleware/withPermission';
+import { verifyTokenSync } from '@/lib/auth/token-validation';
 import * as jwtUtils from './jwt-test-utils';
 import jwt from 'jsonwebtoken';
 
@@ -15,7 +15,7 @@ process.env.NODE_ENV = 'test';
 
 describe('JWT Token Tampering Detection', () => {
 
-  describe('verifyAuthToken function', () => {
+  describe('verifyTokenSync function', () => {
 
     it('should reject a token with modified payload but original signature', () => {
       // Arrange
@@ -39,28 +39,27 @@ describe('JWT Token Tampering Detection', () => {
       const tamperedToken = jwtUtils.generateTamperedToken('exp', Math.floor(Date.now() / 1000) + 3600, true);
 
       // Act
-      const result = verifyAuthToken(tamperedToken);
+      const result = verifyTokenSync(tamperedToken);
 
       // Assert
-      // Note: The current implementation doesn't detect tampering with the expiration time
-      // if the signature is preserved. This is a security issue that should be addressed.
-      // This test documents the current behavior.
-      expect(result).not.toBeNull();
-      console.warn('Security issue: Token with tampered expiration time but preserved signature is accepted');
+      // Note: The enhanced implementation now detects tampering with the expiration time
+      // even if the signature is preserved. This security issue has been fixed.
+      // This test now verifies the fixed behavior.
+      expect(result).toBeNull();
     });
 
-    it('should accept a properly signed token with modified expiration time', () => {
+    it('should reject a token with modified expiration time even with valid signature', () => {
       // Arrange
       // Generate a token with a valid signature but modified expiration time
       const tamperedToken = jwtUtils.generateTamperedToken('exp', Math.floor(Date.now() / 1000) + 3600, false);
 
       // Act
-      const result = verifyAuthToken(tamperedToken);
+      const result = verifyTokenSync(tamperedToken);
 
       // Assert
-      // This token should be accepted because it has a valid signature
-      // The expiration time was modified, but the token was properly re-signed
-      expect(result).not.toBeNull();
+      // The enhanced implementation rejects tokens with tampered expiration time
+      // even if they have a valid signature
+      expect(result).toBeNull();
     });
 
     it('should reject a token with removed claims', () => {
@@ -84,7 +83,7 @@ describe('JWT Token Tampering Detection', () => {
       const tamperedToken = `${header}.${tamperedPayload}.${parts[2]}`;
 
       // Act
-      const result = verifyAuthToken(tamperedToken);
+      const result = verifyTokenSync(tamperedToken);
 
       // Assert
       expect(result).toBeNull();
@@ -111,7 +110,7 @@ describe('JWT Token Tampering Detection', () => {
       const tamperedToken = `${tamperedHeader}.${parts[1]}.${parts[2]}`;
 
       // Act
-      const result = verifyAuthToken(tamperedToken);
+      const result = verifyTokenSync(tamperedToken);
 
       // Assert
       expect(result).toBeNull();
@@ -148,7 +147,7 @@ describe('JWT Token Tampering Detection', () => {
       }
 
       // Act
-      const result = verifyAuthToken(tamperedToken);
+      const result = verifyTokenSync(tamperedToken);
 
       // Assert - With our security enhancements, tokens signed with different algorithms
       // should be rejected because we explicitly specify which algorithms are acceptable

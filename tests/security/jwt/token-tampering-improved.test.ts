@@ -5,7 +5,7 @@
  * with improved performance by avoiding the delete operator.
  */
 
-import { verifyAuthToken } from '@/middleware/withPermission';
+import { verifyTokenSync } from '@/lib/auth/token-validation';
 import * as jwtUtils from './jwt-test-utils';
 import jwt from 'jsonwebtoken';
 
@@ -38,7 +38,7 @@ describe('JWT Token Tampering Detection with Improved Performance', () => {
       const tamperedToken = `${header}.${tamperedPayload}.${parts[2]}`;
 
       // Act
-      const result = verifyAuthToken(tamperedToken);
+      const result = verifyTokenSync(tamperedToken);
 
       // Assert
       expect(result).toBeNull();

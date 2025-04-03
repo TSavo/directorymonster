@@ -39,6 +39,7 @@ export function generateValidToken(
   const defaultClaims = {
     exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
     iat: Math.floor(Date.now() / 1000),
+    jti: 'test-jwt-id-' + Math.random().toString(36).substring(2, 15), // Add a JWT ID
   };
 
   // Merge default claims with provided claims
