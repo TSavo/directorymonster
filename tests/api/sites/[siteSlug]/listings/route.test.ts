@@ -32,4 +32,56 @@ describe('GET /api/sites/[siteSlug]/listings', () => {
     expect(SiteService.getSiteBySlug).toHaveBeenCalledWith('non-existent');
     expect(ListingService.getListingsBySiteId).not.toHaveBeenCalled();
   });
+
+  it('should return listings when site is found', async () => {
+    // Mock site
+    const mockSite = { id: 'site-1', name: 'Test Site', slug: 'test-site' };
+    (SiteService.getSiteBySlug as jest.Mock).mockResolvedValue(mockSite);
+    
+    // Mock listings
+    const mockListings = { 
+      results: [{ id: 'listing-1', name: 'Test Listing' }],
+      pagination: { total: 1, totalPages: 1, page: 1, limit: 10 }
+    };
+    (ListingService.getListingsBySiteId as jest.Mock).mockResolvedValue(mockListings);
+    
+    // Create request
+    const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings');
+    
+    // Execute the route handler
+    const response = await GET(request, { params: { siteSlug: 'test-site' } });
+    
+    // Verify response
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data).toEqual(mockListings);
+    
+    // Verify service calls
+    expect(SiteService.getSiteBySlug).toHaveBeenCalledWith('test-site');
+    expect(ListingService.getListingsBySiteId).toHaveBeenCalledWith('site-1', expect.any(Object));
+  });
+
+  it('should pass filter parameters to ListingService', async () => {
+    // Mock site and service responses
+    const mockSite = { id: 'site-1', name: 'Test Site', slug: 'test-site' };
+    (SiteService.getSiteBySlug as jest.Mock).mockResolvedValue(mockSite);
+    (ListingService.getListingsBySiteId as jest.Mock).mockResolvedValue({ results: [] });
+    
+    // Create request with query parameters
+    const request = new NextRequest('http://localhost:3000/api/sites/test-site/listings?name=test&status=active&categoryId=cat-1&page=2&limit=20&sort=name&order=desc');
+    
+    // Execute the route handler
+    await GET(request, { params: { siteSlug: 'test-site' } });
+    
+    // Verify filter parameters were passed correctly
+    expect(ListingService.getListingsBySiteId).toHaveBeenCalledWith('site-1', {
+      name: 'test',
+      status: 'active',
+      categoryId: 'cat-1',
+      page: 2,
+      limit: 20,
+      sort: 'name',
+      order: 'desc'
+    });
+  });
 });
