@@ -203,7 +203,7 @@ export function createMalformedAuthHeader(malformationType: 'missing-bearer' | '
     case 'no-token':
       return 'Bearer ';
     default:
-      return `Bearer ${token}`;
+      throw new Error(`Unknown malformation type: ${malformationType}`);
   }
 }
 
