@@ -79,6 +79,128 @@ export class ListingService {
   }
 
   /**
+   * Get listings for a specific site and category with filtering and pagination
+   *
+   * @param siteId The site ID
+   * @param categoryId The category ID
+   * @param options Filtering and pagination options
+   * @returns Object containing listings and pagination info
+   */
+  static async getListingsBySiteAndCategory(
+    siteId: string,
+    categoryId: string,
+    options: {
+      page?: number;
+      limit?: number;
+      name?: string;
+      status?: string;
+      sort?: string;
+      order?: 'asc' | 'desc';
+      featured?: boolean;
+    } = {}
+  ): Promise<{
+    results: Listing[];
+    pagination: {
+      totalResults: number;
+      currentPage: number;
+      limit: number;
+      totalPages: number;
+    };
+  }> {
+    try {
+      // Set default options
+      const page = options.page || 1;
+      const limit = options.limit || 20;
+      const sort = options.sort || 'createdAt';
+      const order = options.order || 'desc';
+
+      // Get all listing IDs for the category
+      const listingKeys = await kv.keys(`category:${categoryId}:listings:*`);
+
+      if (!listingKeys.length) {
+        return {
+          results: [],
+          pagination: {
+            totalResults: 0,
+            currentPage: page,
+            limit,
+            totalPages: 0
+          }
+        };
+      }
+
+      // Extract listing IDs from keys
+      const listingIds = listingKeys.map(key => key.split(':').pop() as string);
+
+      // Get all listings by their IDs
+      let listings = await Promise.all(
+        listingIds.map(id => this.getListingById(siteId, id))
+      );
+
+      // Filter out any null values
+      listings = listings.filter(Boolean) as Listing[];
+
+      // Apply filters
+      if (options.name) {
+        const nameRegex = new RegExp(options.name, 'i');
+        listings = listings.filter(listing => nameRegex.test(listing.title));
+      }
+
+      if (options.status) {
+        listings = listings.filter(listing => listing.status === options.status);
+      }
+
+      if (options.featured !== undefined) {
+        listings = listings.filter(listing => listing.featured === options.featured);
+      }
+
+      // Sort listings
+      listings.sort((a, b) => {
+        const aValue = a[sort as keyof Listing];
+        const bValue = b[sort as keyof Listing];
+
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        }
+
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return order === 'asc' ? aValue - bValue : bValue - aValue;
+        }
+
+        return 0;
+      });
+
+      // Calculate pagination
+      const totalResults = listings.length;
+      const totalPages = Math.ceil(totalResults / limit);
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedListings = listings.slice(startIndex, endIndex);
+
+      return {
+        results: paginatedListings,
+        pagination: {
+          totalResults,
+          currentPage: page,
+          limit,
+          totalPages
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching listings by site and category:', error);
+      return {
+        results: [],
+        pagination: {
+          totalResults: 0,
+          currentPage: options.page || 1,
+          limit: options.limit || 20,
+          totalPages: 0
+        }
+      };
+    }
+  }
+
+  /**
    * Create a new listing
    *
    * @param siteId The site ID
