@@ -6,5 +6,5 @@ export * from './redis-keys';
 export * from './tenant-service';
 export { default as TenantService } from './tenant-service';
 export * from './use-tenant';
-
-// Additional tenant-related utilities can be added here in the future
+export * from './public-tenant-service';
+export { default as PublicTenantService } from './public-tenant-service';
