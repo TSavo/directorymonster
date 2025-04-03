@@ -23,6 +23,7 @@ export interface Category {
   order: number;
   createdAt: number;
   updatedAt: number;
+  siteSlug?: string; // Added siteSlug for filtering by site slug
 }
 
 export interface Listing {

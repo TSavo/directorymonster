@@ -62,6 +62,40 @@ npm run seed
 - Domain-based routing and site identification
 - Isolated content per site with shared infrastructure
 
+### RESTful API Structure
+
+The API follows a RESTful structure with nested resources:
+
+```
+/api/sites/[siteSlug]/categories                       # All categories for a site
+/api/sites/[siteSlug]/categories/[categorySlug]        # Specific category operations
+/api/sites/[siteSlug]/categories/[categorySlug]/listings # Listings within a specific category
+/api/sites/[siteSlug]/listings                         # All listings for a site
+/api/sites/[siteSlug]/listings/[listingSlug]           # Specific listing operations
+```
+
+### Flexible URL Resolution
+
+The platform supports multiple ways to access listings:
+
+1. **Domain-based access**:
+   - `https://example.com/categories/category-name/listings`
+   - `https://example.com/listings`
+
+2. **Subdomain-based access**:
+   - `https://site-name.example.com/categories/category-name/listings`
+   - `https://site-name.example.com/listings`
+
+3. **Path-based access**:
+   - `/site/site-name/categories/category-name/listings`
+   - `/site/site-name/listings`
+
+4. **Query parameter-based access**:
+   - `/categories/category-name/listings?site=site-name`
+   - `/listings?site=site-name`
+
+All these URL patterns are automatically rewritten to the canonical API endpoints by the edge middleware.
+
 ### Admin Dashboard
 
 - Comprehensive site management
