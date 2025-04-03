@@ -58,10 +58,13 @@ jest.mock('@/middleware/tenant-validation', () => {
           );
         }
 
+        // Enhanced tenant membership verification
         const isMember =
           tenantId.startsWith('tenant-') &&
           userId.startsWith('user-') &&
-          tenantId.charAt(tenantId.length - 1) === userId.charAt(userId.length - 1);
+          // More explicit membership check:
+          (payload.tenantId === tenantId ||
+           (Array.isArray(payload.tenantIds) && payload.tenantIds.includes(tenantId)));
 
         if (!isMember) {
           return NextResponse.json(
@@ -123,11 +126,13 @@ jest.mock('@/middleware/tenant-validation', () => {
           );
         }
 
-        // Check tenant membership
+        // Enhanced tenant membership verification
         const isMember =
           tenantId.startsWith('tenant-') &&
           userId.startsWith('user-') &&
-          tenantId.charAt(tenantId.length - 1) === userId.charAt(userId.length - 1);
+          // More explicit membership check:
+          (payload.tenantId === tenantId ||
+           (Array.isArray(payload.tenantIds) && payload.tenantIds.includes(tenantId)));
 
         if (!isMember) {
           return NextResponse.json(

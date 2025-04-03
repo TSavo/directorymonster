@@ -131,11 +131,13 @@ export function generateTokenWithInvalidSignature(
  *
  * @param claimToTamper - The name of the claim to tamper with
  * @param newValue - The new value for the tampered claim
- * @returns A tampered JWT token (with invalid signature)
+ * @param preserveSignature - Whether to preserve the original signature (default: false)
+ * @returns A tampered JWT token
  */
 export function generateTamperedToken(
   claimToTamper: string = 'userId',
-  newValue: any = 'tampered-user-id'
+  newValue: any = 'tampered-user-id',
+  preserveSignature: boolean = false
 ): string {
   // Generate a valid token
   const token = generateValidToken();
@@ -146,16 +148,26 @@ export function generateTamperedToken(
   // Modify the claim
   decoded[claimToTamper] = newValue;
 
-  // Re-encode the header and payload
-  const parts = token.split('.');
-  const header = parts[0];
-  const tamperedPayload = Buffer.from(JSON.stringify(decoded)).toString('base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
+  if (preserveSignature) {
+    // Re-encode the header and payload but keep the original signature
+    // This simulates a token where the payload has been modified but the signature is still valid
+    // This is a security risk that our enhanced validation should catch
+    const parts = token.split('.');
+    const header = parts[0];
+    // Use a more reliable Base64URL encoding approach
+    const tamperedPayload = Buffer.from(JSON.stringify(decoded))
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
 
-  // Return the tampered token with the original signature (which is now invalid)
-  return `${header}.${tamperedPayload}.${parts[2]}`;
+    // Return the tampered token with the original signature
+    return `${header}.${tamperedPayload}.${parts[2]}`;
+  } else {
+    // Re-sign the token with the proper secret to create a valid signature
+    // This simulates a properly signed token with modified claims
+    return jwt.sign(decoded, TEST_JWT_SECRET, { algorithm: 'HS256' });
+  }
 }
 
 /**
@@ -203,7 +215,7 @@ export function createMalformedAuthHeader(malformationType: 'missing-bearer' | '
     case 'no-token':
       return 'Bearer ';
     default:
-      return `Bearer ${token}`;
+      throw new Error(`Unknown malformation type: ${malformationType}`);
   }
 }
 
