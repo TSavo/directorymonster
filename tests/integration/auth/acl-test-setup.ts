@@ -19,7 +19,7 @@ export interface TestUser {
 export interface TestTenant {
   id: string;
   name: string;
-  hostname: string;
+  hostnames: string[];
 }
 
 // Test data IDs for cleanup
@@ -44,27 +44,25 @@ export function generateUserToken(userId: string): string {
 export async function setupTestTenants(): Promise<{tenantA: TestTenant, tenantB: TestTenant}> {
   // Create two test tenants
   const tenantA = await TenantService.createTenant({
-    id: TEST_IDS.TENANT_A,
     name: 'Test Tenant A',
-    hostname: 'tenant-a-test.example.com'
+    hostnames: ['tenant-a-test.example.com']
   });
 
   const tenantB = await TenantService.createTenant({
-    id: TEST_IDS.TENANT_B,
     name: 'Test Tenant B',
-    hostname: 'tenant-b-test.example.com'
+    hostnames: ['tenant-b-test.example.com']
   });
 
   return {
     tenantA: {
       id: tenantA.id,
       name: tenantA.name,
-      hostname: tenantA.hostname
+      hostnames: tenantA.hostnames
     },
     tenantB: {
       id: tenantB.id,
       name: tenantB.name,
-      hostname: tenantB.hostname
+      hostnames: tenantB.hostnames
     }
   };
 }
@@ -142,23 +140,39 @@ export async function cleanupTestData(): Promise<void> {
   // Scan for all keys related to the test
   const pattern = `*test*`;
   const keys = await scanKeys(pattern);
-  
+
   // Delete all matching keys
   if (keys.length > 0) {
-    await redis.del(...keys);
+    // For in-memory Redis implementation
+    if (typeof redis.del !== 'function') {
+      for (const key of keys) {
+        await kv.delete(key);
+      }
+    } else {
+      // For real Redis
+      await redis.del(...keys);
+    }
   }
 }
 
 // Helper to scan Redis keys
 async function scanKeys(pattern: string): Promise<string[]> {
+  // For in-memory Redis implementation, we need to handle this differently
+  if (typeof redis.scan !== 'function') {
+    // Get all keys from the in-memory store that match the pattern
+    const allKeys = await kv.keys();
+    return allKeys.filter(key => key.includes('test'));
+  }
+
+  // For real Redis, use scan
   const keys: string[] = [];
   let cursor = '0';
-  
+
   do {
     const result = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', '100');
     cursor = result[0];
     keys.push(...result[1]);
   } while (cursor !== '0');
-  
+
   return keys;
 }
