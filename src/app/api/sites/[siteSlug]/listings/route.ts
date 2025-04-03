@@ -212,72 +212,65 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
     };
     console.log('Created listing:', listing);
 
-    // Use a Redis transaction for atomicity
-    const multi = redis.multi();
+    // We already checked for existing listings above, so we can proceed
 
-    multi.set(`${keyPrefix}listing:id:${listing.id}`, JSON.stringify(listing));
-    multi.set(`${keyPrefix}listing:site:${site.id}:${listing.slug}`, JSON.stringify(listing));
-    multi.set(`${keyPrefix}listing:category:${listing.categoryId}:${listing.slug}`, JSON.stringify(listing));
+    // Use a transaction for atomicity
+    const transaction = kv.multi();
+
+    // Store the listing in multiple indices for efficient retrieval
+    transaction.set(`${keyPrefix}listing:id:${listing.id}`, listing);
+    transaction.set(`${keyPrefix}listing:site:${site.id}:${listing.slug}`, listing);
+    transaction.set(`${keyPrefix}listing:category:${listing.categoryId}:${listing.slug}`, listing);
 
     try {
-      // Execute all commands as a transaction
-      const results = await multi.exec();
-
-      // Check for errors in the transaction
-      const errors = results.filter(([err]) => err !== null);
-      if (errors.length > 0) {
-        console.error('Transaction errors:', errors);
-        return NextResponse.json(
-          { error: 'Failed to save listing data' },
-          { status: 500 }
-        );
-      }
-
-      // Index the listing for search (this is isolated from the transaction with error handling)
-      try {
-        await searchIndexer.indexListing(listing);
-      } catch (error) {
-        // Log but don't fail the request if indexing fails
-        console.error('Error indexing listing:', error);
-      }
-
-      // Return the listing with URLs
-      const baseUrl = site.domain
-        ? `https://${site.domain}`
-        : `http://localhost:3000`; // For local testing
-
-      // Get the category slug for the URL
-      let categorySlug = '';
-      try {
-        if (category && typeof category === 'object' && 'slug' in category) {
-          categorySlug = category.slug;
-        } else if (typeof category === 'string') {
-          const parsedCategory = JSON.parse(category);
-          categorySlug = parsedCategory.slug;
-        }
-      } catch (e) {
-        console.error('Error parsing category:', e);
-      }
-
-      const responseData = {
-        ...listing,
-        url: `${baseUrl}/${categorySlug}/${listing.slug}`,
-      };
-
-      console.log('Returning response data:', responseData);
-
-      return NextResponse.json(responseData, { status: 201 });
+      // Execute the transaction
+      await transaction.exec();
     } catch (error) {
-      console.error('Error executing Redis transaction:', error);
+      console.error('Transaction error:', error);
       return NextResponse.json(
         { error: 'Failed to save listing data' },
         { status: 500 }
       );
     }
+
+    // Index the listing for search (this is isolated from the transaction with error handling)
+    try {
+      await searchIndexer.indexListing(listing);
+    } catch (error) {
+      // Log but don't fail the request if indexing fails
+      console.error('Error indexing listing:', error);
+    }
+
+    // Return the listing with URLs
+    const baseUrl = site.domain
+      ? `https://${site.domain}`
+      : `http://localhost:3000`; // For local testing
+
+    // Get the category slug for the URL
+    let categorySlug = '';
+    try {
+      if (category && typeof category === 'object' && 'slug' in category) {
+        categorySlug = category.slug;
+      } else if (typeof category === 'string') {
+        const parsedCategory = JSON.parse(category);
+        categorySlug = parsedCategory.slug;
+      }
+    } catch (e) {
+      console.error('Error parsing category:', e);
+    }
+
+    const responseData = {
+      ...listing,
+      url: `${baseUrl}/${categorySlug}/${listing.slug}`,
+    };
+
+    console.log('Returning response data:', responseData);
+
+    return NextResponse.json(responseData, { status: 201 });
   } catch (error) {
     console.error('Error creating listing:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to save listing data' },
       { status: 500 }
     );
   }
