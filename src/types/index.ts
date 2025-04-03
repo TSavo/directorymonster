@@ -44,6 +44,11 @@ export interface Listing {
   customFields: Record<string, unknown>;
   createdAt: number;
   updatedAt: number;
+  /**
+   * Status of the listing (e.g., 'active', 'inactive', 'pending')
+   * Used for filtering listings by status
+   */
+  status?: string;
 }
 
 export interface ApiKey {

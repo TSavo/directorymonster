@@ -18,7 +18,7 @@ This provides several benefits:
 
 Users can access resources using a custom domain:
 
-```
+```http
 https://example.com/categories/category-name/listings
 https://example.com/listings
 ```
@@ -29,7 +29,7 @@ In this case, the site is identified by the domain (`example.com`).
 
 Users can access resources using a subdomain:
 
-```
+```http
 https://site-name.example.com/categories/category-name/listings
 https://site-name.example.com/listings
 ```
@@ -40,7 +40,7 @@ In this case, the site is identified by the subdomain (`site-name`).
 
 Users can access resources using a path segment:
 
-```
+```http
 /site/site-name/categories/category-name/listings
 /site/site-name/listings
 ```
@@ -51,7 +51,7 @@ In this case, the site is identified by the path segment (`site-name`).
 
 Users can access resources using a query parameter:
 
-```
+```http
 /categories/category-name/listings?site=site-name
 /listings?site=site-name
 ```
@@ -85,22 +85,22 @@ The URL resolution is implemented in the edge middleware:
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
-  
+
   // Get site from hostname, path, or query parameter
   const site = await getSiteFromRequest(request);
-  
+
   if (site && (pathname.includes('/categories/') || pathname.includes('/listings'))) {
     // Rewrite to the canonical API endpoint
     const newPathname = constructApiPath(site, pathname);
     const rewriteUrl = new URL(newPathname, request.url);
-    
+
     // Copy query parameters
     copyQueryParameters(url, rewriteUrl);
-    
+
     // Rewrite the URL
     return NextResponse.rewrite(rewriteUrl);
   }
-  
+
   // For other paths, continue
   return NextResponse.next();
 }
@@ -115,7 +115,7 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
   // Check for direct domain match
   const site = await kv.get<SiteConfig>(`site:domain:${hostname}`);
   if (site) return site;
-  
+
   // Check for subdomain match
   const domainParts = hostname.split('.');
   if (domainParts.length > 1) {
@@ -123,13 +123,13 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
     const site = await kv.get<SiteConfig>(`site:slug:${subdomain}`);
     if (site) return site;
   }
-  
+
   // Check for localhost development
   if (hostname.includes('localhost')) {
     // Return default site for development
     return await kv.get<SiteConfig>('site:default');
   }
-  
+
   return null;
 }
 ```
@@ -144,13 +144,13 @@ describe('URL Resolution', () => {
     const request = new NextRequest(
       new URL('http://example.com/categories/test-category/listings')
     );
-    
+
     const response = await middleware(request);
-    
+
     expect(response.headers.get('x-middleware-rewrite'))
       .toBe('http://example.com/api/sites/example/categories/test-category/listings');
   });
-  
+
   // Tests for other patterns...
 });
 ```

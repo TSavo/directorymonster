@@ -6,7 +6,7 @@ The Listings API provides endpoints for retrieving listings from sites and categ
 
 The API follows a RESTful structure with nested resources:
 
-```
+```http
 /api/sites/[siteSlug]/categories/[categorySlug]/listings  # Listings within a specific category
 /api/sites/[siteSlug]/listings                           # All listings for a site
 /api/sites/[siteSlug]/listings/[listingSlug]             # Specific listing operations
@@ -16,7 +16,7 @@ The API follows a RESTful structure with nested resources:
 
 The API supports multiple ways to access listings:
 
-1. **Domain-based access**: 
+1. **Domain-based access**:
    - `https://example.com/categories/category-name/listings`
    - `https://example.com/listings`
 
@@ -146,7 +146,7 @@ Retrieves listings for a specific category within a site, with optional filterin
 
 All listing endpoints include appropriate cache control headers:
 
-```
+```http
 Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=3600
 ```
 

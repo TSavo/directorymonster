@@ -12,8 +12,13 @@ const mockListings: Listing[] = [
     categoryId: 'category_1',
     metaDescription: 'Test description 1',
     content: 'Test content 1',
-    createdAt: '2023-01-01T00:00:00.000Z',
-    updatedAt: '2023-01-01T00:00:00.000Z',
+    backlinkUrl: 'https://example.com',
+    backlinkAnchorText: 'Example',
+    backlinkPosition: 'body',
+    backlinkType: 'dofollow',
+    customFields: {},
+    createdAt: 1672531200000, // timestamp for 2023-01-01T00:00:00.000Z
+    updatedAt: 1672531200000, // timestamp for 2023-01-01T00:00:00.000Z
   },
   {
     id: 'listing_2',
@@ -23,8 +28,13 @@ const mockListings: Listing[] = [
     categoryId: 'category_2',
     metaDescription: 'Test description 2',
     content: 'Test content 2',
-    createdAt: '2023-01-02T00:00:00.000Z',
-    updatedAt: '2023-01-02T00:00:00.000Z',
+    backlinkUrl: 'https://example.com',
+    backlinkAnchorText: 'Example',
+    backlinkPosition: 'body',
+    backlinkType: 'dofollow',
+    customFields: {},
+    createdAt: 1672617600000, // timestamp for 2023-01-02T00:00:00.000Z
+    updatedAt: 1672617600000, // timestamp for 2023-01-02T00:00:00.000Z
   },
   {
     id: 'listing_3',
@@ -34,8 +44,13 @@ const mockListings: Listing[] = [
     categoryId: 'category_1',
     metaDescription: 'Test description 3',
     content: 'Test content 3',
-    createdAt: '2023-01-03T00:00:00.000Z',
-    updatedAt: '2023-01-03T00:00:00.000Z',
+    backlinkUrl: 'https://example.com',
+    backlinkAnchorText: 'Example',
+    backlinkPosition: 'body',
+    backlinkType: 'dofollow',
+    customFields: {},
+    createdAt: 1672704000000, // timestamp for 2023-01-03T00:00:00.000Z
+    updatedAt: 1672704000000, // timestamp for 2023-01-03T00:00:00.000Z
   },
   {
     id: 'listing_4',
@@ -45,8 +60,13 @@ const mockListings: Listing[] = [
     categoryId: 'category_2',
     metaDescription: 'Test description 4',
     content: 'Test content 4',
-    createdAt: '2023-01-04T00:00:00.000Z',
-    updatedAt: '2023-01-04T00:00:00.000Z',
+    backlinkUrl: 'https://example.com',
+    backlinkAnchorText: 'Example',
+    backlinkPosition: 'body',
+    backlinkType: 'dofollow',
+    customFields: {},
+    createdAt: 1672790400000, // timestamp for 2023-01-04T00:00:00.000Z
+    updatedAt: 1672790400000, // timestamp for 2023-01-04T00:00:00.000Z
   },
   {
     id: 'listing_5',
@@ -56,8 +76,13 @@ const mockListings: Listing[] = [
     categoryId: 'category_1',
     metaDescription: 'Test description 5',
     content: 'Test content 5',
-    createdAt: '2023-01-05T00:00:00.000Z',
-    updatedAt: '2023-01-05T00:00:00.000Z',
+    backlinkUrl: 'https://example.com',
+    backlinkAnchorText: 'Example',
+    backlinkPosition: 'body',
+    backlinkType: 'dofollow',
+    customFields: {},
+    createdAt: 1672876800000, // timestamp for 2023-01-05T00:00:00.000Z
+    updatedAt: 1672876800000, // timestamp for 2023-01-05T00:00:00.000Z
   }
 ];
 
