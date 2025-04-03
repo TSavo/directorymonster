@@ -97,11 +97,21 @@ export class ListingService {
       }
 
       // Apply status filter if provided
-      if (options.status) {
-        listings = listings.filter(listing =>
-          listing.status === options.status
-        );
-      }
+interface Listing {
+  // Existing properties
+  id: number;
+  title: string;
+  // ... other properties
+  
++  status?: string; // add if needed
+}
+
+// Later in the file, where the filter is applied:
+if (options.status) {
+  listings = listings.filter(listing =>
+    listing.status === options.status
+  );
+}
 
       // Apply sorting if provided
       if (options.sort) {
