@@ -21,7 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
   disabled = false,
   type = 'button',
-  'data-testid': testId = 'category-filter-button',
+  'data-testid': testId = 'button',
   ...props
 }) => {
   return (

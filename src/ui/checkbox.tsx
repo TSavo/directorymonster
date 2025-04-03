@@ -36,7 +36,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
           checked={checked}
           onChange={handleChange}
           className={`ui-checkbox ${error ? 'ui-checkbox-error' : ''}`}
-          data-testid={testId || `category-checkbox-${id || 'default'}`}
+          data-testid={testId || `checkbox-${id || 'default'}`}
           id={id}
           {...props}
         />

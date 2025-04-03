@@ -17,6 +17,10 @@ interface CategoryFilterTreeProps {
   categories: Category[];
   selectedCategoryIds: string[];
   onChange: (categoryIds: string[]) => void;
+  buttonVariant?: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive';
+  buttonSize?: 'default' | 'sm' | 'lg' | 'icon';
+  buttonLabel?: string;
+  buttonTestId?: string;
 }
 
 // Recursive function to build the category tree structure
@@ -33,6 +37,10 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
   categories,
   selectedCategoryIds,
   onChange,
+  buttonVariant = 'outline',
+  buttonSize = 'sm',
+  buttonLabel = 'Categories',
+  buttonTestId = 'category-filter-button',
 }) => {
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
@@ -164,12 +172,12 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
-          size="sm"
+          variant={buttonVariant}
+          size={buttonSize}
           className="hidden md:flex"
-          data-testid="category-filter-button"
+          data-testid={buttonTestId}
         >
-          <span>Categories</span>
+          <span>{buttonLabel}</span>
           {selectedCategoryIds.length > 0 && (
             <Badge variant="secondary" className="ml-2">
               {selectedCategoryIds.length}
