@@ -9,6 +9,24 @@ import { NextRequest } from 'next/server';
 import { verifyAuthToken } from '@/middleware/withPermission';
 import * as jwtUtils from './jwt-test-utils';
 
+// Mock the config to provide a default secret for tests
+jest.mock('@/lib/config', () => ({
+  config: {
+    security: {
+      jwt: {
+        secret: 'test-secret-for-testing',
+        algorithm: 'HS256',
+        accessTokenLifetime: 3600,
+        refreshTokenLifetime: 86400
+      }
+    },
+    redis: {
+      keyPrefix: ''
+    },
+    isProduction: false
+  }
+}));
+
 // Mock environment variables
 process.env.JWT_SECRET = jwtUtils.TEST_JWT_SECRET;
 process.env.NODE_ENV = 'test';

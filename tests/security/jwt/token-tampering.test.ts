@@ -6,6 +6,24 @@
  */
 
 import { verifyTokenSync } from '@/lib/auth/token-validation';
+
+// Mock the config to provide a default secret for tests
+jest.mock('@/lib/config', () => ({
+  config: {
+    security: {
+      jwt: {
+        secret: 'test-secret-for-testing',
+        algorithm: 'HS256',
+        accessTokenLifetime: 3600,
+        refreshTokenLifetime: 86400
+      }
+    },
+    redis: {
+      keyPrefix: ''
+    },
+    isProduction: false
+  }
+}));
 import * as jwtUtils from './jwt-test-utils';
 import jwt from 'jsonwebtoken';
 
@@ -22,7 +40,7 @@ describe('JWT Token Tampering Detection', () => {
       const token = jwtUtils.generateTamperedToken('userId', 'hacker-user-id', true);
 
       // Act
-      const result = verifyAuthToken(token);
+      const result = verifyTokenSync(token);
 
       // Assert
       // Our security enhancements successfully detect tampering with the payload

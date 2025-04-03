@@ -6,6 +6,24 @@
  */
 
 import { verifyTokenSync } from '@/lib/auth/token-validation';
+
+// Mock the config to provide a default secret for tests
+jest.mock('@/lib/config', () => ({
+  config: {
+    security: {
+      jwt: {
+        secret: 'test-secret-for-testing',
+        algorithm: 'HS256',
+        accessTokenLifetime: 3600,
+        refreshTokenLifetime: 86400
+      }
+    },
+    redis: {
+      keyPrefix: ''
+    },
+    isProduction: false
+  }
+}));
 import * as jwtUtils from './jwt-test-utils';
 
 // Mock environment variables
@@ -14,7 +32,7 @@ process.env.NODE_ENV = 'test';
 
 describe('JWT Token Expiration', () => {
 
-  describe('verifyAuthToken function', () => {
+  describe('verifyTokenSync function', () => {
 
     it('should accept a token that is not expired', () => {
       // Arrange
