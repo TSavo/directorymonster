@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSites } from './hooks';
+import { useNotificationsContext } from '../../notifications/NotificationProvider';
 import {
   BasicInfoStep,
   DomainStep,
@@ -218,29 +219,50 @@ export const SiteForm: React.FC<SiteFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Get notification context
+    const { showNotification } = useNotificationsContext();
+
     // For testing purposes, we'll allow form submission even if not on the last step
     // In production, we'd only allow submission on the last step
     const isTest = process.env.NODE_ENV === 'test';
 
     // Only proceed if we're on the last step or in a test environment
     if (isLastStep || isTest) {
-      let result;
-      if (mode === 'edit' && site.id) {
-        result = await saveSite(site.id);
-      } else {
-        result = await createSite();
-      }
-
-      if (result.success) {
-        // Call success callback if provided
-        if (onSuccess) {
-          onSuccess(result.data);
+      try {
+        let result;
+        if (mode === 'edit' && site.id) {
+          result = await saveSite(site.id);
+        } else {
+          result = await createSite();
         }
 
-        // Redirect after successful submission
-        setTimeout(() => {
-          router.push(`/admin/sites/${result.data?.id || result.data?.slug || site.slug}`);
-        }, 1500);
+        if (result.success) {
+          // Show success notification
+          showNotification({
+            type: 'success',
+            title: 'Site Created',
+            message: 'Your site has been created successfully',
+            duration: 5000,
+          });
+
+          // Call success callback if provided
+          if (onSuccess) {
+            onSuccess(result.data);
+          }
+
+          // Redirect after successful submission
+          setTimeout(() => {
+            router.push(`/admin/sites/${result.data?.id || result.data?.slug || site.slug}`);
+          }, 1500);
+        }
+      } catch (error) {
+        // Show error notification
+        showNotification({
+          type: 'error',
+          title: 'Site Creation Failed',
+          message: 'There was an error creating your site',
+          duration: 5000,
+        });
       }
     }
   };
