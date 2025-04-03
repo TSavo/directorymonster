@@ -40,6 +40,8 @@ export interface Listing {
   backlinkPosition: 'prominent' | 'body' | 'footer';
   backlinkType: 'dofollow' | 'nofollow';
   backlinkVerifiedAt?: number;
+  featured?: boolean; // Flag to mark featured listings
+  status?: string; // Status of the listing (e.g., 'published', 'draft', 'archived')
   customFields: Record<string, unknown>;
   createdAt: number;
   updatedAt: number;

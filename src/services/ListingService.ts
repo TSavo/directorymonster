@@ -9,6 +9,7 @@ interface ListingFilterOptions {
   categoryId?: string;
   name?: string;
   status?: string;
+  featured?: boolean;
   sort?: string;
   order?: 'asc' | 'desc';
   page?: number;
@@ -100,6 +101,13 @@ export class ListingService {
       if (options.status) {
         listings = listings.filter(listing =>
           listing.status === options.status
+        );
+      }
+
+      // Apply featured filter if provided
+      if (options.featured !== undefined) {
+        listings = listings.filter(listing =>
+          listing.featured === options.featured
         );
       }
 
