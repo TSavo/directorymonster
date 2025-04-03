@@ -59,9 +59,11 @@ jest.mock('@/middleware/tenant-validation', () => {
         }
 
         const isMember =
-          tenantId.startsWith('tenant-') &&
-          userId.startsWith('user-') &&
-          tenantId.charAt(tenantId.length - 1) === userId.charAt(userId.length - 1);
+          tenantId.startsWith('tenant-') && 
+          userId.startsWith('user-') && 
+          // More explicit membership check:
+          (payload.tenantId === tenantId || 
+           (Array.isArray(payload.tenantIds) && payload.tenantIds.includes(tenantId)));
 
         if (!isMember) {
           return NextResponse.json(
