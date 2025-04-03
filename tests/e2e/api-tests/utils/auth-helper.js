@@ -1,53 +1,66 @@
 /**
- * Authentication helper utilities for API testing
- * 
- * Provides functions for generating test tokens and auth headers
- * for use in API tests.
+ * Authentication Helper for API Tests
+ *
+ * Provides utilities for generating tokens and authentication headers
+ * for testing the DirectoryMonster API endpoints.
  */
 
 const jwt = require('jsonwebtoken');
 
-// Secret key for test tokens - this should match the one used in the API
-// In a real environment, this would be an environment variable
-const JWT_SECRET = process.env.JWT_SECRET || 'test-secret-key';
+// Try to import secret from config, fallback to a test secret if not available
+let secret;
+try {
+  const authConfig = require('../../../../src/config/auth');
+  secret = authConfig.secret;
+} catch (error) {
+  console.warn('Auth config not found, using test secret');
+  secret = 'test-secret-for-api-testing';
+}
 
 /**
- * Generate a test JWT token
- * @param {string} userId - User ID to include in the token
- * @param {string} tenantId - Tenant ID to include in the token
+ * Generates JWT tokens for testing tenant-specific APIs
+ *
+ * @param {string} userId - The user ID
+ * @param {string} tenantId - The tenant ID
  * @param {Array} permissions - Array of permission objects
+ * @param {Object} options - Additional options
  * @returns {string} JWT token
  */
-function generateTestToken(userId, tenantId, permissions = []) {
+function generateTestToken(userId, tenantId, permissions = [], options = {}) {
+  const {
+    expiresIn = '1h',
+    roles = ['user'],
+    email = 'test@example.com'
+  } = options;
   const payload = {
     sub: userId,
     tenantId,
     permissions,
-    // Add standard JWT claims
+    roles,
+    email,
     iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1 hour expiration
+    exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour
   };
-  
-  return jwt.sign(payload, JWT_SECRET);
+
+  return jwt.sign(payload, secret);
 }
 
 /**
- * Generate authentication headers for API requests
+ * Generate complete authentication headers including token and tenant ID
+ *
  * @param {Object} options - Configuration options
- * @param {string} options.userId - User ID (default: 'test-user')
- * @param {string} options.tenantId - Tenant ID (default: 'test-tenant')
- * @param {Array} options.permissions - Array of permission objects
  * @returns {Object} Headers object
  */
 function getAuthHeaders(options = {}) {
   const {
-    userId = 'test-user',
+    userId = 'user-12345',
     tenantId = 'test-tenant',
-    permissions = [{ resource: '*', action: '*' }]
+    permissions = [{ resource: 'site', action: 'read' }],
+    roles = ['user'],
   } = options;
-  
-  const token = generateTestToken(userId, tenantId, permissions);
-  
+
+  const token = generateTestToken(userId, tenantId, permissions, { roles });
+
   return {
     'Authorization': `Bearer ${token}`,
     'X-Tenant-ID': tenantId,

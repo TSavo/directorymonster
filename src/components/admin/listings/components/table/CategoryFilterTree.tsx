@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/ui/dropdown-menu';
 import { Category } from '@/components/admin/listings/types';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/ui/badge';
+import { Checkbox } from '@/ui/checkbox';
 import { FolderIcon, ChevronRightIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +17,10 @@ interface CategoryFilterTreeProps {
   categories: Category[];
   selectedCategoryIds: string[];
   onChange: (categoryIds: string[]) => void;
+  buttonVariant?: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive';
+  buttonSize?: 'default' | 'sm' | 'lg' | 'icon';
+  buttonLabel?: string;
+  buttonTestId?: string;
 }
 
 // Recursive function to build the category tree structure
@@ -33,12 +37,16 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
   categories,
   selectedCategoryIds,
   onChange,
+  buttonVariant = 'outline',
+  buttonSize = 'sm',
+  buttonLabel = 'Categories',
+  buttonTestId = 'category-filter-button',
 }) => {
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
-  
+
   // Build category tree
   const categoryTree = buildCategoryTree(categories);
-  
+
   // Toggle category expansion
   const toggleExpanded = (categoryId: string) => {
     setExpandedCategories(prev => ({
@@ -46,11 +54,11 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
       [categoryId]: !prev[categoryId]
     }));
   };
-  
+
   // Handle category selection
   const handleCategoryChange = (categoryId: string) => {
     let newSelectedIds: string[];
-    
+
     if (selectedCategoryIds.includes(categoryId)) {
       // Remove this category and all its descendants
       const descendantIds = getDescendantIds(categories, categoryId);
@@ -60,7 +68,7 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
     } else {
       // Add this category
       newSelectedIds = [...selectedCategoryIds, categoryId];
-      
+
       // Check if all siblings are now selected, if so, also select the parent
       const category = categories.find(c => c.id === categoryId);
       if (category?.parentId) {
@@ -69,38 +77,38 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
         const allSiblingsSelected = siblingIds.every(
           id => newSelectedIds.includes(id)
         );
-        
+
         if (allSiblingsSelected && !newSelectedIds.includes(category.parentId)) {
           newSelectedIds.push(category.parentId);
         }
       }
     }
-    
+
     onChange(newSelectedIds);
   };
-  
+
   // Get all descendant category IDs for a given category
   const getDescendantIds = (categories: Category[], categoryId: string): string[] => {
     const directChildren = categories.filter(c => c.parentId === categoryId);
     const childrenIds = directChildren.map(c => c.id);
-    
+
     const descendantIds = [...childrenIds];
     childrenIds.forEach(childId => {
       descendantIds.push(...getDescendantIds(categories, childId));
     });
-    
+
     return descendantIds;
   };
-  
+
   // Recursive render function for category items
   const renderCategoryItem = (category: Category, depth = 0) => {
     const isExpanded = expandedCategories[category.id] || false;
     const hasChildren = category.children && category.children.length > 0;
     const isSelected = selectedCategoryIds.includes(category.id);
-    
+
     return (
       <div key={category.id} className="category-item">
-        <div 
+        <div
           className={cn(
             "flex items-center py-1 px-2 hover:bg-accent rounded-sm",
             depth > 0 && "ml-4"
@@ -117,22 +125,22 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
               }}
               data-testid={`toggle-category-${category.id}`}
             >
-              <ChevronRightIcon 
+              <ChevronRightIcon
                 className={cn(
-                  "h-4 w-4 transition-transform", 
+                  "h-4 w-4 transition-transform",
                   isExpanded && "transform rotate-90"
-                )} 
+                )}
               />
               <span className="sr-only">
                 {isExpanded ? "Collapse" : "Expand"}
               </span>
             </Button>
           )}
-          
+
           {!hasChildren && (
             <div className="w-5 mr-1" />
           )}
-          
+
           <div className="flex items-center flex-1">
             <Checkbox
               id={`category-${category.id}`}
@@ -141,7 +149,7 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
               className="mr-2"
               data-testid={`category-checkbox-${category.id}`}
             />
-            <label 
+            <label
               htmlFor={`category-${category.id}`}
               className="text-sm cursor-pointer flex items-center flex-1"
             >
@@ -150,7 +158,7 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
             </label>
           </div>
         </div>
-        
+
         {hasChildren && isExpanded && (
           <div className="category-children">
             {category.children?.map(child => renderCategoryItem(child, depth + 1))}
@@ -163,13 +171,13 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant={buttonVariant}
+          size={buttonSize}
           className="hidden md:flex"
-          data-testid="category-filter-button"
+          data-testid={buttonTestId}
         >
-          <span>Categories</span>
+          <span>{buttonLabel}</span>
           {selectedCategoryIds.length > 0 && (
             <Badge variant="secondary" className="ml-2">
               {selectedCategoryIds.length}
@@ -177,17 +185,17 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        align="end" 
+      <DropdownMenuContent
+        align="end"
         className="w-64 p-2 max-h-96 overflow-y-auto"
       >
         <DropdownMenuLabel>Filter by Category</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
+
         <div className="py-1">
           {categoryTree.map(category => renderCategoryItem(category))}
         </div>
-        
+
         {/* Clear Selection Button */}
         {selectedCategoryIds.length > 0 && (
           <div className="pt-2 flex justify-end border-t mt-2">
