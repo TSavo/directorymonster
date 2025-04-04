@@ -9,7 +9,7 @@ import crypto from 'crypto';
  * and the snarkjs library to generate and verify proofs.
  */
 export class SnarkAdapter implements ZKPAdapter {
-  private snarkjs: any;
+  private snarkjs: unknown;
   private wasmFilePath: string;
   private zkeyFilePath: string;
   private verificationKeyPath: string;
@@ -26,8 +26,8 @@ export class SnarkAdapter implements ZKPAdapter {
     this.snarkjs = {
       groth16: {
         fullProve: this.mockFullProve.bind(this),
-        verify: this.mockVerify.bind(this)
-      }
+        verify: this.mockVerify.bind(this),
+      },
     };
   }
 
@@ -40,7 +40,7 @@ export class SnarkAdapter implements ZKPAdapter {
     try {
       // In a real implementation, we would call snarkjs.groth16.fullProve
       // with the actual circuit WASM and zkey files
-      const { username, password, salt } = input;
+      const { username, salt } = input;
 
       // Create a hash of the credentials to use as circuit input
       const credentialsHash = this.hashCredentials(input);
@@ -49,7 +49,7 @@ export class SnarkAdapter implements ZKPAdapter {
       const circuitInputs = {
         usernameHash: Buffer.from(username).toString('hex'),
         credentialsHash,
-        salt
+        salt,
       };
 
       // In a real implementation, this would be:
@@ -63,7 +63,7 @@ export class SnarkAdapter implements ZKPAdapter {
       const { proof, publicSignals } = await this.snarkjs.groth16.fullProve(
         circuitInputs,
         this.wasmFilePath,
-        this.zkeyFilePath
+        this.zkeyFilePath,
       );
 
       return { proof, publicSignals };
@@ -81,8 +81,8 @@ export class SnarkAdapter implements ZKPAdapter {
    * @returns A promise that resolves to true if verified, false otherwise
    */
   async verifyProof(params: {
-    proof: any;
-    publicSignals: any;
+    proof: unknown;
+    publicSignals: unknown;
     publicKey: string;
   }): Promise<boolean> {
     try {
@@ -103,7 +103,7 @@ export class SnarkAdapter implements ZKPAdapter {
       const result = await this.snarkjs.groth16.verify(
         verificationKey,
         publicSignals,
-        proof
+        proof,
       );
 
       return result;
@@ -159,7 +159,7 @@ export class SnarkAdapter implements ZKPAdapter {
    * Mock implementation of snarkjs.groth16.fullProve
    * In a real implementation, this would use the actual snarkjs library
    */
-  private async mockFullProve(inputs: any, wasmFile: string, zkeyFile: string): Promise<any> {
+  private async mockFullProve(inputs: unknown, wasmFile: string, zkeyFile: string): Promise<unknown> {
     // This is a mock implementation that simulates the behavior of snarkjs.groth16.fullProve
     console.log(`Generating proof with inputs: ${JSON.stringify(inputs)}`);
     console.log(`Using wasm file: ${wasmFile}`);
@@ -170,13 +170,13 @@ export class SnarkAdapter implements ZKPAdapter {
       pi_a: ['12345', '67890', '1'],
       pi_b: [['12345', '67890'], ['12345', '67890'], ['1', '0']],
       pi_c: ['12345', '67890', '1'],
-      protocol: 'groth16'
+      protocol: 'groth16',
     };
 
     // Generate mock public signals
     const publicSignals = [
-      inputs.usernameHash,
-      inputs.salt
+      (inputs as Record<string, unknown>).usernameHash,
+      (inputs as Record<string, unknown>).salt,
     ];
 
     return { proof, publicSignals };
@@ -186,7 +186,7 @@ export class SnarkAdapter implements ZKPAdapter {
    * Mock implementation of snarkjs.groth16.verify
    * In a real implementation, this would use the actual snarkjs library
    */
-  private async mockVerify(verificationKey: any, publicSignals: any, proof: any): Promise<boolean> {
+  private async mockVerify(verificationKey: unknown, publicSignals: unknown, proof: unknown): Promise<boolean> {
     console.log('=== ZKP VERIFICATION DEBUG ===');
     console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
     console.log(`Is development: ${process.env.NODE_ENV === 'development'}`);
@@ -218,10 +218,10 @@ export class SnarkAdapter implements ZKPAdapter {
       if (hasValidStructure) {
         console.log('Proof has valid structure');
         return true;
-      } else {
-        console.warn('Invalid proof structure');
-        return false;
       }
+
+      console.warn('Invalid proof structure');
+      return false;
     } catch (error) {
       console.error('Error in ZKP verification:', error);
       return false;

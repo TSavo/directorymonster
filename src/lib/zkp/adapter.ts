@@ -1,6 +1,6 @@
 /**
  * ZKP Adapter Interface
- * 
+ *
  * This interface defines the contract for all ZKP implementations.
  * It follows the adapter pattern to allow easy swapping of ZKP implementations.
  */
@@ -12,8 +12,8 @@ export interface ZKPInput {
 }
 
 export interface ZKPProof {
-  proof: any;
-  publicSignals: any;
+  proof: unknown;
+  publicSignals: unknown;
 }
 
 export interface ZKPAdapter {
@@ -23,7 +23,7 @@ export interface ZKPAdapter {
    * @returns A promise that resolves to the proof and public signals
    */
   generateProof(input: ZKPInput): Promise<ZKPProof>;
-  
+
   /**
    * Verify a Zero-Knowledge Proof
    * @param proof The proof to verify
@@ -32,17 +32,17 @@ export interface ZKPAdapter {
    * @returns A promise that resolves to true if verified, false otherwise
    */
   verifyProof(params: {
-    proof: any;
-    publicSignals: any;
+    proof: unknown;
+    publicSignals: unknown;
     publicKey: string;
   }): Promise<boolean>;
-  
+
   /**
    * Generate a salt value for a new user
    * @returns A unique salt value
    */
   generateSalt(): string;
-  
+
   /**
    * Derive a public key from user credentials
    * This is stored server-side for verification

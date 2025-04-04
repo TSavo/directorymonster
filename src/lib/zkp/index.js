@@ -47,9 +47,9 @@ async function generateProof(username, password, salt) {
 
     // Convert inputs to the format expected by the circuit
     const input = {
-      username: BigInt('0x' + crypto.createHash('sha256').update(username).digest('hex')) % BigInt(2**64),
-      password: BigInt('0x' + crypto.createHash('sha256').update(password).digest('hex')) % BigInt(2**64),
-      publicSalt: BigInt('0x' + crypto.createHash('sha256').update(salt).digest('hex')) % BigInt(2**64)
+      username: BigInt(`0x${crypto.createHash('sha256').update(username).digest('hex')}`) % BigInt(2 ** 64),
+      password: BigInt(`0x${crypto.createHash('sha256').update(password).digest('hex')}`) % BigInt(2 ** 64),
+      publicSalt: BigInt(`0x${crypto.createHash('sha256').update(salt).digest('hex')}`) % BigInt(2 ** 64),
     };
 
     // Generate the proof using snarkjs
@@ -104,5 +104,5 @@ async function verifyProof(proof, publicSignals) {
 module.exports = {
   generateProof,
   verifyProof,
-  generatePublicKey
+  generatePublicKey,
 };
