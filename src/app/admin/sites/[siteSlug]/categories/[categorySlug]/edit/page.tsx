@@ -34,19 +34,19 @@ try {
 interface EditCategoryPageProps {
   params: {
     siteSlug: string;
-    categoryId: string;
+    categorySlug: string;
   };
 }
 
 export default async function EditCategoryPage({ params }: EditCategoryPageProps) {
-  const { siteSlug, categoryId } = params;
+  const { siteSlug, categorySlug } = params;
   
   // Fetch initial category data for editing
   let initialData = null;
   let error = null;
   
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/sites/${siteSlug}/categories/${categoryId}`, { cache: 'no-store' });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/sites/${siteSlug}/categories/${categorySlug}`, { cache: 'no-store' });
     
     if (!response.ok) {
       throw new Error(`Failed to fetch category: ${response.statusText}`);
@@ -96,7 +96,7 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
         ) : (
           <CategoryForm 
             siteSlug={siteSlug} 
-            categoryId={categoryId} 
+            categoryId={initialData?.id} 
             initialData={initialData}
           />
         )}

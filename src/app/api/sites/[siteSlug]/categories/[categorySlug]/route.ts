@@ -4,10 +4,10 @@ import { SiteConfig, Category } from '@/types';
 import { withRedis } from '@/middleware/withRedis';
 
 /**
- * GET handler for retrieving a single category by ID
+ * GET handler for retrieving a single category by slug
  */
-export const GET = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string, categoryId: string } }) => {
-  const { siteSlug, categoryId } = params;
+export const GET = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string, categorySlug: string } }) => {
+  const { siteSlug, categorySlug } = params;
   
   // Get site by slug
   const site = await kv.get<SiteConfig>(`site:slug:${siteSlug}`);
@@ -20,8 +20,8 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
   }
   
   try {
-    // Get category by ID
-    const category = await kv.get<Category>(`category:id:${categoryId}`);
+    // Get category by slug
+    const category = await kv.get<Category>(`category:site:${site.id}:${categorySlug}`);
     
     if (!category) {
       return NextResponse.json(
@@ -51,8 +51,8 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
 /**
  * PUT handler for updating a category
  */
-export const PUT = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string, categoryId: string } }) => {
-  const { siteSlug, categoryId } = params;
+export const PUT = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string, categorySlug: string } }) => {
+  const { siteSlug, categorySlug } = params;
   
   // Get site by slug
   const site = await kv.get<SiteConfig>(`site:slug:${siteSlug}`);
@@ -66,7 +66,7 @@ export const PUT = withRedis(async (request: NextRequest, { params }: { params: 
   
   try {
     // Get existing category
-    const existingCategory = await kv.get<Category>(`category:id:${categoryId}`);
+    const existingCategory = await kv.get<Category>(`category:site:${site.id}:${categorySlug}`);
     
     if (!existingCategory) {
       return NextResponse.json(
@@ -135,7 +135,7 @@ export const PUT = withRedis(async (request: NextRequest, { params }: { params: 
       }
       
       // Check for circular reference
-      if (data.parentId === categoryId) {
+      if (data.parentId === existingCategory.id) {
         return NextResponse.json(
           { error: 'A category cannot be its own parent' },
           { status: 400 }
@@ -145,7 +145,7 @@ export const PUT = withRedis(async (request: NextRequest, { params }: { params: 
       // Check if this would create a circular reference in the hierarchy
       let currentParent = parentCategory;
       while (currentParent.parentId) {
-        if (currentParent.parentId === categoryId) {
+        if (currentParent.parentId === existingCategory.id) {
           return NextResponse.json(
             { error: 'This would create a circular reference in the category hierarchy' },
             { status: 400 }
@@ -172,7 +172,7 @@ export const PUT = withRedis(async (request: NextRequest, { params }: { params: 
     const multi = redis.multi();
     
     // Update the category
-    multi.set(`category:id:${categoryId}`, JSON.stringify(updatedCategory));
+    multi.set(`category:id:${existingCategory.id}`, JSON.stringify(updatedCategory));
     
     // Handle slug change
     if (slug !== existingCategory.slug) {
@@ -219,8 +219,8 @@ export const PUT = withRedis(async (request: NextRequest, { params }: { params: 
 /**
  * DELETE handler for removing a category
  */
-export const DELETE = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string, categoryId: string } }) => {
-  const { siteSlug, categoryId } = params;
+export const DELETE = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string, categorySlug: string } }) => {
+  const { siteSlug, categorySlug } = params;
   
   // Get site by slug
   const site = await kv.get<SiteConfig>(`site:slug:${siteSlug}`);
@@ -233,8 +233,8 @@ export const DELETE = withRedis(async (request: NextRequest, { params }: { param
   }
   
   try {
-    // Get category by ID
-    const category = await kv.get<Category>(`category:id:${categoryId}`);
+    // Get category by slug
+    const category = await kv.get<Category>(`category:site:${site.id}:${categorySlug}`);
     
     if (!category) {
       return NextResponse.json(
@@ -257,7 +257,7 @@ export const DELETE = withRedis(async (request: NextRequest, { params }: { param
       allCategories.map(async (key) => await kv.get<Category>(key))
     );
     
-    const childCategories = categoriesData.filter(cat => cat?.parentId === categoryId);
+    const childCategories = categoriesData.filter(cat => cat?.parentId === category.id);
     
     if (childCategories.length > 0) {
       return NextResponse.json(
@@ -270,7 +270,7 @@ export const DELETE = withRedis(async (request: NextRequest, { params }: { param
     }
     
     // Check if category has any listings
-    const listingKeys = await kv.keys(`listing:category:${categoryId}:*`);
+    const listingKeys = await kv.keys(`listing:category:${category.id}:*`);
     
     if (listingKeys.length > 0) {
       return NextResponse.json(
@@ -286,7 +286,7 @@ export const DELETE = withRedis(async (request: NextRequest, { params }: { param
     const multi = redis.multi();
     
     // Delete category references
-    multi.del(`category:id:${categoryId}`);
+    multi.del(`category:id:${category.id}`);
     multi.del(`category:site:${site.id}:${category.slug}`);
     
     try {
