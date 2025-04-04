@@ -4,15 +4,22 @@ import { RoleService } from '@/lib/role-service';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 
 // Mock dependencies
-jest.mock('@/lib/role-service');
-jest.mock('@/middleware/withPermission', () => {
-  const originalModule = jest.requireActual('@/middleware/withPermission');
-  // Mock the exported functions but keep the original implementation
-  return {
-    ...originalModule,
-    withPermission: jest.fn(originalModule.withPermission)
-  };
-});
+jest.mock('@/lib/role-service', () => ({
+  RoleService: {
+    hasPermission: jest.fn(),
+  }
+}));
+
+// Mock jsonwebtoken to control token verification
+jest.mock('jsonwebtoken', () => ({
+  verify: jest.fn().mockImplementation((token) => {
+    if (token === 'valid-token') {
+      return { userId: 'user-123' };
+    }
+    throw new Error('Invalid token');
+  }),
+  JwtPayload: jest.fn()
+}));
 
 jest.mock('next/server', () => {
   const originalModule = jest.requireActual('next/server');
@@ -45,7 +52,10 @@ describe('withPermission middleware', () => {
       }
     });
 
-    const mockHandler = jest.fn().mockResolvedValue({ status: 200 });
+    const mockHandler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
+
+    // Mock hasPermission to return true
+    (RoleService.hasPermission as jest.Mock).mockResolvedValue(true);
 
     // Act
     await withPermission(
@@ -57,7 +67,7 @@ describe('withPermission middleware', () => {
 
     // Assert
     expect(RoleService.hasPermission).toHaveBeenCalledWith(
-      expect.any(String), // userId
+      'user-123', // userId from the mocked JWT token
       testTenantId,
       'setting',
       'read',
@@ -137,7 +147,7 @@ describe('withPermission middleware', () => {
     const mockHandler = jest.fn();
 
     // Act
-    await withPermission(
+    const response = await withPermission(
       req,
       'setting' as ResourceType,
       'read' as Permission,
@@ -147,7 +157,7 @@ describe('withPermission middleware', () => {
     // Assert
     expect(NextResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        error: expect.stringContaining('Tenant')
+        error: 'Tenant ID required'
       }),
       { status: 400 }
     );
