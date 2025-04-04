@@ -87,6 +87,9 @@ seo_data/processed/*.json
 *.log
 /logs/
 logs/*.log
+/debug-logs/
+debug-logs/*.txt
+debug-logs/*.log
 
 # Test output files
 *_test_output.log
@@ -143,4 +146,27 @@ after-*.png
 # Coverage reports
 /coverage*/
 coverage_summary.txt
-.early.coverage
+
+# Circuit files
+*.sym
+*.r1cs
+*.wtns
+circuits/test_*.circom
+circuits/*_test.circom
+circuits/test_*.json
+circuits/*/input*.json
+circuits/*/witness*.json
+circuits/*/witness*.wtns
+circuits/*/proof*.json
+circuits/*/public*.json
+circuits/*/verification_key_new.json
+circuits/*/simple_auth_output/
+circuits/*/zkp_auth_no_pragma*
+circuits/circomlib_*.circom
+
+# Test scripts
+scripts/test-*.js
+scripts/compare-*.js
+
+# Generated WebAssembly files
+*.wasm
