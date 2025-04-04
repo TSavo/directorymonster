@@ -3,27 +3,27 @@ import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { ListingDetailPanel } from '@/components/admin/listings/components/ListingDetailPanel';
+import { ListingDetailPanel } from '@/components/admin/listings/components';
 
 // Mock the hooks
-jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
+jest.mock('@/components/admin/listings/hooks/useListings', () => ({
   useListings: jest.fn(),
 }));
 
-jest.mock('../../../../src/components/admin/sites/hooks/useSites', () => ({
+jest.mock('@/components/admin/sites/hooks/useSites', () => ({
   useSites: jest.fn(),
 }));
 
 // Mock data
-const mockListing = { 
-  id: 'listing1', 
-  title: 'Listing 1', 
+const mockListing = {
+  id: 'listing1',
+  title: 'Listing 1',
   description: 'Test description',
   siteId: 'site1',
-  site: { 
-    id: 'site1', 
-    name: 'Test Site 1', 
-    domain: 'test1.com' 
+  site: {
+    id: 'site1',
+    name: 'Test Site 1',
+    domain: 'test1.com'
   }
 };
 
@@ -35,7 +35,7 @@ const mockStore = configureStore([]);
 
 describe('Integration: Listing Site Association Display', () => {
   let store;
-  
+
   beforeEach(() => {
     // Mock the hooks to return test data
     (useListings as jest.Mock).mockReturnValue({
@@ -43,13 +43,13 @@ describe('Integration: Listing Site Association Display', () => {
       isLoading: false,
       error: null,
     });
-    
+
     (useSites as jest.Mock).mockReturnValue({
       getSiteById: jest.fn(() => mockListing.site),
       isLoading: false,
       error: null,
     });
-    
+
     // Create a mock store
     store = mockStore({
       listings: {
@@ -74,13 +74,13 @@ describe('Integration: Listing Site Association Display', () => {
 
     // Check that the site information section is present
     expect(screen.getByTestId('listing-site-info')).toBeInTheDocument();
-    
+
     // Check that the site name is displayed correctly
     expect(screen.getByTestId('listing-site-name')).toHaveTextContent('Test Site 1');
-    
+
     // Check that the site domain is displayed correctly
     expect(screen.getByTestId('listing-site-domain')).toHaveTextContent('test1.com');
-    
+
     // Check for the site link
     const siteLink = screen.getByTestId('listing-site-link');
     expect(siteLink).toBeInTheDocument();
@@ -94,13 +94,13 @@ describe('Integration: Listing Site Association Display', () => {
       siteId: null,
       site: null
     };
-    
+
     (useListings as jest.Mock).mockReturnValue({
       getListingById: jest.fn(() => listingWithNoSite),
       isLoading: false,
       error: null,
     });
-    
+
     render(
       <Provider store={store}>
         <ListingDetailPanel listingId={listingWithNoSite.id} />
@@ -110,7 +110,7 @@ describe('Integration: Listing Site Association Display', () => {
     // Check that the "No site associated" message is displayed
     expect(screen.getByTestId('listing-no-site-message')).toBeInTheDocument();
     expect(screen.getByTestId('listing-no-site-message')).toHaveTextContent('No site associated');
-    
+
     // Check that the link to assign a site is present
     expect(screen.getByTestId('assign-site-button')).toBeInTheDocument();
   });
@@ -122,13 +122,13 @@ describe('Integration: Listing Site Association Display', () => {
       isLoading: false,
       error: null,
     });
-    
+
     (useSites as jest.Mock).mockReturnValue({
       getSiteById: jest.fn(() => null),
       isLoading: true,
       error: null,
     });
-    
+
     render(
       <Provider store={store}>
         <ListingDetailPanel listingId={mockListing.id} />
@@ -146,13 +146,13 @@ describe('Integration: Listing Site Association Display', () => {
       isLoading: false,
       error: null,
     });
-    
+
     (useSites as jest.Mock).mockReturnValue({
       getSiteById: jest.fn(() => null),
       isLoading: false,
       error: new Error('Failed to load site information'),
     });
-    
+
     render(
       <Provider store={store}>
         <ListingDetailPanel listingId={mockListing.id} />

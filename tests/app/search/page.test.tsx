@@ -54,29 +54,35 @@ jest.mock('../../../src/lib/redis-client', () => ({
       }
       return Promise.resolve(null);
     }),
+    keys: jest.fn().mockResolvedValue([]),
   },
+}));
+
+// Mock the auth module
+jest.mock('../../../src/lib/auth', () => ({
+  currentUser: jest.fn().mockResolvedValue(null)
 }));
 
 describe('SearchPage Component', () => {
   it('renders search form when no query is provided', async () => {
     const { getSiteFromRequest } = require('../../../src/lib/site-utils');
-    
+
     const page = await SearchPage({ searchParams: {} });
     render(page);
-    
+
     // Check that page title is rendered
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Search');
-    
+
     // Check that search form is rendered with correct props
     const searchForm = screen.getByTestId('mock-search-form');
     expect(searchForm).toBeInTheDocument();
     expect(searchForm).toHaveAttribute('data-site-id', 'site1');
     expect(searchForm).toHaveAttribute('data-placeholder', 'Search for products, services, or keywords...');
-    
+
     // Check that no results component is rendered
     expect(screen.getByText('Enter a search query to find listings')).toBeInTheDocument();
     expect(screen.queryByTestId('mock-search-results')).not.toBeInTheDocument();
-    
+
     // Verify site utils was called
     expect(getSiteFromRequest).toHaveBeenCalled();
   });
@@ -84,14 +90,14 @@ describe('SearchPage Component', () => {
   it('renders search results when query is provided', async () => {
     const page = await SearchPage({ searchParams: { q: 'test query' } });
     render(page);
-    
+
     // Check that page title is rendered
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Search');
-    
+
     // Check that search form is rendered
     const searchForm = screen.getByTestId('mock-search-form');
     expect(searchForm).toBeInTheDocument();
-    
+
     // Check that search results are rendered with correct props
     const searchResults = screen.getByTestId('mock-search-results');
     expect(searchResults).toBeInTheDocument();
@@ -102,35 +108,35 @@ describe('SearchPage Component', () => {
 
   it('uses specified site when siteId is provided', async () => {
     const { kv } = require('../../../src/lib/redis-client');
-    
+
     const page = await SearchPage({ searchParams: { q: 'test query', siteId: 'site2' } });
     render(page);
-    
+
     // Check that search results are rendered with correct site
     const searchResults = screen.getByTestId('mock-search-results');
     expect(searchResults).toBeInTheDocument();
     expect(searchResults).toHaveAttribute('data-site-id', 'site2');
     expect(searchResults).toHaveAttribute('data-site-name', 'Another Test Site');
-    
+
     // Verify Redis was called with correct key
     expect(kv.get).toHaveBeenCalledWith('site:id:site2');
   });
 
   it('falls back to current site when specified siteId is not found', async () => {
     const { kv } = require('../../../src/lib/redis-client');
-    
+
     // Mock Redis to return null for invalid site ID
     kv.get.mockImplementationOnce(() => Promise.resolve(null));
-    
+
     const page = await SearchPage({ searchParams: { q: 'test query', siteId: 'invalid-site' } });
     render(page);
-    
+
     // Check that search results are rendered with current site
     const searchResults = screen.getByTestId('mock-search-results');
     expect(searchResults).toBeInTheDocument();
     expect(searchResults).toHaveAttribute('data-site-id', 'site1');
     expect(searchResults).toHaveAttribute('data-site-name', 'Test Site');
-    
+
     // Verify Redis was called with correct key
     expect(kv.get).toHaveBeenCalledWith('site:id:invalid-site');
   });
@@ -138,16 +144,16 @@ describe('SearchPage Component', () => {
   describe('generateMetadata', () => {
     it('returns default metadata when no query is provided', async () => {
       const metadata = await generateMetadata({ searchParams: {} });
-      
+
       expect(metadata).toEqual({
         title: 'Search',
         description: 'Search our directory for products, services, and information',
       });
     });
-    
+
     it('returns query-specific metadata when query is provided', async () => {
       const metadata = await generateMetadata({ searchParams: { q: 'test query' } });
-      
+
       expect(metadata).toEqual({
         title: 'Search Results for "test query"',
         description: 'Search results for "test query" in our directory',

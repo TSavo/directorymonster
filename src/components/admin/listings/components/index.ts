@@ -15,3 +15,6 @@ export { default as ListingsMobileView } from './ListingsMobileView';
 // Export modal components
 export { default as ListingFormModal } from './ListingFormModal';
 export { default as DeleteConfirmationModal } from './DeleteConfirmationModal';
+
+// Export detail components
+export { default as ListingDetailPanel } from './ListingDetailPanel';
