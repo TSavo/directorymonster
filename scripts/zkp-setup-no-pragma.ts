@@ -1,6 +1,6 @@
 /**
  * ZKP Authentication System Setup Script
- * 
+ *
  * This script sets up the ZKP authentication system by:
  * 1. Compiling the no-pragma circuit
  * 2. Generating the proving key
@@ -131,7 +131,7 @@ async function setupZkpAuth() {
     try {
       // Create the directory if it doesn't exist
       ensureDirExists(zkpAuthNoPragmaJsDir);
-      
+
       // Move the file
       fs.renameSync(wasmRootFile, wasmFile);
       console.log(`✅ WebAssembly file moved to: ${wasmFile}`);
@@ -237,12 +237,43 @@ async function setupZkpAuth() {
 
   // Step 11: Verify the proof
   console.log(`\n🔄 Verifying proof...`);
-  if (!executeCommand(
-    `npx snarkjs groth16 verify ${vkeyFile} ${publicFile} ${proofFile}`,
-    'Verifying proof'
-  )) {
-    console.log(`\n⚠️ Proof verification failed. This might be due to changes in the circuit or inputs.`);
-    console.log(`   Try removing the proof and public files and generating them again.`);
+  try {
+    // Use execSync directly to capture the output
+    const result = execSync(
+      `npx snarkjs groth16 verify ${vkeyFile} ${publicFile} ${proofFile}`,
+      { encoding: 'utf8' }
+    );
+    console.log(result);
+    console.log(`\n✅ Proof verification successful!`);
+  } catch (error) {
+    console.log(`\n⚠️ Proof verification failed. Let's regenerate the verification key and proof.`);
+
+    // Remove the existing files
+    if (fileExists(proofFile)) fs.unlinkSync(proofFile);
+    if (fileExists(publicFile)) fs.unlinkSync(publicFile);
+
+    // Regenerate the proof
+    console.log(`\n🔄 Regenerating proof...`);
+    if (!executeCommand(
+      `npx snarkjs groth16 prove ${zkeyFile} ${witnessFile} ${proofFile} ${publicFile}`,
+      'Regenerating proof'
+    )) {
+      return;
+    }
+
+    // Try verifying again
+    console.log(`\n🔄 Verifying regenerated proof...`);
+    try {
+      const result = execSync(
+        `npx snarkjs groth16 verify ${vkeyFile} ${publicFile} ${proofFile}`,
+        { encoding: 'utf8' }
+      );
+      console.log(result);
+      console.log(`\n✅ Proof verification successful!`);
+    } catch (error) {
+      console.log(`\n⚠️ Proof verification still failed. This might be due to an issue with the circuit.`);
+      console.log(`   Please check the circuit implementation and try again.`);
+    }
   }
 
   // Step 12: Generate a call to the verifier
@@ -264,7 +295,7 @@ async function setupZkpAuth() {
   console.log(`- Witness: ${witnessFile}`);
   console.log(`- Proof: ${proofFile}`);
   console.log(`- Public Inputs: ${publicFile}`);
-  
+
   console.log(`\n💡 To use the ZKP Authentication System in your application:`);
   console.log(`1. Import the ZKP provider from src/lib/zkp`);
   console.log(`2. Use the provider to generate and verify proofs`);
