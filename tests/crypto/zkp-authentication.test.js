@@ -396,7 +396,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
     let mockServer;
     let authToken;
 
-    before(() => {
+    beforeAll(() => {
       // Mock server responses
       mockServer = {
         url: 'http://localhost:3000',
@@ -462,7 +462,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       };
     });
 
-    after(() => {
+    afterAll(() => {
       // Restore original fetch
       global.fetch = originalFetch;
     });

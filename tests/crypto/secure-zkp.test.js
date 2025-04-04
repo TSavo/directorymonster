@@ -11,7 +11,7 @@ describe('Secure ZKP Authentication Tests', () => {
   const vkeyPath = path.join(circuitPath, 'verification_key.json');
 
   // Skip tests if circuit files don't exist
-  before(function() {
+  beforeAll(function() {
     if (!fs.existsSync(wasmPath) || !fs.existsSync(zkeyPath) || !fs.existsSync(vkeyPath)) {
       console.warn(`
         Warning: Circuit files not found. Skipping secure ZKP tests.

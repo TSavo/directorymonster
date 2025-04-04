@@ -37,7 +37,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
   // Create a direct instance of the adapter for testing
   let zkpAdapter;
 
-  before(() => {
+  beforeAll(() => {
     // Initialize the adapter
     zkpAdapter = new SnarkAdapter();
 
