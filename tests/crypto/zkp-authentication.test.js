@@ -1,5 +1,4 @@
 // ZKP Authentication Cryptographic Tests
-const { expect } = require('chai');
 const snarkjs = require('snarkjs');
 const fs = require('fs');
 const path = require('path');
@@ -9,74 +8,74 @@ const crypto = require('crypto');
 const { generateProof, verifyProof } = require('../../src/lib/zkp');
 
 describe('ZKP Authentication Cryptographic Tests', () => {
-  
+
   describe('Core ZKP Functions', () => {
     const testUsername = 'testuser';
     const testPassword = 'Password123!';
     const testSalt = 'randomsalt123';
-    
+
     // Load the actual circuit and keys
     const circuitWasmPath = path.join(__dirname, '../../circuits/auth/auth_js/auth.wasm');
     const zkeyPath = path.join(__dirname, '../../circuits/auth/auth_final.zkey');
-    
+
     it('should generate a valid proof with correct credentials', async () => {
       // Generate a proof using the actual ZKP implementation
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       // Verify the proof structure
       expect(proof).to.have.property('pi_a').that.is.an('array');
       expect(proof).to.have.property('pi_b').that.is.an('array');
       expect(proof).to.have.property('pi_c').that.is.an('array');
       expect(proof).to.have.property('protocol').that.equals('groth16');
-      
+
       // Verify the public signals
       expect(publicSignals).to.be.an('array');
       expect(publicSignals.length).to.be.at.least(2);
-      
+
       // Verify the proof is valid using snarkjs directly
       const vKey = JSON.parse(fs.readFileSync(path.join(__dirname, '../../circuits/auth/verification_key.json')));
       const isValid = await snarkjs.groth16.verify(vKey, publicSignals, proof);
-      
+
       expect(isValid).to.be.true;
     });
-    
+
     it('should generate different proofs for different passwords', async () => {
       // Generate proofs for two different passwords
       const { proof: proof1, publicSignals: publicSignals1 } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       const { proof: proof2, publicSignals: publicSignals2 } = await generateProof(
-        testUsername, 
-        'DifferentPassword456!', 
+        testUsername,
+        'DifferentPassword456!',
         testSalt
       );
-      
+
       // The proofs should be different
       expect(JSON.stringify(proof1)).to.not.equal(JSON.stringify(proof2));
       expect(JSON.stringify(publicSignals1)).to.not.equal(JSON.stringify(publicSignals2));
     });
-    
+
     it('should generate the same public key for the same inputs', async () => {
       // Generate two proofs with the same inputs
       const { proof: proof1, publicSignals: publicSignals1 } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       const { proof: proof2, publicSignals: publicSignals2 } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       // The public signals should be the same (deterministic)
       // Note: The proofs themselves might differ due to randomness in the proving algorithm
       expect(publicSignals1[0]).to.equal(publicSignals2[0]);
@@ -87,54 +86,54 @@ describe('ZKP Authentication Cryptographic Tests', () => {
     const testUsername = 'testuser';
     const testPassword = 'Password123!';
     const testSalt = 'randomsalt123';
-    
+
     it('should verify a valid proof', async () => {
       // Generate a valid proof
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       // Verify the proof using our verification function
       const isValid = await verifyProof(proof, publicSignals);
-      
+
       expect(isValid).to.be.true;
     });
-    
+
     it('should reject a tampered proof', async () => {
       // Generate a valid proof
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       // Tamper with the proof
       const tamperedProof = JSON.parse(JSON.stringify(proof)); // Deep copy
       tamperedProof.pi_a[0] = (BigInt(tamperedProof.pi_a[0]) + 1n).toString();
-      
+
       // Verify the tampered proof
       const isValid = await verifyProof(tamperedProof, publicSignals);
-      
+
       expect(isValid).to.be.false;
     });
-    
+
     it('should reject a tampered public signal', async () => {
       // Generate a valid proof
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       // Tamper with the public signals
       const tamperedPublicSignals = [...publicSignals];
       tamperedPublicSignals[0] = (BigInt(tamperedPublicSignals[0]) + 1n).toString();
-      
+
       // Verify with tampered public signals
       const isValid = await verifyProof(proof, tamperedPublicSignals);
-      
+
       expect(isValid).to.be.false;
     });
   });
@@ -142,11 +141,11 @@ describe('ZKP Authentication Cryptographic Tests', () => {
   describe('Authentication Flow', () => {
     const testUsername = 'testuser';
     const testPassword = 'Password123!';
-    
+
     // Mock the database and authentication service
     let authService;
     let mockDb;
-    
+
     beforeEach(() => {
       // Set up mock database with a test user
       mockDb = {
@@ -164,7 +163,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
           }
         }
       };
-      
+
       // Create auth service with the mock DB
       authService = {
         authenticate: async (username, proof, publicSignals) => {
@@ -172,67 +171,67 @@ describe('ZKP Authentication Cryptographic Tests', () => {
           const user = await mockDb.users.findUnique({
             where: { username }
           });
-          
+
           if (!user) {
             return { success: false, error: 'User not found' };
           }
-          
+
           // Verify the proof
           const isValid = await verifyProof(proof, publicSignals);
-          
+
           if (!isValid) {
             return { success: false, error: 'Invalid proof' };
           }
-          
+
           // Generate a token
           const token = 'valid-jwt-token-' + Math.random().toString(36).substring(2);
-          
+
           return { success: true, token };
         }
       };
     });
-    
+
     it('should authenticate a user with valid credentials', async () => {
       // Generate a proof for the test user
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         'randomsalt123'
       );
-      
+
       // Attempt to authenticate
       const result = await authService.authenticate(testUsername, proof, publicSignals);
-      
+
       expect(result).to.have.property('success').that.is.true;
       expect(result).to.have.property('token').that.is.a('string');
     });
-    
+
     it('should reject authentication with invalid credentials', async () => {
       // Generate a proof with wrong password
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        'WrongPassword!', 
+        testUsername,
+        'WrongPassword!',
         'randomsalt123'
       );
-      
+
       // Attempt to authenticate
       const result = await authService.authenticate(testUsername, proof, publicSignals);
-      
+
       expect(result).to.have.property('success').that.is.false;
       expect(result).to.have.property('error').that.equals('Invalid proof');
     });
-    
+
     it('should reject authentication for non-existent users', async () => {
       // Generate a proof for a non-existent user
       const { proof, publicSignals } = await generateProof(
-        'nonexistentuser', 
-        testPassword, 
+        'nonexistentuser',
+        testPassword,
         'randomsalt123'
       );
-      
+
       // Attempt to authenticate
       const result = await authService.authenticate('nonexistentuser', proof, publicSignals);
-      
+
       expect(result).to.have.property('success').that.is.false;
       expect(result).to.have.property('error').that.equals('User not found');
     });
@@ -242,69 +241,69 @@ describe('ZKP Authentication Cryptographic Tests', () => {
     const testUsername = 'testuser';
     const testPassword = 'Password123!';
     const testSalt = 'randomsalt123';
-    
+
     it('should not reveal the password in the proof or public signals', async () => {
       // Generate a proof
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       // Convert everything to strings for easy searching
       const proofStr = JSON.stringify(proof);
       const publicSignalsStr = JSON.stringify(publicSignals);
       const combinedStr = proofStr + publicSignalsStr;
-      
+
       // The password should not appear in the proof or public signals
       expect(combinedStr).to.not.include(testPassword);
-      
+
       // Even parts of the password should not appear
       for (let i = 0; i < testPassword.length - 3; i++) {
         const passwordPart = testPassword.substring(i, i + 3);
         expect(combinedStr).to.not.include(passwordPart);
       }
     });
-    
+
     it('should be resistant to replay attacks', async () => {
       // Generate a proof
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       // Verify the proof
       const isValid1 = await verifyProof(proof, publicSignals);
       expect(isValid1).to.be.true;
-      
+
       // In a real system, the verification would mark this proof as used
       // For testing, we can simulate this by modifying the timestamp in the public signals
-      
+
       // Simulate a replay attack by using the same proof but with a different timestamp
       const replayPublicSignals = [...publicSignals];
       replayPublicSignals[1] = (Date.now() + 1000).toString(); // Different timestamp
-      
+
       // This should fail in a real system that tracks used proofs
       // For this test, we're checking that the public signals are properly bound to the proof
       const isValid2 = await verifyProof(proof, replayPublicSignals);
       expect(isValid2).to.be.false;
     });
-    
+
     it('should be resistant to man-in-the-middle attacks', async () => {
       // Generate a proof
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       // Simulate a MITM attack by replacing the username in the request
       // but keeping the original proof and public signals
-      
+
       // In a real system, this would be caught because the public signals
       // include a commitment to the username
-      
+
       // Mock authentication service
       const authService = {
         authenticate: async (username, p, ps) => {
@@ -312,18 +311,18 @@ describe('ZKP Authentication Cryptographic Tests', () => {
           if (username !== testUsername) {
             return { success: false, error: 'Username mismatch' };
           }
-          
+
           // Otherwise, verify the proof normally
           const isValid = await verifyProof(p, ps);
-          return isValid 
+          return isValid
             ? { success: true, token: 'valid-token' }
             : { success: false, error: 'Invalid proof' };
         }
       };
-      
+
       // Attempt the MITM attack
       const result = await authService.authenticate('attackerusername', proof, publicSignals);
-      
+
       expect(result).to.have.property('success').that.is.false;
       expect(result).to.have.property('error').that.equals('Username mismatch');
     });
@@ -333,54 +332,54 @@ describe('ZKP Authentication Cryptographic Tests', () => {
     const testUsername = 'testuser';
     const testPassword = 'Password123!';
     const testSalt = 'randomsalt123';
-    
+
     it('should generate proofs within acceptable time limits', async () => {
       const startTime = Date.now();
-      
+
       await generateProof(testUsername, testPassword, testSalt);
-      
+
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       // The proof generation should complete within a reasonable time
       // Adjust this threshold based on your performance requirements
       expect(duration).to.be.below(5000); // 5 seconds
     });
-    
+
     it('should verify proofs within acceptable time limits', async () => {
       // Generate a proof first
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         testSalt
       );
-      
+
       // Measure verification time
       const startTime = Date.now();
-      
+
       await verifyProof(proof, publicSignals);
-      
+
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       // The verification should be fast
       expect(duration).to.be.below(1000); // 1 second
     });
-    
+
     it('should handle concurrent proof generations', async () => {
       // Generate multiple proofs concurrently
       const promises = [];
       for (let i = 0; i < 5; i++) {
         promises.push(generateProof(
-          `${testUsername}${i}`, 
-          `${testPassword}${i}`, 
+          `${testUsername}${i}`,
+          `${testPassword}${i}`,
           `${testSalt}${i}`
         ));
       }
-      
+
       // All should complete without errors
       const results = await Promise.all(promises);
-      
+
       // Verify all proofs were generated
       expect(results).to.have.length(5);
       results.forEach(result => {
@@ -396,7 +395,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
     const originalFetch = global.fetch;
     let mockServer;
     let authToken;
-    
+
     before(() => {
       // Mock server responses
       mockServer = {
@@ -407,12 +406,12 @@ describe('ZKP Authentication Cryptographic Tests', () => {
           '/api/protected-resource': { success: true, data: 'Protected data' }
         }
       };
-      
+
       // Mock fetch
       global.fetch = async (url, options = {}) => {
         const urlObj = new URL(url);
         const path = urlObj.pathname + urlObj.search;
-        
+
         // Salt endpoint
         if (path.startsWith('/api/auth/salt')) {
           return {
@@ -420,11 +419,11 @@ describe('ZKP Authentication Cryptographic Tests', () => {
             json: async () => mockServer.responses['/api/auth/salt']
           };
         }
-        
+
         // Verify endpoint
         if (path === '/api/auth/verify') {
           const body = JSON.parse(options.body);
-          
+
           // Check for valid proof
           if (body.username === 'testuser' && body.proof && body.publicSignals) {
             return {
@@ -438,11 +437,11 @@ describe('ZKP Authentication Cryptographic Tests', () => {
             };
           }
         }
-        
+
         // Protected resource
         if (path === '/api/protected-resource') {
           const authHeader = options.headers?.Authorization;
-          
+
           if (authHeader && authHeader.startsWith('Bearer ')) {
             return {
               status: 200,
@@ -455,40 +454,40 @@ describe('ZKP Authentication Cryptographic Tests', () => {
             };
           }
         }
-        
+
         return {
           status: 404,
           json: async () => ({ error: 'Not found' })
         };
       };
     });
-    
+
     after(() => {
       // Restore original fetch
       global.fetch = originalFetch;
     });
-    
+
     // Helper function to generate CSRF token
     function generateCsrfToken() {
-      return Math.random().toString(36).substring(2, 15) + 
+      return Math.random().toString(36).substring(2, 15) +
              Math.random().toString(36).substring(2, 15);
     }
-    
+
     it('should authenticate through the API with valid ZKP proof', async () => {
       const testUsername = 'testuser';
       const testPassword = 'Password123!';
-      
+
       // First, get the salt from the server
       const saltResponse = await fetch(`${mockServer.url}/api/auth/salt?username=${testUsername}`);
       const { salt } = await saltResponse.json();
-      
+
       // Generate a proof
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        testPassword, 
+        testUsername,
+        testPassword,
         salt
       );
-      
+
       // Authenticate through the API
       const authResponse = await fetch(`${mockServer.url}/api/auth/verify`, {
         method: 'POST',
@@ -502,16 +501,16 @@ describe('ZKP Authentication Cryptographic Tests', () => {
           publicSignals
         })
       });
-      
+
       const authResult = await authResponse.json();
-      
+
       expect(authResponse.status).to.equal(200);
       expect(authResult).to.have.property('token').that.is.a('string');
-      
+
       // Save the token for subsequent tests
       authToken = authResult.token;
     });
-    
+
     it('should access protected resources with the auth token', async () => {
       // Attempt to access a protected resource
       const protectedResponse = await fetch(`${mockServer.url}/api/protected-resource`, {
@@ -519,23 +518,23 @@ describe('ZKP Authentication Cryptographic Tests', () => {
           'Authorization': `Bearer ${authToken}`
         }
       });
-      
+
       expect(protectedResponse.status).to.equal(200);
-      
+
       const protectedData = await protectedResponse.json();
       expect(protectedData).to.have.property('success').that.is.true;
     });
-    
+
     it('should reject invalid proofs through the API', async () => {
       const testUsername = 'testuser';
-      
+
       // Generate an invalid proof (wrong password)
       const { proof, publicSignals } = await generateProof(
-        testUsername, 
-        'WrongPassword!', 
+        testUsername,
+        'WrongPassword!',
         'somesalt'
       );
-      
+
       // Attempt to authenticate
       const authResponse = await fetch(`${mockServer.url}/api/auth/verify`, {
         method: 'POST',
@@ -549,9 +548,9 @@ describe('ZKP Authentication Cryptographic Tests', () => {
           publicSignals
         })
       });
-      
+
       expect(authResponse.status).to.equal(401);
-      
+
       const authResult = await authResponse.json();
       expect(authResult).to.have.property('error').that.is.a('string');
     });

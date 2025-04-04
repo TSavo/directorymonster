@@ -1,5 +1,4 @@
 // Secure ZKP Authentication Tests
-const { expect } = require('chai');
 const fs = require('fs');
 const path = require('path');
 const snarkjs = require('snarkjs');
