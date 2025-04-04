@@ -50,6 +50,12 @@ jobs:
     - name: Run simplified ZKP tests
       run: npm run test:crypto:simplified
 
+    - name: Run ZKP security measures tests
+      run: npm run test:crypto:security
+
+    - name: Run dynamic salt generation tests
+      run: npm run test:crypto:salt
+
     - name: Run all crypto tests
       run: npm run test:crypto
 
