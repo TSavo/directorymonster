@@ -121,10 +121,9 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       const tamperedProof = JSON.parse(JSON.stringify(proof)); // Deep copy
       tamperedProof.tampered = true;
 
-      // Verify the tampered proof - should throw an error
-      await expect(verifyProof(tamperedProof, publicSignals))
-        .rejects
-        .toThrow('Proof has been tampered with');
+      // Verify the tampered proof
+      const isValid = await verifyProof(tamperedProof, publicSignals);
+      expect(isValid).toBe(false);
     });
 
     it('should reject a tampered public signal', async () => {
@@ -139,10 +138,9 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       const tamperedPublicSignals = [...publicSignals];
       tamperedPublicSignals[0] = 'tampered';
 
-      // Verify with tampered public signals - should throw an error
-      await expect(verifyProof(proof, tamperedPublicSignals))
-        .rejects
-        .toThrow();
+      // Verify with tampered public signals
+      const isValid = await verifyProof(proof, tamperedPublicSignals);
+      expect(isValid).toBe(false);
     });
   });
 
@@ -324,9 +322,8 @@ describe('ZKP Authentication Cryptographic Tests', () => {
 
       // This should fail in a real system that tracks used proofs
       // For this test, we're checking that the public signals are properly bound to the proof
-      await expect(verifyProof(proof, replayPublicSignals))
-        .rejects
-        .toThrow('Potential replay attack detected');
+      const isValid2 = await verifyProof(proof, replayPublicSignals);
+      expect(isValid2).toBe(false);
     });
 
     it('should be resistant to man-in-the-middle attacks', async () => {

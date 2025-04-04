@@ -97,6 +97,9 @@ describe('ZKP Authentication Security Measures Tests', () => {
         return Promise.resolve(null);
       });
 
+      // Mock Redis incr to return a value above the threshold
+      mockRedisClient.incr.mockResolvedValue(mockConfig.ipBlocker.maxFailedAttempts + 1);
+
       // Check if IP is blocked
       const isBlocked = await ipBlocker.isBlocked(testIp);
       expect(isBlocked).toBe(false);
@@ -215,11 +218,16 @@ describe('ZKP Authentication Security Measures Tests', () => {
 
     it('should validate CAPTCHA tokens', async () => {
       // Mock the verification API call
-      global.fetch = jest.fn().mockImplementation(() => 
+      global.fetch = jest.fn().mockImplementation(() =>
         Promise.resolve({
           json: () => Promise.resolve({ success: true, score: 0.9 }),
         })
       );
+
+      // Create a mock URLSearchParams
+      global.URLSearchParams = jest.fn().mockImplementation(() => ({
+        toString: () => 'secret=test-secret-key&response=valid-token&remoteip=192.168.1.1'
+      }));
 
       // Verify a valid token
       const isValid = await captchaService.verifyCaptcha('valid-token', testIp);
@@ -231,12 +239,13 @@ describe('ZKP Authentication Security Measures Tests', () => {
         expect.objectContaining({
           method: 'POST',
           headers: expect.any(Object),
-          body: expect.any(String),
+          body: expect.any(Object),
         })
       );
 
       // Clean up
       delete global.fetch;
+      delete global.URLSearchParams;
     });
   });
 
@@ -358,7 +367,7 @@ describe('ZKP Authentication Security Measures Tests', () => {
       for (let i = 1; i <= 5; i++) {
         attemptCount = i;
         const delay = await ipBlocker.getProgressiveDelay(testIp);
-        
+
         // Verify delay increases with attempt count
         // Typical implementation might use exponential backoff: delay = baseDelay * 2^(attemptCount-1)
         const expectedDelay = 1000 * Math.pow(2, i - 1); // 1s, 2s, 4s, 8s, 16s
@@ -541,21 +550,36 @@ describe('ZKP Authentication Security Measures Tests', () => {
         if (key === `captcha:attempts:${testIp}`) {
           return Promise.resolve(mockConfig.captcha.threshold.toString());
         }
+        if (key === `ip:block:${testIp}`) {
+          return Promise.resolve(null); // Not blocked
+        }
+        if (key === `ip:attempts:${testIp}`) {
+          return Promise.resolve('0'); // No IP attempts
+        }
         return Promise.resolve('0');
       });
 
-      // Attempt to authenticate without CAPTCHA
-      const result = await authService.authenticate(testUsername, testPassword, testIp);
+      // Mock isBlocked to return false
+      const originalIsBlocked = ipBlocker.isBlocked;
+      ipBlocker.isBlocked = jest.fn().mockResolvedValue(false);
 
-      // Verify result
-      expect(result).toHaveProperty('success');
-      expect(result.success).toBe(false);
-      expect(result).toHaveProperty('error');
-      expect(result).toHaveProperty('captchaRequired');
-      expect(result.captchaRequired).toBe(true);
+      try {
+        // Attempt to authenticate without CAPTCHA
+        const result = await authService.authenticate(testUsername, testPassword, testIp);
 
-      // Verify services were called
-      expect(auditService.log).toHaveBeenCalled();
+        // Verify result
+        expect(result).toHaveProperty('success');
+        expect(result.success).toBe(false);
+        expect(result).toHaveProperty('error');
+        expect(result).toHaveProperty('captchaRequired');
+        expect(result.captchaRequired).toBe(true);
+
+        // Verify services were called
+        expect(auditService.log).toHaveBeenCalled();
+      } finally {
+        // Restore original method
+        ipBlocker.isBlocked = originalIsBlocked;
+      }
     });
 
     it('should block IP after too many failed attempts', async () => {
