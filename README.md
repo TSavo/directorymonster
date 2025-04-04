@@ -21,7 +21,9 @@ DirectoryMonster is a comprehensive platform combining:
 
 3. **Zero-Knowledge Proof Authentication**
    - Cryptographically secure authentication without password transmission
-   - Multi-round hashing with domain separation
+   - Poseidon hash function from circomlib for secure hashing
+   - Dynamic salt generation for enhanced security
+   - Rate limiting, IP blocking, and progressive delays for brute force protection
    - Docker-ready deployment for production environments
 
 ## Quick Start
@@ -121,6 +123,13 @@ npx jest -t "ComponentName"
 npm run test:domain
 npm run test:multitenancy
 
+# ZKP authentication tests
+npm run test:crypto           # All crypto tests
+npm run test:crypto:simplified # Simplified ZKP tests
+npm run test:crypto:secure    # Secure ZKP tests
+npm run test:crypto:security  # Security measures tests
+npm run test:crypto:salt      # Dynamic salt generation tests
+
 # Docker tests (complete environment)
 npm run test:docker
 ```
@@ -130,6 +139,8 @@ The test suite covers:
 - Domain resolution and multi-site isolation
 - API endpoints and data management
 - End-to-end user workflows
+- ZKP authentication and security measures
+- Dynamic salt generation and verification
 
 ### Test-Driven Development
 
@@ -207,24 +218,65 @@ The project documentation is organized into implementation guides and specificat
 
 ## Zero-Knowledge Proof Authentication
 
-DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) authentication system that allows users to prove they know their password without revealing it.
+DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) authentication system that allows users to prove they know their password without revealing it, providing a secure authentication mechanism that protects user credentials even in the event of a server compromise.
 
 ### Features
 
 - **Secure Authentication**: Users can authenticate without transmitting passwords
-- **Cryptographic Security**: Uses multi-round hashing with domain separation
+- **Cryptographic Security**: Uses the Poseidon hash function from circomlib
+- **Dynamic Salt Generation**: Each user has a unique, cryptographically secure salt
+- **Security Measures**: Rate limiting, IP blocking, progressive delays, and CAPTCHA verification
+- **Audit Logging**: Comprehensive logging of authentication events
 - **Docker Integration**: Ready for production deployment with Docker
+- **TypeScript Implementation**: Fully typed implementation for better developer experience
+
+### Authentication Flow
+
+1. **First User Setup**:
+   - First user provides username and password
+   - System generates a cryptographically secure random salt
+   - System computes the public key using the ZKP circuit
+   - System stores the username, salt, and public key (but not the password)
+
+2. **User Authentication**:
+   - User provides username and password
+   - System retrieves the salt for the username
+   - Client generates a proof that it knows the password that corresponds to the public key
+   - Server verifies the proof without learning the password
+   - System implements rate limiting, IP blocking, and progressive delays for security
+
+3. **Password Reset**:
+   - User requests password reset
+   - System generates a reset token and sends it to the user's email
+   - User provides new password and reset token
+   - System verifies the reset token
+   - System generates a new salt and public key
+   - System updates the user's salt and public key
 
 ### Usage
 
 ```typescript
-import { generateProof, verifyProof } from './src/lib/zkp';
+import { generateProof, verifyProof, generateSalt, derivePublicKey } from '@/lib/zkp';
+
+// Generate a salt
+const salt = generateSalt();
+
+// Derive a public key
+const publicKey = await derivePublicKey('username', 'password', salt);
 
 // Generate a proof
-const { proof, publicSignals } = await generateProof('username', 'password', 'salt');
+const { proof, publicSignals } = await generateProof({
+  username: 'username',
+  password: 'password',
+  salt: salt
+});
 
 // Verify a proof
-const isValid = await verifyProof(proof, publicSignals);
+const isValid = await verifyProof({
+  proof,
+  publicSignals,
+  publicKey
+});
 ```
 
 ### Setup
@@ -233,11 +285,21 @@ const isValid = await verifyProof(proof, publicSignals);
 # Set up the ZKP authentication system
 npm run zkp:setup
 
-# Run the ZKP authentication system in Docker
-npm run zkp:docker
+# Run tests to verify the setup
+npm run test:crypto
+
+# Run the application with ZKP authentication
+npm run dev
 ```
 
-For more information, see the [Production Deployment Guide](docs/production-deployment.md).
+### Security Considerations
+
+- The ZKP authentication system is designed to be secure against various attacks, including brute force attacks, timing attacks, and replay attacks.
+- The system implements rate limiting, IP blocking, and progressive delays to prevent brute force attacks.
+- The system uses dynamic salt generation to prevent precomputed table attacks.
+- The system logs authentication events for security auditing.
+
+For more information, see the [ZKP Authentication Specification](docs/zkp-authentication.md) and the [Production Deployment Guide](docs/production-deployment.md).
 
 ## Troubleshooting
 
