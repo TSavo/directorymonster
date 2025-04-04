@@ -87,6 +87,9 @@ seo_data/processed/*.json
 *.log
 /logs/
 logs/*.log
+/debug-logs/
+debug-logs/*.txt
+debug-logs/*.log
 
 # Test output files
 *_test_output.log
