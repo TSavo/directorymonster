@@ -49,8 +49,10 @@ class MemoryRedis {
     return value as T;
   }
 
-  async set(key: string, value: string, ...args: any[]): Promise<'OK'> {
-    console.log(`[MemoryRedis] Setting key: ${key} with value: ${value.substring(0, 50)}...`);
+  async set(key: string, value: any, ...args: any[]): Promise<'OK'> {
+    const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
+    const displayValue = stringValue.length > 50 ? `${stringValue.substring(0, 50)}...` : stringValue;
+    console.log(`[MemoryRedis] Setting key: ${key} with value: ${displayValue}`);
     this.store.set(key, value);
     return 'OK';
   }
