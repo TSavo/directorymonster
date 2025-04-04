@@ -3,7 +3,7 @@
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
 // Import the ZKP functions from the application
-import { generateProof, verifyProof } from '../../src/lib/zkp';
+import { generateProof, verifyProof } from '@/lib/zkp';
 
 // Define interfaces for the ZKP system
 interface Proof {
