@@ -2,7 +2,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import * as snarkjs from 'snarkjs';
+// Use require for snarkjs to avoid TypeScript issues
+const snarkjs = require('snarkjs');
 
 interface CircuitInput {
   username: bigint;
@@ -105,4 +106,14 @@ async function testPoseidonHash(): Promise<void> {
   }
 }
 
-testPoseidonHash().catch(console.error);
+// Use an immediately invoked async function to properly await the test function
+(async () => {
+  try {
+    await testPoseidonHash();
+    // Explicitly exit with success code
+    process.exit(0);
+  } catch (error) {
+    console.error('Error running test:', error);
+    process.exit(1);
+  }
+})();

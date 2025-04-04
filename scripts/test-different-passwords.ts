@@ -67,7 +67,11 @@ console.log(`Public key 2: ${publicKey2}`);
 if (publicKey1 !== publicKey2) {
   console.log('\n✅ SUCCESS: Different passwords produce different public keys');
   console.log('This confirms that the Poseidon hash function is working correctly.');
+  // Exit with success code
+  process.exit(0);
 } else {
   console.log('\n❌ FAILURE: Different passwords produce the same public key');
   console.log('This indicates a problem with the hash function implementation.');
+  // Exit with error code
+  process.exit(1);
 }
