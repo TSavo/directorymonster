@@ -28,27 +28,31 @@ npm run zkp:setup
 
 This will:
 
-1. Generate the Poseidon constants
-2. Create the ZKP authentication circuit
-3. Generate the Powers of Tau file
-4. Compile the circuit
-5. Generate the proving key
-6. Export the verification key
-7. Generate a Solidity verifier
-8. Create a test input file
-9. Generate a witness
-10. Generate a proof
-11. Verify the proof
+1. Generate a secure MDS matrix for the Poseidon hash function
+2. Create the ZKP authentication circuit using the circomlib Poseidon implementation
+3. Compile the circuit
+4. Generate the proving key
+5. Export the verification key
+6. Create a test input file
+7. Generate a witness
+8. Generate a proof
+9. Verify the proof
 
 ## Docker
 
 To run the ZKP authentication system in Docker, run:
 
 ```bash
-npm run zkp:docker
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
 This will build and run the Docker container, which will set up the ZKP authentication system.
+
+To stop the Docker container:
+
+```bash
+docker-compose -f docker-compose.dev.yml down
+```
 
 ## Usage
 
