@@ -57,6 +57,11 @@ export interface UseSitesOptions {
   initialData?: SiteData;
   apiEndpoint?: string;
   defaultFilters?: SiteFilters;
+  /**
+   * Whether to use the notification system for success/error messages
+   * @default true
+   */
+  useNotificationsSystem?: boolean;
 }
 
 export interface UseSitesReturn {
@@ -68,25 +73,25 @@ export interface UseSitesReturn {
   error: string | null;
   success: string | null;
   errors: SiteErrors;
-  
+
   // Site operations
   createSite: () => Promise<{ success: boolean; data?: any; error?: any }>;
   saveSite: (id?: string) => Promise<{ success: boolean; data?: any; error?: any }>;
   deleteSite: (id: string) => Promise<{ success: boolean; error?: any }>;
-  
+
   // Form steps
   validateSite: (section?: string) => boolean;
   resetErrors: () => void;
-  
+
   // Multiple sites state
   sites: SiteData[];
   filteredSites: SiteData[];
   totalSites: number;
-  
+
   // Filtering and pagination
   filters: SiteFilters;
   setFilters: (filters: SiteFilters) => void;
-  
+
   // Loading and fetching
   fetchSite: (id: string) => Promise<SiteData | null>;
   fetchSites: () => Promise<SiteData[]>;

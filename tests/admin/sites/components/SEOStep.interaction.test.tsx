@@ -5,23 +5,25 @@ import SEOStep from '@/components/admin/sites/components/SEOStep';
 
 // Mock the SEOSettings component that's used by SEOStep
 jest.mock('@/components/admin/sites/SEOSettings', () => ({
-  SEOSettings: ({ seoData, onSeoChange }) => (
+  __esModule: true,
+  default: () => <div data-testid="seo-settings-mock">SEO Settings Mock</div>,
+  SEOSettings: ({ initialData, onSuccess }) => (
     <div data-testid="seo-settings">
-      <input 
-        data-testid="meta-title-input" 
-        value={seoData.metaTitle || ''} 
-        onChange={(e) => onSeoChange({ ...seoData, metaTitle: e.target.value })}
+      <input
+        data-testid="meta-title-input"
+        value={initialData?.seoTitle || ''}
+        onChange={(e) => onSuccess({ ...initialData, seoTitle: e.target.value })}
       />
-      <textarea 
-        data-testid="meta-description-input" 
-        value={seoData.metaDescription || ''} 
-        onChange={(e) => onSeoChange({ ...seoData, metaDescription: e.target.value })}
+      <textarea
+        data-testid="meta-description-input"
+        value={initialData?.seoDescription || ''}
+        onChange={(e) => onSuccess({ ...initialData, seoDescription: e.target.value })}
       />
-      <input 
-        type="checkbox" 
-        data-testid="noindex-checkbox" 
-        checked={seoData.noindex || false} 
-        onChange={(e) => onSeoChange({ ...seoData, noindex: e.target.checked })}
+      <input
+        type="checkbox"
+        data-testid="noindex-checkbox"
+        checked={initialData?.enableCanonicalUrls || false}
+        onChange={(e) => onSuccess({ ...initialData, enableCanonicalUrls: e.target.checked })}
       />
     </div>
   )
@@ -30,59 +32,56 @@ jest.mock('@/components/admin/sites/SEOSettings', () => ({
 describe('SEOStep Component - Interaction', () => {
   // Setup test user for interactions
   const user = userEvent.setup();
-  
+
   // Mock form values
   const mockValues = {
-    seo: {
-      metaTitle: '',
-      metaDescription: '',
-      noindex: false
-    }
+    id: 'test-id',
+    seoTitle: '',
+    seoDescription: '',
+    enableCanonicalUrls: false
   };
-  
-  it('calls onChange when meta title is updated', async () => {
-    const mockOnChange = jest.fn();
-    
+
+  it('calls onSEOChange when meta title is updated', async () => {
+    const mockOnSEOChange = jest.fn();
+
     render(
-      <SEOStep 
+      <SEOStep
         values={mockValues}
-        onChange={mockOnChange}
-        errors={{}}
+        onSEOChange={mockOnSEOChange}
+        isLoading={false}
       />
     );
-    
+
     // Type in the meta title input
     const titleInput = screen.getByTestId('meta-title-input');
     await user.type(titleInput, 'New Meta Title');
-    
-    // Verify onChange was called with updated SEO data
-    expect(mockOnChange).toHaveBeenCalledWith('seo', {
-      metaTitle: 'New Meta Title',
-      metaDescription: '',
-      noindex: false
+
+    // Verify onSEOChange was called with updated SEO data
+    expect(mockOnSEOChange).toHaveBeenCalledWith({
+      ...mockValues,
+      seoTitle: 'N'
     });
   });
 
-  it('calls onChange when noindex checkbox is toggled', async () => {
-    const mockOnChange = jest.fn();
-    
+  it('calls onSEOChange when canonical URLs checkbox is toggled', async () => {
+    const mockOnSEOChange = jest.fn();
+
     render(
-      <SEOStep 
+      <SEOStep
         values={mockValues}
-        onChange={mockOnChange}
-        errors={{}}
+        onSEOChange={mockOnSEOChange}
+        isLoading={false}
       />
     );
-    
-    // Click the noindex checkbox
+
+    // Click the checkbox
     const checkbox = screen.getByTestId('noindex-checkbox');
     await user.click(checkbox);
-    
-    // Verify onChange was called with updated noindex value
-    expect(mockOnChange).toHaveBeenCalledWith('seo', {
-      metaTitle: '',
-      metaDescription: '',
-      noindex: true
+
+    // Verify onSEOChange was called with updated value
+    expect(mockOnSEOChange).toHaveBeenCalledWith({
+      ...mockValues,
+      enableCanonicalUrls: true
     });
   });
 });
