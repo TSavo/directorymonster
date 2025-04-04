@@ -14,44 +14,44 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  
+
   // Error and loading state
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
-  
+
   // Form validation state
   const [validationErrors, setValidationErrors] = useState<{
     username?: string;
     password?: string;
   }>({});
-  
+
   // Router for redirecting
   const router = useRouter();
-  
+
   /**
    * Validate the form inputs
    * @returns True if the form is valid, false otherwise
    */
   const validateForm = (): boolean => {
     const errors: { username?: string; password?: string } = {};
-    
+
     // Validate username
     if (!username.trim()) {
       errors.username = 'Username is required';
     }
-    
+
     // Validate password
     if (!password) {
       errors.password = 'Password is required';
     } else if (password.length < 8) {
       errors.password = 'Password must be at least 8 characters long';
     }
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
-  
+
   /**
    * Get CSRF token from cookies
    * @returns The CSRF token
@@ -66,61 +66,67 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
     }
 
     // If no CSRF token is found, generate one and set it
-    const newToken = Math.random().toString(36).substring(2, 15) + 
+    const newToken = Math.random().toString(36).substring(2, 15) +
                      Math.random().toString(36).substring(2, 15);
-    
+
     // Set the cookie
     document.cookie = `csrf_token=${newToken}; path=/; max-age=3600; SameSite=Strict`;
-    
+
     return newToken;
   };
-  
+
   /**
    * Handle form submission
    * @param e The form event
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Reset error state
     setError(null);
-    
+
     // Validate form
     if (!validateForm()) {
       return;
     }
-    
+
     // Show loading state
     setIsLoading(true);
-    
+
     try {
-      // Get salt from a server API endpoint
-      // For now, we'll use a hardcoded value for testing
-      const salt = 'test-salt-value';
-      
+      // Get salt from the server API endpoint
+      const saltResponse = await fetch(`/api/auth/salt/${encodeURIComponent(username)}`);
+
+      if (!saltResponse.ok) {
+        throw new Error('Failed to retrieve salt for authentication');
+      }
+
+      const saltData = await saltResponse.json();
+      const salt = saltData.salt;
+
       // Log for debugging
       console.log('Generating proof with credentials:', {
         username,
         password: '********', // Redacted for security
-        salt
+        salt: salt ? 'Retrieved' : 'Missing'
       });
-      
+
       // Generate ZKP
       const { proof, publicSignals } = await generateProof({
         username,
         password,
         salt,
       });
-      
+
       // Get CSRF token
       const csrfToken = getCsrfToken();
-      
+
       // Log for debugging (in production, you would not log the proof)
       console.log('Proof generated:', {
         publicSignals,
         csrfToken: csrfToken ? 'Present' : 'Missing'
       });
-      
+
       // Send to server for verification
       const response = await fetch('/api/auth/verify', {
         method: 'POST',
@@ -134,24 +140,24 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
           publicSignals,
         }),
       });
-      
+
       // Handle response
       if (response.ok) {
         const data = await response.json();
-        
+
         // Log for debugging
         console.log('Authentication successful, token received');
-        
+
         // Store token in localStorage
         localStorage.setItem('authToken', data.token);
-        
+
         // Store remember me preference if checked
         if (rememberMe) {
           localStorage.setItem('rememberMe', 'true');
         } else {
           localStorage.removeItem('rememberMe');
         }
-        
+
         // Redirect to admin dashboard
         router.push(redirectPath);
       } else {
@@ -160,7 +166,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
           // Rate limiting
           setIsDisabled(true);
         }
-        
+
         const data = await response.json();
         setError(data.error || 'Authentication failed');
       }
@@ -171,24 +177,24 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
       setIsLoading(false);
     }
   };
-  
+
   /**
    * Handle forgot password link click
    */
   const handleForgotPassword = () => {
     router.push('/admin/forgot-password');
   };
-  
+
   return (
     <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md" data-testid="login-form-container">
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-800" data-testid="login-title">Admin Login</h2>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded" data-testid="login-error">
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">
@@ -210,7 +216,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
             <p className="mt-1 text-sm text-red-600" data-testid="username-error">{validationErrors.username}</p>
           )}
         </div>
-        
+
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
             Password
@@ -231,7 +237,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
             <p className="mt-1 text-sm text-red-600" data-testid="password-error">{validationErrors.password}</p>
           )}
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <input
@@ -246,7 +252,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
               Remember me
             </label>
           </div>
-          
+
           <div className="text-sm">
             <button
               type="button"
@@ -259,7 +265,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
             </button>
           </div>
         </div>
-        
+
         <div>
           <button
             type="submit"
@@ -305,7 +311,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
           </button>
         </div>
       </form>
-      
+
       <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -315,7 +321,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
             <span className="px-2 bg-white text-gray-500">Secure Authentication</span>
           </div>
         </div>
-        
+
         <div className="mt-6">
           <p className="text-xs text-center text-gray-600">
             This login uses Zero-Knowledge Proof authentication. Your password is never sent to the server.
