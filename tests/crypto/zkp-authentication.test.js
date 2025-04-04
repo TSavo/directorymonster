@@ -285,7 +285,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
 
       // Verify the proof
       const isValid1 = await verifyProof(proof, publicSignals);
-      expect(isValid1).to.be.true;
+      expect(isValid1).toBe(true);
 
       // In a real system, the verification would mark this proof as used
       // For testing, we can simulate this by modifying the timestamp in the public signals
@@ -333,8 +333,10 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       // Attempt the MITM attack
       const result = await authService.authenticate('attackerusername', proof, publicSignals);
 
-      expect(result).to.have.property('success').that.is.false;
-      expect(result).to.have.property('error').that.equals('Username mismatch');
+      expect(result).toHaveProperty('success');
+      expect(result.success).toBe(false);
+      expect(result).toHaveProperty('error');
+      expect(result.error).toBe('Username mismatch');
     });
   });
 
@@ -514,8 +516,9 @@ describe('ZKP Authentication Cryptographic Tests', () => {
 
       const authResult = await authResponse.json();
 
-      expect(authResponse.status).to.equal(200);
-      expect(authResult).to.have.property('token').that.is.a('string');
+      expect(authResponse.status).toBe(200);
+      expect(authResult).toHaveProperty('token');
+      expect(typeof authResult.token).toBe('string');
 
       // Save the token for subsequent tests
       authToken = authResult.token;
