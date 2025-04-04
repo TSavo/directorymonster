@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSites } from './hooks';
+import { NotificationProvider } from '@/components/notifications/NotificationProvider';
 import {
   BasicInfoStep,
   DomainStep,
@@ -250,53 +251,54 @@ export const SiteForm: React.FC<SiteFormProps> = ({
   const isLastStep = activeStep === STEPS[STEPS.length - 1].id;
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded shadow" data-testid="site-form">
-      <h1
-        id="siteForm-header"
-        className="text-xl font-bold mb-6"
-        data-testid="siteForm-header"
-      >
-        {mode === 'edit' ? 'Edit' : 'Create'} Site
-      </h1>
-
-      {/* Error message */}
-      {error && (
-        <div
-          className="mb-4 p-3 bg-red-100 text-red-700 rounded"
-          role="alert"
-          data-testid="siteForm-error"
+    <NotificationProvider>
+      <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded shadow" data-testid="site-form">
+        <h1
+          id="siteForm-header"
+          className="text-xl font-bold mb-6"
+          data-testid="siteForm-header"
         >
-          {error}
-        </div>
-      )}
+          {mode === 'edit' ? 'Edit' : 'Create'} Site
+        </h1>
 
-      {/* Success message */}
-      {success && (
-        <div
-          className="mb-4 p-3 bg-green-100 text-green-700 rounded"
-          role="alert"
-          data-testid="siteForm-success"
+        {/* Error message */}
+        {error && (
+          <div
+            className="mb-4 p-3 bg-red-100 text-red-700 rounded"
+            role="alert"
+            data-testid="siteForm-error"
+          >
+            {error}
+          </div>
+        )}
+
+        {/* Success message */}
+        {success && (
+          <div
+            className="mb-4 p-3 bg-green-100 text-green-700 rounded"
+            role="alert"
+            data-testid="siteForm-success"
+          >
+            {success}
+          </div>
+        )}
+
+        {/* Step Navigation */}
+        <StepNavigation
+          steps={STEPS}
+          activeStep={activeStep}
+          completedSteps={completedSteps}
+          onStepChange={handleStepChange}
+          isLoading={isLoading}
+        />
+
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          role="form"
+          aria-labelledby="siteForm-header"
+          data-testid="siteForm-form"
         >
-          {success}
-        </div>
-      )}
-
-      {/* Step Navigation */}
-      <StepNavigation
-        steps={STEPS}
-        activeStep={activeStep}
-        completedSteps={completedSteps}
-        onStepChange={handleStepChange}
-        isLoading={isLoading}
-      />
-
-      {/* Form */}
-      <form
-        onSubmit={handleSubmit}
-        role="form"
-        aria-labelledby="siteForm-header"
-        data-testid="siteForm-form"
-      >
         {/* Step Content */}
         <div className="mb-6" data-testid="step-content">
           {activeStep === 'basic_info' && (
@@ -381,6 +383,7 @@ export const SiteForm: React.FC<SiteFormProps> = ({
         />
       </form>
     </div>
+    </NotificationProvider>
   );
 };
 
