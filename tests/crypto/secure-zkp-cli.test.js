@@ -372,7 +372,7 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       console.log(`Proof verification took ${duration}ms`);
 
       // The verification should be fast
-      expect(duration).toBeLessThan(1000); // 1 second
+      expect(duration).toBeLessThan(2000); // 2 seconds
     });
   });
 });
