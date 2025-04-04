@@ -10,6 +10,8 @@ import { ResourceType, Permission } from '@/components/admin/auth/utils/accessCo
 import { createTenantAdminRole } from '@/components/admin/auth/utils/roles';
 import { KeyNamespaceService } from '@/lib/key-namespace-service';
 import jwt from 'jsonwebtoken';
+import httpMocks from 'node-mocks-http';
+import { NextRequest } from 'next/server';
 
 export interface TestUser {
   id: string;
@@ -19,7 +21,8 @@ export interface TestUser {
 export interface TestTenant {
   id: string;
   name: string;
-  hostnames: string[];
+  hostname?: string;
+  hostnames?: string[];
 }
 
 // Test data IDs for cleanup
@@ -40,21 +43,17 @@ export function generateUserToken(userId: string): string {
   return jwt.sign({ userId }, secret, { expiresIn: '1h' });
 }
 
-/**
- * Sets up two test tenants for integration testing.
- *
- * This function creates two tenants—"Test Tenant A" and "Test Tenant B"—using the TenantService. Each tenant is initialized with its name and a corresponding array of hostnames. The function returns an object containing both tenant objects with their unique IDs, names, and hostnames.
- *
- * @returns An object with properties `tenantA` and `tenantB` representing the created test tenants.
- */
+// Set up test tenants
 export async function setupTestTenants(): Promise<{tenantA: TestTenant, tenantB: TestTenant}> {
   // Create two test tenants
   const tenantA = await TenantService.createTenant({
+    id: TEST_IDS.TENANT_A,
     name: 'Test Tenant A',
     hostnames: ['tenant-a-test.example.com']
   });
 
   const tenantB = await TenantService.createTenant({
+    id: TEST_IDS.TENANT_B,
     name: 'Test Tenant B',
     hostnames: ['tenant-b-test.example.com']
   });
@@ -63,12 +62,12 @@ export async function setupTestTenants(): Promise<{tenantA: TestTenant, tenantB:
     tenantA: {
       id: tenantA.id,
       name: tenantA.name,
-      hostnames: tenantA.hostnames
+      hostname: tenantA.hostname
     },
     tenantB: {
       id: tenantB.id,
       name: tenantB.name,
-      hostnames: tenantB.hostnames
+      hostname: tenantB.hostname
     }
   };
 }
@@ -141,58 +140,62 @@ export async function setupTestUsersAndRoles(
   return { adminA, adminB, regularUser };
 }
 
-/**
- * Removes test-related data from the storage backend.
- *
- * This function scans for keys matching the "*test*" pattern and deletes all found entries.
- * It handles both in-memory storage (by deleting keys individually) and real Redis instances (by performing a bulk deletion).
- */
+// Clean up test data
 export async function cleanupTestData(): Promise<void> {
-  // Scan for all keys related to the test
-  const pattern = `*test*`;
-  const keys = await scanKeys(pattern);
+  // In a test environment, we'll use a simpler approach to clean up
+  // Instead of scanning, we'll just delete the specific keys we know we created
+  const keysToDelete = [
+    `tenant:${TEST_IDS.TENANT_A}`,
+    `tenant:${TEST_IDS.TENANT_B}`,
+    `user:${TEST_IDS.USER_ADMIN_A}`,
+    `user:${TEST_IDS.USER_ADMIN_B}`,
+    `user:${TEST_IDS.USER_REGULAR}`,
+    `role:${TEST_IDS.ROLE_ADMIN_A}`,
+    `role:${TEST_IDS.ROLE_ADMIN_B}`,
+    `role:${TEST_IDS.ROLE_REGULAR}`,
+    `tenant:${TEST_IDS.TENANT_A}:roles`,
+    `tenant:${TEST_IDS.TENANT_B}:roles`,
+    `user:${TEST_IDS.USER_ADMIN_A}:roles`,
+    `user:${TEST_IDS.USER_ADMIN_B}:roles`,
+    `user:${TEST_IDS.USER_REGULAR}:roles`
+  ];
 
-  // Delete all matching keys
-  if (keys.length > 0) {
-    // For in-memory Redis implementation
-    if (typeof redis.del !== 'function') {
-      for (const key of keys) {
-        await kv.delete(key);
-      }
-    } else {
-      // For real Redis
-      await redis.del(...keys);
+  // Delete each key individually to avoid issues if some don't exist
+  for (const key of keysToDelete) {
+    try {
+      await redis.del(key);
+    } catch (error) {
+      console.warn(`Failed to delete key ${key}:`, error);
     }
   }
 }
 
-/**
- * Scans for and returns Redis keys matching the provided pattern.
- *
- * For a real Redis client, this function iteratively uses the SCAN command with the given pattern.
- * When using an in-memory Redis implementation (without a scan method), it retrieves all keys and
- * filters those that include the substring "test".
- *
- * @param pattern - The pattern to match keys against for a real Redis instance.
- * @returns A promise that resolves to an array of keys matching the specified pattern.
- */
-async function scanKeys(pattern: string): Promise<string[]> {
-  // For in-memory Redis implementation, we need to handle this differently
-  if (typeof redis.scan !== 'function') {
-    // Get all keys from the in-memory store that match the pattern
-    const allKeys = await kv.keys();
-    return allKeys.filter(key => key.includes('test'));
-  }
+// Create a mock NextRequest for testing
+export function createMockRequest(headers: Record<string, string> = {}): NextRequest {
+  // Create a proper headers object with get and has methods
+  const headersObj = {
+    get: (name: string) => headers[name] || null,
+    has: (name: string) => name in headers,
+    // Add other methods that might be needed
+    forEach: (callback: (value: string, key: string) => void) => {
+      Object.entries(headers).forEach(([key, value]) => callback(value, key));
+    },
+    entries: () => Object.entries(headers)[Symbol.iterator](),
+    keys: () => Object.keys(headers)[Symbol.iterator](),
+    values: () => Object.values(headers)[Symbol.iterator]()
+  };
 
-  // For real Redis, use scan
-  const keys: string[] = [];
-  let cursor = '0';
-
-  do {
-    const result = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', '100');
-    cursor = result[0];
-    keys.push(...result[1]);
-  } while (cursor !== '0');
-
-  return keys;
+  // Create the mock request with the headers object
+  return {
+    headers: headersObj,
+    method: 'GET',
+    url: 'http://localhost',
+    nextUrl: new URL('http://localhost'),
+    cookies: { get: () => null, getAll: () => [], has: () => false },
+    json: async () => ({}),
+    text: async () => '',
+    blob: async () => new Blob(),
+    formData: async () => new FormData(),
+    clone: () => createMockRequest(headers)
+  } as unknown as NextRequest;
 }
