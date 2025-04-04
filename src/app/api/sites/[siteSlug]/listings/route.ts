@@ -218,9 +218,14 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
     const transaction = kv.multi();
 
     // Store the listing in multiple indices for efficient retrieval
-    transaction.set(`${keyPrefix}listing:id:${listing.id}`, listing);
-    transaction.set(`${keyPrefix}listing:site:${site.id}:${listing.slug}`, listing);
-    transaction.set(`${keyPrefix}listing:category:${listing.categoryId}:${listing.slug}`, listing);
+    // Convert listing to JSON string for storage
+    const listingJson = JSON.stringify(listing);
+    transaction.set(`${keyPrefix}listing:id:${listing.id}`, listingJson);
+    transaction.set(`${keyPrefix}listing:site:${site.id}:${listing.slug}`, listingJson);
+    transaction.set(`${keyPrefix}listing:category:${listing.categoryId}:${listing.slug}`, listingJson);
+
+    // Add to site listings index
+    transaction.sadd(`${keyPrefix}site:${site.id}:listings`, listing.id);
 
     try {
       // Execute the transaction

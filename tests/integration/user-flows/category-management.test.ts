@@ -2,38 +2,10 @@
  * @jest-environment node
  */
 import { GET as getCategories, POST as createCategory } from '@/app/api/sites/[siteSlug]/categories/route';
-import { setupTestEnvironment, clearTestData } from '../setup-mock';
-import { createMockRequest } from '../auth/acl-test-setup';
+import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
 import { SiteConfig, Category } from '@/types';
 
-// Mock the Redis client
-jest.mock('../../../src/lib/redis-client', () => {
-  // Import our mock Redis client
-  const setupMock = require('../setup-mock');
-
-  // Create jest mock functions that delegate to the original implementation
-  const mockKv = {
-    get: jest.fn().mockImplementation((key) => setupMock.kv.get(key)),
-    set: jest.fn().mockImplementation((key, value) => setupMock.kv.set(key, value)),
-    keys: jest.fn().mockImplementation((pattern) => setupMock.kv.keys(pattern)),
-    del: jest.fn().mockImplementation((...keys) => setupMock.kv.del(...keys)),
-    smembers: jest.fn().mockImplementation((key) => setupMock.kv.smembers(key)),
-    sadd: jest.fn().mockImplementation((key, ...values) => setupMock.kv.sadd(key, ...values))
-  };
-
-  const mockRedis = {
-    multi: jest.fn().mockImplementation(() => setupMock.redis.multi()),
-    ping: jest.fn().mockImplementation(() => setupMock.redis.ping())
-  };
-
-  return {
-    redis: mockRedis,
-    kv: mockKv
-  };
-});
-
-// Store original module for reference
-const originalModule = require('../setup-mock');
+// We're using the real Redis client that we fixed with JSON parsing support
 
 describe('Category Management', () => {
   // Store test data references
