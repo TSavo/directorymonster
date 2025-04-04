@@ -1,0 +1,4 @@
+1,2,0,main.username
+2,3,0,main.password
+3,4,0,main.salt
+4,1,0,main.publicKey

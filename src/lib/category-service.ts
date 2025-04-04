@@ -48,7 +48,7 @@ export class CategoryService {
       // Fetch each category and filter by tenant
       for (const key of categoryKeys) {
         const category = await kv.get<Category>(key);
-        if (category && category.tenantId === tenantId) {
+        if (category?.tenantId === tenantId) {
           categories.push(category);
         }
       }

@@ -38,7 +38,7 @@ export const GET = withRedis(async (request: NextRequest) => {
   }
 
   // If there's a query, validate it
-  if (query && query.trim().length > 0) {
+  if (query?.trim().length > 0) {
     // Split query into terms
     const terms = query.split(/\s+/).filter(term => term.length > 2);
 

@@ -3,17 +3,34 @@
  */
 import { POST as verifyAuth } from '@/app/api/auth/verify/route';
 import { createMockRequest } from '../../integration/setup';
-import { verifyProof } from '@/lib/zkp';
-import { Redis } from '@/lib/redis-client';
 
 // Mock the Redis client
-jest.mock('@/lib/redis-client', () => require('../../__mocks__/redis-client'));
+jest.mock('@/lib/redis-client', () => {
+  return {
+    kv: {
+      get: jest.fn(),
+      set: jest.fn().mockResolvedValue('OK'),
+      keys: jest.fn().mockResolvedValue([]),
+      del: jest.fn().mockResolvedValue(1),
+      expire: jest.fn().mockResolvedValue(1),
+    },
+    redis: {
+      multi: jest.fn().mockReturnValue({
+        exec: jest.fn().mockResolvedValue([]),
+        get: jest.fn().mockReturnThis(),
+        set: jest.fn().mockReturnThis(),
+        expire: jest.fn().mockReturnThis(),
+      }),
+      ping: jest.fn().mockResolvedValue('PONG'),
+    },
+  };
+});
 
 // Mock the ZKP library
 jest.mock('@/lib/zkp', () => ({
   verifyProof: jest.fn(),
-  generateSalt: jest.fn(),
-  derivePublicKey: jest.fn(),
+  generateSalt: jest.fn().mockReturnValue('mock-salt'),
+  derivePublicKey: jest.fn().mockReturnValue('mock-public-key'),
 }));
 
 // Mock the jsonwebtoken library
@@ -27,60 +44,60 @@ jest.mock('jsonwebtoken', () => ({
   }),
 }));
 
-describe('Auth Verification API', () => {
-  // Set up mock user data
-  const mockUsers = {
-    'testuser': {
-      id: 'user-id-1',
-      username: 'testuser',
-      salt: 'test-salt-value',
-      publicKey: 'test-public-key',
-      role: 'admin',
-      lastLogin: Date.now() - 86400000, // 1 day ago
-      createdAt: Date.now() - 30 * 86400000, // 30 days ago
-    },
-    'readonlyuser': {
-      id: 'user-id-2',
-      username: 'readonlyuser',
-      salt: 'test-salt-value-2',
-      publicKey: 'test-public-key-2',
-      role: 'viewer',
-      lastLogin: Date.now() - 86400000, // 1 day ago
-      createdAt: Date.now() - 15 * 86400000, // 15 days ago
-    },
-    'lockeduser': {
-      id: 'user-id-3',
-      username: 'lockeduser',
-      salt: 'test-salt-value-3',
-      publicKey: 'test-public-key-3',
-      role: 'editor',
-      locked: true,
-      lastLogin: Date.now() - 86400000, // 1 day ago
-      createdAt: Date.now() - 45 * 86400000, // 45 days ago
-    }
-  };
+// Set up mock user data
+const mockUsers = {
+  'testuser': {
+    id: 'user-id-1',
+    username: 'testuser',
+    salt: 'test-salt-value',
+    publicKey: 'test-public-key',
+    role: 'admin',
+    lastLogin: Date.now() - 86400000, // 1 day ago
+    createdAt: Date.now() - 30 * 86400000, // 30 days ago
+  },
+  'readonlyuser': {
+    id: 'user-id-2',
+    username: 'readonlyuser',
+    salt: 'test-salt-value-2',
+    publicKey: 'test-public-key-2',
+    role: 'viewer',
+    lastLogin: Date.now() - 86400000, // 1 day ago
+    createdAt: Date.now() - 15 * 86400000, // 15 days ago
+  },
+  'lockeduser': {
+    id: 'user-id-3',
+    username: 'lockeduser',
+    salt: 'test-salt-value-3',
+    publicKey: 'test-public-key-3',
+    role: 'editor',
+    locked: true,
+    lastLogin: Date.now() - 86400000, // 1 day ago
+    createdAt: Date.now() - 45 * 86400000, // 45 days ago
+  }
+};
 
+describe('Auth Verification API', () => {
   // Reset all mocks before each test
   beforeEach(() => {
     jest.clearAllMocks();
 
     // Configure Redis mock to return user data
     const { kv } = require('@/lib/redis-client');
-    (kv.get as jest.Mock).mockImplementation(async (key: string) => {
-      if (key === 'user:testuser') {
-        return mockUsers['testuser'];
+    kv.get.mockImplementation(async (key) => {
+      if (key.startsWith('user:')) {
+        const username = key.replace('user:', '');
+        return mockUsers[username] || null;
       }
-      if (key === 'user:readonlyuser') {
-        return mockUsers['readonlyuser'];
-      }
-      if (key === 'user:lockeduser') {
-        return mockUsers['lockeduser'];
+      // By default, no rate limiting
+      if (key.startsWith('ratelimit:')) {
+        return null;
       }
       return null;
     });
 
     // Configure ZKP verifyProof mock
-    (verifyProof as jest.Mock).mockImplementation(async ({ proof, publicSignals, publicKey }) => {
+    const { verifyProof } = require('@/lib/zkp');
+    verifyProof.mockImplementation(async ({ proof, publicSignals, publicKey }) => {
       // Only return true for testuser with correct public key
       if (publicKey === 'test-public-key') {
         return true;
@@ -162,7 +179,8 @@ describe('Auth Verification API', () => {
 
   it('should reject invalid proofs', async () => {
     // Force verifyProof to return false for this test
-    (verifyProof as jest.Mock).mockResolvedValueOnce(false);
+    const { verifyProof } = require('@/lib/zkp');
+    verifyProof.mockImplementationOnce(async () => false);
 
     // Create request with invalid proof
     const request = createMockRequest('/api/auth/verify', {
@@ -231,12 +249,13 @@ describe('Auth Verification API', () => {
   it('should handle rate limiting for too many failed attempts', async () => {
     // Mock Redis to simulate rate limiting
     const { kv } = require('@/lib/redis-client');
-    (kv.get as jest.Mock).mockImplementationOnce(async (key: string) => {
+    kv.get.mockImplementation(async (key: string) => {
       if (key === 'ratelimit:login:testuser') {
         return 5; // 5 failed attempts
       }
-      if (key === 'user:testuser') {
-        return mockUsers['testuser'];
+      if (key.startsWith('user:')) {
+        const username = key.replace('user:', '');
+        return mockUsers[username] || null;
       }
       return null;
     });
@@ -299,7 +318,10 @@ describe('Auth Verification API', () => {
 
   it('should handle ZKP verification errors gracefully', async () => {
     // Force verifyProof to throw an error
-    (verifyProof as jest.Mock).mockRejectedValueOnce(new Error('ZKP verification error'));
+    const { verifyProof } = require('@/lib/zkp');
+    verifyProof.mockImplementationOnce(async () => {
+      throw new Error('ZKP verification error');
+    });
 
     // Create request
     const request = createMockRequest('/api/auth/verify', {
