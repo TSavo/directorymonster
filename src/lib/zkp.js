@@ -29,8 +29,8 @@ async function generatePublicKey(username, password, salt) {
 async function generateProof(username, password, salt) {
   try {
     // Get the circuit paths
-    const circuitWasmPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_js/zkp_auth.wasm');
-    const zkeyPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_final.zkey');
+    const circuitWasmPath = path.join(process.cwd(), 'circuits/zkp_auth/simple_auth_output/simple_auth_js/simple_auth.wasm');
+    const zkeyPath = path.join(process.cwd(), 'circuits/zkp_auth/simple_auth_output/simple_auth_final.zkey');
 
     // Ensure the circuit files exist
     if (!fs.existsSync(circuitWasmPath) || !fs.existsSync(zkeyPath)) {
@@ -71,7 +71,7 @@ async function generateProof(username, password, salt) {
 async function verifyProof(proof, publicSignals) {
   try {
     // Get the verification key
-    const vKeyPath = path.join(process.cwd(), 'circuits/zkp_auth/verification_key.json');
+    const vKeyPath = path.join(process.cwd(), 'circuits/zkp_auth/simple_auth_output/verification_key.json');
 
     // Ensure the verification key exists
     if (!fs.existsSync(vKeyPath)) {
