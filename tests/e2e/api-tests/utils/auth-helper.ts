@@ -5,10 +5,30 @@
  * for testing the DirectoryMonster API endpoints.
  */
 
-const jwt = require('jsonwebtoken');
+import * as jwt from 'jsonwebtoken';
+
+// Define interfaces for the auth helper
+interface Permission {
+  resource: string;
+  action: string;
+  conditions?: Record<string, any>;
+}
+
+interface TokenOptions {
+  expiresIn?: string;
+  roles?: string[];
+  email?: string;
+}
+
+interface AuthHeaderOptions {
+  userId?: string;
+  tenantId?: string;
+  permissions?: Permission[];
+  roles?: string[];
+}
 
 // Try to import secret from config, fallback to a test secret if not available
-let secret;
+let secret: string;
 try {
   const authConfig = require('../../../../src/config/auth');
   secret = authConfig.secret;
@@ -20,18 +40,24 @@ try {
 /**
  * Generates JWT tokens for testing tenant-specific APIs
  *
- * @param {string} userId - The user ID
- * @param {string} tenantId - The tenant ID
- * @param {Array} permissions - Array of permission objects
- * @param {Object} options - Additional options
- * @returns {string} JWT token
+ * @param userId - The user ID
+ * @param tenantId - The tenant ID
+ * @param permissions - Array of permission objects
+ * @param options - Additional options
+ * @returns JWT token
  */
-function generateTestToken(userId, tenantId, permissions = [], options = {}) {
+export function generateTestToken(
+  userId: string, 
+  tenantId: string, 
+  permissions: Permission[] = [], 
+  options: TokenOptions = {}
+): string {
   const {
     expiresIn = '1h',
     roles = ['user'],
     email = 'test@example.com'
   } = options;
+  
   const payload = {
     sub: userId,
     tenantId,
@@ -48,10 +74,10 @@ function generateTestToken(userId, tenantId, permissions = [], options = {}) {
 /**
  * Generate complete authentication headers including token and tenant ID
  *
- * @param {Object} options - Configuration options
- * @returns {Object} Headers object
+ * @param options - Configuration options
+ * @returns Headers object
  */
-function getAuthHeaders(options = {}) {
+export function getAuthHeaders(options: AuthHeaderOptions = {}): Record<string, string> {
   const {
     userId = 'user-12345',
     tenantId = 'test-tenant',
@@ -67,8 +93,3 @@ function getAuthHeaders(options = {}) {
     'Content-Type': 'application/json'
   };
 }
-
-module.exports = {
-  generateTestToken,
-  getAuthHeaders
-};
