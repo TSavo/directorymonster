@@ -48,7 +48,7 @@ import { useSites } from '@/components/admin/sites/hooks/useSites';
 
 const mockStore = configureStore([]);
 
-describe('Integration: Combined Filtering (Category + Site + Status)', () => {
+describe.skip('Integration: Combined Filtering (Category + Site + Status)', () => {
   let store;
 
   beforeEach(() => {

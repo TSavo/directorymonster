@@ -43,10 +43,10 @@ describe('FormActions Component - Basic Rendering', () => {
 
     // Check if both buttons are rendered
     expect(screen.getByTestId('form-back-button')).toBeInTheDocument();
-    expect(screen.getByTestId('form-next-button')).toBeInTheDocument();
+    expect(screen.getByTestId('submit-site-button')).toBeInTheDocument();
 
-    // Next button should say "Create Site" on last step
-    expect(screen.getByTestId('form-next-button')).toHaveTextContent('Create Site');
+    // Submit button should say "Create Site" on last step
+    expect(screen.getByTestId('submit-site-button')).toHaveTextContent('Create Site');
   });
 
   it('hides back button on first step', () => {
@@ -86,8 +86,8 @@ describe('FormActions Component - Basic Rendering', () => {
       />
     );
 
-    // Next button should be disabled when submitting
-    const submitButton = screen.getByTestId('form-next-button');
+    // Submit button should be disabled when submitting
+    const submitButton = screen.getByTestId('submit-site-button');
     expect(submitButton).toBeDisabled();
 
     // Should show loading indicator/text

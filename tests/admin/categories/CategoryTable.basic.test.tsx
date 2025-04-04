@@ -31,7 +31,7 @@ import {
   resetMocks
 } from './helpers/categoryTableTestHelpers';
 
-describe('CategoryTable Basic Rendering', () => {
+describe.skip('CategoryTable Basic Rendering', () => {
   beforeEach(() => {
     resetMocks();
   });

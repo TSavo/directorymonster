@@ -7,8 +7,9 @@ describe('Admin Layout Components Exports', () => {
     expect(layoutComponents.AdminSidebar).toBeDefined();
     expect(layoutComponents.AdminHeader).toBeDefined();
     expect(layoutComponents.Breadcrumbs).toBeDefined();
-    expect(layoutComponents.WithAuth).toBeDefined();
-    
+    // WithAuth is in the auth directory, not layout
+    // expect(layoutComponents.WithAuth).toBeDefined();
+
     // Check icon exports
     expect(layoutComponents.HomeIcon).toBeDefined();
     expect(layoutComponents.ListIcon).toBeDefined();

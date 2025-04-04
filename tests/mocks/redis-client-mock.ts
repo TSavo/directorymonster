@@ -11,8 +11,33 @@ export class RedisMock {
   }
 
   // Basic Redis operations
-  async get(key: string): Promise<any> {
-    return this.store.get(key);
+  async get<T = any>(key: string): Promise<T | null> {
+    console.log(`[RedisMock] Getting key: ${key}`);
+    const value = this.store.get(key);
+
+    if (value === undefined) {
+      console.log(`[RedisMock] Key not found: ${key}`);
+      return null;
+    }
+
+    console.log(`[RedisMock] Raw value for key ${key}: ${typeof value === 'string' ? value.substring(0, 50) + '...' : value}`);
+
+    // If the value is a string that looks like JSON, try to parse it
+    if (typeof value === 'string' &&
+        (value.startsWith('{') || value.startsWith('[')) &&
+        (value.endsWith('}') || value.endsWith(']'))) {
+      try {
+        const parsed = JSON.parse(value) as T;
+        console.log(`[RedisMock] Successfully parsed JSON for key ${key}`);
+        return parsed;
+      } catch (e) {
+        console.log(`[RedisMock] Failed to parse JSON for key ${key}: ${e.message}`);
+        // If parsing fails, return the raw value
+        return value as unknown as T;
+      }
+    }
+
+    return value as T;
   }
 
   async set(key: string, value: string, ...args: any[]): Promise<'OK'> {
@@ -69,7 +94,7 @@ export class RedisMock {
     const multi = {
       exec: async function(): Promise<Array<[Error | null, any]>> {
         const results: Array<[Error | null, any]> = [];
-        
+
         for (const { cmd, args } of commands) {
           try {
             // Call the method on the Redis client instance
@@ -84,63 +109,63 @@ export class RedisMock {
             results.push([error as Error, null]);
           }
         }
-        
+
         return results;
       },
-      
+
       // Add methods to the multi object
       set: function(...args: any[]) {
         commands.push({ cmd: 'set', args });
         return this;
       },
-      
+
       get: function(...args: any[]) {
         commands.push({ cmd: 'get', args });
         return this;
       },
-      
+
       del: function(...args: any[]) {
         commands.push({ cmd: 'del', args });
         return this;
       },
-      
+
       sadd: function(...args: any[]) {
         commands.push({ cmd: 'sadd', args });
         return this;
       },
-      
+
       smembers: function(...args: any[]) {
         commands.push({ cmd: 'smembers', args });
         return this;
       },
-      
+
       // Add other methods as needed
       hset: function(...args: any[]) {
         commands.push({ cmd: 'hset', args });
         return this;
       },
-      
+
       hget: function(...args: any[]) {
         commands.push({ cmd: 'hget', args });
         return this;
       },
-      
+
       hgetall: function(...args: any[]) {
         commands.push({ cmd: 'hgetall', args });
         return this;
       },
-      
+
       zadd: function(...args: any[]) {
         commands.push({ cmd: 'zadd', args });
         return this;
       },
-      
+
       zrange: function(...args: any[]) {
         commands.push({ cmd: 'zrange', args });
         return this;
       }
     };
-    
+
     return multi;
   }
 

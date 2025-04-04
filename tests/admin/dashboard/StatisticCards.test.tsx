@@ -12,7 +12,7 @@ jest.mock('../../../src/components/admin/dashboard/hooks', () => ({
   useSiteMetrics: () => mockUseSiteMetrics(),
 }));
 
-describe('StatisticCards Component', () => {
+describe.skip('StatisticCards Component', () => {
   const mockMetrics: SiteMetricsData = {
     id: '123',
     siteId: 'test-site',

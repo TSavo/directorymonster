@@ -7,6 +7,12 @@ import ListingTable from '@/components/admin/listings/ListingTable';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { retry } from '@/utils/api';
 
+// Add global declarations for TypeScript
+declare global {
+  var fetchListings: jest.Mock;
+  var retryFetch: jest.Mock;
+}
+
 // Mock the hooks and API calls
 jest.mock('../../../../src/components/admin/listings/hooks/useListings', () => ({
   useListings: jest.fn(),
@@ -23,22 +29,30 @@ const mockStore = configureStore([]);
 
 describe('Integration: Error Recovery Flows', () => {
   let store;
-  
+
   beforeEach(() => {
+    // Create mock functions
+    const fetchListingsMock = jest.fn();
+    const retryFetchMock = jest.fn();
+
+    // Make the mock functions available globally in the test
+    global.fetchListings = fetchListingsMock;
+    global.retryFetch = retryFetchMock;
+
     // Mock listings hook
     (useListings as jest.Mock).mockReturnValue({
       listings: [],
       isLoading: false,
       error: null,
-      fetchListings: jest.fn(),
-      retryFetch: jest.fn(),
+      fetchListings: fetchListingsMock,
+      retryFetch: retryFetchMock,
     });
-    
+
     // Mock retry utility
     (retry as jest.Mock).mockImplementation((fn, retries) => {
       return fn();
     });
-    
+
     // Create a mock store
     store = mockStore({
       listings: {
@@ -51,7 +65,7 @@ describe('Integration: Error Recovery Flows', () => {
 
   it('should retry failed API requests automatically', async () => {
     const { fetchListings } = useListings();
-    
+
     // First call fails, then succeeds
     let callCount = 0;
     fetchListings.mockImplementation(() => {
@@ -59,13 +73,13 @@ describe('Integration: Error Recovery Flows', () => {
       if (callCount === 1) {
         throw new Error('Network error');
       }
-      
+
       return Promise.resolve([
         { id: 'listing1', title: 'Listing 1' },
         { id: 'listing2', title: 'Listing 2' },
       ]);
     });
-    
+
     // Mock retry to actually implement retry logic for the test
     (retry as jest.Mock).mockImplementation((fn, retries = 3) => {
       return new Promise((resolve, reject) => {
@@ -73,13 +87,13 @@ describe('Integration: Error Recovery Flows', () => {
           if (retries === 0) {
             return reject(error);
           }
-          
+
           // Retry with one fewer retry
           return resolve(retry(fn, retries - 1));
         });
       });
     });
-    
+
     // Initial state has no listings and no error
     render(
       <Provider store={store}>
@@ -88,10 +102,10 @@ describe('Integration: Error Recovery Flows', () => {
         </ErrorBoundary>
       </Provider>
     );
-    
+
     // Verify fetchListings was called
     expect(fetchListings).toHaveBeenCalled();
-    
+
     // Update listings hook to simulate a successful retry
     (useListings as jest.Mock).mockReturnValue({
       listings: [
@@ -103,7 +117,7 @@ describe('Integration: Error Recovery Flows', () => {
       fetchListings,
       retryFetch: jest.fn(),
     });
-    
+
     // Re-render with listings loaded after retry
     render(
       <Provider store={store}>
@@ -112,21 +126,23 @@ describe('Integration: Error Recovery Flows', () => {
         </ErrorBoundary>
       </Provider>
     );
-    
+
     // Verify listings appear after retry
     expect(screen.getByText('Listing 1')).toBeInTheDocument();
     expect(screen.getByText('Listing 2')).toBeInTheDocument();
-    
+
     // Verify fetchListings was called twice (original + retry)
     expect(fetchListings).toHaveBeenCalledTimes(2);
   });
 
   it('should show a user-friendly error and retry button when API calls fail', async () => {
-    const { fetchListings, retryFetch } = useListings();
-    
+    // Use the global mock functions
+
     // Simulate a failed API call
-    fetchListings.mockRejectedValue(new Error('API error'));
-    
+    fetchListings.mockImplementation(() => {
+      throw new Error('API error');
+    });
+
     // Update listings hook to show an error state
     (useListings as jest.Mock).mockReturnValue({
       listings: [],
@@ -138,7 +154,7 @@ describe('Integration: Error Recovery Flows', () => {
       fetchListings,
       retryFetch,
     });
-    
+
     render(
       <Provider store={store}>
         <ErrorBoundary>
@@ -146,19 +162,19 @@ describe('Integration: Error Recovery Flows', () => {
         </ErrorBoundary>
       </Provider>
     );
-    
+
     // Verify error message is displayed
     expect(screen.getByText('Failed to load listings')).toBeInTheDocument();
-    
+
     // Verify retry button is present
     expect(screen.getByTestId('retry-button')).toBeInTheDocument();
-    
+
     // Click the retry button
     fireEvent.click(screen.getByTestId('retry-button'));
-    
+
     // Verify retryFetch was called
     expect(retryFetch).toHaveBeenCalled();
-    
+
     // Update listings hook to simulate a successful retry
     (useListings as jest.Mock).mockReturnValue({
       listings: [
@@ -170,7 +186,7 @@ describe('Integration: Error Recovery Flows', () => {
       fetchListings,
       retryFetch,
     });
-    
+
     // Re-render with listings loaded after retry
     render(
       <Provider store={store}>
@@ -179,7 +195,7 @@ describe('Integration: Error Recovery Flows', () => {
         </ErrorBoundary>
       </Provider>
     );
-    
+
     // Verify listings appear after retry
     expect(screen.getByText('Listing 1')).toBeInTheDocument();
     expect(screen.getByText('Listing 2')).toBeInTheDocument();
@@ -191,7 +207,7 @@ describe('Integration: Error Recovery Flows', () => {
       throw new Error('Component error');
       return null;
     };
-    
+
     // Render the component inside an error boundary
     render(
       <Provider store={store}>
@@ -200,19 +216,19 @@ describe('Integration: Error Recovery Flows', () => {
         </ErrorBoundary>
       </Provider>
     );
-    
+
     // Verify error fallback is displayed
     expect(screen.getByText('Something went wrong.')).toBeInTheDocument();
-    
+
     // Verify reset button is present
     expect(screen.getByTestId('reset-error')).toBeInTheDocument();
-    
+
     // Click the reset button
     fireEvent.click(screen.getByTestId('reset-error'));
-    
+
     // Mock a working component after reset
     const WorkingComponent = () => <div>Component is working</div>;
-    
+
     // Re-render with the working component
     render(
       <Provider store={store}>
@@ -221,7 +237,7 @@ describe('Integration: Error Recovery Flows', () => {
         </ErrorBoundary>
       </Provider>
     );
-    
+
     // Verify component works after reset
     expect(screen.getByText('Component is working')).toBeInTheDocument();
   });

@@ -10,6 +10,7 @@ import { ResourceType, Permission } from '@/components/admin/auth/utils/accessCo
 import { createTenantAdminRole } from '@/components/admin/auth/utils/roles';
 import { KeyNamespaceService } from '@/lib/key-namespace-service';
 import jwt from 'jsonwebtoken';
+import { NextRequest } from 'next/server';
 
 export interface TestUser {
   id: string;
@@ -44,15 +45,23 @@ export function generateUserToken(userId: string): string {
 export async function setupTestTenants(): Promise<{tenantA: TestTenant, tenantB: TestTenant}> {
   // Create two test tenants
   const tenantA = await TenantService.createTenant({
-    id: TEST_IDS.TENANT_A,
+    slug: TEST_IDS.TENANT_A,
     name: 'Test Tenant A',
-    hostname: 'tenant-a-test.example.com'
+    hostnames: ['tenant-a-test.example.com'],
+    primaryHostname: 'tenant-a-test.example.com',
+    theme: 'default',
+    settings: {},
+    active: true
   });
 
   const tenantB = await TenantService.createTenant({
-    id: TEST_IDS.TENANT_B,
+    slug: TEST_IDS.TENANT_B,
     name: 'Test Tenant B',
-    hostname: 'tenant-b-test.example.com'
+    hostnames: ['tenant-b-test.example.com'],
+    primaryHostname: 'tenant-b-test.example.com',
+    theme: 'default',
+    settings: {},
+    active: true
   });
 
   return {
@@ -151,52 +160,52 @@ export async function cleanupTestData(): Promise<void> {
 
 // Helper to scan Redis keys
 async function scanKeys(pattern: string): Promise<string[]> {
-  const keys: string[] = [];
-  let cursor = '0';
-
-  do {
-    const result = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', '100');
-    cursor = result[0];
-    keys.push(...result[1]);
-  } while (cursor !== '0');
-
-  return keys;
+  try {
+    // Use keys method instead of scan for compatibility with mock Redis
+    return await kv.keys(pattern);
+  } catch (error) {
+    console.error('Error scanning keys:', error);
+    return [];
+  }
 }
 
-// Create a mock NextRequest for testing
-export function createMockRequest(url: string = 'http://localhost', options: {
-  method?: string;
-  headers?: Record<string, string>;
-  body?: any;
-} = {}): NextRequest {
-  const { method = 'GET', headers = {}, body = undefined } = options;
 
-  // Create a proper headers object with get and has methods
-  const headersObj = {
-    get: (name: string) => headers[name] || null,
-    has: (name: string) => name in headers,
-    // Add other methods that might be needed
-    forEach: (callback: (value: string, key: string) => void) => {
-      Object.entries(headers).forEach(([key, value]) => callback(value, key));
+
+// Create a mock Next.js request with headers
+export function createMockRequest(headers: Record<string, string>): NextRequest {
+  return {
+    headers: {
+      get: (name: string) => headers[name.toLowerCase()] || null,
+      has: (name: string) => headers[name.toLowerCase()] !== undefined,
+      forEach: () => {},
+      entries: () => Object.entries(headers)[Symbol.iterator](),
+      keys: () => Object.keys(headers)[Symbol.iterator](),
+      values: () => Object.values(headers)[Symbol.iterator]()
     },
-    entries: () => Object.entries(headers)[Symbol.iterator](),
-    keys: () => Object.keys(headers)[Symbol.iterator](),
-    values: () => Object.values(headers)[Symbol.iterator]()
-  };
-
-  // Create the mock request with the headers object
-  const mockRequest = {
-    headers: headersObj,
-    method,
-    url,
-    nextUrl: new URL(url.startsWith('http') ? url : `http://localhost${url}`),
-    cookies: { get: () => null, getAll: () => [], has: () => false },
-    json: async () => body || {},
-    text: async () => body ? JSON.stringify(body) : '',
+    nextUrl: new URL('http://localhost'),
+    cookies: {
+      get: () => undefined,
+      getAll: () => [],
+      has: () => false,
+      set: () => {},
+      delete: () => {}
+    },
+    method: 'GET',
+    json: async () => ({}),
+    text: async () => '',
     blob: async () => new Blob(),
     formData: async () => new FormData(),
-    clone: () => createMockRequest(url, { method, headers, body })
+    arrayBuffer: async () => new ArrayBuffer(0),
+    body: null,
+    cache: 'default',
+    credentials: 'same-origin',
+    destination: '',
+    integrity: '',
+    keepalive: false,
+    mode: 'cors',
+    redirect: 'follow',
+    referrer: '',
+    referrerPolicy: '',
+    signal: new AbortController().signal
   } as unknown as NextRequest;
-
-  return mockRequest;
 }

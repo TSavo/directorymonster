@@ -44,19 +44,28 @@ async function verifyTestData(sites: SiteConfig[], categories: Category[], listi
 
   // Verify sites
   for (const site of sites) {
-    const storedSiteById = await kv.get(`test:site:id:${site.id}`);
-    const storedSiteBySlug = await kv.get(`test:site:slug:${site.slug}`);
+    const storedSiteById = await kv.get(`test:site:${site.id}`);
+    const storedSiteBySlug = await kv.get(`site:slug:${site.slug}`);
+    const storedSiteByDomain = site.domain ? await kv.get(`site:domain:${site.domain}`) : null;
 
     if (!storedSiteById) {
       console.error(`Site with ID ${site.id} not found in Redis`);
       // Re-store the site
-      await kv.set(`test:site:id:${site.id}`, JSON.stringify(site));
+      await kv.set(`test:site:${site.id}`, JSON.stringify(site));
     }
 
     if (!storedSiteBySlug) {
       console.error(`Site with slug ${site.slug} not found in Redis`);
       // Re-store the site
+      await kv.set(`site:slug:${site.slug}`, JSON.stringify(site));
       await kv.set(`test:site:slug:${site.slug}`, JSON.stringify(site));
+    }
+
+    if (site.domain && !storedSiteByDomain) {
+      console.error(`Site with domain ${site.domain} not found in Redis`);
+      // Re-store the site
+      await kv.set(`site:domain:${site.domain}`, JSON.stringify(site));
+      await kv.set(`test:site:domain:${site.domain}`, JSON.stringify(site));
     }
   }
 
@@ -148,24 +157,24 @@ export async function createTestSites(): Promise<SiteConfig[]> {
   const sites: SiteConfig[] = [
     {
       id: 'site1',
-      name: 'Test Site 1',
-      slug: 'test-site-1',  // This matches the slug used in tests
-      domain: 'test-site-1.localhost',
-      primaryKeyword: 'test site',
-      metaDescription: 'Test site 1 for integration testing',
-      headerText: 'Test Site 1',
+      name: 'Test Fishing Site',
+      slug: 'test-fishing',  // This matches the slug used in site-identity tests
+      domain: 'test-fishing.localhost',
+      primaryKeyword: 'fishing gear',
+      metaDescription: 'Test fishing site for integration testing',
+      headerText: 'Test Fishing Site',
       defaultLinkAttributes: 'dofollow',
       createdAt: timestamp,
       updatedAt: timestamp,
     },
     {
       id: 'site2',
-      name: 'Test Site 2',
-      slug: 'test-site-2',  // This matches the slug used in tests
-      domain: 'test-site-2.localhost',
-      primaryKeyword: 'test site 2',
-      metaDescription: 'Test site 2 for integration testing',
-      headerText: 'Test Site 2',
+      name: 'Test Hiking Site',
+      slug: 'test-hiking',  // This matches the slug used in site-identity tests
+      domain: 'test-hiking.localhost',
+      primaryKeyword: 'hiking gear',
+      metaDescription: 'Test hiking site for integration testing',
+      headerText: 'Test Hiking Site',
       defaultLinkAttributes: 'dofollow',
       createdAt: timestamp,
       updatedAt: timestamp,
@@ -177,14 +186,25 @@ export async function createTestSites(): Promise<SiteConfig[]> {
   // Store sites in Redis
   const multi = redis.multi();
 
+  console.log('Storing sites with the following data:');
   sites.forEach(site => {
+    console.log(`Site: ${site.name}, slug: ${site.slug}, domain: ${site.domain}`);
+
     // Store by ID
-    multi.set(`test:site:id:${site.id}`, JSON.stringify(site));
+    multi.set(`test:site:${site.id}`, JSON.stringify(site));
 
-    // Store by slug
+    // Store by slug - this is used by getSiteByHostname
+    multi.set(`site:slug:${site.slug}`, JSON.stringify(site));
+    console.log(`Setting key: site:slug:${site.slug}`);
+
+    // Store by domain - this is used by getSiteByHostname
+    if (site.domain) {
+      multi.set(`site:domain:${site.domain}`, JSON.stringify(site));
+      console.log(`Setting key: site:domain:${site.domain}`);
+    }
+
+    // Also store with test prefix for cleanup
     multi.set(`test:site:slug:${site.slug}`, JSON.stringify(site));
-
-    // Store by domain
     if (site.domain) {
       multi.set(`test:site:domain:${site.domain}`, JSON.stringify(site));
     }

@@ -18,8 +18,17 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams()
 }));
 
+// Mock the NotificationProvider
+jest.mock('@/components/notifications/NotificationProvider', () => ({
+  useNotificationsContext: () => ({
+    showNotification: jest.fn(),
+    notifications: []
+  })
+}));
+
 // Mock the useSites hook
 jest.mock('@/components/admin/sites/hooks', () => ({
+
   useSites: () => ({
     site: {
       name: '',

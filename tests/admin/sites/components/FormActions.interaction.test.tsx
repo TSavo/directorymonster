@@ -69,7 +69,7 @@ describe('FormActions Component - Interaction', () => {
     );
 
     // Try to click the submit button
-    const submitButton = screen.getByTestId('form-next-button');
+    const submitButton = screen.getByTestId('submit-site-button');
     await user.click(submitButton);
 
     // Verify callback was not called because button is disabled

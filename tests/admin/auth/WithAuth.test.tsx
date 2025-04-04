@@ -6,7 +6,10 @@ import { useRouter, usePathname } from 'next/navigation';
 
 // Mock the hooks
 jest.mock('@/components/admin/auth/hooks/useAuth');
-jest.mock('next/navigation');
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+  usePathname: jest.fn()
+}));
 
 describe('WithAuth component', () => {
   const mockRouter = { push: jest.fn() };
