@@ -132,8 +132,18 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
   console.log('Available site keys:', siteKeys);
 
   // Get site by slug
-  const site = await kv.get<SiteConfig>(`${keyPrefix}site:slug:${siteSlug}`);
-  console.log('Found site:', site);
+  let site = await kv.get<SiteConfig>(`${keyPrefix}site:slug:${siteSlug}`);
+  console.log('Found site (raw):', site);
+
+  // Parse site if it's a string
+  if (typeof site === 'string') {
+    try {
+      site = JSON.parse(site);
+      console.log('Parsed site object:', site);
+    } catch (e) {
+      console.error('Error parsing site JSON:', e);
+    }
+  }
 
   if (!site) {
     return NextResponse.json(
@@ -141,6 +151,8 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
       { status: 404 }
     );
   }
+
+  console.log('Using site:', site);
 
   try {
     const data = await request.json();
@@ -180,7 +192,7 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
     const timestamp = Date.now();
     const category: Category = {
       id: `category_${timestamp}`,
-      siteId: site.id,
+      siteId: site.id, // Ensure site ID is set correctly from the site object
       name: data.name,
       slug,
       metaDescription: data.metaDescription,
@@ -190,11 +202,29 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
       updatedAt: timestamp,
     };
 
+    // Force the siteId to be the site.id
+    category.siteId = site.id;
+
+    // Log the category for debugging
+    console.log('Creating category:', category);
+
+    // Log the site object for debugging
+    console.log('Site object:', site);
+
     // Use a Redis transaction for atomicity
     const multi = redis.multi();
 
+    // Store category by ID
     multi.set(`${keyPrefix}category:id:${category.id}`, JSON.stringify(category));
-    multi.set(`${keyPrefix}category:site:${site.id}:${category.slug}`, JSON.stringify(category));
+
+    // Store category by slug within site
+    multi.set(`${keyPrefix}category:site:${site.id}:slug:${category.slug}`, JSON.stringify(category));
+
+    // Add to site's categories index
+    multi.sadd(`${keyPrefix}site:${site.id}:categories`, category.id);
+
+    // Add to global categories index
+    multi.sadd(`${keyPrefix}categories`, category.id);
 
     try {
       // Execute all commands as a transaction

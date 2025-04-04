@@ -10,8 +10,6 @@ import { ResourceType, Permission } from '@/components/admin/auth/utils/accessCo
 import { createTenantAdminRole } from '@/components/admin/auth/utils/roles';
 import { KeyNamespaceService } from '@/lib/key-namespace-service';
 import jwt from 'jsonwebtoken';
-import httpMocks from 'node-mocks-http';
-import { NextRequest } from 'next/server';
 
 export interface TestUser {
   id: string;
@@ -21,8 +19,7 @@ export interface TestUser {
 export interface TestTenant {
   id: string;
   name: string;
-  hostname?: string;
-  hostnames?: string[];
+  hostname: string;
 }
 
 // Test data IDs for cleanup
@@ -49,13 +46,13 @@ export async function setupTestTenants(): Promise<{tenantA: TestTenant, tenantB:
   const tenantA = await TenantService.createTenant({
     id: TEST_IDS.TENANT_A,
     name: 'Test Tenant A',
-    hostnames: ['tenant-a-test.example.com']
+    hostname: 'tenant-a-test.example.com'
   });
 
   const tenantB = await TenantService.createTenant({
     id: TEST_IDS.TENANT_B,
     name: 'Test Tenant B',
-    hostnames: ['tenant-b-test.example.com']
+    hostname: 'tenant-b-test.example.com'
   });
 
   return {
@@ -142,36 +139,38 @@ export async function setupTestUsersAndRoles(
 
 // Clean up test data
 export async function cleanupTestData(): Promise<void> {
-  // In a test environment, we'll use a simpler approach to clean up
-  // Instead of scanning, we'll just delete the specific keys we know we created
-  const keysToDelete = [
-    `tenant:${TEST_IDS.TENANT_A}`,
-    `tenant:${TEST_IDS.TENANT_B}`,
-    `user:${TEST_IDS.USER_ADMIN_A}`,
-    `user:${TEST_IDS.USER_ADMIN_B}`,
-    `user:${TEST_IDS.USER_REGULAR}`,
-    `role:${TEST_IDS.ROLE_ADMIN_A}`,
-    `role:${TEST_IDS.ROLE_ADMIN_B}`,
-    `role:${TEST_IDS.ROLE_REGULAR}`,
-    `tenant:${TEST_IDS.TENANT_A}:roles`,
-    `tenant:${TEST_IDS.TENANT_B}:roles`,
-    `user:${TEST_IDS.USER_ADMIN_A}:roles`,
-    `user:${TEST_IDS.USER_ADMIN_B}:roles`,
-    `user:${TEST_IDS.USER_REGULAR}:roles`
-  ];
+  // Scan for all keys related to the test
+  const pattern = `*test*`;
+  const keys = await scanKeys(pattern);
 
-  // Delete each key individually to avoid issues if some don't exist
-  for (const key of keysToDelete) {
-    try {
-      await redis.del(key);
-    } catch (error) {
-      console.warn(`Failed to delete key ${key}:`, error);
-    }
+  // Delete all matching keys
+  if (keys.length > 0) {
+    await redis.del(...keys);
   }
 }
 
+// Helper to scan Redis keys
+async function scanKeys(pattern: string): Promise<string[]> {
+  const keys: string[] = [];
+  let cursor = '0';
+
+  do {
+    const result = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', '100');
+    cursor = result[0];
+    keys.push(...result[1]);
+  } while (cursor !== '0');
+
+  return keys;
+}
+
 // Create a mock NextRequest for testing
-export function createMockRequest(headers: Record<string, string> = {}): NextRequest {
+export function createMockRequest(url: string = 'http://localhost', options: {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: any;
+} = {}): NextRequest {
+  const { method = 'GET', headers = {}, body = undefined } = options;
+
   // Create a proper headers object with get and has methods
   const headersObj = {
     get: (name: string) => headers[name] || null,
@@ -186,16 +185,18 @@ export function createMockRequest(headers: Record<string, string> = {}): NextReq
   };
 
   // Create the mock request with the headers object
-  return {
+  const mockRequest = {
     headers: headersObj,
-    method: 'GET',
-    url: 'http://localhost',
-    nextUrl: new URL('http://localhost'),
+    method,
+    url,
+    nextUrl: new URL(url.startsWith('http') ? url : `http://localhost${url}`),
     cookies: { get: () => null, getAll: () => [], has: () => false },
-    json: async () => ({}),
-    text: async () => '',
+    json: async () => body || {},
+    text: async () => body ? JSON.stringify(body) : '',
     blob: async () => new Blob(),
     formData: async () => new FormData(),
-    clone: () => createMockRequest(headers)
+    clone: () => createMockRequest(url, { method, headers, body })
   } as unknown as NextRequest;
+
+  return mockRequest;
 }
