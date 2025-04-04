@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSites } from './hooks';
-import { useNotificationsContext } from '../../notifications/NotificationProvider';
+import { useNotificationsContext } from '@/components/notifications/NotificationProvider';
 import {
   BasicInfoStep,
   DomainStep,
@@ -86,6 +86,7 @@ export const SiteForm: React.FC<SiteFormProps> = ({
   initialStep
 }) => {
   const router = useRouter();
+  const { showNotification } = useNotificationsContext();
   const [activeStep, setActiveStep] = useState<string>(initialStep || STEPS[0].id);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [newDomain, setNewDomain] = useState<string>('');
@@ -219,20 +220,6 @@ export const SiteForm: React.FC<SiteFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-export const SiteForm: React.FC<SiteFormProps> = ({
-  initialData = {},
-  mode = 'create',
-  onCancel,
-  onSuccess,
-  apiEndpoint = '/api/sites',
-  initialStep
-}) => {
-  const router = useRouter();
-  const { showNotification } = useNotificationsContext();
-  const [activeStep, setActiveStep] = useState<string>(initialStep || STEPS[0].id);
-  // ...rest of the component
-}
-
     // For testing purposes, we'll allow form submission even if not on the last step
     // In production, we'd only allow submission on the last step
     const isTest = process.env.NODE_ENV === 'test';
@@ -251,8 +238,8 @@ export const SiteForm: React.FC<SiteFormProps> = ({
           // Show success notification
           showNotification({
             type: 'success',
-            title: 'Site Created',
-            message: 'Your site has been created successfully',
+            title: mode === 'edit' ? 'Site Updated' : 'Site Created',
+            message: mode === 'edit' ? 'Your site has been updated successfully' : 'Your site has been created successfully',
             duration: 5000,
           });
 
@@ -270,10 +257,11 @@ export const SiteForm: React.FC<SiteFormProps> = ({
         // Show error notification
         showNotification({
           type: 'error',
-          title: 'Site Creation Failed',
-          message: 'There was an error creating your site',
+          title: mode === 'edit' ? 'Site Update Failed' : 'Site Creation Failed',
+          message: `There was an error ${mode === 'edit' ? 'updating' : 'creating'} your site: ${error instanceof Error ? error.message : 'Unknown error'}`,
           duration: 5000,
         });
+        console.error('Site form submission error:', error);
       }
     }
   };

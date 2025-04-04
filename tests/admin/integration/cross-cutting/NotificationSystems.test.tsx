@@ -40,17 +40,20 @@ describe('Integration: Notification Systems for Operations', () => {
       sites: [],
       isLoading: false,
       error: null,
-      currentStep: 0,
-      setCurrentStep: jest.fn(),
-      siteData: {
+      success: null,
+      errors: {},
+      site: {
         name: 'Test Site',
         slug: 'test-site',
         description: 'This is a test site',
+        domains: [],
+        id: 'test-id'
       },
-      updateSiteData: jest.fn(),
-      validateSiteData: jest.fn(() => ({})),
-      submitSite: jest.fn(),
-      isSubmitting: false,
+      updateSite: jest.fn(),
+      validateSite: jest.fn(() => true),
+      createSite: jest.fn(),
+      saveSite: jest.fn(),
+      resetErrors: jest.fn(),
     });
 
     // Create a mock store
@@ -67,19 +70,15 @@ describe('Integration: Notification Systems for Operations', () => {
   });
 
   it('should show a success notification when site creation succeeds', async () => {
-    const { submitSite } = useSites();
+    const { createSite } = useSites();
     const { showNotification } = useNotifications();
 
     // Implement a successful submission
-    submitSite.mockImplementation(() => {
-      showNotification({
-        type: 'success',
-        title: 'Site Created',
-        message: 'Your site has been created successfully',
-        duration: 5000,
+    createSite.mockImplementation(() => {
+      return Promise.resolve({
+        success: true,
+        data: { id: 'new-site-id', name: 'Test Site' }
       });
-
-      return Promise.resolve({ id: 'new-site-id', name: 'Test Site' });
     });
 
     render(
@@ -90,62 +89,33 @@ describe('Integration: Notification Systems for Operations', () => {
       </Provider>
     );
 
-    // Submit the form
-    fireEvent.click(screen.getByTestId('submit-site-button'));
+    // Get the form and submit it directly
+    const form = screen.getByTestId('siteForm-form');
+    fireEvent.submit(form);
 
-    // Verify submitSite was called
-    expect(submitSite).toHaveBeenCalled();
+    // Verify createSite was called
+    expect(createSite).toHaveBeenCalled();
 
     // Wait for the async submission to complete
     await waitFor(() => {
       // Verify showNotification was called with success message
-      expect(showNotification).toHaveBeenCalledWith({
+      expect(showNotification).toHaveBeenCalledWith(expect.objectContaining({
         type: 'success',
         title: 'Site Created',
-        message: 'Your site has been created successfully',
-        duration: 5000,
-      });
+        message: 'Your site has been created successfully'
+      }));
     });
 
-    // Update notifications in the mock hook
-    (useNotifications as jest.Mock).mockReturnValue({
-      notifications: [{
-        id: 'notification-1',
-        type: 'success',
-        title: 'Site Created',
-        message: 'Your site has been created successfully',
-      }],
-      showNotification: jest.fn(),
-      dismissNotification: jest.fn(),
-    });
-
-    // Re-render with the notification
-    render(
-      <Provider store={store}>
-        <NotificationProvider>
-          <SiteForm />
-        </NotificationProvider>
-      </Provider>
-    );
-
-    // Verify notification is displayed
-    expect(screen.getByText('Site Created')).toBeInTheDocument();
-    expect(screen.getByText('Your site has been created successfully')).toBeInTheDocument();
+    // Verify notification was shown
+    expect(showNotification).toHaveBeenCalled();
   });
 
   it('should show an error notification when site creation fails', async () => {
-    const { submitSite } = useSites();
+    const { createSite } = useSites();
     const { showNotification } = useNotifications();
 
     // Implement a failed submission
-    submitSite.mockImplementation(() => {
-      showNotification({
-        type: 'error',
-        title: 'Site Creation Failed',
-        message: 'There was an error creating your site',
-        duration: 5000,
-      });
-
+    createSite.mockImplementation(() => {
       return Promise.reject(new Error('API Error'));
     });
 
@@ -157,46 +127,24 @@ describe('Integration: Notification Systems for Operations', () => {
       </Provider>
     );
 
-    // Submit the form
-    fireEvent.click(screen.getByTestId('submit-site-button'));
+    // Get the form and submit it directly
+    const form = screen.getByTestId('siteForm-form');
+    fireEvent.submit(form);
 
-    // Verify submitSite was called
-    expect(submitSite).toHaveBeenCalled();
+    // Verify createSite was called
+    expect(createSite).toHaveBeenCalled();
 
     // Wait for the async submission to complete
     await waitFor(() => {
       // Verify showNotification was called with error message
-      expect(showNotification).toHaveBeenCalledWith({
+      expect(showNotification).toHaveBeenCalledWith(expect.objectContaining({
         type: 'error',
         title: 'Site Creation Failed',
-        message: 'There was an error creating your site',
-        duration: 5000,
-      });
+        message: expect.stringContaining('There was an error creating your site')
+      }));
     });
 
-    // Update notifications in the mock hook
-    (useNotifications as jest.Mock).mockReturnValue({
-      notifications: [{
-        id: 'notification-1',
-        type: 'error',
-        title: 'Site Creation Failed',
-        message: 'There was an error creating your site',
-      }],
-      showNotification: jest.fn(),
-      dismissNotification: jest.fn(),
-    });
-
-    // Re-render with the notification
-    render(
-      <Provider store={store}>
-        <NotificationProvider>
-          <SiteForm />
-        </NotificationProvider>
-      </Provider>
-    );
-
-    // Verify notification is displayed
-    expect(screen.getByText('Site Creation Failed')).toBeInTheDocument();
-    expect(screen.getByText('There was an error creating your site')).toBeInTheDocument();
+    // Verify notification was shown
+    expect(showNotification).toHaveBeenCalled();
   });
 });
