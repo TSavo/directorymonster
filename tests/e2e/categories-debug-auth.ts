@@ -2,11 +2,16 @@
  * @file Authentication utilities for categories debug tests
  */
 
-const { logDebug, BASE_URL, ADMIN_USERNAME, ADMIN_PASSWORD } = require('./categories-debug-setup');
-const { analyzePageComprehensively } = require('./categories-debug-utils');
+import { Page } from 'puppeteer';
+import { logDebug, BASE_URL, ADMIN_USERNAME, ADMIN_PASSWORD } from './categories-debug-setup';
+import { analyzePageComprehensively } from './categories-debug-utils';
 
-// Helper function for login
-async function login(page) {
+/**
+ * Helper function for login
+ * @param page - Puppeteer page object
+ * @returns Whether login was successful
+ */
+export async function login(page: Page): Promise<boolean> {
   logDebug('Starting login process...');
   
   try {
@@ -16,8 +21,8 @@ async function login(page) {
     
     // Check if we need to do first-user setup
     const isFirstUserSetup = await page.evaluate(() => {
-      return document.body.textContent.includes('First User') || 
-             document.body.textContent.includes('Create Admin');
+      return document.body.textContent?.includes('First User') || 
+             document.body.textContent?.includes('Create Admin') || false;
     });
     
     if (isFirstUserSetup) {
@@ -71,7 +76,7 @@ async function login(page) {
       // Try to identify why login failed
       const errorMessages = await page.evaluate(() => {
         const errorElements = document.querySelectorAll('.text-red-500, .text-red-600, .error, .alert');
-        return Array.from(errorElements).map(el => el.textContent.trim());
+        return Array.from(errorElements).map(el => el.textContent?.trim() || '');
       });
       
       if (errorMessages.length > 0) {
@@ -82,12 +87,8 @@ async function login(page) {
       return false;
     }
   } catch (error) {
-    logDebug(`Login error: ${error.message}`);
+    logDebug(`Login error: ${(error as Error).message}`);
     await analyzePageComprehensively(page, 'login-error');
     return false;
   }
 }
-
-module.exports = {
-  login
-};
