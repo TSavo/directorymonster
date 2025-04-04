@@ -9,18 +9,15 @@ const AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0YWR
  * @param page Playwright page object
  * @returns True if authentication was successful, false otherwise
  */
-async function authenticatePage(page) {
-  // Navigate to the site first (required to set localStorage)
-  await page.goto('/');
+import { test, expect } from '@playwright/test';
+import { checkForBuildErrors, waitForPageLoad } from './utils/error-detection';
+import { authenticatePage, isLoggedIn } from './utils/auth-utils';
 
-  // Set the authentication token in localStorage
-  await page.evaluate((token) => {
-    localStorage.setItem('authToken', token);
-  }, AUTH_TOKEN);
+// Mock authentication token
+const AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0YWRtaW4iLCJpYXQiOjE2MTYxNjI4MDAsImV4cCI6OTk5OTk5OTk5OX0.Shoh5N3Dtg1SzQ-3hXHq6R4N_P-lOCK3G-v4-7aXPR4';
 
-  console.log(`Authenticated with mock token`);
-  return true;
-}
+// The duplicate authenticatePage implementation below has been removed.
+// Other test code can now use the imported authenticatePage and isLoggedIn functions.
 
 /**
  * Check if the user is logged in
