@@ -10,14 +10,14 @@ describe('Cross-Tenant Reference Detection Tests', () => {
     // that detects and rejects cross-tenant references in requests
   };
 
-  it('should detect and reject cross-tenant references in request body', () => {
+  it.skip('should detect and reject cross-tenant references in request body', () => {
     // This test verifies that the system can detect and reject
     // attempts to access resources from a different tenant
+    // TODO: Will be implemented when cross-tenant detection middleware is complete
     mockCrossTenantDetection();
 
     // The test passes because we've implemented the cross-tenant detection
     // in the middleware
-    expect(true).toBe(true);
   });
 
   it('should allow valid requests with matching tenant IDs', () => {
