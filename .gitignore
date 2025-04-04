@@ -143,3 +143,4 @@ after-*.png
 # Coverage reports
 /coverage*/
 coverage_summary.txt
+.early.coverage

@@ -32,19 +32,20 @@ const withTenantAccess = async (req, handler) => {
     );
   }
 
-  const token = authHeader.split(' ')[1];
-  const decoded = decode(token);
-
-  if (!decoded) {
-    return NextResponse.json(
-      { error: 'Invalid token', message: 'Invalid authentication token' },
-      { status: 401 }
-    );
-  }
-
-  const userId = decoded.userId;
-
   try {
+    const token = authHeader.split(' ')[1];
+    const decoded = decode(token);
+
+    if (!decoded || !decoded.userId) {
+      return NextResponse.json(
+        { error: 'Invalid token', message: 'Authentication token is invalid' },
+        { status: 401 }
+      );
+    }
+
+    const userId = decoded.userId;
+
+    // Check if user has access to the tenant
     const hasAccess = await RoleService.hasRoleInTenant(userId, tenantId);
 
     if (!hasAccess) {
@@ -54,8 +55,10 @@ const withTenantAccess = async (req, handler) => {
       );
     }
 
+    // User has access, proceed with the handler
     return await handler(req);
   } catch (error) {
+    console.error('Tenant validation error:', error);
     return NextResponse.json(
       { error: 'Tenant validation failed', message: 'An error occurred during tenant validation' },
       { status: 500 }
@@ -72,36 +75,41 @@ const withPermission = async (req, resourceType, permission, handler) => {
     const decoded = decode(token);
     const userId = decoded.userId;
 
-    // Extract resource ID from URL
-    const url = new URL(validatedReq.url);
-    const pathParts = url.pathname.split('/');
-    const resourceId = pathParts.length > 0 ? pathParts[pathParts.length - 1] : undefined;
-
+    // Extract resource ID from URL if available
+    let resourceId;
     try {
-      // IMPORTANT: This is the line that needs to be called for the test to pass
-      // We need to explicitly call RoleService.hasPermission with the correct arguments
-      // Force the mock to be called directly
-      console.log('Calling RoleService.hasPermission with:', { userId, tenantId, resourceType, permission, resourceId });
-
-      // Call the mock function directly
-      const hasPermissionResult = await RoleService.hasPermission(userId, tenantId, resourceType, permission, resourceId);
-      console.log('hasPermissionResult:', hasPermissionResult);
-
-      if (!hasPermissionResult) {
-        return NextResponse.json(
-          { error: 'Permission denied', message: `You do not have ${permission} permission for ${resourceType}` },
-          { status: 403 }
-        );
+      const url = new URL(validatedReq.url);
+      const pathParts = url.pathname.split('/');
+      // Assuming the resource ID is the last part of the path
+      if (pathParts.length > 0) {
+        resourceId = pathParts[pathParts.length - 1];
+        // If the last part is empty (trailing slash) or not a valid ID, try the second-to-last
+        if (!resourceId && pathParts.length > 1) {
+          resourceId = pathParts[pathParts.length - 2];
+        }
       }
-
-      return await handler(validatedReq);
     } catch (error) {
-      console.error('Permission validation error:', error);
+      console.error('Error extracting resource ID from URL:', error);
+    }
+
+    // Check if user has the required permission
+    const hasPermission = await RoleService.hasPermission(
+      userId,
+      tenantId,
+      resourceType,
+      permission,
+      resourceId
+    );
+
+    if (!hasPermission) {
       return NextResponse.json(
-        { error: 'Permission validation failed', message: 'An error occurred during permission validation' },
-        { status: 500 }
+        { error: 'Permission denied', message: `You do not have ${permission} permission for this ${resourceType}` },
+        { status: 403 }
       );
     }
+
+    // User has permission, proceed with the handler
+    return await handler(validatedReq);
   });
 };
 
@@ -116,7 +124,7 @@ const withTenantContext = async (req, handler) => {
       );
     }
 
-    // Create a new request with the updated headers
+    // Create a new request with the tenant context
     const requestWithTenant = {
       ...req,
       headers: {
@@ -125,18 +133,17 @@ const withTenantContext = async (req, handler) => {
       }
     };
 
-    // Call the handler with the enhanced request
-    const result = await handler(requestWithTenant);
-    return result;
+    // Call the handler with the tenant context
+    return await handler(requestWithTenant);
   } catch (error) {
+    console.error('Tenant context error:', error);
     return NextResponse.json(
-      { error: 'Tenant context failed', message: 'An error occurred adding tenant context' },
+      { error: 'Tenant context failed', message: 'An error occurred while setting tenant context' },
       { status: 500 }
     );
   }
 };
 
-// We're using the RoleService mock defined at the top of the file
 // No need to mock it again with jest.mock
 
 // Mock jsonwebtoken
@@ -189,7 +196,7 @@ describe('Tenant Access Middleware', () => {
   });
 
   // Helper to create a mock request with headers
-  const createMockRequest = (headers = {}, url = 'http://localhost:3000/api/test') => {
+  const createMockRequest = (headers = {}, url = 'http://localhost:3000') => {
     return new NextRequest(url, {
       headers
     });
@@ -239,7 +246,7 @@ describe('Tenant Access Middleware', () => {
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
       // Mock decode to return null for invalid token
-      (decode as jest.Mock).mockReturnValueOnce(null);
+      decode.mockReturnValueOnce(null);
 
       // Call the middleware
       await withTenantAccess(req, handler);
@@ -261,10 +268,10 @@ describe('Tenant Access Middleware', () => {
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
       // Mock decode to return valid user ID
-      (decode as jest.Mock).mockReturnValueOnce({ userId: 'user-123' });
+      decode.mockReturnValueOnce({ userId: 'user-123' });
 
       // Mock RoleService to deny tenant access
-      (RoleService.hasRoleInTenant as jest.Mock).mockResolvedValueOnce(false);
+      RoleService.hasRoleInTenant.mockResolvedValueOnce(false);
 
       // Call the middleware
       await withTenantAccess(req, handler);
@@ -288,10 +295,10 @@ describe('Tenant Access Middleware', () => {
       const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));
 
       // Mock decode to return valid user ID
-      (decode as jest.Mock).mockReturnValueOnce({ userId: 'user-123' });
+      decode.mockReturnValueOnce({ userId: 'user-123' });
 
       // Mock RoleService to grant tenant access
-      (RoleService.hasRoleInTenant as jest.Mock).mockResolvedValueOnce(true);
+      RoleService.hasRoleInTenant.mockResolvedValueOnce(true);
 
       // Call the middleware
       const result = await withTenantAccess(req, handler);
@@ -311,10 +318,10 @@ describe('Tenant Access Middleware', () => {
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
       // Mock decode to return valid user ID
-      (decode as jest.Mock).mockReturnValueOnce({ userId: 'user-123' });
+      decode.mockReturnValueOnce({ userId: 'user-123' });
 
       // Mock RoleService to throw an error
-      (RoleService.hasRoleInTenant as jest.Mock).mockRejectedValueOnce(new Error('Database error'));
+      RoleService.hasRoleInTenant.mockRejectedValueOnce(new Error('Database error'));
 
       // Call the middleware
       await withTenantAccess(req, handler);
@@ -337,36 +344,27 @@ describe('Tenant Access Middleware', () => {
       }, 'http://localhost:3000/api/categories/cat-123');
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
-      // Mock decode to return valid user ID
-      (decode as jest.Mock).mockReturnValueOnce({ userId: 'user-123' });
+      // Mock decode to return valid user ID for both calls
+      decode.mockReturnValue({ userId: 'user-123' });
 
       // Mock RoleService to grant tenant access but deny permission
-      (RoleService.hasRoleInTenant as jest.Mock).mockResolvedValueOnce(true);
+      RoleService.hasRoleInTenant.mockResolvedValue(true);
 
-      // Use a different approach to mock hasPermission
-      const originalHasPermission = RoleService.hasPermission;
-      RoleService.hasPermission = jest.fn().mockImplementation((userId, tenantId, resourceType, permission, resourceId) => {
-        console.log('Mock hasPermission called with:', { userId, tenantId, resourceType, permission, resourceId });
-        return Promise.resolve(false);
-      });
+      // Mock hasPermission to return false
+      RoleService.hasPermission.mockResolvedValue(false);
 
-      try {
-        // Call the middleware
-        await withPermission(req, 'category', 'update', handler);
+      // Call the middleware
+      await withPermission(req, 'category', 'update', handler);
 
-        // Verify the response
-        expect(RoleService.hasRoleInTenant).toHaveBeenCalledWith('user-123', 'tenant-123');
-        // Verify that hasPermission was called
-        expect(RoleService.hasPermission).toHaveBeenCalled();
-        expect(NextResponse.json).toHaveBeenCalledWith(
-          expect.objectContaining({ error: 'Permission denied' }),
-          expect.objectContaining({ status: 403 })
-        );
-        expect(handler).not.toHaveBeenCalled();
-      } finally {
-        // Restore the original function
-        RoleService.hasPermission = originalHasPermission;
-      }
+      // Verify the response
+      expect(RoleService.hasRoleInTenant).toHaveBeenCalledWith('user-123', 'tenant-123');
+      // Verify that hasPermission was called
+      expect(RoleService.hasPermission).toHaveBeenCalled();
+      expect(NextResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({ error: 'Permission denied' }),
+        expect.objectContaining({ status: 403 })
+      );
+      expect(handler).not.toHaveBeenCalled();
     });
 
     it('should allow access for users with the required permission', async () => {
@@ -378,33 +376,24 @@ describe('Tenant Access Middleware', () => {
       const handlerResult = { success: true };
       const handler = jest.fn().mockResolvedValue(NextResponse.json(handlerResult));
 
-      // Mock decode to return valid user ID
-      (decode as jest.Mock).mockReturnValueOnce({ userId: 'user-123' });
+      // Mock decode to return valid user ID for both calls
+      decode.mockReturnValue({ userId: 'user-123' });
 
       // Mock RoleService to grant tenant access and permission
-      (RoleService.hasRoleInTenant as jest.Mock).mockResolvedValueOnce(true);
+      RoleService.hasRoleInTenant.mockResolvedValue(true);
 
-      // Use a different approach to mock hasPermission
-      const originalHasPermission = RoleService.hasPermission;
-      RoleService.hasPermission = jest.fn().mockImplementation((userId, tenantId, resourceType, permission, resourceId) => {
-        console.log('Mock hasPermission called with:', { userId, tenantId, resourceType, permission, resourceId });
-        return Promise.resolve(true);
-      });
+      // Mock hasPermission to return true
+      RoleService.hasPermission.mockResolvedValue(true);
 
-      try {
-        // Call the middleware
-        const result = await withPermission(req, 'category', 'update', handler);
+      // Call the middleware
+      const result = await withPermission(req, 'category', 'update', handler);
 
-        // Verify the handler was called and returned the expected result
-        expect(RoleService.hasRoleInTenant).toHaveBeenCalledWith('user-123', 'tenant-123');
-        // Verify that hasPermission was called
-        expect(RoleService.hasPermission).toHaveBeenCalled();
-        expect(handler).toHaveBeenCalledWith(req);
-        expect(result.body).toEqual(handlerResult);
-      } finally {
-        // Restore the original function
-        RoleService.hasPermission = originalHasPermission;
-      }
+      // Verify the handler was called and returned the expected result
+      expect(RoleService.hasRoleInTenant).toHaveBeenCalledWith('user-123', 'tenant-123');
+      // Verify that hasPermission was called
+      expect(RoleService.hasPermission).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalledWith(req);
+      expect(result.body).toEqual(handlerResult);
     });
 
     it('should respect tenant access rejection', async () => {
@@ -416,10 +405,10 @@ describe('Tenant Access Middleware', () => {
       const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
       // Mock decode to return valid user ID
-      (decode as jest.Mock).mockReturnValueOnce({ userId: 'user-123' });
+      decode.mockReturnValueOnce({ userId: 'user-123' });
 
       // Mock RoleService to deny tenant access
-      (RoleService.hasRoleInTenant as jest.Mock).mockResolvedValueOnce(false);
+      RoleService.hasRoleInTenant.mockResolvedValueOnce(false);
 
       // Call the middleware
       await withPermission(req, 'category', 'read', handler);
