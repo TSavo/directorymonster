@@ -1,8 +1,23 @@
 // Secure ZKP Authentication Tests using CLI
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
-const crypto = require('crypto');
+import * as fs from 'fs';
+import * as path from 'path';
+import { execSync } from 'child_process';
+import * as crypto from 'crypto';
+
+// Define interfaces for the ZKP system
+interface CircuitInput {
+  publicSalt: number;
+  username: number;
+  password: number;
+}
+
+interface Proof {
+  pi_a: string[] | number[];
+  pi_b: (string[] | number[])[];
+  pi_c: string[] | number[];
+  protocol: string;
+  curve?: string;
+}
 
 describe('Secure ZKP Authentication Tests (CLI)', () => {
   // Define paths to circuit files
@@ -49,11 +64,11 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
               return;
             }
             fs.unlinkSync(filePath);
-          } catch (error) {
+          } catch (error: any) {
             console.warn(`Warning: Could not delete file ${file}: ${error.message}`);
           }
         });
-      } catch (error) {
+      } catch (error: any) {
         console.warn(`Warning: Could not clean up temp directory: ${error.message}`);
       }
     }
@@ -69,7 +84,7 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       const testId = crypto.randomBytes(8).toString('hex');
 
       // Create input for the circuit
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789,
         username: 123,
         password: 456
@@ -104,8 +119,8 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       }
 
       // Read the proof and public signals
-      const proof = JSON.parse(fs.readFileSync(proofPath));
-      const publicSignals = JSON.parse(fs.readFileSync(publicPath));
+      const proof: Proof = JSON.parse(fs.readFileSync(proofPath, 'utf8'));
+      const publicSignals: string[] = JSON.parse(fs.readFileSync(publicPath, 'utf8'));
 
       // Verify the proof structure
       expect(proof).toHaveProperty('pi_a');
@@ -134,13 +149,13 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
 
       // Create inputs with different passwords
       // The circuit should generate different public keys for different passwords
-      const input1 = {
+      const input1: CircuitInput = {
         publicSalt: 789,
         username: 123,
         password: 456
       };
 
-      const input2 = {
+      const input2: CircuitInput = {
         publicSalt: 789, // Same salt
         username: 123, // Same username
         password: 789 // Different password
@@ -169,10 +184,10 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       execSync(`npx snarkjs groth16 prove ${zkeyPath} ${witnessPath2} ${proofPath2} ${publicPath2}`);
 
       // Read the proofs and public signals
-      const proof1 = JSON.parse(fs.readFileSync(proofPath1));
-      const proof2 = JSON.parse(fs.readFileSync(proofPath2));
-      const publicSignals1 = JSON.parse(fs.readFileSync(publicPath1));
-      const publicSignals2 = JSON.parse(fs.readFileSync(publicPath2));
+      const proof1: Proof = JSON.parse(fs.readFileSync(proofPath1, 'utf8'));
+      const proof2: Proof = JSON.parse(fs.readFileSync(proofPath2, 'utf8'));
+      const publicSignals1: string[] = JSON.parse(fs.readFileSync(publicPath1, 'utf8'));
+      const publicSignals2: string[] = JSON.parse(fs.readFileSync(publicPath2, 'utf8'));
 
       // In our current implementation, the public keys might be the same for different inputs
       // This is a limitation of the current circuit implementation
@@ -196,7 +211,7 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       const testId = crypto.randomBytes(8).toString('hex');
 
       // Create input with large numbers to ensure they're not accidentally revealed
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789,
         username: 12345,
         password: 67890
@@ -218,8 +233,8 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       execSync(`npx snarkjs groth16 prove ${zkeyPath} ${witnessPath} ${proofPath} ${publicPath}`);
 
       // Read the proof and public signals
-      const proof = JSON.parse(fs.readFileSync(proofPath));
-      const publicSignals = JSON.parse(fs.readFileSync(publicPath));
+      const proof: Proof = JSON.parse(fs.readFileSync(proofPath, 'utf8'));
+      const publicSignals: string[] = JSON.parse(fs.readFileSync(publicPath, 'utf8'));
 
       // Convert everything to strings for easy searching
       const proofStr = JSON.stringify(proof);
@@ -245,7 +260,7 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       const testId = crypto.randomBytes(8).toString('hex');
 
       // Create input for the circuit
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789,
         username: 123,
         password: 456
@@ -267,7 +282,7 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       execSync(`npx snarkjs groth16 prove ${zkeyPath} ${witnessPath} ${proofPath} ${publicPath}`);
 
       // Read the public signals
-      const publicSignals = JSON.parse(fs.readFileSync(publicPath));
+      const publicSignals: string[] = JSON.parse(fs.readFileSync(publicPath, 'utf8'));
 
       // The public signals should contain only the public key and the public salt
       expect(publicSignals.length).toBe(2);
@@ -291,7 +306,7 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       const testId = crypto.randomBytes(8).toString('hex');
 
       // Create input for the circuit
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789,
         username: 123,
         password: 456
@@ -333,7 +348,7 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       const testId = crypto.randomBytes(8).toString('hex');
 
       // Create input for the circuit
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789,
         username: 123,
         password: 456
