@@ -3,25 +3,26 @@
  * @description Common setup and teardown functions for login tests
  */
 
-const puppeteer = require('puppeteer');
-const { takeScreenshot, log } = require('../utils/test-utils');
+import * as puppeteer from 'puppeteer';
+import { takeScreenshot, log } from '../utils/test-utils';
+import { LoginCredentials, LoginOptions, LoginSelectors, LoginTestSetup, NavigateOptions } from './types/login.types';
 
 // Configuration
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-const SITE_DOMAIN = process.env.SITE_DOMAIN || 'mydirectory.com';
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password123456';
+export const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+export const SITE_DOMAIN = process.env.SITE_DOMAIN || 'mydirectory.com';
+export const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password123456';
 
 // Test timeouts
-const DEFAULT_TIMEOUT = 45000; // 45 seconds
-const LOGIN_TIMEOUT = 15000; // 15 seconds
-const NAVIGATION_TIMEOUT = 30000; // 30 seconds
+export const DEFAULT_TIMEOUT = 45000; // 45 seconds
+export const LOGIN_TIMEOUT = 15000; // 15 seconds
+export const NAVIGATION_TIMEOUT = 30000; // 30 seconds
 
 /**
  * Sets up the browser and page for login tests
- * @returns {Promise<Object>} Object containing browser and page
+ * @returns Object containing browser and page
  */
-async function setupLoginTest() {
+export async function setupLoginTest(): Promise<LoginTestSetup> {
   // Launch browser
   const browser = await puppeteer.launch({
     headless: process.env.NODE_ENV === 'production',
@@ -62,9 +63,9 @@ async function setupLoginTest() {
 
 /**
  * Tears down the browser after login tests
- * @param {puppeteer.Browser} browser Browser instance to close
+ * @param browser Browser instance to close
  */
-async function teardownLoginTest(browser) {
+export async function teardownLoginTest(browser: puppeteer.Browser): Promise<void> {
   if (browser) {
     await browser.close();
   }
@@ -72,11 +73,10 @@ async function teardownLoginTest(browser) {
 
 /**
  * Navigates to the login page
- * @param {puppeteer.Page} page Page to use for navigation
- * @param {Object} options Additional options
- * @returns {Promise<void>}
+ * @param page Page to use for navigation
+ * @param options Additional options
  */
-async function navigateToLoginPage(page, options = {}) {
+export async function navigateToLoginPage(page: puppeteer.Page, options: NavigateOptions = {}): Promise<void> {
   const { screenshotName = 'login-page' } = options;
   
   log('Navigating to login page...');
@@ -95,12 +95,16 @@ async function navigateToLoginPage(page, options = {}) {
 
 /**
  * Attempts to login with provided credentials
- * @param {puppeteer.Page} page Page to use for login
- * @param {Object} credentials Credentials to use for login
- * @param {Object} options Additional options
- * @returns {Promise<boolean>} Whether login was successful
+ * @param page Page to use for login
+ * @param credentials Credentials to use for login
+ * @param options Additional options
+ * @returns Whether login was successful
  */
-async function attemptLogin(page, credentials = {}, options = {}) {
+export async function attemptLogin(
+  page: puppeteer.Page, 
+  credentials: LoginCredentials = {}, 
+  options: LoginOptions = {}
+): Promise<boolean> {
   const { 
     username = ADMIN_USERNAME, 
     password = ADMIN_PASSWORD,
@@ -111,6 +115,10 @@ async function attemptLogin(page, credentials = {}, options = {}) {
     selectors,
     screenshotPrefix = 'login-attempt'
   } = options;
+  
+  if (!selectors) {
+    throw new Error('Selectors are required for login attempt');
+  }
   
   log(`Attempting login with username: ${username}`);
   
@@ -168,17 +176,3 @@ async function attemptLogin(page, credentials = {}, options = {}) {
   
   return isAdminPage;
 }
-
-module.exports = {
-  setupLoginTest,
-  teardownLoginTest,
-  navigateToLoginPage,
-  attemptLogin,
-  BASE_URL,
-  SITE_DOMAIN,
-  ADMIN_USERNAME,
-  ADMIN_PASSWORD,
-  DEFAULT_TIMEOUT,
-  LOGIN_TIMEOUT,
-  NAVIGATION_TIMEOUT
-};

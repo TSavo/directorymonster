@@ -3,7 +3,9 @@
  * @description Centralized selectors for login page E2E tests
  */
 
-const LoginSelectors = {
+import { LoginSelectors } from './types/login.types';
+
+const loginSelectors: LoginSelectors = {
   // Main login page elements
   page: '[data-testid="login-page"], .login-page, main, body',
   formContainer: '[data-testid="login-form-container"], .login-form-container, form, .login',
@@ -56,4 +58,4 @@ const LoginSelectors = {
   }
 };
 
-module.exports = LoginSelectors;
+export default loginSelectors;
