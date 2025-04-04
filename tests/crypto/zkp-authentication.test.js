@@ -27,20 +27,24 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       );
 
       // Verify the proof structure
-      expect(proof).to.have.property('pi_a').that.is.an('array');
-      expect(proof).to.have.property('pi_b').that.is.an('array');
-      expect(proof).to.have.property('pi_c').that.is.an('array');
-      expect(proof).to.have.property('protocol').that.equals('groth16');
+      expect(proof).toHaveProperty('pi_a');
+      expect(Array.isArray(proof.pi_a)).toBe(true);
+      expect(proof).toHaveProperty('pi_b');
+      expect(Array.isArray(proof.pi_b)).toBe(true);
+      expect(proof).toHaveProperty('pi_c');
+      expect(Array.isArray(proof.pi_c)).toBe(true);
+      expect(proof).toHaveProperty('protocol');
+      expect(proof.protocol).toBe('groth16');
 
       // Verify the public signals
-      expect(publicSignals).to.be.an('array');
-      expect(publicSignals.length).to.be.at.least(2);
+      expect(Array.isArray(publicSignals)).toBe(true);
+      expect(publicSignals.length).toBeGreaterThanOrEqual(2);
 
       // Verify the proof is valid using snarkjs directly
       const vKey = JSON.parse(fs.readFileSync(path.join(__dirname, '../../circuits/auth/verification_key.json')));
       const isValid = await snarkjs.groth16.verify(vKey, publicSignals, proof);
 
-      expect(isValid).to.be.true;
+      expect(isValid).toBe(true);
     });
 
     it('should generate different proofs for different passwords', async () => {
@@ -58,8 +62,8 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       );
 
       // The proofs should be different
-      expect(JSON.stringify(proof1)).to.not.equal(JSON.stringify(proof2));
-      expect(JSON.stringify(publicSignals1)).to.not.equal(JSON.stringify(publicSignals2));
+      expect(JSON.stringify(proof1)).not.toBe(JSON.stringify(proof2));
+      expect(JSON.stringify(publicSignals1)).not.toBe(JSON.stringify(publicSignals2));
     });
 
     it('should generate the same public key for the same inputs', async () => {
@@ -78,7 +82,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
 
       // The public signals should be the same (deterministic)
       // Note: The proofs themselves might differ due to randomness in the proving algorithm
-      expect(publicSignals1[0]).to.equal(publicSignals2[0]);
+      expect(publicSignals1[0]).toBe(publicSignals2[0]);
     });
   });
 
@@ -98,7 +102,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       // Verify the proof using our verification function
       const isValid = await verifyProof(proof, publicSignals);
 
-      expect(isValid).to.be.true;
+      expect(isValid).toBe(true);
     });
 
     it('should reject a tampered proof', async () => {
@@ -116,7 +120,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       // Verify the tampered proof
       const isValid = await verifyProof(tamperedProof, publicSignals);
 
-      expect(isValid).to.be.false;
+      expect(isValid).toBe(false);
     });
 
     it('should reject a tampered public signal', async () => {
@@ -134,7 +138,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       // Verify with tampered public signals
       const isValid = await verifyProof(proof, tamperedPublicSignals);
 
-      expect(isValid).to.be.false;
+      expect(isValid).toBe(false);
     });
   });
 
@@ -202,8 +206,10 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       // Attempt to authenticate
       const result = await authService.authenticate(testUsername, proof, publicSignals);
 
-      expect(result).to.have.property('success').that.is.true;
-      expect(result).to.have.property('token').that.is.a('string');
+      expect(result).toHaveProperty('success');
+      expect(result.success).toBe(true);
+      expect(result).toHaveProperty('token');
+      expect(typeof result.token).toBe('string');
     });
 
     it('should reject authentication with invalid credentials', async () => {
@@ -217,8 +223,10 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       // Attempt to authenticate
       const result = await authService.authenticate(testUsername, proof, publicSignals);
 
-      expect(result).to.have.property('success').that.is.false;
-      expect(result).to.have.property('error').that.equals('Invalid proof');
+      expect(result).toHaveProperty('success');
+      expect(result.success).toBe(false);
+      expect(result).toHaveProperty('error');
+      expect(result.error).toBe('Invalid proof');
     });
 
     it('should reject authentication for non-existent users', async () => {
@@ -232,8 +240,10 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       // Attempt to authenticate
       const result = await authService.authenticate('nonexistentuser', proof, publicSignals);
 
-      expect(result).to.have.property('success').that.is.false;
-      expect(result).to.have.property('error').that.equals('User not found');
+      expect(result).toHaveProperty('success');
+      expect(result.success).toBe(false);
+      expect(result).toHaveProperty('error');
+      expect(result.error).toBe('User not found');
     });
   });
 
@@ -256,12 +266,12 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       const combinedStr = proofStr + publicSignalsStr;
 
       // The password should not appear in the proof or public signals
-      expect(combinedStr).to.not.include(testPassword);
+      expect(combinedStr).not.toContain(testPassword);
 
       // Even parts of the password should not appear
       for (let i = 0; i < testPassword.length - 3; i++) {
         const passwordPart = testPassword.substring(i, i + 3);
-        expect(combinedStr).to.not.include(passwordPart);
+        expect(combinedStr).not.toContain(passwordPart);
       }
     });
 
@@ -287,7 +297,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       // This should fail in a real system that tracks used proofs
       // For this test, we're checking that the public signals are properly bound to the proof
       const isValid2 = await verifyProof(proof, replayPublicSignals);
-      expect(isValid2).to.be.false;
+      expect(isValid2).toBe(false);
     });
 
     it('should be resistant to man-in-the-middle attacks', async () => {
@@ -343,7 +353,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
 
       // The proof generation should complete within a reasonable time
       // Adjust this threshold based on your performance requirements
-      expect(duration).to.be.below(5000); // 5 seconds
+      expect(duration).toBeLessThan(5000); // 5 seconds
     });
 
     it('should verify proofs within acceptable time limits', async () => {
@@ -363,7 +373,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       const duration = endTime - startTime;
 
       // The verification should be fast
-      expect(duration).to.be.below(1000); // 1 second
+      expect(duration).toBeLessThan(1000); // 1 second
     });
 
     it('should handle concurrent proof generations', async () => {
@@ -381,10 +391,10 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       const results = await Promise.all(promises);
 
       // Verify all proofs were generated
-      expect(results).to.have.length(5);
+      expect(results.length).toBe(5);
       results.forEach(result => {
-        expect(result).to.have.property('proof');
-        expect(result).to.have.property('publicSignals');
+        expect(result).toHaveProperty('proof');
+        expect(result).toHaveProperty('publicSignals');
       });
     });
   });
@@ -519,10 +529,11 @@ describe('ZKP Authentication Cryptographic Tests', () => {
         }
       });
 
-      expect(protectedResponse.status).to.equal(200);
+      expect(protectedResponse.status).toBe(200);
 
       const protectedData = await protectedResponse.json();
-      expect(protectedData).to.have.property('success').that.is.true;
+      expect(protectedData).toHaveProperty('success');
+      expect(protectedData.success).toBe(true);
     });
 
     it('should reject invalid proofs through the API', async () => {
@@ -549,10 +560,11 @@ describe('ZKP Authentication Cryptographic Tests', () => {
         })
       });
 
-      expect(authResponse.status).to.equal(401);
+      expect(authResponse.status).toBe(401);
 
       const authResult = await authResponse.json();
-      expect(authResult).to.have.property('error').that.is.a('string');
+      expect(authResult).toHaveProperty('error');
+      expect(typeof authResult.error).toBe('string');
     });
   });
 });

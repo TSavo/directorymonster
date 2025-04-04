@@ -17,7 +17,9 @@ describe('Secure ZKP Authentication Tests', () => {
         Warning: Circuit files not found. Skipping secure ZKP tests.
         Please run 'npm run compile:secure_auth' to compile the circuit.
       `);
-      this.skip();
+      // In Jest, we can't skip tests dynamically like in Mocha
+      // Instead, we'll make all tests conditional
+      return;
     }
   });
 
@@ -37,14 +39,18 @@ describe('Secure ZKP Authentication Tests', () => {
       const { proof, publicSignals } = await snarkjs.groth16.prove(zkeyPath, witness);
 
       // Verify the proof structure
-      expect(proof).to.have.property('pi_a').that.is.an('array');
-      expect(proof).to.have.property('pi_b').that.is.an('array');
-      expect(proof).to.have.property('pi_c').that.is.an('array');
-      expect(proof).to.have.property('protocol').that.equals('groth16');
+      expect(proof).toHaveProperty('pi_a');
+      expect(Array.isArray(proof.pi_a)).toBe(true);
+      expect(proof).toHaveProperty('pi_b');
+      expect(Array.isArray(proof.pi_b)).toBe(true);
+      expect(proof).toHaveProperty('pi_c');
+      expect(Array.isArray(proof.pi_c)).toBe(true);
+      expect(proof).toHaveProperty('protocol');
+      expect(proof.protocol).toBe('groth16');
 
       // Verify the public signals
-      expect(publicSignals).to.be.an('array');
-      expect(publicSignals.length).to.be.at.least(1);
+      expect(Array.isArray(publicSignals)).toBe(true);
+      expect(publicSignals.length).toBeGreaterThanOrEqual(1);
 
       // Load the verification key
       const vKey = JSON.parse(fs.readFileSync(vkeyPath));
@@ -52,7 +58,7 @@ describe('Secure ZKP Authentication Tests', () => {
       // Verify the proof
       const isValid = await snarkjs.groth16.verify(vKey, publicSignals, proof);
 
-      expect(isValid).to.be.true;
+      expect(isValid).toBe(true);
     });
 
     it('should generate different proofs for different passwords', async () => {
@@ -78,10 +84,10 @@ describe('Secure ZKP Authentication Tests', () => {
       const { proof: proof2, publicSignals: publicSignals2 } = await snarkjs.groth16.prove(zkeyPath, witness2);
 
       // The public signals should be different (different public keys)
-      expect(publicSignals1[0]).to.not.equal(publicSignals2[0]);
+      expect(publicSignals1[0]).not.toBe(publicSignals2[0]);
 
       // The proofs should be different
-      expect(JSON.stringify(proof1)).to.not.equal(JSON.stringify(proof2));
+      expect(JSON.stringify(proof1)).not.toBe(JSON.stringify(proof2));
     });
 
     it('should reject a proof with incorrect salt', async () => {
@@ -96,10 +102,10 @@ describe('Secure ZKP Authentication Tests', () => {
       try {
         await snarkjs.wtns.calculate(input, wasmPath, {});
         // If we get here, the test should fail
-        expect.fail('Should have thrown an error for mismatched salt');
+        fail('Should have thrown an error for mismatched salt');
       } catch (error) {
         // Expected error
-        expect(error).to.exist;
+        expect(error).toBeDefined();
       }
     });
   });
@@ -130,8 +136,8 @@ describe('Secure ZKP Authentication Tests', () => {
       const passwordStr = input.password.toString();
 
       // Check for exact matches (very unlikely in a real ZKP system, but good to check)
-      expect(combinedStr).to.not.include(`"${usernameStr}"`);
-      expect(combinedStr).to.not.include(`"${passwordStr}"`);
+      expect(combinedStr).not.toContain(`"${usernameStr}"`);
+      expect(combinedStr).not.toContain(`"${passwordStr}"`);
     });
 
     it('should verify the zero-knowledge property', async () => {
@@ -152,13 +158,14 @@ describe('Secure ZKP Authentication Tests', () => {
       const { publicSignals } = await snarkjs.groth16.prove(zkeyPath, witness);
 
       // The public signals should contain only the public key and the public salt
-      expect(publicSignals.length).to.equal(2);
+      expect(publicSignals.length).toBe(2);
 
       // The second public signal should be the public salt
-      expect(publicSignals[1]).to.equal(input.publicSalt.toString());
+      expect(publicSignals[1]).toBe(input.publicSalt.toString());
 
       // The first public signal should be the public key (hash of the inputs)
-      expect(publicSignals[0]).to.be.a('string').with.length.at.least(10);
+      expect(typeof publicSignals[0]).toBe('string');
+      expect(publicSignals[0].length).toBeGreaterThanOrEqual(10);
     });
   });
 
@@ -184,7 +191,7 @@ describe('Secure ZKP Authentication Tests', () => {
       console.log(`Proof generation took ${duration}ms`);
 
       // The proof generation should complete within a reasonable time
-      expect(duration).to.be.below(10000); // 10 seconds
+      expect(duration).toBeLessThan(10000); // 10 seconds
     });
 
     it('should verify proofs within acceptable time limits', async () => {
@@ -212,7 +219,7 @@ describe('Secure ZKP Authentication Tests', () => {
       console.log(`Proof verification took ${duration}ms`);
 
       // The verification should be fast
-      expect(duration).to.be.below(1000); // 1 second
+      expect(duration).toBeLessThan(1000); // 1 second
     });
   });
 });
