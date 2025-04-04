@@ -128,13 +128,8 @@ async function verifyProof(proof, publicSignals) {
   } catch (error) {
     console.error('Error verifying proof:', error);
 
-    // In test environment, rethrow the error to make tests fail properly
-    if (isTestEnv) {
-      throw error;
-    }
-
-    // In production, return false for security reasons
-    return false;
+    // Always throw the error to make tests fail properly
+    throw error;
   }
 }
 
