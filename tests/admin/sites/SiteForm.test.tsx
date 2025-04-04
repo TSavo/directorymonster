@@ -11,6 +11,16 @@ jest.mock('next/navigation', () => ({
   useRouter: () => useRouter(),
 }));
 
+// Mock the NotificationProvider
+jest.mock('@/components/notifications/NotificationProvider', () => ({
+  useNotificationsContext: () => ({
+    notifications: [],
+    addNotification: jest.fn(),
+    removeNotification: jest.fn(),
+    clearNotifications: jest.fn()
+  })
+}));
+
 // Mock useSites hook
 const mockUpdateSite = jest.fn().mockImplementation((field, value) => {
   // For the 'clears validation errors' test, clear the error when the name field is updated
