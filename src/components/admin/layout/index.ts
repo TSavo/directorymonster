@@ -1,6 +1,6 @@
 // Standardized barrel file - Updated on 2025-03-30
 
-// Import components explicitly 
+// Import components explicitly
 import AdminHeaderComponent from './AdminHeader';
 import AdminLayoutComponent from './AdminLayout';
 import AdminSidebarComponent from './AdminSidebar';
@@ -11,6 +11,9 @@ export * from './AdminHeader';
 export * from './AdminLayout';
 export * from './AdminSidebar';
 export * from './Breadcrumbs';
+
+// Export all icons
+export * from './icons/index.tsx';
 
 // Re-export default as named exports
 export { default as AdminHeader } from './AdminHeader';

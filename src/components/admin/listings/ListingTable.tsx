@@ -18,7 +18,7 @@ import {
 
 /**
  * ListingTable - A comprehensive table component for managing listings
- * 
+ *
  * Features:
  * - Sorting (click column headers)
  * - Filtering (by category, search term)
@@ -63,16 +63,16 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
   const goToPage = setPage;
   const handleSort = setSorting;
   const handleDelete = deleteListing;
-  
+
   // For delete modal functionality
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [listingToDelete, setListingToDelete] = useState<any>(null);
-  
+
   const confirmDelete = useCallback((listing: any) => {
     setListingToDelete(listing);
     setIsDeleteModalOpen(true);
   }, []);
-  
+
   const cancelDelete = useCallback(() => {
     setIsDeleteModalOpen(false);
     setListingToDelete(null);
@@ -82,7 +82,7 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
   const searchTerm = filters?.search || '';
   const categoryFilter = filters?.categoryIds?.[0] || '';
   const siteFilter = filters?.siteId || '';
-  
+
   // Mock data for testing - should come from API in production
   const categories = []; // Should be populated from API
   const sites = []; // Should be populated from API
@@ -92,7 +92,9 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
 
   // Render loading state - only show if loading and no initialListings provided
   if (isLoading && !initialListings?.length) {
-    return <ListingTableSkeleton />;
+    return <div data-testid="listings-loading">
+      <ListingTableSkeleton />
+    </div>;
   }
 
   // Render error state
@@ -115,12 +117,12 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
         categories={categories}
         sites={sites}
       />
-      
+
       {/* Empty state */}
       {filteredListings?.length === 0 && (
         <ListingTableEmptyState siteSlug={siteSlug} />
       )}
-      
+
       {/* Table for desktop */}
       {filteredListings?.length > 0 && (
         <>
@@ -179,15 +181,15 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
               </tbody>
             </table>
           </div>
-          
+
           {/* Mobile view */}
-          <ListingsMobileView 
-            listings={currentListings} 
-            showSiteColumn={showSiteColumn} 
+          <ListingsMobileView
+            listings={currentListings}
+            showSiteColumn={showSiteColumn}
             onDeleteClick={confirmDelete}
             siteSlug={siteSlug}
           />
-          
+
           {/* Pagination */}
           <ListingTablePagination
             currentPage={currentPage}
@@ -199,7 +201,7 @@ export function ListingTable({ siteSlug, initialListings }: ListingTableProps) {
           />
         </>
       )}
-      
+
       {/* Delete confirmation modal */}
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
