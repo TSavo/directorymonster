@@ -324,7 +324,7 @@ async function createTestCategory() {
       var siteSlug = siteResponse.data.slug;
     } else {
       console.log(`Found ${sitesResponse.data.length} sites`);
-      var siteSlug = sitesResponse.data[0].slug;
+      siteSlug = sitesResponse.data[0].slug;
     }
 
     // Create a test category
