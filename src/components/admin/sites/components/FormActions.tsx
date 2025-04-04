@@ -78,7 +78,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded focus:outline-none focus:ring-2 disabled:opacity-50"
-            data-testid="form-next-button"
+            data-testid="submit-site-button"
             disabled={isLoading}
           >
             {isLoading ? (

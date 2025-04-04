@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSites } from './hooks';
-import { NotificationProvider } from '@/components/notifications/NotificationProvider';
+import { useNotificationsContext } from '@/components/notifications/NotificationProvider';
 import {
   BasicInfoStep,
   DomainStep,
@@ -86,6 +86,7 @@ export const SiteForm: React.FC<SiteFormProps> = ({
   initialStep
 }) => {
   const router = useRouter();
+  const { showNotification } = useNotificationsContext();
   const [activeStep, setActiveStep] = useState<string>(initialStep || STEPS[0].id);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [newDomain, setNewDomain] = useState<string>('');
@@ -225,23 +226,42 @@ export const SiteForm: React.FC<SiteFormProps> = ({
 
     // Only proceed if we're on the last step or in a test environment
     if (isLastStep || isTest) {
-      let result;
-      if (mode === 'edit' && site.id) {
-        result = await saveSite(site.id);
-      } else {
-        result = await createSite();
-      }
-
-      if (result.success) {
-        // Call success callback if provided
-        if (onSuccess) {
-          onSuccess(result.data);
+      try {
+        let result;
+        if (mode === 'edit' && site.id) {
+          result = await saveSite(site.id);
+        } else {
+          result = await createSite();
         }
 
-        // Redirect after successful submission
-        setTimeout(() => {
-          router.push(`/admin/sites/${result.data?.id || result.data?.slug || site.slug}`);
-        }, 1500);
+        if (result.success) {
+          // Show success notification
+          showNotification({
+            type: 'success',
+            title: mode === 'edit' ? 'Site Updated' : 'Site Created',
+            message: mode === 'edit' ? 'Your site has been updated successfully' : 'Your site has been created successfully',
+            duration: 5000,
+          });
+
+          // Call success callback if provided
+          if (onSuccess) {
+            onSuccess(result.data);
+          }
+
+          // Redirect after successful submission
+          setTimeout(() => {
+            router.push(`/admin/sites/${result.data?.id || result.data?.slug || site.slug}`);
+          }, 1500);
+        }
+      } catch (error) {
+        // Show error notification
+        showNotification({
+          type: 'error',
+          title: mode === 'edit' ? 'Site Update Failed' : 'Site Creation Failed',
+          message: `There was an error ${mode === 'edit' ? 'updating' : 'creating'} your site: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          duration: 5000,
+        });
+        console.error('Site form submission error:', error);
       }
     }
   };
@@ -251,54 +271,53 @@ export const SiteForm: React.FC<SiteFormProps> = ({
   const isLastStep = activeStep === STEPS[STEPS.length - 1].id;
 
   return (
-    <NotificationProvider>
-      <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded shadow" data-testid="site-form">
-        <h1
-          id="siteForm-header"
-          className="text-xl font-bold mb-6"
-          data-testid="siteForm-header"
+    <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded shadow" data-testid="site-form">
+      <h1
+        id="siteForm-header"
+        className="text-xl font-bold mb-6"
+        data-testid="siteForm-header"
+      >
+        {mode === 'edit' ? 'Edit' : 'Create'} Site
+      </h1>
+
+      {/* Error message */}
+      {error && (
+        <div
+          className="mb-4 p-3 bg-red-100 text-red-700 rounded"
+          role="alert"
+          data-testid="siteForm-error"
         >
-          {mode === 'edit' ? 'Edit' : 'Create'} Site
-        </h1>
+          {error}
+        </div>
+      )}
 
-        {/* Error message */}
-        {error && (
-          <div
-            className="mb-4 p-3 bg-red-100 text-red-700 rounded"
-            role="alert"
-            data-testid="siteForm-error"
-          >
-            {error}
-          </div>
-        )}
-
-        {/* Success message */}
-        {success && (
-          <div
-            className="mb-4 p-3 bg-green-100 text-green-700 rounded"
-            role="alert"
-            data-testid="siteForm-success"
-          >
-            {success}
-          </div>
-        )}
-
-        {/* Step Navigation */}
-        <StepNavigation
-          steps={STEPS}
-          activeStep={activeStep}
-          completedSteps={completedSteps}
-          onStepChange={handleStepChange}
-          isLoading={isLoading}
-        />
-
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          role="form"
-          aria-labelledby="siteForm-header"
-          data-testid="siteForm-form"
+      {/* Success message */}
+      {success && (
+        <div
+          className="mb-4 p-3 bg-green-100 text-green-700 rounded"
+          role="alert"
+          data-testid="siteForm-success"
         >
+          {success}
+        </div>
+      )}
+
+      {/* Step Navigation */}
+      <StepNavigation
+        steps={STEPS}
+        activeStep={activeStep}
+        completedSteps={completedSteps}
+        onStepChange={handleStepChange}
+        isLoading={isLoading}
+      />
+
+      {/* Form */}
+      <form
+        onSubmit={handleSubmit}
+        role="form"
+        aria-labelledby="siteForm-header"
+        data-testid="siteForm-form"
+      >
         {/* Step Content */}
         <div className="mb-6" data-testid="step-content">
           {activeStep === 'basic_info' && (
@@ -383,7 +402,6 @@ export const SiteForm: React.FC<SiteFormProps> = ({
         />
       </form>
     </div>
-    </NotificationProvider>
   );
 };
 
