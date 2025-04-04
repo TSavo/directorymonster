@@ -62,3 +62,25 @@ export interface SiteIdentity {
   isAdmin: boolean;
   isApiRequest: boolean;
 }
+
+export interface ACLEntry {
+  resource: {
+    type: string;
+    id?: string;
+  };
+  permission: string;
+}
+
+export interface ACL {
+  entries: ACLEntry[];
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'admin' | 'user' | 'editor';
+  acl: ACL;
+  createdAt: number;
+  updatedAt: number;
+}

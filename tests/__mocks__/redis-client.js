@@ -39,10 +39,37 @@ const redisMock = {
   ttl: jest.fn(() => Promise.resolve(3600)),
   
   // Sets
-  sadd: jest.fn(() => Promise.resolve(1)),
-  srem: jest.fn(() => Promise.resolve(1)),
-  smembers: jest.fn(() => Promise.resolve([])),
-  sismember: jest.fn(() => Promise.resolve(0)),
+  sadd: jest.fn((key, ...members) => {
+    if (!memoryStore.has(key)) {
+      memoryStore.set(key, new Set());
+    }
+    const set = memoryStore.get(key);
+    let added = 0;
+    for (const member of members) {
+      const size = set.size;
+      set.add(member);
+      if (set.size > size) added++;
+    }
+    return Promise.resolve(added);
+  }),
+  srem: jest.fn((key, ...members) => {
+    if (!memoryStore.has(key)) return Promise.resolve(0);
+    const set = memoryStore.get(key);
+    let removed = 0;
+    for (const member of members) {
+      if (set.delete(member)) removed++;
+    }
+    return Promise.resolve(removed);
+  }),
+  smembers: jest.fn((key) => {
+    if (!memoryStore.has(key)) return Promise.resolve([]);
+    return Promise.resolve(Array.from(memoryStore.get(key)));
+  }),
+  sismember: jest.fn((key, member) => {
+    if (!memoryStore.has(key)) return Promise.resolve(0);
+    const set = memoryStore.get(key);
+    return Promise.resolve(set.has(member) ? 1 : 0);
+  }),
   
   // Hashes
   hget: jest.fn(() => Promise.resolve(null)),
@@ -60,39 +87,18 @@ const redisMock = {
     transactionCommands.length = 0;
     transactionResults.length = 0;
     
-    return {
-      get: jest.fn((key) => {
-        transactionCommands.push(['get', key]);
-        transactionResults.push(memoryStore.get(key) || null);
-        return redisMock.multi();
-      }),
-      set: jest.fn((key, value) => {
-        transactionCommands.push(['set', key, value]);
-        transactionResults.push('OK');
-        return redisMock.multi();
-      }),
-      del: jest.fn((key) => {
-        transactionCommands.push(['del', key]);
-        transactionResults.push(1);
-        return redisMock.multi();
-      }),
-      sadd: jest.fn((key, ...members) => {
-        transactionCommands.push(['sadd', key, ...members]);
-        transactionResults.push(members.length);
-        return redisMock.multi();
-      }),
-      srem: jest.fn((key, ...members) => {
-        transactionCommands.push(['srem', key, ...members]);
-        transactionResults.push(members.length);
-        return redisMock.multi();
-      }),
-      hset: jest.fn((key, field, value) => {
-        transactionCommands.push(['hset', key, field, value]);
-        transactionResults.push(1);
-        return redisMock.multi();
-      }),
-      exec: jest.fn(() => Promise.resolve(transactionResults)),
+    const transaction = {
+      get: jest.fn(() => transaction),
+      set: jest.fn(() => transaction),
+      del: jest.fn(() => transaction),
+      sadd: jest.fn(() => transaction),
+      srem: jest.fn(() => transaction),
+      smembers: jest.fn(() => transaction),
+      hset: jest.fn(() => transaction),
+      exec: jest.fn(() => Promise.resolve([[null, 'OK'], [null, 'OK']])),
     };
+    
+    return transaction;
   }),
   
   // Connection
@@ -123,11 +129,51 @@ const kvMock = {
   expire: jest.fn(() => Promise.resolve(1)),
   ttl: jest.fn(() => Promise.resolve(3600)),
   
+  // Set operations
+  sadd: jest.fn((key, ...members) => {
+    if (!memoryStore.has(key)) {
+      memoryStore.set(key, new Set());
+    }
+    const set = memoryStore.get(key);
+    let added = 0;
+    for (const member of members) {
+      const size = set.size;
+      set.add(member);
+      if (set.size > size) added++;
+    }
+    return Promise.resolve(added);
+  }),
+  srem: jest.fn((key, ...members) => {
+    if (!memoryStore.has(key)) return Promise.resolve(0);
+    const set = memoryStore.get(key);
+    let removed = 0;
+    for (const member of members) {
+      if (set.delete(member)) removed++;
+    }
+    return Promise.resolve(removed);
+  }),
+  smembers: jest.fn((key) => {
+    if (!memoryStore.has(key)) return Promise.resolve([]);
+    return Promise.resolve(Array.from(memoryStore.get(key)));
+  }),
+  sismember: jest.fn((key, member) => {
+    if (!memoryStore.has(key)) return Promise.resolve(0);
+    const set = memoryStore.get(key);
+    return Promise.resolve(set.has(member) ? 1 : 0);
+  }),
+  
   // Transaction support
   multi: jest.fn(() => {
-    return {
-      exec: jest.fn(() => Promise.resolve([])),
+    const transaction = {
+      get: jest.fn(() => transaction),
+      set: jest.fn(() => transaction),
+      del: jest.fn(() => transaction),
+      sadd: jest.fn(() => transaction),
+      srem: jest.fn(() => transaction),
+      smembers: jest.fn(() => transaction),
+      exec: jest.fn(() => Promise.resolve([[null, 'OK'], [null, 'OK']])),
     };
+    return transaction;
   }),
 };
 
