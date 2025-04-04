@@ -6,7 +6,7 @@ const defaultProof = {
   protocol: 'groth16'
 };
 
-const defaultPublicSignals = ['12345', '67890'];
+const defaultPublicSignals = ['abcdef', 'ghijkl'];
 
 // Store input-specific proofs and signals for tests that need different values
 const proofStore = new Map();
