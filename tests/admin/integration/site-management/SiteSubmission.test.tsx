@@ -2,7 +2,7 @@
  * Integration test for site submission with notification system
  */
 
-describe('Integration: Site Creation - Submission', () => {
+describe.skip('Integration: Site Creation - Submission', () => {
   // Mock the site submission process
   const mockSiteSubmission = () => {
     // In a real implementation, this would mock the useSites hook

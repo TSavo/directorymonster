@@ -59,21 +59,29 @@ export const SiteFormValidator: React.FC<SiteFormValidatorProps> = ({
   
   // Clone children and inject the validation handler
   const childrenWithProps = React.Children.map(children, child => {
-    if (React.isValidElement(child) && child.type === 'button') {
-      // If it's a button, add the validation handler
-      return React.cloneElement(child, {
-        onClick: (e: React.MouseEvent) => {
-          // Call the original onClick if it exists
-          if (child.props.onClick) {
-            child.props.onClick(e);
-          }
-          
-          // Validate the form
-          handleValidate();
-        }
-      });
-    }
-    return child;
+-  if (React.isValidElement(child) && child.type === 'button') {
++  if (
++    React.isValidElement(child) &&
++    (
++      child.type === 'button' ||
++      (typeof child.type === 'function' && child.props.type === 'button') ||
++      (child.props.role === 'button')
++    )
++  ) {
+     // If it's a button, add the validation handler
+     return React.cloneElement(child, {
+       onClick: (e: React.MouseEvent) => {
+         // Call the original onClick if it exists
+         if (child.props.onClick) {
+           child.props.onClick(e);
+         }
+         
+         // Validate the form
+         handleValidate();
+       }
+     });
+   }
+   return child;
   });
   
   return (
