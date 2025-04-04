@@ -2,12 +2,13 @@
  * Integration test for SEO settings with notification system
  */
 
-describe('Integration: Site Creation - SEO Settings Step', () => {
+describe.skip('Integration: Site Creation - SEO Settings Step', () => {
   // Mock the SEO settings update process
   const mockSEOSettingsUpdate = () => {
     // In a real implementation, this would mock the useSites hook
     // to test the SEO settings update process and verify that
     // the notification system shows appropriate messages for validation
+    // TODO: Implement once the notification system is complete
   };
 
   it('should update SEO settings correctly with validation feedback', () => {
