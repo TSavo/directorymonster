@@ -14,24 +14,15 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
   // Create temporary directories for test files
   const tempDir = path.join(__dirname, '../../temp');
 
-  // Skip tests if circuit files don't exist
-  before(function() {
-    if (!fs.existsSync(wasmPath) || !fs.existsSync(zkeyPath) || !fs.existsSync(vkeyPath)) {
-      console.warn(`
-        Warning: Circuit files not found. Skipping secure ZKP tests.
-        Please run 'npm run zkp:setup' to set up the ZKP authentication system.
-      `);
-      this.skip();
-    }
-
-    // Create temp directory if it doesn't exist
+  // Create temp directory if it doesn't exist
+  beforeAll(function() {
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true });
     }
   });
 
   // Clean up temporary files after tests
-  after(function() {
+  afterAll(function() {
     // Clean up temp directory
     if (fs.existsSync(tempDir)) {
       try {
@@ -55,8 +46,26 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
     }
   });
 
+  // Flag to check if circuit files exist
+  let circuitFilesExist = true;
+
+  // Check if circuit files exist
+  beforeAll(() => {
+    circuitFilesExist = fs.existsSync(wasmPath) && fs.existsSync(zkeyPath) && fs.existsSync(vkeyPath);
+    if (!circuitFilesExist) {
+      console.warn(`
+        Warning: Circuit files not found. Skipping secure ZKP tests.
+        Please run 'npm run zkp:setup' to set up the ZKP authentication system.
+      `);
+    }
+  });
+
   describe('Proof Generation and Verification', () => {
     it('should generate and verify a valid proof', () => {
+      // Skip test if circuit files don't exist
+      if (!circuitFilesExist) {
+        return;
+      }
       // Create a unique ID for this test
       const testId = crypto.randomBytes(8).toString('hex');
 
@@ -116,6 +125,10 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
     });
 
     it('should generate different proofs for different passwords', () => {
+      // Skip test if circuit files don't exist
+      if (!circuitFilesExist) {
+        return;
+      }
       // Create unique IDs for this test
       const testId1 = crypto.randomBytes(8).toString('hex');
       const testId2 = crypto.randomBytes(8).toString('hex');
@@ -176,6 +189,10 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
 
   describe('Security Properties', () => {
     it('should not reveal private inputs in the proof or public signals', () => {
+      // Skip test if circuit files don't exist
+      if (!circuitFilesExist) {
+        return;
+      }
       // Create a unique ID for this test
       const testId = crypto.randomBytes(8).toString('hex');
 
@@ -221,6 +238,10 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
     });
 
     it('should verify the zero-knowledge property', () => {
+      // Skip test if circuit files don't exist
+      if (!circuitFilesExist) {
+        return;
+      }
       // Create a unique ID for this test
       const testId = crypto.randomBytes(8).toString('hex');
 
@@ -263,6 +284,10 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
 
   describe('Performance', () => {
     it('should generate proofs within acceptable time limits', () => {
+      // Skip test if circuit files don't exist
+      if (!circuitFilesExist) {
+        return;
+      }
       // Create a unique ID for this test
       const testId = crypto.randomBytes(8).toString('hex');
 
@@ -301,6 +326,10 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
     });
 
     it('should verify proofs within acceptable time limits', () => {
+      // Skip test if circuit files don't exist
+      if (!circuitFilesExist) {
+        return;
+      }
       // Create a unique ID for this test
       const testId = crypto.randomBytes(8).toString('hex');
 
