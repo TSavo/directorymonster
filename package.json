@@ -80,6 +80,7 @@
     "test:crypto:salt": "jest tests/crypto/dynamic-salt-generation.test.js",
     "zkp:setup": "ts-node scripts/zkp-setup.ts",
     "zkp:setup:no-pragma": "ts-node scripts/zkp-setup-no-pragma.ts",
+    "zkp:setup:simple": "ts-node scripts/zkp-setup-no-pragma.ts",
     "zkp:docker": "docker-compose -f docker-compose.zkp.yml up -d",
     "zkp:docker:down": "docker-compose -f docker-compose.zkp.yml down",
     "zkp:docker:logs": "docker-compose -f docker-compose.zkp.yml logs -f",

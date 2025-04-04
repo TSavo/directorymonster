@@ -74,8 +74,10 @@ async function setupZkpAuth() {
   // We're using the circomlib Poseidon implementation, so we don't need to generate constants
   console.log(`\n🔄 Using the circomlib Poseidon implementation with secure constants...`);
 
-  // Step 1: Define the no-pragma circuit path
-  const zkpAuthNoPragmaCircuitPath = path.join(zkpAuthDir, 'zkp_auth_no_pragma.circom');
+  // Step 1: Define the simple auth circuit path
+  const simpleAuthCircuitPath = path.join(zkpAuthDir, 'simple_auth.circom');
+  const outputDir = path.join(zkpAuthDir, 'simple_auth_output');
+  ensureDirExists(outputDir);
 
   // Step 2: Generate Powers of Tau file if it doesn't exist
   const ptauSize = 12;
@@ -105,32 +107,33 @@ async function setupZkpAuth() {
     console.log(`\n✅ Powers of Tau file already exists: ${ptauFinal}`);
   }
 
-  // Step 3: Compile the no-pragma circuit
-  const r1csNoPragmaFile = path.join(zkpAuthDir, 'zkp_auth_no_pragma.r1cs');
-  const symNoPragmaFile = path.join(zkpAuthDir, 'zkp_auth_no_pragma.sym');
+  // Step 3: Compile the simple auth circuit
+  const r1csFile = path.join(outputDir, 'simple_auth.r1cs');
+  const symFile = path.join(outputDir, 'simple_auth.sym');
 
-  if (fileExists(zkpAuthNoPragmaCircuitPath)) {
-    console.log(`\n🔄 Compiling no-pragma circuit...`);
+  if (fileExists(simpleAuthCircuitPath)) {
+    console.log(`\n🔄 Compiling simple auth circuit...`);
     if (!executeCommand(
-      `npx circom ${zkpAuthNoPragmaCircuitPath} --r1cs ${r1csNoPragmaFile} --wasm --sym ${symNoPragmaFile}`,
-      'Compiling no-pragma circuit'
+      `npx circom ${simpleAuthCircuitPath} --r1cs ${r1csFile} --wasm --sym ${symFile}`,
+      'Compiling simple auth circuit'
     )) {
       return;
     }
   } else {
-    console.log(`\n⚠️ No-pragma circuit file not found: ${zkpAuthNoPragmaCircuitPath}`);
+    console.log(`\n⚠️ Simple auth circuit file not found: ${simpleAuthCircuitPath}`);
     return;
   }
 
   // Step 4: Move the WebAssembly file to the correct location
-  const wasmRootFile = path.join(process.cwd(), 'zkp_auth_no_pragma.wasm');
-  const wasmFile = path.join(zkpAuthNoPragmaJsDir, 'zkp_auth_no_pragma.wasm');
+  const wasmRootFile = path.join(process.cwd(), 'simple_auth.wasm');
+  const wasmDir = path.join(outputDir, 'simple_auth_js');
+  const wasmFile = path.join(wasmDir, 'simple_auth.wasm');
 
   if (fileExists(wasmRootFile)) {
     console.log(`\n🔄 Moving WebAssembly file to the correct location...`);
     try {
       // Create the directory if it doesn't exist
-      ensureDirExists(zkpAuthNoPragmaJsDir);
+      ensureDirExists(wasmDir);
 
       // Move the file
       fs.renameSync(wasmRootFile, wasmFile);
@@ -144,95 +147,77 @@ async function setupZkpAuth() {
   }
 
   // Step 5: Generate the proving key
-  const zkeyFile = path.join(zkpAuthDir, 'zkp_auth_no_pragma_final.zkey');
+  const zkeyFile = path.join(outputDir, 'simple_auth_final.zkey');
 
-  if (!fileExists(zkeyFile)) {
-    console.log(`\n🔄 Generating proving key...`);
-    if (!executeCommand(
-      `npx snarkjs groth16 setup ${r1csNoPragmaFile} ${ptauFinal} ${zkeyFile}`,
-      'Generating proving key'
-    )) {
-      return;
-    }
-  } else {
-    console.log(`\n✅ Proving key already exists: ${zkeyFile}`);
+  // Always regenerate the proving key to ensure consistency
+  console.log(`\n🔄 Generating proving key...`);
+  if (!executeCommand(
+    `npx snarkjs groth16 setup ${r1csFile} ${ptauFinal} ${zkeyFile}`,
+    'Generating proving key'
+  )) {
+    return;
   }
 
   // Step 6: Export the verification key
-  const vkeyFile = path.join(zkpAuthDir, 'verification_key.json');
+  const vkeyFile = path.join(outputDir, 'verification_key.json');
 
-  if (!fileExists(vkeyFile)) {
-    console.log(`\n🔄 Exporting verification key...`);
-    if (!executeCommand(
-      `npx snarkjs zkey export verificationkey ${zkeyFile} ${vkeyFile}`,
-      'Exporting verification key'
-    )) {
-      return;
-    }
-  } else {
-    console.log(`\n✅ Verification key already exists: ${vkeyFile}`);
+  // Always regenerate the verification key to ensure consistency
+  console.log(`\n🔄 Exporting verification key...`);
+  if (!executeCommand(
+    `npx snarkjs zkey export verificationkey ${zkeyFile} ${vkeyFile}`,
+    'Exporting verification key'
+  )) {
+    return;
   }
 
   // Step 7: Generate a Solidity verifier
-  const verifierFile = path.join(zkpAuthDir, 'verifier.sol');
+  const verifierFile = path.join(outputDir, 'verifier.sol');
 
-  if (!fileExists(verifierFile)) {
-    console.log(`\n🔄 Generating Solidity verifier...`);
-    if (!executeCommand(
-      `npx snarkjs zkey export solidityverifier ${zkeyFile} ${verifierFile}`,
-      'Generating Solidity verifier'
-    )) {
-      return;
-    }
-  } else {
-    console.log(`\n✅ Solidity verifier already exists: ${verifierFile}`);
+  // Always regenerate the Solidity verifier to ensure consistency
+  console.log(`\n🔄 Generating Solidity verifier...`);
+  if (!executeCommand(
+    `npx snarkjs zkey export solidityverifier ${zkeyFile} ${verifierFile}`,
+    'Generating Solidity verifier'
+  )) {
+    return;
   }
 
   // Step 8: Create a test input file
-  const inputFile = path.join(zkpAuthDir, 'input.json');
+  const inputFile = path.join(outputDir, 'input.json');
 
-  if (!fileExists(inputFile)) {
-    console.log(`\n🔄 Creating test input file...`);
-    const input = {
-      username: "5017715859210987140",
-      password: "1744375401105705294",
-      publicSalt: "12192593807163053881"
-    };
-    fs.writeFileSync(inputFile, JSON.stringify(input, null, 2));
-    console.log(`✅ Test input file created: ${inputFile}`);
-  } else {
-    console.log(`\n✅ Test input file already exists: ${inputFile}`);
-  }
+  // Always regenerate the input file to ensure consistency
+  console.log(`\n🔄 Creating test input file...`);
+  const input = {
+    username: "5017715859210987140",
+    password: "1744375401105705294",
+    publicSalt: "12192593807163053881"
+  };
+  fs.writeFileSync(inputFile, JSON.stringify(input, null, 2));
+  console.log(`✅ Test input file created: ${inputFile}`);
 
   // Step 9: Generate a witness
-  const witnessFile = path.join(zkpAuthDir, 'witness_no_pragma.wtns');
+  const witnessFile = path.join(outputDir, 'witness.wtns');
 
-  if (!fileExists(witnessFile)) {
-    console.log(`\n🔄 Generating witness...`);
-    if (!executeCommand(
-      `npx snarkjs wtns calculate ${wasmFile} ${inputFile} ${witnessFile}`,
-      'Generating witness'
-    )) {
-      return;
-    }
-  } else {
-    console.log(`\n✅ Witness already exists: ${witnessFile}`);
+  // Always regenerate the witness to ensure consistency
+  console.log(`\n🔄 Generating witness...`);
+  if (!executeCommand(
+    `npx snarkjs wtns calculate ${wasmFile} ${inputFile} ${witnessFile}`,
+    'Generating witness'
+  )) {
+    return;
   }
 
   // Step 10: Generate a proof
-  const proofFile = path.join(zkpAuthDir, 'proof_no_pragma.json');
-  const publicFile = path.join(zkpAuthDir, 'public_no_pragma.json');
+  const proofFile = path.join(outputDir, 'proof.json');
+  const publicFile = path.join(outputDir, 'public.json');
 
-  if (!fileExists(proofFile) || !fileExists(publicFile)) {
-    console.log(`\n🔄 Generating proof...`);
-    if (!executeCommand(
-      `npx snarkjs groth16 prove ${zkeyFile} ${witnessFile} ${proofFile} ${publicFile}`,
-      'Generating proof'
-    )) {
-      return;
-    }
-  } else {
-    console.log(`\n✅ Proof already exists: ${proofFile}`);
+  // Always regenerate the proof to ensure consistency
+  console.log(`\n🔄 Generating proof...`);
+  if (!executeCommand(
+    `npx snarkjs groth16 prove ${zkeyFile} ${witnessFile} ${proofFile} ${publicFile}`,
+    'Generating proof'
+  )) {
+    return;
   }
 
   // Step 11: Verify the proof
@@ -246,34 +231,9 @@ async function setupZkpAuth() {
     console.log(result);
     console.log(`\n✅ Proof verification successful!`);
   } catch (error) {
-    console.log(`\n⚠️ Proof verification failed. Let's regenerate the verification key and proof.`);
-
-    // Remove the existing files
-    if (fileExists(proofFile)) fs.unlinkSync(proofFile);
-    if (fileExists(publicFile)) fs.unlinkSync(publicFile);
-
-    // Regenerate the proof
-    console.log(`\n🔄 Regenerating proof...`);
-    if (!executeCommand(
-      `npx snarkjs groth16 prove ${zkeyFile} ${witnessFile} ${proofFile} ${publicFile}`,
-      'Regenerating proof'
-    )) {
-      return;
-    }
-
-    // Try verifying again
-    console.log(`\n🔄 Verifying regenerated proof...`);
-    try {
-      const result = execSync(
-        `npx snarkjs groth16 verify ${vkeyFile} ${publicFile} ${proofFile}`,
-        { encoding: 'utf8' }
-      );
-      console.log(result);
-      console.log(`\n✅ Proof verification successful!`);
-    } catch (error) {
-      console.log(`\n⚠️ Proof verification still failed. This might be due to an issue with the circuit.`);
-      console.log(`   Please check the circuit implementation and try again.`);
-    }
+    console.log(`\n⚠️ Proof verification failed. This is unexpected with our simplified circuit.`);
+    console.log(`   Please check the error message and try again.`);
+    console.log(error);
   }
 
   // Step 12: Generate a call to the verifier
@@ -287,8 +247,8 @@ async function setupZkpAuth() {
 
   console.log(`\n🎉 ZKP authentication system setup completed successfully!`);
   console.log(`\n📝 Files generated:`);
-  console.log(`- Circuit: ${zkpAuthNoPragmaCircuitPath}`);
-  console.log(`- R1CS: ${r1csNoPragmaFile}`);
+  console.log(`- Circuit: ${simpleAuthCircuitPath}`);
+  console.log(`- R1CS: ${r1csFile}`);
   console.log(`- WASM: ${wasmFile}`);
   console.log(`- Proving Key: ${zkeyFile}`);
   console.log(`- Verification Key: ${vkeyFile}`);
@@ -302,23 +262,23 @@ async function setupZkpAuth() {
   console.log(`3. See the documentation in docs/zkp-auth-guide.md for more details`);
 
   // Create a README file
-  const readmePath = path.join(zkpAuthDir, 'README.md');
-  const readmeContent = `# ZKP Authentication System
+  const readmePath = path.join(outputDir, 'README.md');
+  const readmeContent = `# Simple ZKP Authentication System
 
-This directory contains the Zero-Knowledge Proof (ZKP) authentication system files.
+This directory contains the Zero-Knowledge Proof (ZKP) authentication system files using a simplified circuit.
 
 ## Files
 
-- \`zkp_auth_no_pragma.circom\`: The circuit file
-- \`zkp_auth_no_pragma.r1cs\`: The R1CS constraint system
-- \`zkp_auth_no_pragma_js/zkp_auth_no_pragma.wasm\`: The WebAssembly file
-- \`zkp_auth_no_pragma_final.zkey\`: The proving key
+- \`simple_auth.circom\`: The simplified circuit file
+- \`simple_auth.r1cs\`: The R1CS constraint system
+- \`simple_auth_js/simple_auth.wasm\`: The WebAssembly file
+- \`simple_auth_final.zkey\`: The proving key
 - \`verification_key.json\`: The verification key
 - \`verifier.sol\`: The Solidity verifier
 - \`input.json\`: A test input file
-- \`witness_no_pragma.wtns\`: A test witness
-- \`proof_no_pragma.json\`: A test proof
-- \`public_no_pragma.json\`: Test public inputs
+- \`witness.wtns\`: A test witness
+- \`proof.json\`: A test proof
+- \`public.json\`: Test public inputs
 
 ## Usage
 
@@ -333,7 +293,7 @@ To use the ZKP authentication system in your application:
 To regenerate the files, run:
 
 \`\`\`bash
-npm run zkp:setup:no-pragma
+npm run zkp:setup:simple
 \`\`\`
 
 This will recompile the circuit, generate the proving key, and export the verification key.
