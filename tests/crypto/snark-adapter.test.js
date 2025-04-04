@@ -72,10 +72,14 @@ describe('SnarkAdapter Cryptographic Tests', () => {
   describe('Adapter Interface Implementation', () => {
     it('should implement all required methods of the ZKPAdapter interface', () => {
       // Check that all required methods are implemented
-      expect(zkpAdapter).to.have.property('generateProof').that.is.a('function');
-      expect(zkpAdapter).to.have.property('verifyProof').that.is.a('function');
-      expect(zkpAdapter).to.have.property('generateSalt').that.is.a('function');
-      expect(zkpAdapter).to.have.property('derivePublicKey').that.is.a('function');
+      expect(zkpAdapter).toHaveProperty('generateProof');
+      expect(typeof zkpAdapter.generateProof).toBe('function');
+      expect(zkpAdapter).toHaveProperty('verifyProof');
+      expect(typeof zkpAdapter.verifyProof).toBe('function');
+      expect(zkpAdapter).toHaveProperty('generateSalt');
+      expect(typeof zkpAdapter.generateSalt).toBe('function');
+      expect(zkpAdapter).toHaveProperty('derivePublicKey');
+      expect(typeof zkpAdapter.derivePublicKey).toBe('function');
     });
   });
 
@@ -87,14 +91,17 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const salt3 = zkpAdapter.generateSalt();
 
       // Each salt should be unique
-      expect(salt1).to.not.equal(salt2);
-      expect(salt1).to.not.equal(salt3);
-      expect(salt2).to.not.equal(salt3);
+      expect(salt1).not.toBe(salt2);
+      expect(salt1).not.toBe(salt3);
+      expect(salt2).not.toBe(salt3);
 
       // Salts should be strings of sufficient length
-      expect(salt1).to.be.a('string').with.length.at.least(16);
-      expect(salt2).to.be.a('string').with.length.at.least(16);
-      expect(salt3).to.be.a('string').with.length.at.least(16);
+      expect(typeof salt1).toBe('string');
+      expect(salt1.length).toBeGreaterThanOrEqual(16);
+      expect(typeof salt2).toBe('string');
+      expect(salt2.length).toBeGreaterThanOrEqual(16);
+      expect(typeof salt3).toBe('string');
+      expect(salt3.length).toBeGreaterThanOrEqual(16);
     });
   });
 
@@ -116,10 +123,11 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const publicKey2 = zkpAdapter.derivePublicKey(input);
 
       // The public keys should be the same
-      expect(publicKey1).to.equal(publicKey2);
+      expect(publicKey1).toBe(publicKey2);
 
       // Public key should be a string of sufficient length
-      expect(publicKey1).to.be.a('string').with.length.at.least(16);
+      expect(typeof publicKey1).toBe('string');
+      expect(publicKey1.length).toBeGreaterThanOrEqual(16);
     });
 
     it('should derive different public keys for different passwords', () => {
@@ -141,7 +149,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const publicKey2 = zkpAdapter.derivePublicKey(input2);
 
       // The public keys should be different
-      expect(publicKey1).to.not.equal(publicKey2);
+      expect(publicKey1).not.toBe(publicKey2);
     });
 
     it('should derive different public keys for different usernames', () => {
@@ -163,7 +171,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const publicKey2 = zkpAdapter.derivePublicKey(input2);
 
       // The public keys should be different
-      expect(publicKey1).to.not.equal(publicKey2);
+      expect(publicKey1).not.toBe(publicKey2);
     });
 
     it('should derive different public keys for different salts', () => {
@@ -185,7 +193,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const publicKey2 = zkpAdapter.derivePublicKey(input2);
 
       // The public keys should be different
-      expect(publicKey1).to.not.equal(publicKey2);
+      expect(publicKey1).not.toBe(publicKey2);
     });
 
     it('should not reveal the password in the public key', () => {
@@ -200,13 +208,13 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const publicKey = zkpAdapter.derivePublicKey(input);
 
       // The password should not appear in the public key
-      expect(publicKey).to.not.include(testPassword);
+      expect(publicKey).not.toContain(testPassword);
 
       // Even parts of the password should not appear (for passwords longer than 3 chars)
       if (testPassword.length > 3) {
         for (let i = 0; i < testPassword.length - 3; i++) {
           const passwordPart = testPassword.substring(i, i + 3);
-          expect(publicKey).to.not.include(passwordPart);
+          expect(publicKey).not.toContain(passwordPart);
         }
       }
     });
@@ -229,14 +237,18 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const { proof, publicSignals } = await zkpAdapter.generateProof(input);
 
       // Verify the proof structure
-      expect(proof).to.be.an('object');
-      expect(proof).to.have.property('pi_a').that.is.an('array');
-      expect(proof).to.have.property('pi_b').that.is.an('array');
-      expect(proof).to.have.property('pi_c').that.is.an('array');
-      expect(proof).to.have.property('protocol').that.equals('groth16');
+      expect(typeof proof).toBe('object');
+      expect(proof).toHaveProperty('pi_a');
+      expect(Array.isArray(proof.pi_a)).toBe(true);
+      expect(proof).toHaveProperty('pi_b');
+      expect(Array.isArray(proof.pi_b)).toBe(true);
+      expect(proof).toHaveProperty('pi_c');
+      expect(Array.isArray(proof.pi_c)).toBe(true);
+      expect(proof).toHaveProperty('protocol');
+      expect(proof.protocol).toBe('groth16');
 
       // Verify the public signals
-      expect(publicSignals).to.be.an('array');
+      expect(Array.isArray(publicSignals)).toBe(true);
 
       // Derive the public key for verification
       const publicKey = zkpAdapter.derivePublicKey(input);
@@ -248,7 +260,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
         publicKey
       });
 
-      expect(isValid).to.be.true;
+      expect(isValid).toBe(true);
     });
 
     it('should reject a proof with incorrect password', async () => {
@@ -279,7 +291,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
         publicKey
       });
 
-      expect(isValid).to.be.false;
+      expect(isValid).toBe(false);
     });
 
     it('should reject a tampered proof', async () => {
@@ -317,7 +329,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
         publicKey
       });
 
-      expect(isValid).to.be.false;
+      expect(isValid).toBe(false);
     });
   });
 
@@ -355,7 +367,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
         publicKey
       });
 
-      expect(isValid).to.be.true;
+      expect(isValid).toBe(true);
 
       // 6. Failed login attempt: Wrong password
       const wrongPasswordInput = {
@@ -372,7 +384,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
         publicKey
       });
 
-      expect(isInvalid).to.be.false;
+      expect(isInvalid).toBe(false);
     });
   });
 
@@ -398,7 +410,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
       // The proof generation should complete within a reasonable time
       // Adjust this threshold based on your performance requirements
-      expect(duration).to.be.below(10000); // 10 seconds
+      expect(duration).toBeLessThan(10000); // 10 seconds
 
       console.log(`Proof generation took ${duration}ms`);
     });
@@ -430,7 +442,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const duration = endTime - startTime;
 
       // The verification should be fast
-      expect(duration).to.be.below(2000); // 2 seconds
+      expect(duration).toBeLessThan(2000); // 2 seconds
 
       console.log(`Proof verification took ${duration}ms`);
     });
@@ -452,10 +464,10 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const results = await Promise.all(promises);
 
       // Verify all proofs were generated
-      expect(results).to.have.length(3);
+      expect(results.length).toBe(3);
       results.forEach(result => {
-        expect(result).to.have.property('proof');
-        expect(result).to.have.property('publicSignals');
+        expect(result).toHaveProperty('proof');
+        expect(result).toHaveProperty('publicSignals');
       });
     });
   });
