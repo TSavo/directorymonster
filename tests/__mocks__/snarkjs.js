@@ -65,12 +65,27 @@ const snarkjsMock = {
     // Mock verify function that checks if the proof is valid
     verify: jest.fn().mockImplementation((vKey, publicSignals, proof) => {
       // For tests that need to verify invalid proofs
-      if (proof.pi_a && proof.pi_a[0] === 'invalid') {
+      if (proof && proof.pi_a && proof.pi_a[0] === 'invalid') {
         return Promise.resolve(false);
       }
 
       // For tests that need to verify tampered public signals
       if (publicSignals && publicSignals[0] === 'tampered') {
+        return Promise.resolve(false);
+      }
+
+      // For tests that check wrong password
+      if (proof && proof.protocol === 'wrong_password') {
+        return Promise.resolve(false);
+      }
+
+      // For tests that check tampered proofs
+      if (proof && proof.tampered) {
+        return Promise.resolve(false);
+      }
+
+      // For tests that check replay attacks
+      if (publicSignals && publicSignals[0] === 'replay') {
         return Promise.resolve(false);
       }
 

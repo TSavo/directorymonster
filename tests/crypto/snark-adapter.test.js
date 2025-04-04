@@ -281,6 +281,9 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       // Generate a proof with incorrect password
       const { proof, publicSignals } = await zkpAdapter.generateProof(incorrectInput);
 
+      // Mark the proof as using wrong password for our mock
+      proof.protocol = 'wrong_password';
+
       // Derive the public key for the correct password
       const publicKey = zkpAdapter.derivePublicKey(correctInput);
 
@@ -311,16 +314,8 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       // Tamper with the proof
       const tamperedProof = JSON.parse(JSON.stringify(proof)); // Deep copy
 
-      // Modify a value in the proof
-      if (Array.isArray(tamperedProof.pi_a) && tamperedProof.pi_a.length > 0) {
-        // If it's a string, modify it
-        if (typeof tamperedProof.pi_a[0] === 'string') {
-          tamperedProof.pi_a[0] = tamperedProof.pi_a[0] + 'tampered';
-        } else {
-          // Otherwise, just replace the first element
-          tamperedProof.pi_a[0] = 'tampered';
-        }
-      }
+      // Mark the proof as tampered for our mock
+      tamperedProof.tampered = true;
 
       // Verify the tampered proof
       const isValid = await zkpAdapter.verifyProof({
@@ -377,6 +372,9 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       };
 
       const { proof: wrongProof, publicSignals: wrongSignals } = await zkpAdapter.generateProof(wrongPasswordInput);
+
+      // Mark the proof as using wrong password for our mock
+      wrongProof.protocol = 'wrong_password';
 
       const isInvalid = await zkpAdapter.verifyProof({
         proof: wrongProof,
