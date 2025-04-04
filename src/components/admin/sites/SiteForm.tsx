@@ -219,8 +219,19 @@ export const SiteForm: React.FC<SiteFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Get notification context
-    const { showNotification } = useNotificationsContext();
+export const SiteForm: React.FC<SiteFormProps> = ({
+  initialData = {},
+  mode = 'create',
+  onCancel,
+  onSuccess,
+  apiEndpoint = '/api/sites',
+  initialStep
+}) => {
+  const router = useRouter();
+  const { showNotification } = useNotificationsContext();
+  const [activeStep, setActiveStep] = useState<string>(initialStep || STEPS[0].id);
+  // ...rest of the component
+}
 
     // For testing purposes, we'll allow form submission even if not on the last step
     // In production, we'd only allow submission on the last step
