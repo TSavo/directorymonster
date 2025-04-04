@@ -48,10 +48,29 @@ const customJestConfig = {
   testPathIgnorePatterns: ['/node_modules/', '/.next/', '/tests/e2e/'],
   // Use JSON output by default
   json: true,
-  // Transform node_modules for snarkjs
-  transformIgnorePatterns: [
-    '/node_modules/(?!(snarkjs|ffjavascript|circomlib)/)',
-  ],
+  // Mock snarkjs module
+  moduleNameMapper: {
+    // Main app path aliases
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@/app/(.*)$': '<rootDir>/src/app/$1',
+    '^@/components/(.*)$': '<rootDir>/src/components/$1',
+    '^@/hooks/(.*)$': '<rootDir>/src/hooks/$1',
+    '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
+    '^@/services/(.*)$': '<rootDir>/src/services/$1',
+    '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@/types/(.*)$': '<rootDir>/src/types/$1',
+
+    // UI component mocks at various relative path depths
+    '^../../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^./ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+    '^@/ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
+
+    // Mock snarkjs
+    '^snarkjs$': '<rootDir>/tests/__mocks__/snarkjs.js',
+  },
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
