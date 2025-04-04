@@ -3,7 +3,7 @@
  * Utility script to run all ACL integration tests with appropriate configuration
  */
 
-const { run } = require('jest-cli');
+import { run } from 'jest-cli';
 
 // Configure and run the tests
 run([
