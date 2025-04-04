@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateProof } from '@/lib/zkp';
+import { getSalt, clearSaltCache } from '@/lib/auth/salt-cache';
+import { getAuthErrorMessage, AuthErrorType } from '@/lib/auth/error-handler';
 
 interface ZKPLoginProps {
   // Optional props for customization
@@ -94,15 +96,8 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
     setIsLoading(true);
 
     try {
-      // Get salt from the server API endpoint
-      const saltResponse = await fetch(`/api/auth/salt/${encodeURIComponent(username)}`);
-
-      if (!saltResponse.ok) {
-        throw new Error('Failed to retrieve salt for authentication');
-      }
-
-      const saltData = await saltResponse.json();
-      const salt = saltData.salt;
+      // Get salt from cache or server API
+      const salt = await getSalt(username);
 
       // Log for debugging
       console.log('Generating proof with credentials:', {
@@ -172,7 +167,27 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
       }
     } catch (err) {
       console.error('Authentication error:', err);
-      setError(`Authentication error: ${err.message}`);
+
+      // Determine the appropriate error type based on the error
+      let errorType = AuthErrorType.UNKNOWN;
+
+      if (err instanceof Error) {
+        if (err.message.includes('salt')) {
+          errorType = AuthErrorType.SALT_RETRIEVAL;
+        } else if (err.message.includes('proof') || err.message.includes('generate')) {
+          errorType = AuthErrorType.ZKP_GENERATION;
+        } else if (err.message.includes('network') || err.message.includes('fetch')) {
+          errorType = AuthErrorType.NETWORK;
+        }
+      }
+
+      // Get a user-friendly error message
+      setError(getAuthErrorMessage(err, errorType));
+
+      // If there was an error with the salt, clear the cache for this user
+      if (errorType === AuthErrorType.SALT_RETRIEVAL) {
+        clearSaltCache(username);
+      }
     } finally {
       setIsLoading(false);
     }

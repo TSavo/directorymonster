@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateProof } from '@/lib/zkp';
+import { getSalt } from '@/lib/auth/salt-cache';
+import { getAuthErrorMessage, AuthErrorType } from '@/lib/auth/error-handler';
 
 interface PasswordResetFormProps {
   isConfirmation?: boolean;
@@ -96,7 +98,23 @@ export function PasswordResetForm({
         setError(data.error || 'Failed to request password reset');
       }
     } catch (error) {
-      setError(`An error occurred: ${error.message}`);
+      console.error('Password reset request error:', error);
+
+      // Determine the appropriate error type based on the error
+      let errorType = AuthErrorType.UNKNOWN;
+
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorType = AuthErrorType.NETWORK;
+        } else if (error.message.includes('user') || error.message.includes('email')) {
+          errorType = AuthErrorType.USER_NOT_FOUND;
+        } else if (error.message.includes('rate') || error.message.includes('limit')) {
+          errorType = AuthErrorType.RATE_LIMIT;
+        }
+      }
+
+      // Get a user-friendly error message
+      setError(getAuthErrorMessage(error, errorType));
     } finally {
       setIsLoading(false);
     }
@@ -124,15 +142,8 @@ export function PasswordResetForm({
         throw new Error('Email is required for password reset');
       }
 
-      // Get salt from the server API endpoint
-      const saltResponse = await fetch(`/api/auth/salt/${encodeURIComponent(email)}`);
-
-      if (!saltResponse.ok) {
-        throw new Error('Failed to retrieve salt for password reset');
-      }
-
-      const saltData = await saltResponse.json();
-      const salt = saltData.salt;
+      // Get salt from cache or server API
+      const salt = await getSalt(email);
 
       // Generate ZKP for new password
       const { proof, publicSignals } = await generateProof({
@@ -163,7 +174,25 @@ export function PasswordResetForm({
         setError(data.error || 'Failed to reset password');
       }
     } catch (error) {
-      setError(`An error occurred: ${error.message}`);
+      console.error('Password reset error:', error);
+
+      // Determine the appropriate error type based on the error
+      let errorType = AuthErrorType.UNKNOWN;
+
+      if (error instanceof Error) {
+        if (error.message.includes('salt')) {
+          errorType = AuthErrorType.SALT_RETRIEVAL;
+        } else if (error.message.includes('proof') || error.message.includes('generate')) {
+          errorType = AuthErrorType.ZKP_GENERATION;
+        } else if (error.message.includes('token')) {
+          errorType = AuthErrorType.INVALID_TOKEN;
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorType = AuthErrorType.NETWORK;
+        }
+      }
+
+      // Get a user-friendly error message
+      setError(getAuthErrorMessage(error, errorType));
     } finally {
       setIsLoading(false);
     }

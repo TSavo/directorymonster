@@ -7,9 +7,8 @@ import { withAuthSecurity } from '@/middleware/withAuthSecurity';
 import { recordFailedAttempt, resetFailedAttempts } from '@/lib/auth/ip-blocker';
 import { recordFailedAttemptForCaptcha } from '@/lib/auth/captcha-service';
 import { recordFailedAttemptForDelay, resetDelay } from '@/lib/auth/progressive-delay';
-import { logAuthEvent } from '@/lib/audit-log';
-import { AuditEventType } from '@/lib/audit-log';
 import { AuditService } from '@/lib/audit/audit-service';
+import { AuditAction, AuditSeverity } from '@/lib/audit/types';
 
 interface VerifyRequestBody {
   username: string;
@@ -134,26 +133,20 @@ export const POST = withRateLimit(
       await recordFailedAttemptForCaptcha(ipAddress);
       await recordFailedAttemptForDelay(ipAddress);
 
-      // Log the failed attempt
-      await logAuthEvent(
-        AuditEventType.LOGIN_FAILURE,
-        body.username,
+      // Log the failed attempt to the audit system
+      await AuditService.logEvent({
+        userId: user.id,
+        tenantId: 'global', // Use global tenant for security events
+        action: AuditAction.USER_LOGIN,
+        severity: AuditSeverity.WARNING,
         ipAddress,
         userAgent,
-        { reason: 'Invalid proof' }
-      );
-
-      // Also log to the comprehensive audit system
-      await AuditService.logAuthEvent(
-        user.id,
-        'global', // Use global tenant for security events
-        false,
-        {
-          ipAddress,
-          userAgent,
+        details: {
+          username: body.username,
           reason: 'Invalid proof'
-        }
-      );
+        },
+        success: false
+      });
 
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
@@ -173,25 +166,20 @@ export const POST = withRateLimit(
     await resetFailedAttempts(ipAddress);
     await resetDelay(ipAddress);
 
-    // Log the successful login
-    await logAuthEvent(
-      AuditEventType.LOGIN_SUCCESS,
-      body.username,
+    // Log the successful login to the audit system
+    await AuditService.logEvent({
+      userId: user.id,
+      tenantId: 'global', // Use global tenant for security events
+      action: AuditAction.USER_LOGIN,
+      severity: AuditSeverity.INFO,
       ipAddress,
       userAgent,
-      { userId: user.id }
-    );
-
-    // Also log to the comprehensive audit system
-    await AuditService.logAuthEvent(
-      user.id,
-      'global', // Use global tenant for security events
-      true,
-      {
-        ipAddress,
-        userAgent
-      }
-    );
+      details: {
+        username: body.username,
+        success: true
+      },
+      success: true
+    });
 
     // Update last login timestamp
     const updatedUser = {
