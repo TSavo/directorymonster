@@ -96,6 +96,7 @@ test.describe('First User Registration', () => {
 
       if (hasSuccess) {
         console.log('Successfully registered, redirected to login');
+        expect(hasSuccess).toBeTruthy('Success message should be displayed after registration');
       } else {
         // Check for any error messages
         const errorMessage = page.locator('.error-message, .alert-error, [role="alert"]');
