@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * Update ZKP Implementation
- * 
+ *
  * This script updates the ZKP implementation in the existing codebase to use the
  * new ZKP authentication system.
- * 
+ *
  * Usage:
  *   node scripts/update-zkp-implementation.js
  */
@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Define paths
-const zkpIndexPath = path.join(__dirname, '../src/lib/zkp/index.js');
+const zkpIndexPath = path.join(__dirname, '../src/lib/zkp/index.ts');
 const zkpAuthDir = path.join(__dirname, '../circuits/zkp_auth');
 
 // Check if the ZKP authentication system is set up

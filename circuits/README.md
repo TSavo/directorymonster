@@ -58,14 +58,14 @@ docker-compose -f docker-compose.dev.yml down
 
 To use the ZKP authentication system in your application, import the `src/lib/zkp` module:
 
-```javascript
-const zkp = require('./src/lib/zkp');
+```typescript
+import { generateProof, verifyProof } from './src/lib/zkp';
 
 // Generate a proof
-const { proof, publicSignals } = await zkp.generateProof('username', 'password', 'salt');
+const { proof, publicSignals } = await generateProof('username', 'password', 'salt');
 
 // Verify a proof
-const isValid = await zkp.verifyProof(proof, publicSignals);
+const isValid = await verifyProof(proof, publicSignals);
 ```
 
 ## Files

@@ -217,14 +217,14 @@ DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) 
 
 ### Usage
 
-```javascript
-const zkp = require('./src/lib/zkp');
+```typescript
+import { generateProof, verifyProof } from './src/lib/zkp';
 
 // Generate a proof
-const { proof, publicSignals } = await zkp.generateProof('username', 'password', 'salt');
+const { proof, publicSignals } = await generateProof('username', 'password', 'salt');
 
 // Verify a proof
-const isValid = await zkp.verifyProof(proof, publicSignals);
+const isValid = await verifyProof(proof, publicSignals);
 ```
 
 ### Setup

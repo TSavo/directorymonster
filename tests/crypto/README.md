@@ -71,7 +71,7 @@ If you don't want to compile the circuits, you have two options:
 
 1. **Use the simplified tests**: Run `npx mocha tests/crypto/simplified-zkp.test.js` which uses a simplified implementation that doesn't require circuit files.
 
-2. **Modify the ZKP implementation**: Modify the `src/lib/zkp.js` file to use mock functions instead of the actual snarkjs implementation.
+2. **Modify the ZKP implementation**: Modify the `src/lib/zkp.ts` file to use mock functions instead of the actual snarkjs implementation.
 
 The simplified tests are recommended for CI/CD environments where you don't have access to the circuit files.
 
