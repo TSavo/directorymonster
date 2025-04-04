@@ -2,21 +2,22 @@
  * @file Authentication utilities for E2E testing
  */
 
-const { 
+import { Page } from 'puppeteer';
+import { 
   BASE_URL, 
   ADMIN_USERNAME, 
   ADMIN_PASSWORD, 
   log, 
   wait, 
   takeScreenshot 
-} = require('./test-utils');
+} from './test-utils';
 
 /**
  * Logs in as an admin user
- * @param {Object} page - Puppeteer page object 
- * @returns {Promise<boolean>} - Whether login was successful
+ * @param page - Puppeteer page object 
+ * @returns Whether login was successful
  */
-async function loginAsAdmin(page) {
+export async function loginAsAdmin(page: Page): Promise<boolean> {
   log('Starting admin login process');
   
   try {
@@ -26,8 +27,8 @@ async function loginAsAdmin(page) {
     
     // Check if we're on first user setup instead
     const isFirstUserSetup = await page.evaluate(() => {
-      return document.body.textContent.includes('First User Setup') || 
-             document.body.textContent.includes('Create Admin');
+      return document.body.textContent?.includes('First User Setup') || 
+             document.body.textContent?.includes('Create Admin') || false;
     });
     
     if (isFirstUserSetup) {
@@ -50,7 +51,7 @@ async function loginAsAdmin(page) {
         page.waitForSelector('#admin-dashboard, .admin-dashboard', { timeout: 30000 })
       ]);
     } catch (error) {
-      log(`Navigation timeout: ${error.message}`, 'warning');
+      log(`Navigation timeout: ${(error as Error).message}`, 'warning');
     }
     
     // Verify successful login
@@ -67,7 +68,7 @@ async function loginAsAdmin(page) {
       return false;
     }
   } catch (error) {
-    log(`Error during login: ${error.message}`, 'error');
+    log(`Error during login: ${(error as Error).message}`, 'error');
     await takeScreenshot(page, 'login-error');
     return false;
   }
@@ -75,10 +76,10 @@ async function loginAsAdmin(page) {
 
 /**
  * Handles the first user setup process
- * @param {Object} page - Puppeteer page object
- * @returns {Promise<boolean>} - Whether setup was successful
+ * @param page - Puppeteer page object
+ * @returns Whether setup was successful
  */
-async function handleFirstUserSetup(page) {
+export async function handleFirstUserSetup(page: Page): Promise<boolean> {
   log('Handling first user setup');
   await takeScreenshot(page, 'first-user-setup');
   
@@ -123,7 +124,7 @@ async function handleFirstUserSetup(page) {
         page.waitForSelector('#admin-dashboard, .admin-dashboard', { timeout: 30000 })
       ]);
     } catch (error) {
-      log(`Navigation timeout after setup: ${error.message}`, 'warning');
+      log(`Navigation timeout after setup: ${(error as Error).message}`, 'warning');
     }
     
     // Verify successful setup
@@ -140,7 +141,7 @@ async function handleFirstUserSetup(page) {
       return false;
     }
   } catch (error) {
-    log(`Error during first user setup: ${error.message}`, 'error');
+    log(`Error during first user setup: ${(error as Error).message}`, 'error');
     await takeScreenshot(page, 'setup-error');
     return false;
   }
@@ -148,10 +149,10 @@ async function handleFirstUserSetup(page) {
 
 /**
  * Checks if user is currently logged in
- * @param {Object} page - Puppeteer page object
- * @returns {Promise<boolean>} - Whether user is logged in
+ * @param page - Puppeteer page object
+ * @returns Whether user is logged in
  */
-async function isLoggedIn(page) {
+export async function isLoggedIn(page: Page): Promise<boolean> {
   return page.evaluate(() => {
     // Check for admin layout/elements
     const hasAdminNav = document.querySelector('#admin-nav, .admin-sidebar, .admin-header') !== null;
@@ -161,9 +162,3 @@ async function isLoggedIn(page) {
     return hasAdminNav && !hasLoginForm;
   });
 }
-
-module.exports = {
-  loginAsAdmin,
-  handleFirstUserSetup,
-  isLoggedIn
-};
