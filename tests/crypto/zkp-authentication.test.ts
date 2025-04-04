@@ -1,11 +1,56 @@
 // ZKP Authentication Cryptographic Tests
-const snarkjs = require('snarkjs');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+import * as snarkjs from 'snarkjs';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as crypto from 'crypto';
 
 // Import the ZKP functions from the application
-const { generateProof, verifyProof } = require('../../src/lib/zkp');
+import { generateProof, verifyProof } from '../../src/lib/zkp';
+
+// Define interfaces for the ZKP system
+interface Proof {
+  pi_a: number[] | string[];
+  pi_b: (number[] | string[])[];
+  pi_c: number[] | string[];
+  protocol: string;
+  curve: string;
+  tampered?: boolean;
+}
+
+interface ZKPResult {
+  proof: Proof;
+  publicSignals: string[];
+}
+
+interface AuthResult {
+  success: boolean;
+  token?: string;
+  error?: string;
+}
+
+interface MockUser {
+  id: number;
+  username: string;
+  salt: string;
+  publicKey: string;
+}
+
+interface MockDB {
+  users: {
+    findUnique: (query: { where: { username: string } }) => Promise<MockUser | null>;
+  };
+}
+
+interface AuthService {
+  authenticate: (username: string, proof: Proof, publicSignals: string[]) => Promise<AuthResult>;
+}
+
+interface MockServer {
+  url: string;
+  responses: {
+    [key: string]: any;
+  };
+}
 
 describe('ZKP Authentication Cryptographic Tests', () => {
 
@@ -41,7 +86,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       expect(publicSignals.length).toBeGreaterThanOrEqual(2);
 
       // Verify the proof is valid using snarkjs directly
-      const vKey = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'circuits/zkp_auth/verification_key.json')));
+      const vKey = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'circuits/zkp_auth/verification_key.json'), 'utf8'));
       const isValid = await snarkjs.groth16.verify(vKey, publicSignals, proof);
 
       expect(isValid).toBe(true);
@@ -118,7 +163,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       );
 
       // Tamper with the proof
-      const tamperedProof = JSON.parse(JSON.stringify(proof)); // Deep copy
+      const tamperedProof = JSON.parse(JSON.stringify(proof)) as Proof; // Deep copy
       tamperedProof.tampered = true;
 
       // Verify the tampered proof
@@ -149,8 +194,8 @@ describe('ZKP Authentication Cryptographic Tests', () => {
     const testPassword = 'Password123!';
 
     // Mock the database and authentication service
-    let authService;
-    let mockDb;
+    let authService: AuthService;
+    let mockDb: MockDB;
 
     beforeEach(() => {
       // Set up mock database with a test user
@@ -229,7 +274,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       const originalVerifyProof = verifyProof;
       try {
         // Mock the verifyProof function to catch the error
-        global.verifyProof = async (p, ps) => {
+        (global as any).verifyProof = async (p: Proof, ps: string[]) => {
           try {
             await originalVerifyProof(p, ps);
             return true;
@@ -247,7 +292,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
         expect(result.error).toBe('Invalid proof');
       } finally {
         // Restore the original function
-        global.verifyProof = originalVerifyProof;
+        (global as any).verifyProof = originalVerifyProof;
       }
     });
 
@@ -341,7 +386,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       // include a commitment to the username
 
       // Mock authentication service
-      const authService = {
+      const authService: AuthService = {
         authenticate: async (username, p, ps) => {
           // The username doesn't match what was used to generate the proof
           if (username !== testUsername) {
@@ -406,7 +451,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
 
     it('should handle concurrent proof generations', async () => {
       // Generate multiple proofs concurrently
-      const promises = [];
+      const promises: Promise<ZKPResult>[] = [];
       for (let i = 0; i < 5; i++) {
         promises.push(generateProof(
           `${testUsername}${i}`,
@@ -431,8 +476,8 @@ describe('ZKP Authentication Cryptographic Tests', () => {
   describe('API Integration', () => {
     // Mock fetch for testing
     const originalFetch = global.fetch;
-    let mockServer;
-    let authToken;
+    let mockServer: MockServer;
+    let authToken: string;
 
     beforeAll(() => {
       // Mock server responses
@@ -446,8 +491,8 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       };
 
       // Mock fetch
-      global.fetch = async (url, options = {}) => {
-        const urlObj = new URL(url);
+      global.fetch = jest.fn().mockImplementation(async (url, options = {}) => {
+        const urlObj = new URL(url.toString());
         const path = urlObj.pathname + urlObj.search;
 
         // Salt endpoint
@@ -460,7 +505,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
 
         // Verify endpoint
         if (path === '/api/auth/verify') {
-          const body = JSON.parse(options.body);
+          const body = JSON.parse((options as RequestInit).body as string);
 
           // Check for valid proof
           if (body.username === 'testuser' && body.proof && body.publicSignals) {
@@ -478,9 +523,9 @@ describe('ZKP Authentication Cryptographic Tests', () => {
 
         // Protected resource
         if (path === '/api/protected-resource') {
-          const authHeader = options.headers?.Authorization;
+          const authHeader = (options as RequestInit).headers?.['Authorization'];
 
-          if (authHeader && authHeader.startsWith('Bearer ')) {
+          if (authHeader && authHeader.toString().startsWith('Bearer ')) {
             return {
               status: 200,
               json: async () => mockServer.responses['/api/protected-resource']
@@ -497,7 +542,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
           status: 404,
           json: async () => ({ error: 'Not found' })
         };
-      };
+      });
     });
 
     afterAll(() => {
@@ -506,7 +551,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
     });
 
     // Helper function to generate CSRF token
-    function generateCsrfToken() {
+    function generateCsrfToken(): string {
       return Math.random().toString(36).substring(2, 15) +
              Math.random().toString(36).substring(2, 15);
     }
