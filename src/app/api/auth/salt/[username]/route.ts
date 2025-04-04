@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { kv } from '@/lib/redis-client';
 import { withRateLimit } from '@/middleware/withRateLimit';
 import { withAuthSecurity } from '@/middleware/withAuthSecurity';
-import { logAuthEvent } from '@/lib/audit-log';
-import { AuditEventType } from '@/lib/audit-log';
+import { AuditService } from '@/lib/audit/audit-service';
+import { AuditAction, AuditSeverity } from '@/lib/audit/types';
 
 /**
  * Get the salt for a user by username
@@ -45,13 +45,21 @@ export const GET = withRateLimit(
         const userAgent = request.headers.get('user-agent') || 'unknown';
 
         // Log the salt retrieval attempt for non-existent user
-        await logAuthEvent(
-          AuditEventType.SALT_RETRIEVAL,
-          username,
+        await AuditService.logEvent({
+          userId: 'unknown', // User doesn't exist
+          tenantId: 'global', // Use global tenant for security events
+          action: AuditAction.USER_LOGIN, // Using USER_LOGIN for salt retrieval
+          severity: AuditSeverity.INFO,
           ipAddress,
           userAgent,
-          { success: false, reason: 'User not found' }
-        );
+          details: {
+            username,
+            action: 'salt_retrieval',
+            success: false,
+            reason: 'User not found'
+          },
+          success: false
+        });
 
         return NextResponse.json({
           success: true,
@@ -64,13 +72,20 @@ export const GET = withRateLimit(
       const userAgent = request.headers.get('user-agent') || 'unknown';
 
       // Log the salt retrieval
-      await logAuthEvent(
-        AuditEventType.SALT_RETRIEVAL,
-        username,
+      await AuditService.logEvent({
+        userId: user.id,
+        tenantId: 'global', // Use global tenant for security events
+        action: AuditAction.USER_LOGIN, // Using USER_LOGIN for salt retrieval
+        severity: AuditSeverity.INFO,
         ipAddress,
         userAgent,
-        { success: true }
-      );
+        details: {
+          username,
+          action: 'salt_retrieval',
+          success: true
+        },
+        success: true
+      });
 
       // Return the user's salt
       return NextResponse.json({
