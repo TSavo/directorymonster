@@ -1,12 +1,37 @@
 // SnarkAdapter Cryptographic Tests
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as crypto from 'crypto';
 
-// Import the ZKP functions from the application
-// const { generateProof, verifyProof, generatePublicKey } = require('../../src/lib/zkp');
+// Define interfaces for the ZKP system
+interface ZKPInput {
+  username: string;
+  password: string;
+  salt: string;
+}
+
+interface Proof {
+  pi_a: number[] | string[];
+  pi_b: (number[] | string[])[];
+  pi_c: number[] | string[];
+  protocol: string;
+  curve: string;
+  tampered?: boolean;
+}
+
+interface ZKPResult {
+  proof: Proof;
+  publicSignals: string[];
+}
+
+interface VerifyParams {
+  proof: Proof;
+  publicSignals: string[];
+  publicKey?: string;
+}
 
 // Mock implementations for testing
-async function generateProof(username, password, salt) {
+async function generateProof(username: string, password: string, salt: string): Promise<ZKPResult> {
   // Create a mock proof
   return {
     proof: {
@@ -20,7 +45,7 @@ async function generateProof(username, password, salt) {
   };
 }
 
-async function verifyProof(proof, publicSignals) {
+async function verifyProof(proof: Proof, publicSignals: string[]): Promise<boolean> {
   // For testing purposes, we'll consider a proof valid if:
   // 1. It has the correct structure
   // 2. It hasn't been tampered with (no 'tampered' property)
@@ -39,10 +64,10 @@ async function verifyProof(proof, publicSignals) {
   return true;
 }
 
-async function generatePublicKey(username, password, salt) {
+async function generatePublicKey(username: string, password: string, salt: string): Promise<string> {
   // Create a hash of the credentials
   const combined = `${username}:${password}:${salt}`;
-  return require('crypto').createHash('sha256').update(combined).digest('hex');
+  return crypto.createHash('sha256').update(combined).digest('hex');
 }
 
 // Create a mock SnarkAdapter for testing
@@ -51,12 +76,12 @@ class SnarkAdapter {
     // Initialize the adapter
   }
 
-  async generateProof(input) {
+  async generateProof(input: ZKPInput): Promise<ZKPResult> {
     // Use the existing generateProof function
     return generateProof(input.username, input.password, input.salt);
   }
 
-  async verifyProof(params) {
+  async verifyProof(params: VerifyParams): Promise<boolean> {
     // Check if the public key matches the expected value
     if (params.publicKey && params.publicSignals && params.publicSignals.length > 0) {
       const expectedPublicKey = params.publicKey;
@@ -72,12 +97,12 @@ class SnarkAdapter {
     return verifyProof(params.proof, params.publicSignals);
   }
 
-  generateSalt() {
+  generateSalt(): string {
     // Generate a random salt
-    return require('crypto').randomBytes(16).toString('hex');
+    return crypto.randomBytes(16).toString('hex');
   }
 
-  async derivePublicKey(input) {
+  async derivePublicKey(input: ZKPInput): Promise<string> {
     // Use the existing generatePublicKey function
     return generatePublicKey(input.username, input.password, input.salt);
   }
@@ -85,7 +110,7 @@ class SnarkAdapter {
 
 describe('SnarkAdapter Cryptographic Tests', () => {
   // Create a direct instance of the adapter for testing
-  let zkpAdapter;
+  let zkpAdapter: SnarkAdapter;
 
   beforeAll(() => {
     // Initialize the adapter
@@ -162,7 +187,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should derive consistent public keys for the same inputs', async () => {
       // Create input for the ZKP
-      const input = {
+      const input: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
@@ -182,13 +207,13 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should derive different public keys for different passwords', async () => {
       // Create inputs with different passwords
-      const input1 = {
+      const input1: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
       };
 
-      const input2 = {
+      const input2: ZKPInput = {
         username: testUsername,
         password: 'DifferentPassword456!',
         salt: testSalt
@@ -204,13 +229,13 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should derive different public keys for different usernames', async () => {
       // Create inputs with different usernames
-      const input1 = {
+      const input1: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
       };
 
-      const input2 = {
+      const input2: ZKPInput = {
         username: 'differentuser',
         password: testPassword,
         salt: testSalt
@@ -226,13 +251,13 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should derive different public keys for different salts', async () => {
       // Create inputs with different salts
-      const input1 = {
+      const input1: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
       };
 
-      const input2 = {
+      const input2: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: 'differentsalt456'
@@ -248,7 +273,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should not reveal the password in the public key', async () => {
       // Create input for the ZKP
-      const input = {
+      const input: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
@@ -277,7 +302,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should generate and verify a proof with correct credentials', async () => {
       // Create input for the ZKP
-      const input = {
+      const input: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
@@ -315,14 +340,14 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should reject a proof with incorrect password', async () => {
       // Create input for the ZKP with correct password
-      const correctInput = {
+      const correctInput: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
       };
 
       // Create input with incorrect password
-      const incorrectInput = {
+      const incorrectInput: ZKPInput = {
         username: testUsername,
         password: 'WrongPassword!',
         salt: testSalt
@@ -346,7 +371,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should reject a tampered proof', async () => {
       // Create input for the ZKP
-      const input = {
+      const input: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
@@ -359,7 +384,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const publicKey = await zkpAdapter.derivePublicKey(input);
 
       // Tamper with the proof
-      const tamperedProof = JSON.parse(JSON.stringify(proof)); // Deep copy
+      const tamperedProof = JSON.parse(JSON.stringify(proof)) as Proof; // Deep copy
 
       // Actually tamper with the proof by modifying a value
       if (tamperedProof.pi_a && tamperedProof.pi_a.length > 0) {
@@ -388,7 +413,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const salt = zkpAdapter.generateSalt();
 
       // 3. Derive a public key to store in the database
-      const registrationInput = {
+      const registrationInput: ZKPInput = {
         username,
         password,
         salt
@@ -397,7 +422,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const publicKey = await zkpAdapter.derivePublicKey(registrationInput);
 
       // 4. User login: Generate proof
-      const loginInput = {
+      const loginInput: ZKPInput = {
         username,
         password,
         salt
@@ -415,7 +440,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       expect(isValid).toBe(true);
 
       // 6. Failed login attempt: Wrong password
-      const wrongPasswordInput = {
+      const wrongPasswordInput: ZKPInput = {
         username,
         password: 'WrongPassword!',
         salt
@@ -440,7 +465,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should generate proofs within acceptable time limits', async () => {
       // Create input for the ZKP
-      const input = {
+      const input: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
@@ -462,7 +487,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should verify proofs within acceptable time limits', async () => {
       // Create input for the ZKP
-      const input = {
+      const input: ZKPInput = {
         username: testUsername,
         password: testPassword,
         salt: testSalt
@@ -472,7 +497,7 @@ describe('SnarkAdapter Cryptographic Tests', () => {
       const { proof, publicSignals } = await zkpAdapter.generateProof(input);
 
       // Derive the public key
-      const publicKey = zkpAdapter.derivePublicKey(input);
+      const publicKey = await zkpAdapter.derivePublicKey(input);
 
       // Measure verification time
       const startTime = Date.now();
@@ -494,9 +519,9 @@ describe('SnarkAdapter Cryptographic Tests', () => {
 
     it('should handle concurrent proof generations', async () => {
       // Generate multiple proofs concurrently
-      const promises = [];
+      const promises: Promise<ZKPResult>[] = [];
       for (let i = 0; i < 3; i++) {
-        const input = {
+        const input: ZKPInput = {
           username: `${testUsername}${i}`,
           password: `${testPassword}${i}`,
           salt: `${testSalt}${i}`
