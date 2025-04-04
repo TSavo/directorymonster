@@ -25,21 +25,23 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
   const normalizedHostname = hostname
     .replace(/^https?:\/\//, '') // Remove protocol
     .replace(/:\d+$/, '');       // Remove port
-  
+
   console.log(`DEBUG: getSiteByHostname called with: "${hostname}", normalized to: "${normalizedHostname}"`);
-  
+
   // Check for direct domain match
-  let site = await kv.get<SiteConfig>(`site:domain:${normalizedHostname}`);
+  const domainKey = `site:domain:${normalizedHostname}`;
+  console.log(`DEBUG: Looking up domain key: ${domainKey}`);
+  let site = await kv.get<SiteConfig>(domainKey);
   console.log(`DEBUG: Direct domain lookup result: ${site?.name || 'null'}`);
-  
+
   if (site) return site;
-  
+
   // If running in test/development environment, use the configured default site for localhost
   if (normalizedHostname === 'localhost' || normalizedHostname.includes('localhost')) {
     // First, check if a default site is explicitly configured
     console.log('DEBUG: Looking up configured default site');
     const defaultSiteSlug = await getDefaultSiteSlug();
-    
+
     if (defaultSiteSlug) {
       console.log(`DEBUG: Found configured default site: ${defaultSiteSlug}`);
       const defaultSite = await kv.get<SiteConfig>(`site:slug:${defaultSiteSlug}`);
@@ -48,7 +50,7 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
         return defaultSite;
       }
     }
-    
+
     // If no default site configured or not found, try to use hiking-gear
     console.log('DEBUG: No default site configured, trying hiking-gear');
     const hikingGearSite = await kv.get<SiteConfig>('site:slug:hiking-gear');
@@ -56,7 +58,7 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
       console.log('DEBUG: Using hiking-gear as default site');
       return hikingGearSite;
     }
-    
+
     // Last resort - try to get any site from the database
     console.log('DEBUG: Trying to find any site to use as default');
     const siteKeys = await kv.keys('site:slug:*');
@@ -68,7 +70,7 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
         return firstSite;
       }
     }
-    
+
     // Ultimate fallback - return a dummy test site
     console.log('DEBUG: No sites found, using basic test site');
     return {
@@ -95,25 +97,41 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
       updatedAt: new Date().toISOString(),
     };
   }
-  
-  // Check for subdomain match (e.g., fishing-gear.mydirectory.com)
-  const subdomainMatch = normalizedHostname.match(/^([^.]+)\.(?:mydirectory\.com)$/);
+
+  // Check for subdomain match (e.g., fishing-gear.mydirectory.com or test-fishing.localhost)
+  const subdomainMatch = normalizedHostname.match(/^([^.]+)\.(?:mydirectory\.com|localhost)$/);
   console.log(`DEBUG: Subdomain match result:`, subdomainMatch);
-  
+
   if (subdomainMatch) {
     const slug = subdomainMatch[1];
-    console.log(`DEBUG: Looking up site by slug: "${slug}"`);
-    site = await kv.get<SiteConfig>(`site:slug:${slug}`);
+    const slugKey = `site:slug:${slug}`;
+    console.log(`DEBUG: Looking up site by slug key: "${slugKey}"`);
+    site = await kv.get<SiteConfig>(slugKey);
     console.log(`DEBUG: Slug lookup result: ${site?.name || 'null'}`);
+
+    // If not found, try to list all keys to see what's available
+    if (!site) {
+      console.log('DEBUG: Site not found by slug, listing all site keys:');
+      const allKeys = await kv.keys('site:*');
+      console.log(`DEBUG: Available site keys: ${JSON.stringify(allKeys)}`);
+
+      // Try to get all sites to see what's available
+      const allSites = await Promise.all(allKeys.map(async key => {
+        const siteData = await kv.get<SiteConfig>(key);
+        return { key, name: siteData?.name, slug: siteData?.slug, domain: siteData?.domain };
+      }));
+      console.log(`DEBUG: Available sites: ${JSON.stringify(allSites)}`);
+    }
+
     if (site) return site;
   }
-  
+
   // Handle direct slug lookup (useful for testing with ?hostname=slug)
   console.log(`DEBUG: Trying direct slug lookup: "${normalizedHostname}"`);
   site = await kv.get<SiteConfig>(`site:slug:${normalizedHostname}`);
   console.log(`DEBUG: Direct slug lookup result: ${site?.name || 'null'}`);
   if (site) return site;
-  
+
   console.log(`DEBUG: No site found for hostname: "${normalizedHostname}"`);
   return null;
 }
@@ -178,7 +196,7 @@ export async function setDefaultSite(siteSlug: string): Promise<boolean> {
       console.error(`Site with slug "${siteSlug}" not found`);
       return false;
     }
-    
+
     // Set the default site slug in Redis
     await kv.set('config:default-site', siteSlug);
     return true;
@@ -204,7 +222,7 @@ export async function getSiteIdentity(
       isApiRequest: false,
     };
   }
-  
+
   // For API paths, check if it's a site-specific API or platform API
   if (isApiPath) {
     const siteApiMatch = hostname.match(/^api\.([^.]+)\.(?:mydirectory\.com)$/);
@@ -217,14 +235,14 @@ export async function getSiteIdentity(
         isApiRequest: true,
       };
     }
-    
+
     return {
       siteConfig: null,
       isAdmin: false,
       isApiRequest: true,
     };
   }
-  
+
   // For regular paths, get site config
   const siteConfig = await getSiteByHostname(hostname);
   return {

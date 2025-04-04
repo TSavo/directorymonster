@@ -20,11 +20,37 @@ class MemoryRedis {
   }
 
   // Basic Redis operations
-  async get(key: string): Promise<any> {
-    return this.store.get(key);
+  async get<T = any>(key: string): Promise<T | null> {
+    console.log(`[MemoryRedis] Getting key: ${key}`);
+    const value = this.store.get(key);
+
+    if (value === undefined) {
+      console.log(`[MemoryRedis] Key not found: ${key}`);
+      return null;
+    }
+
+    console.log(`[MemoryRedis] Raw value for key ${key}: ${typeof value === 'string' ? value.substring(0, 50) + '...' : value}`);
+
+    // If the value is a string that looks like JSON, try to parse it
+    if (typeof value === 'string' &&
+        (value.startsWith('{') || value.startsWith('[')) &&
+        (value.endsWith('}') || value.endsWith(']'))) {
+      try {
+        const parsed = JSON.parse(value) as T;
+        console.log(`[MemoryRedis] Successfully parsed JSON for key ${key}`);
+        return parsed;
+      } catch (e) {
+        console.log(`[MemoryRedis] Failed to parse JSON for key ${key}: ${e.message}`);
+        // If parsing fails, return the raw value
+        return value as unknown as T;
+      }
+    }
+
+    return value as T;
   }
 
   async set(key: string, value: string, ...args: any[]): Promise<'OK'> {
+    console.log(`[MemoryRedis] Setting key: ${key} with value: ${value.substring(0, 50)}...`);
     this.store.set(key, value);
     return 'OK';
   }
