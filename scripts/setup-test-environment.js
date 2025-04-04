@@ -82,6 +82,14 @@ async function updateCategoryTest(categorySlug) {
   try {
     const testFilePath = path.join(__dirname, '..', 'tests', 'e2e', 'category.spec.ts');
 
+    // Check if the test file exists
+    try {
+      await fs.access(testFilePath);
+    } catch (error) {
+      console.error(`❌ Test file not found: ${testFilePath}`);
+      return false;
+    }
+
     // Read the current test file
     const testFileContent = await fs.readFile(testFilePath, 'utf8');
 
@@ -99,8 +107,10 @@ async function updateCategoryTest(categorySlug) {
     } else {
       console.log('❓ Could not find category options in the test file');
     }
+    return true;
   } catch (error) {
     console.error('❌ Error updating category test:', error.message);
+    return false;
   }
 }
 
