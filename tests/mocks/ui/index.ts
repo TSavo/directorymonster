@@ -8,3 +8,4 @@ export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 export { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from './sheet';
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './accordion';
 export { Label } from './label';
+export { default as LoadingSpinner } from './LoadingSpinner';

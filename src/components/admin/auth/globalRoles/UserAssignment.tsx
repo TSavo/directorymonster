@@ -7,19 +7,19 @@ import { UserAssignmentProps } from './types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // TenantSelector Modal component for role removal
-const TenantSelector = ({ 
-  userId, 
-  onCancel, 
+const TenantSelector = ({
+  userId,
+  onCancel,
   onConfirm,
   isLoading
-}: { 
-  userId: string; 
-  onCancel: () => void; 
+}: {
+  userId: string;
+  onCancel: () => void;
   onConfirm: (tenantId: string) => void;
   isLoading: boolean;
 }) => {
   const [selectedTenantId, setSelectedTenantId] = useState('');
-  
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-md max-w-md w-full">
@@ -27,12 +27,13 @@ const TenantSelector = ({
         <p className="text-sm text-gray-600 mb-4">
           Please specify which tenant context to remove this role from user <span className="font-medium">{userId}</span>.
         </p>
-        
+
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="tenant-id" className="block text-sm font-medium text-gray-700 mb-1">
             Tenant ID
           </label>
           <input
+            id="tenant-id"
             type="text"
             value={selectedTenantId}
             onChange={(e) => setSelectedTenantId(e.target.value)}
@@ -41,7 +42,7 @@ const TenantSelector = ({
             disabled={isLoading}
           />
         </div>
-        
+
         <div className="flex justify-end space-x-2">
           <button
             onClick={onCancel}
@@ -73,7 +74,7 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
   const [isAssigning, setIsAssigning] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const [userToRemove, setUserToRemove] = useState<string | null>(null);
-  
+
   // Load users with this role
   useEffect(() => {
     const loadUsers = async () => {
@@ -89,20 +90,20 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
         setIsLoading(false);
       }
     };
-    
+
     loadUsers();
   }, [roleId, getUsersWithRole]);
-  
+
   // Assign role to a new user
   const handleAssignRole = async () => {
     if (!newUserId || !tenantId) {
       setError('User ID and Tenant ID are required');
       return;
     }
-    
+
     setIsAssigning(true);
     setError(null);
-    
+
     try {
       const success = await assignRole(newUserId, tenantId, roleId);
       if (success) {
@@ -122,29 +123,29 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
       setIsAssigning(false);
     }
   };
-  
+
   // Initiate role removal process
   const initiateRemoveRole = (userId: string) => {
     setUserToRemove(userId);
     setError(null);
   };
-  
+
   // Cancel role removal
   const cancelRemoveRole = () => {
     setUserToRemove(null);
     setIsRemoving(false);
   };
-  
+
   // Complete role removal with specific tenant context
   const completeRemoveRole = async (tenantId: string) => {
     if (!userToRemove || !tenantId) {
       setError('User ID and Tenant ID are required for role removal');
       return;
     }
-    
+
     setIsRemoving(true);
     setError(null);
-    
+
     try {
       const success = await removeRole(userToRemove, tenantId, roleId);
       if (success) {
@@ -160,7 +161,7 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
       setIsRemoving(false);
     }
   };
-  
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-4">
@@ -175,13 +176,13 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
           </svg>
         </button>
       </div>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
           {error}
         </div>
       )}
-      
+
       {isLoading ? (
         <div className="py-8 flex justify-center">
           <LoadingSpinner />
@@ -190,7 +191,7 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
         <>
           <div className="mb-6">
             <h4 className="text-sm font-medium text-gray-700 mb-2">Current Users</h4>
-            
+
             {users.length === 0 ? (
               <p className="text-sm text-gray-500 italic p-4 bg-gray-50 rounded">
                 No users have this global role.
@@ -216,7 +217,7 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
               </div>
             )}
           </div>
-          
+
           <div className="mb-4">
             <h4 className="text-sm font-medium text-gray-700 mb-2">Assign to User</h4>
             <div className="flex flex-col sm:flex-row gap-2 mb-2">
@@ -248,7 +249,7 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
               Note: Global roles need a tenant context for assignment. The role will be active for the user in this tenant.
             </p>
           </div>
-          
+
           <div className="flex justify-end">
             <button
               onClick={onClose}
@@ -259,7 +260,7 @@ const UserAssignment: React.FC<UserAssignmentProps> = ({ roleId, roleName, onClo
           </div>
         </>
       )}
-      
+
       {/* Tenant Selector Modal for Role Removal */}
       {userToRemove && (
         <TenantSelector
