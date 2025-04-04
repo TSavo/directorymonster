@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { checkForBuildErrors, waitForPageLoad } from './utils/error-detection';
 
 // Mock authentication token
-const AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0YWRtaW4iLCJpYXQiOjE2MTYxNjI4MDAsImV4cCI6OTk5OTk5OTk5OX0.Shoh5N3Dtg1SzQ-3hXHq6R4N_P-lOCK3G-v4-7aXPR4';
+const AUTH_TOKEN = process.env.TEST_AUTH_TOKEN || 'mock_token_for_testing';
 
 /**
  * Set the authentication token in localStorage for the page
