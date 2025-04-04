@@ -1,13 +1,34 @@
 // Dynamic Salt Generation Tests
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
+import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Import the ZKP functions from the application
-const { generateProof, verifyProof } = require('../../src/lib/zkp');
+import { generateProof, verifyProof } from '../../src/lib/zkp';
+
+// Define interfaces for the ZKP system
+interface Proof {
+  pi_a: string[] | number[];
+  pi_b: (string[] | number[])[];
+  pi_c: string[] | number[];
+  protocol: string;
+  curve?: string;
+  tampered?: boolean;
+}
+
+interface ZKPResult {
+  proof: Proof;
+  publicSignals: string[];
+}
+
+interface RedisClient {
+  get: jest.Mock;
+  set: jest.Mock;
+  del: jest.Mock;
+}
 
 // Mock Redis client for testing
-const mockRedisClient = {
+const mockRedisClient: RedisClient = {
   get: jest.fn(),
   set: jest.fn(),
   del: jest.fn(),
@@ -15,7 +36,11 @@ const mockRedisClient = {
 
 // Salt service for dynamic salt generation
 class SaltService {
-  constructor(redisClient) {
+  private redisClient: RedisClient;
+  public saltLength: number;
+  public saltExpiry: number;
+
+  constructor(redisClient: RedisClient) {
     this.redisClient = redisClient;
     this.saltLength = 32; // 32 bytes = 256 bits
     this.saltExpiry = 60 * 60 * 24 * 7; // 1 week in seconds
@@ -25,7 +50,7 @@ class SaltService {
    * Generate a cryptographically secure random salt
    * @returns {string} - A hex-encoded random salt
    */
-  generateSalt() {
+  generateSalt(): string {
     return crypto.randomBytes(this.saltLength).toString('hex');
   }
 
@@ -34,7 +59,7 @@ class SaltService {
    * @param {string} username - The username to get a salt for
    * @returns {Promise<string>} - The salt for the user
    */
-  async getSaltForUser(username) {
+  async getSaltForUser(username: string): Promise<string> {
     const key = `user:salt:${username}`;
 
     // Try to get existing salt
@@ -54,7 +79,7 @@ class SaltService {
    * @param {string} username - The username to update the salt for
    * @returns {Promise<string>} - The new salt
    */
-  async updateSaltForUser(username) {
+  async updateSaltForUser(username: string): Promise<string> {
     const key = `user:salt:${username}`;
     const salt = this.generateSalt();
 
@@ -68,14 +93,14 @@ class SaltService {
    * @param {string} username - The username to delete the salt for
    * @returns {Promise<void>}
    */
-  async deleteSaltForUser(username) {
+  async deleteSaltForUser(username: string): Promise<void> {
     const key = `user:salt:${username}`;
     await this.redisClient.del(key);
   }
 }
 
 describe('Dynamic Salt Generation Tests', () => {
-  let saltService;
+  let saltService: SaltService;
 
   beforeEach(() => {
     // Reset mocks
@@ -199,7 +224,7 @@ describe('Dynamic Salt Generation Tests', () => {
       );
 
       // Verify the proof
-      let isValid;
+      let isValid: boolean;
       try {
         isValid = await verifyProof(proof, publicSignals);
       } catch (error) {
@@ -283,7 +308,7 @@ describe('Dynamic Salt Generation Tests', () => {
       );
 
       // Verify the proof is valid
-      let isOldProofValid;
+      let isOldProofValid: boolean;
       try {
         isOldProofValid = await verifyProof(oldProof, oldPublicSignals);
       } catch (error) {
@@ -317,7 +342,7 @@ describe('Dynamic Salt Generation Tests', () => {
       );
 
       // Verify the new proof is valid
-      let isNewProofValid;
+      let isNewProofValid: boolean;
       try {
         isNewProofValid = await verifyProof(newProof, newPublicSignals);
       } catch (error) {
