@@ -7,31 +7,7 @@ import { verifyProof } from '@/lib/zkp';
 import { Redis } from '@/lib/redis-client';
 
 // Mock the Redis client
-jest.mock('@/lib/redis-client', () => {
-  // Store the original module to restore when needed
-  const originalModule = jest.requireActual('@/lib/redis-client');
-  
-  return {
-    ...originalModule,
-    kv: {
-      ...originalModule.kv,
-      get: jest.fn(),
-      set: jest.fn(),
-      keys: jest.fn(),
-      del: jest.fn(),
-    },
-    redis: {
-      ...originalModule.redis,
-      multi: jest.fn().mockReturnValue({
-        exec: jest.fn().mockResolvedValue([]),
-        get: jest.fn().mockReturnThis(),
-        set: jest.fn().mockReturnThis(),
-        expire: jest.fn().mockReturnThis(),
-      }),
-      ping: jest.fn(),
-    },
-  };
-});
+jest.mock('@/lib/redis-client', () => require('../../__mocks__/redis-client'));
 
 // Mock the ZKP library
 jest.mock('@/lib/zkp', () => ({
@@ -87,7 +63,7 @@ describe('Auth Verification API', () => {
   // Reset all mocks before each test
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Configure Redis mock to return user data
     const { kv } = require('@/lib/redis-client');
     (kv.get as jest.Mock).mockImplementation(async (key: string) => {
@@ -102,7 +78,7 @@ describe('Auth Verification API', () => {
       }
       return null;
     });
-    
+
     // Configure ZKP verifyProof mock
     (verifyProof as jest.Mock).mockImplementation(async ({ proof, publicSignals, publicKey }) => {
       // Only return true for testuser with correct public key
@@ -119,16 +95,16 @@ describe('Auth Verification API', () => {
       method: 'POST',
       body: {},
     });
-    
+
     // Call the verify auth API endpoint
     const response = await verifyAuth(request);
-    
+
     // Verify response is bad request
     expect(response.status).toBe(400);
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the error message
     expect(data).toHaveProperty('error');
     expect(data.error).toContain('Missing required fields');
@@ -144,16 +120,16 @@ describe('Auth Verification API', () => {
         publicSignals: ['mock-public-signal-1', 'mock-public-signal-2'],
       },
     });
-    
+
     // Call the verify auth API endpoint
     const response = await verifyAuth(request);
-    
+
     // Verify response is unauthorized
     expect(response.status).toBe(401);
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the error message
     expect(data).toHaveProperty('error');
     expect(data.error).toContain('Invalid credentials');
@@ -169,16 +145,16 @@ describe('Auth Verification API', () => {
         publicSignals: ['mock-public-signal-1', 'mock-public-signal-2'],
       },
     });
-    
+
     // Call the verify auth API endpoint
     const response = await verifyAuth(request);
-    
+
     // Verify response is forbidden
     expect(response.status).toBe(403);
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the error message
     expect(data).toHaveProperty('error');
     expect(data.error).toContain('Account locked');
@@ -187,7 +163,7 @@ describe('Auth Verification API', () => {
   it('should reject invalid proofs', async () => {
     // Force verifyProof to return false for this test
     (verifyProof as jest.Mock).mockResolvedValueOnce(false);
-    
+
     // Create request with invalid proof
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
@@ -197,16 +173,16 @@ describe('Auth Verification API', () => {
         publicSignals: ['invalid-signal-1', 'invalid-signal-2'],
       },
     });
-    
+
     // Call the verify auth API endpoint
     const response = await verifyAuth(request);
-    
+
     // Verify response is unauthorized
     expect(response.status).toBe(401);
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the error message
     expect(data).toHaveProperty('error');
     expect(data.error).toContain('Invalid credentials');
@@ -225,22 +201,22 @@ describe('Auth Verification API', () => {
         'X-CSRF-Token': 'valid-csrf-token'
       }
     });
-    
+
     // Call the verify auth API endpoint
     const response = await verifyAuth(request);
-    
+
     // Verify response is successful
     expect(response.status).toBe(200);
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the token and user info are returned
     expect(data).toHaveProperty('token', 'mock-jwt-token');
     expect(data).toHaveProperty('user');
     expect(data.user).toHaveProperty('username', 'testuser');
     expect(data.user).toHaveProperty('role', 'admin');
-    
+
     // Verify Redis was called to update the last login time
     const { kv } = require('@/lib/redis-client');
     expect(kv.set).toHaveBeenCalledWith(
@@ -264,7 +240,7 @@ describe('Auth Verification API', () => {
       }
       return null;
     });
-    
+
     // Create request
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
@@ -274,20 +250,20 @@ describe('Auth Verification API', () => {
         publicSignals: ['mock-public-signal-1', 'mock-public-signal-2'],
       },
     });
-    
+
     // Call the verify auth API endpoint
     const response = await verifyAuth(request);
-    
+
     // Verify response is rate limited
     expect(response.status).toBe(429);
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the error message
     expect(data).toHaveProperty('error');
     expect(data.error).toContain('Too many login attempts');
-    
+
     // Verify Redis was not called to update the user data
     expect(kv.set).not.toHaveBeenCalledWith('user:testuser', expect.anything());
   });
@@ -306,16 +282,16 @@ describe('Auth Verification API', () => {
         'X-Test-CSRF-Check': 'true'
       }
     });
-    
+
     // Call the verify auth API endpoint
     const response = await verifyAuth(request);
-    
+
     // Verify response is forbidden due to CSRF protection
     expect(response.status).toBe(403);
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the error message
     expect(data).toHaveProperty('error');
     expect(data.error).toContain('CSRF token');
@@ -324,7 +300,7 @@ describe('Auth Verification API', () => {
   it('should handle ZKP verification errors gracefully', async () => {
     // Force verifyProof to throw an error
     (verifyProof as jest.Mock).mockRejectedValueOnce(new Error('ZKP verification error'));
-    
+
     // Create request
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
@@ -337,16 +313,16 @@ describe('Auth Verification API', () => {
         'X-CSRF-Token': 'valid-csrf-token'
       }
     });
-    
+
     // Call the verify auth API endpoint
     const response = await verifyAuth(request);
-    
+
     // Verify response is server error
     expect(response.status).toBe(500);
-    
+
     // Parse the response
     const data = await response.json();
-    
+
     // Verify the error message
     expect(data).toHaveProperty('error');
     expect(data.error).toContain('Authentication error');

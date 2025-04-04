@@ -5,18 +5,7 @@ import { NextRequest } from 'next/server';
 import { GET, POST } from '@/app/api/sites/[siteSlug]/listings/route';
 
 // Mock the Redis client
-jest.mock('../../src/lib/redis-client', () => ({
-  kv: {
-    get: jest.fn(),
-    set: jest.fn(),
-    keys: jest.fn(),
-    del: jest.fn(),
-  },
-  redis: {
-    multi: jest.fn(),
-    ping: jest.fn(),
-  },
-}));
+jest.mock('../../src/lib/redis-client', () => require('../__mocks__/redis-client'));
 
 // Mock the search indexer
 jest.mock('../../src/lib/search-indexer', () => ({
