@@ -1,3 +1,9 @@
+// Polyfill for TextEncoder/TextDecoder used by whatwg-url
+if (typeof TextEncoder === 'undefined') {
+  global.TextEncoder = require('util').TextEncoder;
+  global.TextDecoder = require('util').TextDecoder;
+}
+
 // Learn more: https://github.com/testing-library/jest-dom
 require('@testing-library/jest-dom');
 const { enableFetchMocks } = require('jest-fetch-mock');

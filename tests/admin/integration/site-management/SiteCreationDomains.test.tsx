@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import SiteForm from '@/components/admin/sites/SiteForm';
-import DomainStep from '@/components/admin/sites/components/DomainStep';
+import { DomainManager } from '@/components/admin/sites/DomainManager';
 
 // Mock the hooks and API calls
 jest.mock('@/components/admin/sites/hooks/useSites', () => ({
@@ -64,23 +64,139 @@ describe('Integration: Site Creation - Domain Management Step', () => {
     });
   });
 
-  it.skip('should add a domain to the site', async () => {
-    // This test is skipped until the DomainStep component is properly implemented
-    expect(true).toBe(true);
+  it('should add a domain to the site', async () => {
+    const mockAddDomain = jest.fn();
+    (useDomains as jest.Mock).mockReturnValue({
+      domains: [],
+      isLoading: false,
+      error: null,
+      success: null,
+      domainInput: 'example.com',
+      errors: {},
+      setDomainInput: jest.fn(),
+      addDomain: mockAddDomain,
+      removeDomain: jest.fn(),
+      setPrimaryDomain: jest.fn(),
+      validateDomain: jest.fn(() => ({})),
+      handleInputChange: jest.fn(),
+      handleSubmit: jest.fn(),
+    });
+
+    render(
+      <Provider store={store}>
+        <DomainManager
+          initialData={{ domains: [] }}
+          mode="create"
+        />
+      </Provider>
+    );
+
+    // Find the add domain button and click it
+    const addButton = screen.getByTestId('domainManager-add-domain');
+    fireEvent.click(addButton);
+
+    // Verify the addDomain function was called
+    expect(mockAddDomain).toHaveBeenCalled();
   });
 
-  it.skip('should show domain validation errors', async () => {
-    // This test is skipped until the DomainStep component is properly implemented
-    expect(true).toBe(true);
+  it('should show domain validation errors', async () => {
+    (useDomains as jest.Mock).mockReturnValue({
+      domains: [],
+      isLoading: false,
+      error: null,
+      success: null,
+      domainInput: 'invalid domain',
+      errors: {
+        domainInput: 'Please enter a valid domain name'
+      },
+      setDomainInput: jest.fn(),
+      addDomain: jest.fn(),
+      removeDomain: jest.fn(),
+      setPrimaryDomain: jest.fn(),
+      validateDomain: jest.fn(),
+      handleInputChange: jest.fn(),
+      handleSubmit: jest.fn(),
+    });
+
+    render(
+      <Provider store={store}>
+        <DomainManager
+          initialData={{ domains: [] }}
+          mode="create"
+        />
+      </Provider>
+    );
+
+    // Verify the error message is displayed
+    const errorMessage = screen.getByTestId('domainManager-domain-input-error');
+    expect(errorMessage).toBeInTheDocument();
+    expect(errorMessage).toHaveTextContent('Please enter a valid domain name');
   });
 
-  it.skip('should remove a domain from the site', async () => {
-    // This test is skipped until the DomainStep component is properly implemented
-    expect(true).toBe(true);
+  it('should remove a domain from the site', async () => {
+    const mockRemoveDomain = jest.fn();
+
+    (useDomains as jest.Mock).mockReturnValue({
+      domains: ['example.com', 'test.com'],
+      isLoading: false,
+      error: null,
+      success: null,
+      domainInput: '',
+      errors: {},
+      setDomainInput: jest.fn(),
+      addDomain: jest.fn(),
+      removeDomain: mockRemoveDomain,
+      setPrimaryDomain: jest.fn(),
+      validateDomain: jest.fn(),
+      handleInputChange: jest.fn(),
+      handleSubmit: jest.fn(),
+    });
+
+    render(
+      <Provider store={store}>
+        <DomainManager
+          initialData={{ domains: ['example.com', 'test.com'] }}
+          mode="create"
+        />
+      </Provider>
+    );
+
+    // Find the remove button for the first domain and click it
+    const removeButton = screen.getByTestId('domainManager-remove-domain-0');
+    fireEvent.click(removeButton);
+
+    // Verify the removeDomain function was called with the correct domain
+    expect(mockRemoveDomain).toHaveBeenCalledWith('example.com');
   });
 
-  it.skip('should set a primary domain when multiple domains exist', async () => {
-    // This test is skipped until the DomainStep component is properly implemented
-    expect(true).toBe(true);
+  it('should disable the add button when no domain is entered', async () => {
+    (useDomains as jest.Mock).mockReturnValue({
+      domains: [],
+      isLoading: false,
+      error: null,
+      success: null,
+      domainInput: '',
+      errors: {},
+      setDomainInput: jest.fn(),
+      addDomain: jest.fn(),
+      removeDomain: jest.fn(),
+      setPrimaryDomain: jest.fn(),
+      validateDomain: jest.fn(),
+      handleInputChange: jest.fn(),
+      handleSubmit: jest.fn(),
+    });
+
+    render(
+      <Provider store={store}>
+        <DomainManager
+          initialData={{ domains: [] }}
+          mode="create"
+        />
+      </Provider>
+    );
+
+    // Find the add domain button and verify it's disabled
+    const addButton = screen.getByTestId('domainManager-add-domain');
+    expect(addButton).toBeDisabled();
   });
 });
