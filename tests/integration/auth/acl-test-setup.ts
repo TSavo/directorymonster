@@ -40,7 +40,13 @@ export function generateUserToken(userId: string): string {
   return jwt.sign({ userId }, secret, { expiresIn: '1h' });
 }
 
-// Set up test tenants
+/**
+ * Sets up two test tenants for integration testing.
+ *
+ * This function creates two tenants—"Test Tenant A" and "Test Tenant B"—using the TenantService. Each tenant is initialized with its name and a corresponding array of hostnames. The function returns an object containing both tenant objects with their unique IDs, names, and hostnames.
+ *
+ * @returns An object with properties `tenantA` and `tenantB` representing the created test tenants.
+ */
 export async function setupTestTenants(): Promise<{tenantA: TestTenant, tenantB: TestTenant}> {
   // Create two test tenants
   const tenantA = await TenantService.createTenant({
@@ -135,7 +141,12 @@ export async function setupTestUsersAndRoles(
   return { adminA, adminB, regularUser };
 }
 
-// Clean up test data
+/**
+ * Removes test-related data from the storage backend.
+ *
+ * This function scans for keys matching the "*test*" pattern and deletes all found entries.
+ * It handles both in-memory storage (by deleting keys individually) and real Redis instances (by performing a bulk deletion).
+ */
 export async function cleanupTestData(): Promise<void> {
   // Scan for all keys related to the test
   const pattern = `*test*`;
@@ -155,7 +166,16 @@ export async function cleanupTestData(): Promise<void> {
   }
 }
 
-// Helper to scan Redis keys
+/**
+ * Scans for and returns Redis keys matching the provided pattern.
+ *
+ * For a real Redis client, this function iteratively uses the SCAN command with the given pattern.
+ * When using an in-memory Redis implementation (without a scan method), it retrieves all keys and
+ * filters those that include the substring "test".
+ *
+ * @param pattern - The pattern to match keys against for a real Redis instance.
+ * @returns A promise that resolves to an array of keys matching the specified pattern.
+ */
 async function scanKeys(pattern: string): Promise<string[]> {
   // For in-memory Redis implementation, we need to handle this differently
   if (typeof redis.scan !== 'function') {
