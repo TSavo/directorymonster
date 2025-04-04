@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { kv } from '@/lib/redis-client';
 import { withRateLimit } from '@/middleware/withRateLimit';
+import { withAuthSecurity } from '@/middleware/withAuthSecurity';
+import { logAuthEvent } from '@/lib/audit-log';
+import { AuditEventType } from '@/lib/audit-log';
 
 /**
  * Get the salt for a user by username
@@ -14,7 +17,8 @@ import { withRateLimit } from '@/middleware/withRateLimit';
  * This endpoint is rate limited to prevent brute force attacks
  */
 export const GET = withRateLimit(
-  async (request: NextRequest, { params }: { params: { username: string } }) => {
+  withAuthSecurity(
+    async (request: NextRequest, { params }: { params: { username: string } }) => {
     try {
       const username = params.username;
 
@@ -36,11 +40,37 @@ export const GET = withRateLimit(
         // So we return a random salt that won't work
         const randomSalt = Math.random().toString(36).substring(2, 15);
 
+        // Get IP address and user agent for logging
+        const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+        const userAgent = request.headers.get('user-agent') || 'unknown';
+
+        // Log the salt retrieval attempt for non-existent user
+        await logAuthEvent(
+          AuditEventType.SALT_RETRIEVAL,
+          username,
+          ipAddress,
+          userAgent,
+          { success: false, reason: 'User not found' }
+        );
+
         return NextResponse.json({
           success: true,
           salt: randomSalt
         });
       }
+
+      // Get IP address and user agent for logging
+      const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+      const userAgent = request.headers.get('user-agent') || 'unknown';
+
+      // Log the salt retrieval
+      await logAuthEvent(
+        AuditEventType.SALT_RETRIEVAL,
+        username,
+        ipAddress,
+        userAgent,
+        { success: true }
+      );
 
       // Return the user's salt
       return NextResponse.json({
@@ -81,4 +111,5 @@ export const GET = withRateLimit(
       );
     }
   }
+  )
 );

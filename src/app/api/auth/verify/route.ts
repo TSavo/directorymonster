@@ -3,6 +3,13 @@ import { kv } from '@/lib/redis-client';
 import { verifyProof } from '@/lib/zkp';
 import jwt from 'jsonwebtoken';
 import { withRateLimit } from '@/middleware/withRateLimit';
+import { withAuthSecurity } from '@/middleware/withAuthSecurity';
+import { recordFailedAttempt, resetFailedAttempts } from '@/lib/auth/ip-blocker';
+import { recordFailedAttemptForCaptcha } from '@/lib/auth/captcha-service';
+import { recordFailedAttemptForDelay, resetDelay } from '@/lib/auth/progressive-delay';
+import { logAuthEvent } from '@/lib/audit-log';
+import { AuditEventType } from '@/lib/audit-log';
+import { AuditService } from '@/lib/audit/audit-service';
 
 interface VerifyRequestBody {
   username: string;
@@ -19,8 +26,10 @@ interface VerifyRequestBody {
  *
  * This endpoint is rate limited to prevent brute force attacks.
  */
+// Apply security enhancements with withAuthSecurity, then rate limiting with withRateLimit
 export const POST = withRateLimit(
-  async (request: NextRequest) => {
+  withAuthSecurity(
+    async (request: NextRequest) => {
     try {
       // Log for debugging
       console.log('Verification request received');
@@ -112,9 +121,39 @@ export const POST = withRateLimit(
     if (!isValid) {
       console.warn(`Invalid proof for user ${body.username}`);
 
-      // Increment failed attempts
+      // Get IP address and user agent for logging
+      const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+      const userAgent = request.headers.get('user-agent') || 'unknown';
+
+      // Increment failed attempts for rate limiting
       await kv.set(rateLimitKey, failedAttempts + 1);
       await kv.expire(rateLimitKey, 60 * 15); // 15 minutes
+
+      // Record failed attempts for security measures
+      await recordFailedAttempt(ipAddress, body.username, userAgent);
+      await recordFailedAttemptForCaptcha(ipAddress);
+      await recordFailedAttemptForDelay(ipAddress);
+
+      // Log the failed attempt
+      await logAuthEvent(
+        AuditEventType.LOGIN_FAILURE,
+        body.username,
+        ipAddress,
+        userAgent,
+        { reason: 'Invalid proof' }
+      );
+
+      // Also log to the comprehensive audit system
+      await AuditService.logAuthEvent(
+        user.id,
+        'global', // Use global tenant for security events
+        false,
+        {
+          ipAddress,
+          userAgent,
+          reason: 'Invalid proof'
+        }
+      );
 
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
@@ -125,6 +164,34 @@ export const POST = withRateLimit(
     // Authentication successful, reset failed attempts
     console.log(`Authentication successful for user ${body.username}`);
     await kv.del(rateLimitKey);
+
+    // Get IP address and user agent for logging
+    const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
+    // Reset security counters
+    await resetFailedAttempts(ipAddress);
+    await resetDelay(ipAddress);
+
+    // Log the successful login
+    await logAuthEvent(
+      AuditEventType.LOGIN_SUCCESS,
+      body.username,
+      ipAddress,
+      userAgent,
+      { userId: user.id }
+    );
+
+    // Also log to the comprehensive audit system
+    await AuditService.logAuthEvent(
+      user.id,
+      'global', // Use global tenant for security events
+      true,
+      {
+        ipAddress,
+        userAgent
+      }
+    );
 
     // Update last login timestamp
     const updatedUser = {
@@ -193,4 +260,5 @@ export const POST = withRateLimit(
       );
     }
   }
+  )
 );
