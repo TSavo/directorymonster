@@ -90,23 +90,40 @@ function generatePoseidonConstants() {
     constants.push(value.toString());
   }
 
-  // Generate MDS matrix
+  // Generate secure MDS matrix using the Cauchy matrix construction
+  // This ensures the Maximum Distance Separable property required for security
+  console.log(`Generating secure MDS matrix...`);
+
+  // Execute the secure MDS matrix generator script
+  const { execSync } = require('child_process');
+  try {
+    execSync(`node scripts/generate-secure-mds.js --t 3 --seed "zkp_auth_${Date.now()}"`, { stdio: 'inherit' });
+    console.log(`Secure MDS matrix generated successfully.`);
+  } catch (error) {
+    console.error(`Error generating secure MDS matrix: ${error}`);
+    process.exit(1);
+  }
+
+  // Read the generated MDS matrix
+  const secureMdsPath = path.join(circuitsDir, 'secure_mds_matrix.circom');
+  const secureMdsContent = fs.readFileSync(secureMdsPath, 'utf8');
+
+  // Extract the MDS matrix from the generated file for inclusion in our constants
+  const mdsMatrixRegex = /if \(i == (\d+) && j == (\d+)\) return (\d+n?);/g;
   const mdsMatrix = [];
+
+  // Initialize the matrix with empty rows
   for (let i = 0; i < 3; i++) {
-    const row = [];
-    for (let j = 0; j < 3; j++) {
-      if (i === 0 && j === 0) row.push(1);
-      else if (i === 0 && j === 1) row.push(2);
-      else if (i === 0 && j === 2) row.push(3);
-      else if (i === 1 && j === 0) row.push(1);
-      else if (i === 1 && j === 1) row.push(1);
-      else if (i === 1 && j === 2) row.push(1);
-      else if (i === 2 && j === 0) row.push(1);
-      else if (i === 2 && j === 1) row.push(3);
-      else if (i === 2 && j === 2) row.push(2);
-      else row.push(0);
-    }
-    mdsMatrix.push(row);
+    mdsMatrix[i] = [] as string[];
+  }
+
+  // Fill the matrix with the values from the generated file
+  let match;
+  while ((match = mdsMatrixRegex.exec(secureMdsContent)) !== null) {
+    const i = parseInt(match[1]);
+    const j = parseInt(match[2]);
+    const value = match[3];
+    mdsMatrix[i][j] = value;
   }
 
   // Generate the circom code
@@ -144,19 +161,8 @@ function POSEIDON_CONSTANT(i) {
     return 0;
 }
 
-// MDS matrix for the Poseidon hash function
-function POSEIDON_MDS(i, j) {
-    if (i == 0 && j == 0) return 1;
-    if (i == 0 && j == 1) return 2;
-    if (i == 0 && j == 2) return 3;
-    if (i == 1 && j == 0) return 1;
-    if (i == 1 && j == 1) return 1;
-    if (i == 1 && j == 2) return 1;
-    if (i == 2 && j == 0) return 1;
-    if (i == 2 && j == 1) return 3;
-    if (i == 2 && j == 2) return 2;
-    return 0;
-}
+// Include the secure MDS matrix
+${fs.readFileSync(secureMdsPath, 'utf8').split('/*')[1].split('*/')[1]}
 `;
 
   // Write the constants to a file
