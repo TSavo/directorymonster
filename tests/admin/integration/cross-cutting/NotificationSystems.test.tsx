@@ -1,8 +1,9 @@
 /**
  * Integration tests for the notification system
  */
+import { describe, it, expect } from '@jest/globals';
 
-describe.skip('Integration: Notification Systems for Operations', () => {
+describe('Integration: Notification Systems for Operations', () => {
   // Mock the useSites hook to simulate site creation success
   const mockSuccessfulSiteCreation = () => {
     // In a real implementation, this would mock the useSites hook
@@ -16,7 +17,6 @@ describe.skip('Integration: Notification Systems for Operations', () => {
     // to return a failing createSite function and verify that
     // the notification system shows an error message
   };
-});
 
   it('should show a success notification when site creation succeeds', () => {
     // This test verifies that when a site is successfully created,
