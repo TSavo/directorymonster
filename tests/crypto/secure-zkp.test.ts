@@ -1,7 +1,31 @@
 // Secure ZKP Authentication Tests
-const fs = require('fs');
-const path = require('path');
-const snarkjs = require('snarkjs');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as snarkjs from 'snarkjs';
+
+// Define interfaces for the ZKP system
+interface CircuitInput {
+  publicSalt: number;
+  username?: number;
+  password?: number;
+}
+
+interface Witness {
+  witness: any;
+}
+
+interface Proof {
+  pi_a: string[] | number[];
+  pi_b: (string[] | number[])[];
+  pi_c: string[] | number[];
+  protocol: string;
+  curve?: string;
+}
+
+interface ZKPResult {
+  proof: Proof;
+  publicSignals: string[];
+}
 
 describe('Secure ZKP Authentication Tests', () => {
   // Define paths to circuit files
@@ -25,8 +49,8 @@ describe('Secure ZKP Authentication Tests', () => {
     }
 
     // Reset the snarkjs mock before each test suite
-    if (typeof snarkjs._reset === 'function') {
-      snarkjs._reset();
+    if (typeof (snarkjs as any)._reset === 'function') {
+      (snarkjs as any)._reset();
     }
   });
 
@@ -37,7 +61,7 @@ describe('Secure ZKP Authentication Tests', () => {
         return;
       }
       // Create input for the circuit with both public and private inputs
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789,
         username: 123,  // Private input
         password: 456   // Private input
@@ -64,7 +88,7 @@ describe('Secure ZKP Authentication Tests', () => {
       expect(publicSignals.length).toBeGreaterThanOrEqual(1);
 
       // Load the verification key
-      const vKey = JSON.parse(fs.readFileSync(vkeyPath));
+      const vKey = JSON.parse(fs.readFileSync(vkeyPath, 'utf8'));
 
       // Verify the proof
       const isValid = await snarkjs.groth16.verify(vKey, publicSignals, proof);
@@ -78,13 +102,13 @@ describe('Secure ZKP Authentication Tests', () => {
         return;
       }
       // Create inputs with different passwords
-      const input1 = {
+      const input1: CircuitInput = {
         publicSalt: 789,
         username: 123,
         password: 456
       };
 
-      const input2 = {
+      const input2: CircuitInput = {
         publicSalt: 789,
         username: 123,
         password: 789 // Different password
@@ -117,7 +141,7 @@ describe('Secure ZKP Authentication Tests', () => {
         return;
       }
       // Create input with a valid salt but incorrect private inputs
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 123,
         username: 999,
         password: 888
@@ -142,7 +166,7 @@ describe('Secure ZKP Authentication Tests', () => {
         return;
       }
       // Create input for the circuit with both public and private inputs
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789,
         username: 12345,  // Private input
         password: 67890   // Private input
@@ -161,8 +185,8 @@ describe('Secure ZKP Authentication Tests', () => {
 
       // The private inputs should not appear in the proof or public signals
       // We convert to strings to check for accidental leakage
-      const usernameStr = input.username.toString();
-      const passwordStr = input.password.toString();
+      const usernameStr = input.username!.toString();
+      const passwordStr = input.password!.toString();
 
       // Check for exact matches (very unlikely in a real ZKP system, but good to check)
       expect(combinedStr).not.toContain(`"${usernameStr}"`);
@@ -178,7 +202,7 @@ describe('Secure ZKP Authentication Tests', () => {
       // For our test, we'll just verify that the public signals contain only
       // the expected public inputs and outputs
 
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789,
         username: 123,
         password: 456
@@ -209,7 +233,7 @@ describe('Secure ZKP Authentication Tests', () => {
       if (!circuitFilesExist) {
         return;
       }
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789,
         username: 123,
         password: 456
@@ -237,7 +261,7 @@ describe('Secure ZKP Authentication Tests', () => {
       if (!circuitFilesExist) {
         return;
       }
-      const input = {
+      const input: CircuitInput = {
         publicSalt: 789
       };
 
@@ -248,7 +272,7 @@ describe('Secure ZKP Authentication Tests', () => {
       const { proof, publicSignals } = await snarkjs.groth16.prove(zkeyPath, witness);
 
       // Load the verification key
-      const vKey = JSON.parse(fs.readFileSync(vkeyPath));
+      const vKey = JSON.parse(fs.readFileSync(vkeyPath, 'utf8'));
 
       // Measure verification time
       const startTime = Date.now();
