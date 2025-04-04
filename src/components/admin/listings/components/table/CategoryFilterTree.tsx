@@ -12,6 +12,7 @@ import { Badge } from '@/ui/badge';
 import { Checkbox } from '@/ui/checkbox';
 import { FolderIcon, ChevronRightIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { buildCategoryTree, getDescendantIds, getCategoryName } from './categoryTreeUtils';
 
 interface CategoryFilterTreeProps {
   categories: Category[];
@@ -23,20 +24,10 @@ interface CategoryFilterTreeProps {
   buttonTestId?: string;
 }
 
-// Recursive function to build the category tree structure
-const buildCategoryTree = (categories: Category[], parentId: string | null = null): Category[] => {
-  return categories
-    .filter(category => category.parentId === parentId)
-    .map(category => ({
-      ...category,
-      children: buildCategoryTree(categories, category.id)
-    }));
-};
-
 export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
-  categories,
-  selectedCategoryIds,
-  onChange,
+  categories = [],
+  selectedCategoryIds = [],
+  onChange = () => {},
   buttonVariant = 'outline',
   buttonSize = 'sm',
   buttonLabel = 'Categories',
@@ -147,7 +138,7 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
               checked={isSelected}
               onCheckedChange={() => handleCategoryChange(category.id)}
               className="mr-2"
-              data-testid={`category-checkbox-${category.id}`}
+              data-testid={`category-filter-${category.id}`}
             />
             <label
               htmlFor={`category-${category.id}`}
@@ -179,8 +170,8 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
         >
           <span>{buttonLabel}</span>
           {selectedCategoryIds.length > 0 && (
-            <Badge variant="secondary" className="ml-2">
-              {selectedCategoryIds.length}
+            <Badge variant="secondary" className="ml-2" data-testid="active-category-filter">
+              {selectedCategoryIds.length > 0 && categories.find(c => c.id === selectedCategoryIds[0])?.name}
             </Badge>
           )}
         </Button>
@@ -204,7 +195,7 @@ export const CategoryFilterTree: React.FC<CategoryFilterTreeProps> = ({
               size="sm"
               onClick={() => onChange([])}
               className="text-xs h-7"
-              data-testid="clear-categories-button"
+              data-testid="clear-category-filter"
             >
               Clear Selection
             </Button>
