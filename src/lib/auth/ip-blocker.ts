@@ -307,7 +307,7 @@ export async function unblockIp(
 
       for (const userKey of users) {
         const user = await kv.get(userKey);
-        if (user && user.username === adminUsername) {
+        if (user?.username === adminUsername) {
           adminUserId = user.id;
           break;
         }

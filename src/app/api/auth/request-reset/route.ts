@@ -34,7 +34,7 @@ export const POST = withRateLimit(
       });
 
       const allUsers = await Promise.all(userPromises);
-      const userExists = allUsers.some(user => user && user.email === email);
+      const userExists = allUsers.some(user => user?.email === email);
 
       // For security reasons, always return success even if user doesn't exist
       // This prevents enumeration attacks

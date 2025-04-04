@@ -30,7 +30,7 @@ export const POST = withRateLimit(
       const users = await kv.keys('user:*');
       const userPromises = users.map(async (key) => {
         const user = await kv.get(key);
-        if (user && user.email === email) {
+        if (user?.email === email) {
           return { key, user };
         }
         return null;

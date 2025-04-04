@@ -14,10 +14,23 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
   // Create temporary directories for test files
   const tempDir = path.join(process.cwd(), 'temp');
 
-  // Create temp directory if it doesn't exist
+  // Flag to check if circuit files exist
+  let circuitFilesExist = true;
+
+  // Setup before all tests
   beforeAll(function() {
+    // Create temp directory if it doesn't exist
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    // Check if circuit files exist
+    circuitFilesExist = fs.existsSync(wasmPath) && fs.existsSync(zkeyPath) && fs.existsSync(vkeyPath);
+    if (!circuitFilesExist) {
+      console.warn(`
+        Warning: Circuit files not found. Skipping secure ZKP tests.
+        Please run 'npm run zkp:setup' to set up the ZKP authentication system.
+      `);
     }
   });
 
@@ -43,20 +56,6 @@ describe('Secure ZKP Authentication Tests (CLI)', () => {
       } catch (error) {
         console.warn(`Warning: Could not clean up temp directory: ${error.message}`);
       }
-    }
-  });
-
-  // Flag to check if circuit files exist
-  let circuitFilesExist = true;
-
-  // Check if circuit files exist
-  beforeAll(() => {
-    circuitFilesExist = fs.existsSync(wasmPath) && fs.existsSync(zkeyPath) && fs.existsSync(vkeyPath);
-    if (!circuitFilesExist) {
-      console.warn(`
-        Warning: Circuit files not found. Skipping secure ZKP tests.
-        Please run 'npm run zkp:setup' to set up the ZKP authentication system.
-      `);
     }
   });
 
