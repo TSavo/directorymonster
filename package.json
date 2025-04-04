@@ -82,7 +82,10 @@
     "zkp:docker": "docker-compose -f docker-compose.zkp.yml up -d",
     "zkp:docker:down": "docker-compose -f docker-compose.zkp.yml down",
     "zkp:docker:logs": "docker-compose -f docker-compose.zkp.yml logs -f",
-    "zkp:update": "node scripts/update-zkp-implementation.js"
+    "zkp:update": "node scripts/update-zkp-implementation.js",
+    "zkp:debug": "ts-node scripts/debug-verification.ts",
+    "zkp:test:poseidon": "ts-node scripts/test-poseidon-direct.ts",
+    "zkp:test:passwords": "ts-node scripts/test-different-passwords.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
