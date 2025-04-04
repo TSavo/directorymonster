@@ -48,6 +48,10 @@ const customJestConfig = {
   testPathIgnorePatterns: ['/node_modules/', '/.next/', '/tests/e2e/'],
   // Use JSON output by default
   json: true,
+  // Transform node_modules for snarkjs
+  transformIgnorePatterns: [
+    '/node_modules/(?!(snarkjs|ffjavascript|circomlib)/)',
+  ],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
