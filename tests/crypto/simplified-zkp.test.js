@@ -1,5 +1,4 @@
 // Simplified ZKP Authentication Tests
-const { expect } = require('chai');
 const crypto = require('crypto');
 
 // Mock ZKP functions for testing
@@ -75,14 +74,18 @@ describe('Simplified ZKP Authentication Tests', () => {
       const { proof, publicSignals } = await generateProof(testUsername, testPassword, testSalt);
 
       // Verify the proof structure
-      expect(proof).to.be.an('object');
-      expect(proof).to.have.property('pi_a').that.is.an('array');
-      expect(proof).to.have.property('pi_b').that.is.an('array');
-      expect(proof).to.have.property('pi_c').that.is.an('array');
-      expect(proof).to.have.property('protocol').that.equals('groth16');
+      expect(typeof proof).toBe('object');
+      expect(proof).toHaveProperty('pi_a');
+      expect(Array.isArray(proof.pi_a)).toBe(true);
+      expect(proof).toHaveProperty('pi_b');
+      expect(Array.isArray(proof.pi_b)).toBe(true);
+      expect(proof).toHaveProperty('pi_c');
+      expect(Array.isArray(proof.pi_c)).toBe(true);
+      expect(proof).toHaveProperty('protocol');
+      expect(proof.protocol).toBe('groth16');
 
       // Verify the public signals
-      expect(publicSignals).to.be.an('array');
+      expect(Array.isArray(publicSignals)).toBe(true);
 
       // Derive the public key for verification
       const publicKey = derivePublicKey(testUsername, testPassword, testSalt);
@@ -90,7 +93,7 @@ describe('Simplified ZKP Authentication Tests', () => {
       // Verify the proof
       const isValid = await verifyProof(proof, publicSignals, publicKey);
 
-      expect(isValid).to.be.true;
+      expect(isValid).toBe(true);
     });
 
     it('should generate different proofs for different passwords', async () => {
@@ -102,10 +105,10 @@ describe('Simplified ZKP Authentication Tests', () => {
       const publicKey1 = derivePublicKey(testUsername, testPassword, testSalt);
       const publicKey2 = derivePublicKey(testUsername, 'DifferentPassword456!', testSalt);
 
-      expect(publicKey1).to.not.equal(publicKey2);
+      expect(publicKey1).not.toBe(publicKey2);
 
       // The proofs should be different
-      expect(JSON.stringify(proof1)).to.not.equal(JSON.stringify(proof2));
+      expect(JSON.stringify(proof1)).not.toBe(JSON.stringify(proof2));
     });
 
     it('should generate the same public key for the same inputs', async () => {
@@ -114,7 +117,7 @@ describe('Simplified ZKP Authentication Tests', () => {
       const publicKey2 = derivePublicKey(testUsername, testPassword, testSalt);
 
       // The public keys should be the same
-      expect(publicKey1).to.equal(publicKey2);
+      expect(publicKey1).toBe(publicKey2);
     });
   });
 
@@ -133,7 +136,7 @@ describe('Simplified ZKP Authentication Tests', () => {
       // Verify the proof
       const isValid = await verifyProof(proof, publicSignals, publicKey);
 
-      expect(isValid).to.be.true;
+      expect(isValid).toBe(true);
     });
 
     it('should reject a proof with incorrect password', async () => {
@@ -146,7 +149,7 @@ describe('Simplified ZKP Authentication Tests', () => {
       // Verify the proof - should fail
       const isValid = await verifyProof(proof, publicSignals, publicKey);
 
-      expect(isValid).to.be.false;
+      expect(isValid).toBe(false);
     });
 
     it('should reject a tampered proof', async () => {
@@ -177,7 +180,7 @@ describe('Simplified ZKP Authentication Tests', () => {
       // Verify the tampered proof
       const isValid = await verifyProof(tamperedProof, tamperedPublicSignals, publicKey);
 
-      expect(isValid).to.be.false;
+      expect(isValid).toBe(false);
     });
   });
 
@@ -191,13 +194,13 @@ describe('Simplified ZKP Authentication Tests', () => {
       const publicKey = derivePublicKey(testUsername, testPassword, testSalt);
 
       // The password should not appear in the public key
-      expect(publicKey).to.not.include(testPassword);
+      expect(publicKey).not.toContain(testPassword);
 
       // Even parts of the password should not appear (for passwords longer than 3 chars)
       if (testPassword.length > 3) {
         for (let i = 0; i < testPassword.length - 3; i++) {
           const passwordPart = testPassword.substring(i, i + 3);
-          expect(publicKey).to.not.include(passwordPart);
+          expect(publicKey).not.toContain(passwordPart);
         }
       }
     });
@@ -215,7 +218,7 @@ describe('Simplified ZKP Authentication Tests', () => {
       // This test is simplified for demonstration purposes
       // In a real implementation, the password should not appear in the proof or public signals
       // However, in our simplified implementation, we're using a mock proof that might include parts of the password
-      expect(combinedStr).to.not.include(testPassword);
+      expect(combinedStr).not.toContain(testPassword);
     });
   });
 
@@ -237,14 +240,14 @@ describe('Simplified ZKP Authentication Tests', () => {
       // 5. Server verification: Verify proof against stored public key
       const isValid = await verifyProof(proof, publicSignals, publicKey);
 
-      expect(isValid).to.be.true;
+      expect(isValid).toBe(true);
 
       // 6. Failed login attempt: Wrong password
       const { proof: wrongProof, publicSignals: wrongSignals } = await generateProof(username, 'WrongPassword!', salt);
 
       const isInvalid = await verifyProof(wrongProof, wrongSignals, publicKey);
 
-      expect(isInvalid).to.be.false;
+      expect(isInvalid).toBe(false);
     });
   });
 
@@ -262,7 +265,7 @@ describe('Simplified ZKP Authentication Tests', () => {
       const duration = endTime - startTime;
 
       // The proof generation should complete within a reasonable time
-      expect(duration).to.be.below(1000); // 1 second
+      expect(duration).toBeLessThan(1000); // 1 second
 
       console.log(`Proof generation took ${duration}ms`);
     });
@@ -283,7 +286,7 @@ describe('Simplified ZKP Authentication Tests', () => {
       const duration = endTime - startTime;
 
       // The verification should be fast
-      expect(duration).to.be.below(100); // 100 milliseconds
+      expect(duration).toBeLessThan(100); // 100 milliseconds
 
       console.log(`Proof verification took ${duration}ms`);
     });
@@ -303,10 +306,10 @@ describe('Simplified ZKP Authentication Tests', () => {
       const results = await Promise.all(promises);
 
       // Verify all proofs were generated
-      expect(results).to.have.length(10);
+      expect(results.length).toBe(10);
       results.forEach(result => {
-        expect(result).to.have.property('proof');
-        expect(result).to.have.property('publicSignals');
+        expect(result).toHaveProperty('proof');
+        expect(result).toHaveProperty('publicSignals');
       });
     });
   });
