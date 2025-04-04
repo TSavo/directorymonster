@@ -46,9 +46,9 @@ describe('SnarkAdapter Cryptographic Tests', () => {
     console.log(`Running in test environment: ${isTestEnv}`);
 
     // Check if circuit files exist
-    const circuitWasmPath = path.join(__dirname, '../../circuits/auth/auth_js/auth.wasm');
-    const zkeyPath = path.join(__dirname, '../../circuits/auth/auth_final.zkey');
-    const vKeyPath = path.join(__dirname, '../../circuits/auth/verification_key.json');
+    const circuitWasmPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_js/zkp_auth.wasm');
+    const zkeyPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_final.zkey');
+    const vKeyPath = path.join(process.cwd(), 'circuits/zkp_auth/verification_key.json');
 
     console.log(`Circuit WASM path: ${circuitWasmPath}`);
     console.log(`Circuit zkey path: ${zkeyPath}`);

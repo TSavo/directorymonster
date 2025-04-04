@@ -15,8 +15,8 @@ describe('ZKP Authentication Cryptographic Tests', () => {
     const testSalt = 'randomsalt123';
 
     // Load the actual circuit and keys
-    const circuitWasmPath = path.join(__dirname, '../../circuits/auth/auth_js/auth.wasm');
-    const zkeyPath = path.join(__dirname, '../../circuits/auth/auth_final.zkey');
+    const circuitWasmPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_js/zkp_auth.wasm');
+    const zkeyPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_final.zkey');
 
     it('should generate a valid proof with correct credentials', async () => {
       // Generate a proof using the actual ZKP implementation
@@ -41,7 +41,7 @@ describe('ZKP Authentication Cryptographic Tests', () => {
       expect(publicSignals.length).toBeGreaterThanOrEqual(2);
 
       // Verify the proof is valid using snarkjs directly
-      const vKey = JSON.parse(fs.readFileSync(path.join(__dirname, '../../circuits/auth/verification_key.json')));
+      const vKey = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'circuits/zkp_auth/verification_key.json')));
       const isValid = await snarkjs.groth16.verify(vKey, publicSignals, proof);
 
       expect(isValid).toBe(true);

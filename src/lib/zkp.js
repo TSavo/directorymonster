@@ -14,7 +14,7 @@ const crypto = require('crypto');
 async function generatePublicKey(username, password, salt) {
   // Combine the inputs
   const combined = `${username}:${password}:${salt}`;
-  
+
   // Create a SHA-256 hash
   return crypto.createHash('sha256').update(combined).digest('hex');
 }
@@ -29,17 +29,17 @@ async function generatePublicKey(username, password, salt) {
 async function generateProof(username, password, salt) {
   try {
     // Get the circuit paths
-    const circuitWasmPath = path.join(__dirname, '../../circuits/auth/auth_js/auth.wasm');
-    const zkeyPath = path.join(__dirname, '../../circuits/auth/auth_final.zkey');
-    
+    const circuitWasmPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_js/zkp_auth.wasm');
+    const zkeyPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_final.zkey');
+
     // Ensure the circuit files exist
     if (!fs.existsSync(circuitWasmPath) || !fs.existsSync(zkeyPath)) {
       throw new Error('Circuit files not found. Please compile the circuits first.');
     }
-    
+
     // Generate the public key
     const publicKey = await generatePublicKey(username, password, salt);
-    
+
     // Create the witness input
     const input = {
       username: stringToHex(username),
@@ -47,14 +47,14 @@ async function generateProof(username, password, salt) {
       salt: stringToHex(salt),
       timestamp: Date.now().toString()
     };
-    
+
     // Generate the proof
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(
       input,
       circuitWasmPath,
       zkeyPath
     );
-    
+
     return { proof, publicSignals };
   } catch (error) {
     console.error('Error generating proof:', error);
@@ -71,19 +71,19 @@ async function generateProof(username, password, salt) {
 async function verifyProof(proof, publicSignals) {
   try {
     // Get the verification key
-    const vKeyPath = path.join(__dirname, '../../circuits/auth/verification_key.json');
-    
+    const vKeyPath = path.join(process.cwd(), 'circuits/zkp_auth/verification_key.json');
+
     // Ensure the verification key exists
     if (!fs.existsSync(vKeyPath)) {
       throw new Error('Verification key not found. Please compile the circuits first.');
     }
-    
+
     // Load the verification key
     const vKey = JSON.parse(fs.readFileSync(vKeyPath));
-    
+
     // Verify the proof
     const isValid = await snarkjs.groth16.verify(vKey, publicSignals, proof);
-    
+
     return isValid;
   } catch (error) {
     console.error('Error verifying proof:', error);

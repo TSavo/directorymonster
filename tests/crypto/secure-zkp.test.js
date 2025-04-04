@@ -5,9 +5,9 @@ const snarkjs = require('snarkjs');
 
 describe('Secure ZKP Authentication Tests', () => {
   // Define paths to circuit files
-  const circuitPath = path.join(__dirname, '../../circuits/secure_auth');
-  const wasmPath = path.join(circuitPath, 'secure_auth_js/secure_auth.wasm');
-  const zkeyPath = path.join(circuitPath, 'secure_auth_final.zkey');
+  const circuitPath = path.join(process.cwd(), 'circuits/zkp_auth');
+  const wasmPath = path.join(circuitPath, 'zkp_auth_js/zkp_auth.wasm');
+  const zkeyPath = path.join(circuitPath, 'zkp_auth_final.zkey');
   const vkeyPath = path.join(circuitPath, 'verification_key.json');
 
   // Skip tests if circuit files don't exist
@@ -20,7 +20,7 @@ describe('Secure ZKP Authentication Tests', () => {
     if (!circuitFilesExist) {
       console.warn(`
         Warning: Circuit files not found. Skipping secure ZKP tests.
-        Please run 'npm run compile:secure_auth' to compile the circuit.
+        Please run 'npm run compile:zkp_auth' to compile the circuit.
       `);
     }
 

@@ -6,13 +6,13 @@ const crypto = require('crypto');
 
 describe('Secure ZKP Authentication Tests (CLI)', () => {
   // Define paths to circuit files
-  const circuitPath = path.join(__dirname, '../../circuits/zkp_auth');
+  const circuitPath = path.join(process.cwd(), 'circuits/zkp_auth');
   const wasmPath = path.join(circuitPath, 'zkp_auth_js/zkp_auth.wasm');
   const zkeyPath = path.join(circuitPath, 'zkp_auth_final.zkey');
   const vkeyPath = path.join(circuitPath, 'verification_key.json');
 
   // Create temporary directories for test files
-  const tempDir = path.join(__dirname, '../../temp');
+  const tempDir = path.join(process.cwd(), 'temp');
 
   // Create temp directory if it doesn't exist
   beforeAll(function() {

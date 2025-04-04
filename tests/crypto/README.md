@@ -35,9 +35,9 @@ npx mocha tests/crypto/simplified-zkp.test.js
 
 The tests expect the following circuit files to exist:
 
-- `circuits/auth/auth_js/auth.wasm`: The WebAssembly file for the circuit
-- `circuits/auth/auth_final.zkey`: The proving key for the circuit
-- `circuits/auth/verification_key.json`: The verification key for the circuit
+- `circuits/zkp_auth/zkp_auth_js/zkp_auth.wasm`: The WebAssembly file for the circuit
+- `circuits/zkp_auth/zkp_auth_final.zkey`: The proving key for the circuit
+- `circuits/zkp_auth/verification_key.json`: The verification key for the circuit
 
 If these files don't exist, the tests will fail with the error "Circuit files not found. Please compile the circuits first."
 
@@ -53,16 +53,16 @@ Then, you can compile the circuits:
 
 ```bash
 # Create the circuits directory
-mkdir -p circuits/auth
+mkdir -p circuits/zkp_auth
 
 # Compile the circuit
-circom circuits/auth.circom --r1cs --wasm --sym
+circom circuits/zkp_auth.circom --r1cs --wasm --sym
 
 # Generate the proving key
-snarkjs groth16 setup circuits/auth.r1cs circuits/powersOfTau28_hez_final_10.ptau circuits/auth/auth_final.zkey
+snarkjs groth16 setup circuits/zkp_auth.r1cs circuits/powersOfTau28_hez_final_10.ptau circuits/zkp_auth/zkp_auth_final.zkey
 
 # Export the verification key
-snarkjs zkey export verificationkey circuits/auth/auth_final.zkey circuits/auth/verification_key.json
+snarkjs zkey export verificationkey circuits/zkp_auth/zkp_auth_final.zkey circuits/zkp_auth/verification_key.json
 ```
 
 ### Using Mock Implementations
