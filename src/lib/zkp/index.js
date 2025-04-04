@@ -9,8 +9,8 @@ const { MockZKPAdapter } = require('./mock-adapter');
 const isTestEnv = process.env.NODE_ENV === 'test';
 
 // Check if circuit files exist
-const circuitWasmPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_js/zkp_auth.wasm');
-const zkeyPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_final.zkey');
+const circuitWasmPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_no_pragma_js/zkp_auth_no_pragma.wasm');
+const zkeyPath = path.join(process.cwd(), 'circuits/zkp_auth/zkp_auth_no_pragma_final.zkey');
 const vKeyPath = path.join(process.cwd(), 'circuits/zkp_auth/verification_key.json');
 
 const wasmExists = fs.existsSync(circuitWasmPath);
