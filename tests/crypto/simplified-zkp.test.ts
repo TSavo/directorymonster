@@ -1,17 +1,31 @@
 // Simplified ZKP Authentication Tests
-const crypto = require('crypto');
+import * as crypto from 'crypto';
+
+// Define interfaces for the ZKP system
+interface Proof {
+  pi_a: string[] | number[];
+  pi_b: (string[] | number[])[];
+  pi_c: string[] | number[];
+  protocol: string;
+  curve?: string;
+}
+
+interface ZKPResult {
+  proof: Proof;
+  publicSignals: string[];
+}
 
 // Mock ZKP functions for testing
-function generateSalt() {
+function generateSalt(): string {
   return crypto.randomBytes(16).toString('hex');
 }
 
-function derivePublicKey(username, password, salt) {
+function derivePublicKey(username: string, password: string, salt: string): string {
   const combined = `${username}:${password}:${salt}`;
   return crypto.createHash('sha256').update(combined).digest('hex');
 }
 
-async function generateProof(username, password, salt) {
+async function generateProof(username: string, password: string, salt: string): Promise<ZKPResult> {
   // Derive the public key
   const publicKey = derivePublicKey(username, password, salt);
 
@@ -19,7 +33,7 @@ async function generateProof(username, password, salt) {
   const timestamp = Date.now().toString();
 
   // Create a mock proof
-  const proof = {
+  const proof: Proof = {
     pi_a: [
       crypto.createHash('sha256').update(`${username}:a`).digest('hex'),
       "2",
@@ -56,7 +70,7 @@ async function generateProof(username, password, salt) {
   return { proof, publicSignals };
 }
 
-async function verifyProof(proof, publicSignals, publicKey) {
+async function verifyProof(proof: Proof, publicSignals: string[], publicKey: string): Promise<boolean> {
   // In a real implementation, this would verify the proof cryptographically
   // For our mock, we just check that the public key matches
   return publicSignals[0] === publicKey;
@@ -160,7 +174,7 @@ describe('Simplified ZKP Authentication Tests', () => {
       const publicKey = derivePublicKey(testUsername, testPassword, testSalt);
 
       // Tamper with the proof
-      const tamperedProof = JSON.parse(JSON.stringify(proof)); // Deep copy
+      const tamperedProof = JSON.parse(JSON.stringify(proof)) as Proof; // Deep copy
 
       // Modify a value in the proof
       if (Array.isArray(tamperedProof.pi_a) && tamperedProof.pi_a.length > 0) {
@@ -293,7 +307,7 @@ describe('Simplified ZKP Authentication Tests', () => {
 
     it('should handle concurrent proof generations', async () => {
       // Generate multiple proofs concurrently
-      const promises = [];
+      const promises: Promise<ZKPResult>[] = [];
       for (let i = 0; i < 10; i++) {
         promises.push(generateProof(
           `${testUsername}${i}`,
