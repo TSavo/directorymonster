@@ -318,13 +318,13 @@ export function createSuperAdminACL(userId: string): ACL {
 /**
  * Checks the provided ACL for unauthorized access to resources of a different tenant.
  *
- * This function checks if the ACL has at least one entry for the specified tenant
- * or the system tenant. It returns false if such an entry exists (indicating that
- * access to the tenant is authorized), and true otherwise (indicating unauthorized access).
+ * This function checks if the ACL contains references to tenants other than the specified tenant
+ * or the system tenant. It returns true if such references exist (indicating cross-tenant access),
+ * and false otherwise.
  *
  * @param acl - The access control list to inspect.
  * @param tenantId - The tenant ID that the ACL is expected to be associated with.
- * @returns False if the user has explicit access to the requested tenant; otherwise, true.
+ * @returns True if the ACL contains references to other tenants; otherwise, false.
  */
 export function detectCrossTenantAccess(
   acl: ACL,
@@ -333,18 +333,18 @@ export function detectCrossTenantAccess(
   // Only check ACLs that have entries
   if (!acl.entries.length) return false;
 
-  // Check if the user has any entries for the requested tenant
-  const hasAccessToRequestedTenant = acl.entries.some(entry =>
-    entry.resource.tenantId === tenantId || entry.resource.tenantId === 'system'
-  );
+  // Get all unique tenant IDs referenced in the ACL
+  const referencedTenantIds = new Set<string>();
+  acl.entries.forEach(entry => {
+    referencedTenantIds.add(entry.resource.tenantId);
+  });
 
-  // If the user has access to the requested tenant, return false (no cross-tenant access)
-  if (hasAccessToRequestedTenant) {
-    return false;
-  }
+  // Filter out the specified tenant and the system tenant (which is allowed)
+  referencedTenantIds.delete(tenantId);
+  referencedTenantIds.delete('system');
 
-  // If the user doesn't have access to the requested tenant, return true (cross-tenant access)
-  return true;
+  // If there are any remaining tenant IDs, this indicates cross-tenant access
+  return referencedTenantIds.size > 0;
 }
 
 /**
