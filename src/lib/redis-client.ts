@@ -24,13 +24,13 @@ class MemoryRedis {
   }
 
   // Basic Redis operations
-  async get<T = any>(key: string): Promise<T | null> {
+  async get<T = any>(key: string): Promise<T | undefined> {
     logger.debug(`Getting key: ${key}`);
     const value = this.store.get(key);
 
     if (value === undefined) {
       logger.debug(`Key not found: ${key}`);
-      return null;
+      return undefined;
     }
 
     logger.trace(`Raw value for key ${key}: ${typeof value === 'string' ? value.substring(0, 50) + '...' : value}`);
