@@ -149,7 +149,7 @@ describe('Integration: Category Filtering and Navigation', () => {
     fireEvent.click(screen.getByTestId('category-filter-button'));
 
     // Navigate to a parent category
-    fireEvent.click(screen.getByTestId('category-checkbox-cat1'));
+    fireEvent.click(screen.getByTestId('category-filter-cat1'));
 
     // Manually call filterByCategory
     filterByCategory('cat1');
@@ -210,9 +210,8 @@ describe('Integration: Category Filtering and Navigation', () => {
     // Click the first toggle button
     fireEvent.click(toggleCategoryButtons[0]);
 
-    // Navigate to a subcategory - use the current test ID for now
-    // Note: We'll need to update this once the checkbox component changes are fully applied
-    const subcategoryCheckbox = screen.getByTestId('category-checkbox-cat3');
+    // Navigate to a subcategory
+    const subcategoryCheckbox = screen.getByTestId('category-filter-cat3');
     expect(subcategoryCheckbox).toBeInTheDocument();
     fireEvent.click(subcategoryCheckbox);
 
