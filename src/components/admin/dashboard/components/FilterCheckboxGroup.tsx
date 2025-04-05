@@ -2,30 +2,30 @@
 
 import React from 'react';
 
-export interface CheckboxOption<T extends string> {
-  value: T;
+export interface CheckboxOption {
+  id: string;
   label: string;
 }
 
-interface FilterCheckboxGroupProps<T extends string> {
+interface FilterCheckboxGroupProps {
   title: string;
-  options: CheckboxOption<T>[];
-  selectedValues: T[];
-  onChange: (values: T[]) => void;
+  options: CheckboxOption[];
+  selected: string[];
+  onChange: (values: string[]) => void;
 }
 
-export function FilterCheckboxGroup<T extends string>({
+function FilterCheckboxGroup({
   title,
   options,
-  selectedValues,
+  selected,
   onChange,
-}: FilterCheckboxGroupProps<T>) {
+}: FilterCheckboxGroupProps) {
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value as T;
+    const value = e.target.value;
     if (e.target.checked) {
-      onChange([...selectedValues, value]);
+      onChange([...selected, value]);
     } else {
-      onChange(selectedValues.filter(v => v !== value));
+      onChange(selected.filter(v => v !== value));
     }
   };
 
@@ -34,18 +34,19 @@ export function FilterCheckboxGroup<T extends string>({
       <legend className="text-sm font-medium text-gray-700 mb-2">{title}</legend>
       <div className="space-y-2">
         {options.map(option => (
-          <div key={option.value} className="flex items-center">
+          <div key={option.id} className="flex items-center">
             <input
-              id={`option-${option.value}`}
-              name={option.value}
+              id={`option-${option.id}`}
+              name={option.id}
               type="checkbox"
-              value={option.value}
-              checked={selectedValues.includes(option.value)}
+              value={option.id}
+              checked={selected.includes(option.id)}
               onChange={handleCheckboxChange}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              data-testid={`filter-${option.value}`}
+              data-testid={`filter-${option.id}`}
+              aria-label={option.label}
             />
-            <label htmlFor={`option-${option.value}`} className="ml-2 block text-sm text-gray-700">
+            <label htmlFor={`option-${option.id}`} className="ml-2 block text-sm text-gray-700">
               {option.label}
             </label>
           </div>

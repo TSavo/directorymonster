@@ -3,13 +3,13 @@
 import React, { useRef, useEffect } from 'react';
 
 interface FilterDropdownProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   children: React.ReactNode;
   className?: string;
 }
 
-export function FilterDropdown({
+function FilterDropdown({
   isOpen,
   onClose,
   children,
@@ -20,7 +20,7 @@ export function FilterDropdown({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (onClose && dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         onClose();
       }
     };
@@ -34,17 +34,15 @@ export function FilterDropdown({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (isOpen === false) return null;
 
   return (
-    <div 
+    <div
       ref={dropdownRef}
-      className={`absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10 ${className}`}
+      className={`relative w-full bg-white rounded-md shadow-lg z-10 ${className}`}
       data-testid="filter-dropdown"
     >
-      <div className="p-4">
-        {children}
-      </div>
+      {children}
     </div>
   );
 }

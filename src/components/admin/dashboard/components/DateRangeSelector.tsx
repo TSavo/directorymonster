@@ -13,21 +13,21 @@ interface DateRangeSelectorProps {
   className?: string;
 }
 
-export function DateRangeSelector({
+function DateRangeSelector({
   onChange,
   initialRange,
   className = '',
 }: DateRangeSelectorProps) {
   const today = new Date();
-  
+
   // Initialize with current date if not provided
   const [startDate, setStartDate] = useState<string>(
-    initialRange?.startDate || 
+    initialRange?.startDate ||
     new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]
   );
-  
+
   const [endDate, setEndDate] = useState<string>(
-    initialRange?.endDate || 
+    initialRange?.endDate ||
     today.toISOString().split('T')[0]
   );
 
@@ -45,7 +45,7 @@ export function DateRangeSelector({
   };
 
   return (
-    <div 
+    <div
       className={`flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 ${className}`}
       data-testid="date-range-selector"
     >
