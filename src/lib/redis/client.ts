@@ -3,6 +3,10 @@
  */
 import { createRedisClient, isRedisConnected, forceRedisReconnect, getRedisConnectionState, onRedisConnectionStateChange } from './connection-manager';
 import { MemoryRedis } from './memory-store';
+import { createLogger } from '../logger';
+
+// Create a Redis-specific logger
+const logger = createLogger('Redis');
 
 // Import hash operations to extend MemoryRedis
 import './hash-operations';
@@ -15,7 +19,7 @@ declare global {
 
 // Initialize Redis client if not already created
 if (typeof global !== 'undefined' && (!global.redisClient || !global.redisInitTime)) {
-  console.log('[Redis] Initializing Redis client');
+  logger.info('Initializing Redis client');
 
   // Track when we initialized Redis - for debugging connection cycles
   global.redisInitTime = Date.now();
@@ -24,12 +28,12 @@ if (typeof global !== 'undefined' && (!global.redisClient || !global.redisInitTi
   if (!global.redisClient) {
     global.redisClient = createRedisClient();
   } else {
-    console.log('[Redis] Reusing existing Redis client');
+    logger.info('Reusing existing Redis client');
   }
 } else if (typeof global !== 'undefined' && global.redisClient) {
   // Log but don't recreate if client already exists
   const timeSinceInit = Date.now() - (global.redisInitTime || 0);
-  console.log(`[Redis] Redis client already initialized ${timeSinceInit}ms ago`);
+  logger.debug(`Redis client already initialized ${timeSinceInit}ms ago`);
 }
 
 // The Redis client (real or in-memory)

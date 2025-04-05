@@ -1,4 +1,8 @@
 // No need to import hash operations - we'll implement them directly
+import { createLogger } from './logger';
+
+// Create a Redis-specific logger
+const logger = createLogger('RedisClient');
 
 // In-memory Redis implementation that doesn't depend on ioredis
 class MemoryRedis {
@@ -8,7 +12,7 @@ class MemoryRedis {
     // Create a new store if it doesn't exist globally
     if (typeof global !== 'undefined' && !global.inMemoryRedisStore) {
       global.inMemoryRedisStore = new Map<string, any>();
-      console.log('Created global in-memory Redis store');
+      logger.info('Created global in-memory Redis store');
     }
 
     // Use the global store if available, otherwise create a local one
@@ -16,20 +20,20 @@ class MemoryRedis {
       ? global.inMemoryRedisStore
       : new Map<string, any>();
 
-    console.log(`Using in-memory Redis with ${this.store.size} keys`);
+    logger.info(`Using in-memory Redis with ${this.store.size} keys`);
   }
 
   // Basic Redis operations
   async get<T = any>(key: string): Promise<T | null> {
-    console.log(`[MemoryRedis] Getting key: ${key}`);
+    logger.debug(`Getting key: ${key}`);
     const value = this.store.get(key);
 
     if (value === undefined) {
-      console.log(`[MemoryRedis] Key not found: ${key}`);
+      logger.debug(`Key not found: ${key}`);
       return null;
     }
 
-    console.log(`[MemoryRedis] Raw value for key ${key}: ${typeof value === 'string' ? value.substring(0, 50) + '...' : value}`);
+    logger.trace(`Raw value for key ${key}: ${typeof value === 'string' ? value.substring(0, 50) + '...' : value}`);
 
     // If the value is a string that looks like JSON, try to parse it
     if (typeof value === 'string' &&
@@ -37,10 +41,10 @@ class MemoryRedis {
         (value.endsWith('}') || value.endsWith(']'))) {
       try {
         const parsed = JSON.parse(value) as T;
-        console.log(`[MemoryRedis] Successfully parsed JSON for key ${key}`);
+        logger.trace(`Successfully parsed JSON for key ${key}`);
         return parsed;
       } catch (e) {
-        console.log(`[MemoryRedis] Failed to parse JSON for key ${key}: ${e.message}`);
+        logger.warn(`Failed to parse JSON for key ${key}: ${e.message}`);
         // If parsing fails, return the raw value
         return value as unknown as T;
       }
@@ -52,7 +56,7 @@ class MemoryRedis {
   async set(key: string, value: any, ...args: any[]): Promise<'OK'> {
     const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
     const displayValue = stringValue.length > 50 ? `${stringValue.substring(0, 50)}...` : stringValue;
-    console.log(`[MemoryRedis] Setting key: ${key} with value: ${displayValue}`);
+    logger.debug(`Setting key: ${key} with value: ${displayValue}`);
     this.store.set(key, value);
     return 'OK';
   }
@@ -66,7 +70,7 @@ class MemoryRedis {
   }
 
   async keys(pattern: string): Promise<string[]> {
-    console.log(`[MemoryRedis] Searching for keys matching pattern: ${pattern}`);
+    logger.debug(`Searching for keys matching pattern: ${pattern}`);
     const wildcard = pattern.includes('*');
     const prefix = pattern.replace('*', '');
 
@@ -361,7 +365,7 @@ const isBrowser = typeof window !== 'undefined';
 
 // Log environment detection
 if (isBrowser) {
-  console.log('Browser environment detected, using memory fallback');
+  logger.info('Browser environment detected, using memory fallback');
 }
 
 // Only use real Redis if explicitly enabled and we're in a server context
@@ -375,11 +379,11 @@ declare global {
 }
 
 // Setup Redis client (real or in-memory)
-console.log('Setting up Redis client...');
+logger.info('Setting up Redis client...');
 
 // Use memory implementation for browser or testing
 if (isBrowser || process.env.NODE_ENV === 'test') {
-  console.log('Using memory fallback for Redis');
+  logger.info('Using memory fallback for Redis');
 }
 
 // Export the Redis client

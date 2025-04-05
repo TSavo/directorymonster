@@ -2,6 +2,10 @@
  * Redis connection management with fallback support
  */
 import { MemoryRedis } from './memory-store';
+import { createLogger } from '../logger';
+
+// Create a Redis-specific logger
+const logger = createLogger('RedisConnection');
 
 // Dynamically import Redis to avoid 'dns' module issues in browser
 let Redis: any = null;
@@ -14,9 +18,9 @@ if (typeof window === 'undefined') {
     const ioredis = require('ioredis');
     Redis = ioredis.Redis;
     EventEmitter = require('events');
-    console.log('Successfully loaded ioredis');
+    logger.info('Successfully loaded ioredis');
   } catch (error) {
-    console.warn('[Redis] Failed to load ioredis, using memory implementation:', error);
+    logger.warn(`Failed to load ioredis, using memory implementation: ${error}`);
     // Don't set Redis, which will trigger the fallback later
   }
 }
@@ -54,15 +58,15 @@ if (typeof global !== 'undefined') {
   if (!global.redisConnectionState) {
     global.redisConnectionState = ConnectionState.DISCONNECTED;
   }
-  
+
   if (global.redisReconnectAttempts === undefined) {
     global.redisReconnectAttempts = 0;
   }
-  
+
   if (global.redisLastReconnectTime === undefined) {
     global.redisLastReconnectTime = 0;
   }
-  
+
   if (!global.redisConnectionEvents && typeof window === 'undefined' && EventEmitter) {
     global.redisConnectionEvents = new EventEmitter();
   }
@@ -73,14 +77,14 @@ if (typeof global !== 'undefined') {
  */
 export function updateConnectionState(newState: ConnectionState): void {
   if (typeof global === 'undefined') return;
-  
+
   const previousState = global.redisConnectionState;
   global.redisConnectionState = newState;
-  
+
   // Log state change
   if (previousState !== newState) {
-    console.log(`[Redis] Connection state changed: ${previousState} -> ${newState}`);
-    
+    logger.info(`Connection state changed: ${previousState} -> ${newState}`);
+
     // Emit events
     if (global.redisConnectionEvents) {
       if (newState === ConnectionState.CONNECTED) {
@@ -102,14 +106,14 @@ export function updateConnectionState(newState: ConnectionState): void {
 function shouldThrottleReconnect(): boolean {
   const now = Date.now();
   const timeSinceLastReconnect = now - global.redisLastReconnectTime;
-  
+
   // If we've recently tried to reconnect, throttle new attempts
   // This prevents connection thrashing when there are persistent issues
   if (timeSinceLastReconnect < 2000) {  // 2 seconds minimum between reconnect attempts
     console.log(`[Redis] Throttling reconnection (last attempt ${timeSinceLastReconnect}ms ago)`);
     return true;
   }
-  
+
   global.redisLastReconnectTime = now;
   return false;
 }
@@ -119,12 +123,12 @@ function shouldThrottleReconnect(): boolean {
  */
 export async function attemptReconnect(): Promise<void> {
   if (typeof global === 'undefined') return;
-  
+
   // Prevent reconnection thrashing
   if (shouldThrottleReconnect()) {
     return;
   }
-  
+
   // Clear any existing reconnect timer
   if (global.redisReconnectTimer) {
     clearTimeout(global.redisReconnectTimer);
@@ -136,11 +140,11 @@ export async function attemptReconnect(): Promise<void> {
     global.redisReconnectAttempts = 0;
     return;
   }
-  
+
   if (global.redisReconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
     console.log(`[Redis] Max reconnection attempts (${MAX_RECONNECT_ATTEMPTS}) reached, falling back to memory implementation`);
     updateConnectionState(ConnectionState.FAILED);
-    
+
     // Switch to memory implementation
     if (!(global.redisClient instanceof MemoryRedis)) {
       global.redisClient = new MemoryRedis();
@@ -148,19 +152,19 @@ export async function attemptReconnect(): Promise<void> {
     }
     return;
   }
-  
+
   // Update state and increment attempts
   updateConnectionState(ConnectionState.RECONNECTING);
   global.redisReconnectAttempts++;
-  
+
   // Calculate backoff interval (exponential with max limit)
   const backoff = Math.min(
     RECONNECT_INTERVAL_MS * Math.pow(1.5, global.redisReconnectAttempts - 1),
     MAX_RECONNECT_INTERVAL_MS
   );
-  
+
   console.log(`[Redis] Reconnection attempt ${global.redisReconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${backoff}ms`);
-  
+
   // Schedule reconnection attempt
   global.redisReconnectTimer = setTimeout(async () => {
     try {
@@ -182,7 +186,7 @@ export async function attemptReconnect(): Promise<void> {
             return shouldReconnect;
           }
         });
-        
+
         // Improve error handling by capturing more details
         newClient.on('error', (err) => {
           console.error('[Redis] Connection error:', err.message, 'Stack:', err.stack);
@@ -191,17 +195,17 @@ export async function attemptReconnect(): Promise<void> {
             attemptReconnect();
           }
         });
-        
+
         newClient.on('connect', () => {
           console.log('[Redis] Connected successfully');
           updateConnectionState(ConnectionState.CONNECTED);
           global.redisReconnectAttempts = 0;
         });
-        
+
         newClient.on('ready', () => {
           console.log('[Redis] Client ready for commands');
         });
-        
+
         newClient.on('close', () => {
           if (global.redisConnectionState === ConnectionState.CONNECTED) {
             console.log('[Redis] Connection closed unexpectedly');
@@ -209,31 +213,31 @@ export async function attemptReconnect(): Promise<void> {
             attemptReconnect();
           }
         });
-        
+
         // Try to connect with timeout
         const connectPromise = newClient.connect();
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Connection timeout')), REDIS_CONNECT_TIMEOUT);
         });
-        
+
         await Promise.race([connectPromise, timeoutPromise]);
-        
+
         // Test connection with ping and a short timeout
         const pingPromise = newClient.ping();
         const pingTimeoutPromise = new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Ping timeout')), 5000);
         });
-        
+
         const pong = await Promise.race([pingPromise, pingTimeoutPromise]);
-        
+
         if (pong === 'PONG') {
           console.log('[Redis] Ping successful - connection verified');
-          
+
           // Update global client reference
           global.redisClient = newClient;
           updateConnectionState(ConnectionState.CONNECTED);
           global.redisReconnectAttempts = 0;
-          
+
           // Set up a periodic ping to keep connection alive
           setInterval(async () => {
             try {
@@ -269,7 +273,7 @@ export function getRedisConnectionState(): ConnectionState {
  * @param listener The callback function
  */
 export function onRedisConnectionStateChange(
-  event: 'connected' | 'disconnected' | 'reconnecting' | 'failed', 
+  event: 'connected' | 'disconnected' | 'reconnecting' | 'failed',
   listener: () => void
 ): void {
   if (global.redisConnectionEvents) {
@@ -285,28 +289,28 @@ export function createRedisClient(): any {
     // In browser context, always use memory implementation
     return new MemoryRedis();
   }
-  
+
   // Check for Edge runtime by looking for missing Node.js features
   const isEdgeRuntime = typeof process === 'undefined' || typeof require === 'undefined' || !Redis;
   if (isEdgeRuntime) {
-    console.log('[Redis] Detected Edge runtime, using in-memory implementation');
+    logger.info('Detected Edge runtime, using in-memory implementation');
     const memoryClient = new MemoryRedis();
     updateConnectionState(ConnectionState.CONNECTED);
     return memoryClient;
   }
-  
+
   // Use memory implementation if explicitly configured
   if (USE_MEMORY_FALLBACK) {
-    console.log('[Redis] Using in-memory implementation (configured fallback)');
+    logger.info('Using in-memory implementation (configured fallback)');
     const memoryClient = new MemoryRedis();
     updateConnectionState(ConnectionState.CONNECTED);
     return memoryClient;
   }
-  
+
   // Try to connect to Redis
-  console.log(`[Redis] Connecting to Redis at ${REDIS_URL}`);
+  logger.info(`Connecting to Redis at ${REDIS_URL}`);
   updateConnectionState(ConnectionState.CONNECTING);
-  
+
   try {
     if (Redis) {
       // Create client with improved configuration
@@ -324,62 +328,62 @@ export function createRedisClient(): any {
           // Only reconnect for specific errors that indicate connection issues
           const targetErrors = ['READONLY', 'ETIMEDOUT', 'ECONNREFUSED', 'ECONNRESET'];
           const shouldReconnect = targetErrors.some(e => err.message.includes(e));
-          console.log(`[Redis] Error "${err.message}" - Reconnect? ${shouldReconnect}`);
+          logger.debug(`Error "${err.message}" - Reconnect? ${shouldReconnect}`);
           return shouldReconnect;
         }
       });
-      
+
       // Setup improved event handlers
       client.on('error', (err) => {
-        console.error('[Redis] Connection error:', err.message, 'Stack:', err.stack);
+        logger.error(`Connection error: ${err.message}, Stack: ${err.stack}`);
         if (global.redisConnectionState === ConnectionState.CONNECTED) {
           updateConnectionState(ConnectionState.DISCONNECTED);
           attemptReconnect();
         }
       });
-      
+
       client.on('connect', () => {
-        console.log('[Redis] Connected successfully');
+        logger.info('Connected successfully');
         updateConnectionState(ConnectionState.CONNECTED);
         global.redisReconnectAttempts = 0;
       });
-      
+
       client.on('ready', () => {
-        console.log('[Redis] Client ready for commands');
+        logger.info('Client ready for commands');
       });
-      
+
       client.on('close', () => {
         if (global.redisConnectionState === ConnectionState.CONNECTED) {
-          console.log('[Redis] Connection closed unexpectedly');
+          logger.warn('Connection closed unexpectedly');
           updateConnectionState(ConnectionState.DISCONNECTED);
           attemptReconnect();
         }
       });
-      
+
       // Set up a periodic ping to keep connection alive
       setInterval(async () => {
         try {
-          if (global.redisConnectionState === ConnectionState.CONNECTED && 
-              global.redisClient && 
+          if (global.redisConnectionState === ConnectionState.CONNECTED &&
+              global.redisClient &&
               !(global.redisClient instanceof MemoryRedis)) {
             await global.redisClient.ping();
           }
         } catch (error) {
-          console.error('[Redis] Keepalive ping failed:', error);
+          logger.error(`Keepalive ping failed: ${error}`);
         }
       }, REDIS_KEEPALIVE_INTERVAL);
-      
+
       return client;
     } else {
       // Fallback to memory Redis if Redis class is not available
-      console.log('[Redis] Redis class not available, using memory implementation');
+      logger.warn('Redis class not available, using memory implementation');
       const memoryClient = new MemoryRedis();
       updateConnectionState(ConnectionState.CONNECTED);
       return memoryClient;
     }
   } catch (error) {
-    console.error('[Redis] Connection initialization error:', error.message, 'Stack:', error.stack);
-    console.log('[Redis] Falling back to memory implementation due to initialization error');
+    logger.error(`Connection initialization error: ${error.message}, Stack: ${error.stack}`);
+    logger.warn('Falling back to memory implementation due to initialization error');
     const memoryClient = new MemoryRedis();
     updateConnectionState(ConnectionState.FAILED);
     return memoryClient;
@@ -402,29 +406,29 @@ export function forceRedisReconnect(): void {
  */
 export async function isRedisConnected(): Promise<boolean> {
   if (!global.redisClient) return false;
-  
+
   try {
     if (global.redisClient instanceof MemoryRedis) {
       return true;
     }
-    
+
     // Perform ping to verify connection with timeout to prevent hanging
     const pingPromise = global.redisClient.ping();
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error('Ping timeout')), 2000);
     });
-    
+
     const pong = await Promise.race([pingPromise, timeoutPromise]);
     return pong === 'PONG';
   } catch (error) {
     console.error('[Redis] Connection check failed:', error.message);
-    
+
     // On ping failure, trigger reconnection
     if (global.redisConnectionState === ConnectionState.CONNECTED) {
       updateConnectionState(ConnectionState.DISCONNECTED);
       attemptReconnect();
     }
-    
+
     return false;
   }
 }

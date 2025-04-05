@@ -1,6 +1,10 @@
 /**
  * In-memory implementation of Redis for fallback
  */
+import { createLogger } from '../logger';
+
+// Create a Redis-specific logger
+const logger = createLogger('MemoryRedis');
 
 // Initialize global memory store if needed
 declare global {
@@ -9,7 +13,7 @@ declare global {
 
 if (typeof global !== 'undefined' && !global.inMemoryRedisStore) {
   global.inMemoryRedisStore = new Map<string, any>();
-  console.log('[Redis] Created global in-memory Redis store');
+  logger.info('Created global in-memory Redis store');
 }
 
 export class MemoryRedis {
@@ -17,7 +21,7 @@ export class MemoryRedis {
 
   constructor() {
     this.store = global.inMemoryRedisStore;
-    console.log(`[MemoryRedis] Using in-memory store with ${this.store.size} keys`);
+    logger.info(`Using in-memory store with ${this.store.size} keys`);
   }
 
   // Connection status methods
