@@ -34,7 +34,7 @@ declare module 'snarkjs' {
   }
 
   export namespace powersOfTau {
-    export function new(
+    export function createPowersOfTau(
       curve: string,
       power: number,
       outputFile: string,

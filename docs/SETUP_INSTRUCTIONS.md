@@ -2,6 +2,13 @@
 
 This document provides instructions for setting up the DirectoryMonster application with the fixed CSS and rendering configuration.
 
+## System Requirements
+
+- **Node.js**: Version 14 or higher (required for optional chaining and nullish coalescing operators)
+- **npm**: Version 6 or higher
+- **Docker**: Latest stable version (for containerized setup)
+- **Redis**: Version 6 or higher (optional, in-memory fallback available for development)
+
 ## Getting Started with Docker
 
 The simplest way to run DirectoryMonster is using Docker. Follow these steps:

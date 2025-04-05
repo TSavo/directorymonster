@@ -19,8 +19,8 @@ This guide provides instructions for deploying the Zero-Knowledge Proof (ZKP) Au
 
 Before deploying the ZKP Authentication System, ensure you have the following:
 
-- Node.js 16 or higher
-- npm 7 or higher
+- Node.js 14 or higher (Node.js 16+ recommended for production)
+- npm 6 or higher (npm 7+ recommended for production)
 - Docker and Docker Compose (for containerized deployment)
 - Redis (for session management and rate limiting)
 - A domain name with SSL certificate
@@ -43,10 +43,15 @@ Before deploying the ZKP Authentication System, ensure you have the following:
 
 3. Build the application:
    ```bash
-   npm run build
+   npm run app:build
    ```
 
 4. Set up the ZKP authentication system:
+   ```bash
+   npm run setup
+   ```
+
+   Or use the detailed setup command:
    ```bash
    npm run zkp:setup
    ```
@@ -59,9 +64,15 @@ Before deploying the ZKP Authentication System, ensure you have the following:
    cd directorymonster
    ```
 
-2. Build and start the Docker containers:
+2. Build and start the Docker containers using the simplified command:
    ```bash
-   docker-compose -f docker-compose.prod.yml up -d
+   npm run docker
+   ```
+
+   Or use the detailed Docker commands:
+   ```bash
+   npm run docker:build
+   npm run docker:up
    ```
 
 ## Configuration

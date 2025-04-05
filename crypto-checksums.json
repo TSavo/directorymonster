@@ -1,0 +1,9 @@
+{
+  "circuits/zkp_auth/zkp_auth.circom": "5ef775657d0917296eaa9eccca6f6b3d45b633db4109547d6b86156be33163e0",
+  "circuits/zkp_auth/zkp_auth.r1cs": "7aacc6e550d26d1b2169e40103b0b431cd8dc10b8d013443a3b36f10dd34ddb5",
+  "circuits/zkp_auth/zkp_auth.sym": "d0e3eea32569b97cfc6d3c316b0a44f5d8b1c168fb60424f96197da5f5c7478e",
+  "circuits/zkp_auth/verification_key.json": "fbc7c12121b5bee15975c45c87a50f1f444b5e5a64d80f85d3ee86a8f758ef18",
+  "circuits/poseidon_constants.circom": "e364b2e8d9a9020c99ec6b0106db62a667ef516bc701f3e1b909b814989946b0",
+  "circuits/circomlib/montgomery.circom": "2644938b53bbba72dc5e790f29a864517900bcb53593ce1520e848bcedfac713",
+  "circuits/circomlib/poseidon.circom": "2582464669b69827164bd08ee0337997e1957f2ab4f00cdd86d533ca5e9d9234"
+}

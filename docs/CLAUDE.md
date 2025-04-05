@@ -82,20 +82,42 @@ For detailed TDD guidelines, see [TDD Testing Specification](specs/TDD_TESTING_S
 
 ## Development Setup
 
-Always use Docker for development with the dedicated dev configuration:
+Use the standardized commands for development:
 
 ```bash
-# Start environment
-docker-compose -f docker-compose.dev.yml up -d
+# Run the app in development mode
+npm run run
 
-# View logs
-docker-compose -f docker-compose.dev.yml logs -f
+# Run the app in Docker
+npm run docker
 
-# Windows convenience scripts
-start-dev.bat     # Start environment
-dev-reload.bat    # Fast restart
-rebuild-dev.bat   # Full rebuild
+# Set up ZKP authentication
+npm run setup
+
+# Run all tests
+npm run test
+
+# Verify everything is working
+npm run verify
 ```
+
+For Docker-specific commands:
+
+```bash
+# Start Docker environment
+npm run docker:up
+
+# View Docker logs
+npm run docker:logs
+
+# Stop Docker environment
+npm run docker:down
+
+# Rebuild Docker containers
+npm run docker:build
+```
+
+For a complete list of commands, see [Commands Documentation](docs/COMMANDS.md).
 
 ## Project Architecture
 
@@ -177,7 +199,7 @@ src/components/admin/categories/
    - Pass processed data via props
 
 3. **Testing Issues**
-   - Always seed data: `npm run seed`
+   - Always seed data: `npm run data:seed`
    - Check Redis connection/fallback
    - Use domain mocking or `?hostname=` parameter
 

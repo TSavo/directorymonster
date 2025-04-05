@@ -31,9 +31,28 @@ template Edwards2Montgomery() {
     signal input in[2];
     signal output out[2];
 
+    // Check for division by zero
+    signal denominator1;
+    denominator1 <== 1 - in[1];
+    signal isZero1 <-- denominator1 == 0 ? 1 : 0;
+    isZero1 * (1 - isZero1) === 0; // Constrain isZero1 to be 0 or 1
+    isZero1 * denominator1 === 0; // If isZero1 is 1, then denominator1 must be 0
+    (1 - isZero1) * (1 - denominator1) === 0; // If isZero1 is 0, then denominator1 must be non-zero
+
+    // Check for division by zero
+    signal denominator2;
+    denominator2 <== in[0];
+    signal isZero2 <-- denominator2 == 0 ? 1 : 0;
+    isZero2 * (1 - isZero2) === 0; // Constrain isZero2 to be 0 or 1
+    isZero2 * denominator2 === 0; // If isZero2 is 1, then denominator2 must be 0
+    (1 - isZero2) * (1 - denominator2) === 0; // If isZero2 is 0, then denominator2 must be non-zero
+
+    // Ensure denominators are not zero
+    1 - in[1] != 0;
+    in[0] != 0;
+
     out[0] <-- (1 + in[1]) / (1 - in[1]);
     out[1] <-- out[0] / in[0];
-
 
     out[0] * (1-in[1]) === (1 + in[1]);
     out[1] * in[0] === out[0];
@@ -49,6 +68,26 @@ template Edwards2Montgomery() {
 template Montgomery2Edwards() {
     signal input in[2];
     signal output out[2];
+
+    // Check for division by zero
+    signal denominator1;
+    denominator1 <== in[1];
+    signal isZero1 <-- denominator1 == 0 ? 1 : 0;
+    isZero1 * (1 - isZero1) === 0; // Constrain isZero1 to be 0 or 1
+    isZero1 * denominator1 === 0; // If isZero1 is 1, then denominator1 must be 0
+    (1 - isZero1) * (1 - denominator1) === 0; // If isZero1 is 0, then denominator1 must be non-zero
+
+    // Check for division by zero
+    signal denominator2;
+    denominator2 <== in[0] + 1;
+    signal isZero2 <-- denominator2 == 0 ? 1 : 0;
+    isZero2 * (1 - isZero2) === 0; // Constrain isZero2 to be 0 or 1
+    isZero2 * denominator2 === 0; // If isZero2 is 1, then denominator2 must be 0
+    (1 - isZero2) * (1 - denominator2) === 0; // If isZero2 is 0, then denominator2 must be non-zero
+
+    // Ensure denominators are not zero
+    in[1] != 0;
+    in[0] + 1 != 0;
 
     out[0] <-- in[0] / in[1];
     out[1] <-- (in[0] - 1) / (in[0] + 1);
@@ -97,6 +136,17 @@ template MontgomeryAdd() {
     var A = (2 * (a + d)) / (a - d);
     var B = 4 / (a - d);
 
+    // Check for division by zero
+    signal denominator;
+    denominator <== in2[0] - in1[0];
+    signal isZero <-- denominator == 0 ? 1 : 0;
+    isZero * (1 - isZero) === 0; // Constrain isZero to be 0 or 1
+    isZero * denominator === 0; // If isZero is 1, then denominator must be 0
+    (1 - isZero) * (1 - denominator) === 0; // If isZero is 0, then denominator must be non-zero
+
+    // Ensure denominator is not zero
+    in2[0] - in1[0] != 0;
+
     signal lamda;
 
     lamda <-- (in2[1] - in1[1]) / (in2[0] - in1[0]);
@@ -128,6 +178,17 @@ template MontgomeryDouble() {
 
     var A = (2 * (a + d)) / (a - d);
     var B = 4 / (a - d);
+
+    // Check for division by zero
+    signal denominator;
+    denominator <== 2*B*in[1];
+    signal isZero <-- denominator == 0 ? 1 : 0;
+    isZero * (1 - isZero) === 0; // Constrain isZero to be 0 or 1
+    isZero * denominator === 0; // If isZero is 1, then denominator must be 0
+    (1 - isZero) * (1 - denominator) === 0; // If isZero is 0, then denominator must be non-zero
+
+    // Ensure denominator is not zero
+    2*B*in[1] != 0;
 
     signal lamda;
     signal x1_2;

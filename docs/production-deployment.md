@@ -18,8 +18,8 @@ This guide provides detailed instructions for deploying the Zero-Knowledge Proof
 
 Before deploying the ZKP authentication system to production, ensure you have the following:
 
-- Node.js 18.x or later
-- npm 8.x or later
+- Node.js 14.x or later (Node.js 18.x recommended for production)
+- npm 6.x or later (npm 8.x recommended for production)
 - Docker and Docker Compose (for containerized deployment)
 - Access to a production server with at least 4GB RAM and 2 CPU cores
 - SSL certificate for secure communication
@@ -54,6 +54,11 @@ The ZKP authentication system has the following system requirements:
 
 3. Set up the ZKP authentication system:
    ```bash
+   npm run setup
+   ```
+
+   Or use the detailed setup command:
+   ```bash
    npm run zkp:setup
    ```
    This command will:
@@ -69,9 +74,15 @@ The ZKP authentication system has the following system requirements:
    cd directorymonster
    ```
 
-2. Build and run the Docker container:
+2. Build and run the Docker container using the simplified command:
    ```bash
-   docker-compose -f docker-compose.yml up -d
+   npm run docker
+   ```
+
+   Or use the detailed Docker commands:
+   ```bash
+   npm run docker:build
+   npm run docker:up
    ```
 
 ## Configuration
@@ -285,20 +296,14 @@ The proof generation and verification processes are deterministic, meaning that 
 To verify that the system is working correctly, you can run the following tests:
 
 ```bash
-# Run all crypto tests
+# Run all tests with simplified command
+npm run verify
+
+# Or run specific tests
 npm run test:crypto
-
-# Run secure ZKP tests
-npm run test:crypto:secure
-
-# Run simplified ZKP tests
-npm run test:crypto:simplified
-
-# Run security measures tests
+npm run test:crypto:core
 npm run test:crypto:security
-
-# Run dynamic salt generation tests
-npm run test:crypto:salt
+npm run security:verify
 ```
 
 These tests verify that the ZKP authentication system is working correctly and that it provides the expected security properties.

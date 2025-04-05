@@ -3,6 +3,7 @@ import * as snarkjs from 'snarkjs';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 
 // Define interfaces for the ZKP system
 export interface Proof {
@@ -27,11 +28,12 @@ export interface ZKPResult {
  * @returns The public key
  */
 export async function generatePublicKey(username: string, password: string, salt: string): Promise<string> {
-  // Combine the inputs
-  const combined = `${username}:${password}:${salt}`;
+  // Combine the inputs (excluding salt as bcrypt will handle it)
+  const combined = `${username}:${password}`;
 
-  // Create a SHA-256 hash
-  return crypto.createHash('sha256').update(combined).digest('hex');
+  // Use bcrypt for secure hashing with salt
+  const saltRounds = 12;
+  return await bcrypt.hash(combined, saltRounds);
 }
 
 /**

@@ -125,7 +125,7 @@ const SiteSelectors = {
     emptyState: '[data-testid="empty-state"]',
     header: '[data-testid="table-header"]'
   },
-  
+
   // Row selectors
   row: {
     name: '[data-testid="site-name"]',
@@ -133,7 +133,7 @@ const SiteSelectors = {
     editButton: '[data-testid="edit-button"]',
     deleteButton: '[data-testid="delete-button"]'
   },
-  
+
   // Form selectors
   form: {
     container: '[data-testid="site-form"]',
@@ -141,7 +141,7 @@ const SiteSelectors = {
     slugInput: '[data-testid="slug-input"]',
     submitButton: '[data-testid="submit-button"]'
   },
-  
+
   // Fallback selectors (when data-testid isn't available)
   fallback: {
     table: 'table, .site-table',
@@ -196,10 +196,10 @@ Tests that simulate user interactions and verify the correct behavior:
 // Example interaction test
 it('opens delete confirmation modal when delete button is clicked', async () => {
   const user = userEvent.setup();
-  
+
   // Click delete button
   await user.click(screen.getByTestId('delete-button'));
-  
+
   // Verify modal is shown
   expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
   expect(screen.getByText('Are you sure?')).toBeInTheDocument();
@@ -218,9 +218,9 @@ it('displays loading state when data is being fetched', async () => {
     ...mockUseSites,
     isLoading: true
   });
-  
+
   render(<SiteTable />);
-  
+
   // Verify loading indicators
   expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
   expect(screen.queryByTestId('site-table-row')).not.toBeInTheDocument();
@@ -235,17 +235,17 @@ Tests that verify accessibility features:
 // Example accessibility test
 it('manages focus correctly in modal dialog', async () => {
   const user = userEvent.setup();
-  
+
   // Open the modal
   await user.click(screen.getByTestId('delete-button'));
-  
+
   // First focusable element should be focused
   expect(document.activeElement).toBe(screen.getByTestId('cancel-button'));
-  
+
   // Tab to next element
   await user.tab();
   expect(document.activeElement).toBe(screen.getByTestId('confirm-button'));
-  
+
   // Tab again should wrap to first element (focus trap)
   await user.tab();
   expect(document.activeElement).toBe(screen.getByTestId('cancel-button'));
@@ -260,10 +260,10 @@ Tests that verify form validation:
 // Example validation test
 it('validates required fields', async () => {
   const user = userEvent.setup();
-  
+
   // Try to submit empty form
   await user.click(screen.getByTestId('submit-button'));
-  
+
   // Verify error messages
   expect(screen.getByText('Name is required')).toBeInTheDocument();
   expect(screen.getByText('Slug is required')).toBeInTheDocument();
@@ -280,10 +280,10 @@ it('navigates to edit page when edit button is clicked', async () => {
   const user = userEvent.setup();
   const mockRouter = { push: jest.fn() };
   useRouter.mockReturnValue(mockRouter);
-  
+
   // Click edit button
   await user.click(screen.getByTestId('edit-button'));
-  
+
   // Verify navigation
   expect(mockRouter.push).toHaveBeenCalledWith('/admin/sites/edit/site-1');
 });
@@ -313,28 +313,28 @@ jest.mock('@/components/path/to/Dependency', () => ({
 describe('Component Name - Test Category', () => {
   // Set up common test user
   const user = userEvent.setup();
-  
+
   // Common setup before each test
   beforeEach(() => {
     jest.clearAllMocks();
     // Additional setup
   });
-  
+
   // Test cases
   it('describes specific behavior clearly', async () => {
     // Render component
     render(<ComponentName prop1="value" />);
-    
+
     // Verify initial state
     expect(screen.getByTestId(Selectors.component.element)).toBeInTheDocument();
-    
+
     // Perform interaction
     await user.click(screen.getByTestId(Selectors.component.button));
-    
+
     // Verify result
     expect(screen.getByText('Expected Result')).toBeInTheDocument();
   });
-  
+
   // More test cases...
 });
 ```
@@ -444,15 +444,15 @@ describe('SiteTable - Rendering', () => {
 
   it('renders the table with sites data', () => {
     render(<SiteTable />);
-    
+
     // Verify table structure
     expect(screen.getByTestId(SiteSelectors.table.container)).toBeInTheDocument();
     expect(screen.getByTestId(SiteSelectors.table.header)).toBeInTheDocument();
-    
+
     // Verify all sites are displayed
     const rows = screen.getAllByTestId(SiteSelectors.table.row);
     expect(rows).toHaveLength(2);
-    
+
     // Verify site data is displayed correctly
     expect(screen.getByText('Site 1')).toBeInTheDocument();
     expect(screen.getByText('Site 2')).toBeInTheDocument();
@@ -467,9 +467,9 @@ describe('SiteTable - Rendering', () => {
       sites: [],
       filteredSites: []
     });
-    
+
     render(<SiteTable />);
-    
+
     // Verify empty state
     expect(screen.getByTestId(SiteSelectors.table.emptyState)).toBeInTheDocument();
     expect(screen.getByText(/no sites found/i)).toBeInTheDocument();
@@ -493,15 +493,15 @@ import { ModalSelectors } from './modal.selectors';
 describe('DeleteConfirmationModal - Interaction', () => {
   // Set up user event instance
   const user = userEvent.setup();
-  
+
   // Mock callbacks
   const mockOnConfirm = jest.fn();
   const mockOnCancel = jest.fn();
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  
+
   it('calls onConfirm when confirm button is clicked', async () => {
     render(
       <DeleteConfirmationModal
@@ -511,20 +511,20 @@ describe('DeleteConfirmationModal - Interaction', () => {
         itemName="Test Site"
       />
     );
-    
+
     // Verify modal is displayed
     expect(screen.getByTestId(ModalSelectors.modal.container)).toBeInTheDocument();
     expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
     expect(screen.getByText(/test site/i)).toBeInTheDocument();
-    
+
     // Click confirm button
     await user.click(screen.getByTestId(ModalSelectors.modal.confirmButton));
-    
+
     // Verify onConfirm callback was called
     expect(mockOnConfirm).toHaveBeenCalledTimes(1);
     expect(mockOnCancel).not.toHaveBeenCalled();
   });
-  
+
   it('calls onCancel when cancel button is clicked', async () => {
     render(
       <DeleteConfirmationModal
@@ -534,15 +534,15 @@ describe('DeleteConfirmationModal - Interaction', () => {
         itemName="Test Site"
       />
     );
-    
+
     // Click cancel button
     await user.click(screen.getByTestId(ModalSelectors.modal.cancelButton));
-    
+
     // Verify onCancel callback was called
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
     expect(mockOnConfirm).not.toHaveBeenCalled();
   });
-  
+
   it('calls onCancel when Escape key is pressed', async () => {
     render(
       <DeleteConfirmationModal
@@ -552,15 +552,15 @@ describe('DeleteConfirmationModal - Interaction', () => {
         itemName="Test Site"
       />
     );
-    
+
     // Press Escape key
     await user.keyboard('{Escape}');
-    
+
     // Verify onCancel callback was called
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
     expect(mockOnConfirm).not.toHaveBeenCalled();
   });
-  
+
   it('does not render when isOpen is false', () => {
     render(
       <DeleteConfirmationModal
@@ -570,7 +570,7 @@ describe('DeleteConfirmationModal - Interaction', () => {
         itemName="Test Site"
       />
     );
-    
+
     // Modal should not be in the document
     expect(screen.queryByTestId(ModalSelectors.modal.container)).not.toBeInTheDocument();
   });
@@ -592,28 +592,28 @@ import { FormSelectors } from './form.selectors';
 
 describe('BasicInfoStep - Validation', () => {
   const user = userEvent.setup();
-  
+
   // Mock props
   const mockValues = {
     name: '',
     slug: '',
     description: ''
   };
-  
+
   const mockErrors = {};
   const mockOnChange = jest.fn();
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  
+
   it('displays validation errors when form is submitted with empty fields', async () => {
     // Mock errors
     const errorsWithValidation = {
       name: 'Name is required',
       slug: 'Slug is required'
     };
-    
+
     render(
       <BasicInfoStep
         values={mockValues}
@@ -622,12 +622,12 @@ describe('BasicInfoStep - Validation', () => {
         isLoading={false}
       />
     );
-    
+
     // Verify error messages are displayed
     expect(screen.getByText('Name is required')).toBeInTheDocument();
     expect(screen.getByText('Slug is required')).toBeInTheDocument();
   });
-  
+
   it('updates values when inputs change', async () => {
     render(
       <BasicInfoStep
@@ -637,10 +637,10 @@ describe('BasicInfoStep - Validation', () => {
         isLoading={false}
       />
     );
-    
+
     // Type in name field
     await user.type(screen.getByTestId(FormSelectors.basicInfo.nameInput), 'Test Site');
-    
+
     // Verify onChange was called with correct values
     expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({
       target: expect.objectContaining({
@@ -648,10 +648,10 @@ describe('BasicInfoStep - Validation', () => {
         value: 'Test Site'
       })
     }));
-    
+
     // Type in slug field
     await user.type(screen.getByTestId(FormSelectors.basicInfo.slugInput), 'test-site');
-    
+
     // Verify onChange was called with correct values
     expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({
       target: expect.objectContaining({
@@ -660,7 +660,7 @@ describe('BasicInfoStep - Validation', () => {
       })
     }));
   });
-  
+
   it('autogenerates slug from name when slug is empty', async () => {
     // Mock implementation to simulate auto slug generation
     mockOnChange.mockImplementation((event) => {
@@ -676,7 +676,7 @@ describe('BasicInfoStep - Validation', () => {
         }, 0);
       }
     });
-    
+
     render(
       <BasicInfoStep
         values={mockValues}
@@ -685,13 +685,13 @@ describe('BasicInfoStep - Validation', () => {
         isLoading={false}
       />
     );
-    
+
     // Type in name field
     await user.type(screen.getByTestId(FormSelectors.basicInfo.nameInput), 'Test Site');
-    
+
     // Wait for mock implementation to run
     await new Promise(resolve => setTimeout(resolve, 10));
-    
+
     // Verify onChange was called for slug
     expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({
       target: expect.objectContaining({
@@ -756,7 +756,7 @@ Ensure tests are isolated and don't affect each other:
 afterEach(() => {
   // Restore all mocks
   jest.restoreAllMocks();
-  
+
   // Clean up any mounted components
   cleanup();
 });
@@ -776,7 +776,7 @@ When onboarding new developers to the E2E testing framework:
 ### Quick Start Guide
 
 1. **Clone and setup**: Make sure you have the repository cloned and dependencies installed
-2. **Run existing tests**: Run `npm run test:e2e:organized` to see existing tests pass
+2. **Run existing tests**: Run `npm run test:e2e:all` to see existing tests pass
 3. **Study test structure**: Review the test files in `tests/e2e/` directory
 4. **Create a selector file**: Create a selector file for your component
 5. **Write rendering tests**: Start with basic rendering tests
@@ -787,10 +787,10 @@ When onboarding new developers to the E2E testing framework:
 
 ```bash
 # Run all E2E tests
-npm run test:e2e:organized
+npm run test:e2e:all
 
 # Run tests for a specific page/feature
-npm run test:e2e:admin-dashboard
+npm run test:e2e
 
 # Run a specific test file
 npm run test:e2e -- -t "DeleteConfirmationModal"

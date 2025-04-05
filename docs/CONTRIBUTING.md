@@ -16,17 +16,17 @@ Thank you for considering a contribution to DirectoryMonster! This document outl
 4. Seed sample data:
    ```bash
    # Local development
-   npm run seed
-   
+   npm run data:seed
+
    # With Docker
-   npm run seed:docker
+   npm run data:seed:docker
    ```
-   
+
    All seeding is done through the API to ensure proper validation. See [docs/seeding.md](docs/seeding.md) for more details.
 
 5. Start the development server:
    ```bash
-   npm run dev &
+   npm run app:dev &
    ```
 
 ## Testing
@@ -34,20 +34,20 @@ Thank you for considering a contribution to DirectoryMonster! This document outl
 Please ensure all tests pass before submitting a PR:
 
 ```bash
+# Run all tests
+npm run test
+
 # Run tests with seeding
-npm run test:with-seed
+npm run test:with:seed
 
 # Run tests with Docker seeding
-npm run test:with-seed:docker
+npm run test:with:seed:docker
 
-# Run all tests including domain resolution
-npm run test:all-with-seed
-
-# Run all tests including domain resolution (Docker)
-npm run test:all-with-seed:docker
-
-# Run a complete test with server setup
-npm run test:with-server
+# Run specific test types
+npm run test:unit
+npm run test:integration
+npm run test:api
+npm run test:components
 ```
 
 Read the [testing documentation](./CLAUDE.md) for more details.
@@ -67,8 +67,8 @@ Read the [testing documentation](./CLAUDE.md) for more details.
 - Use TypeScript for all new files
 - Ensure your code passes ESLint and TypeScript checks:
   ```bash
-  npm run lint
-  npm run typecheck
+  npm run app:lint
+  npm run app:typecheck
   ```
 
 ## Component Architecture

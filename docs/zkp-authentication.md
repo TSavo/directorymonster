@@ -13,7 +13,8 @@ This document specifies the Zero-Knowledge Proof (ZKP) authentication system imp
 5. [Implementation Details](#implementation-details)
 6. [Testing Requirements](#testing-requirements)
 7. [Performance Considerations](#performance-considerations)
-8. [References](#references)
+8. [Security Improvements](#security-improvements)
+9. [References](#references)
 
 ## System Architecture
 
@@ -270,6 +271,22 @@ The ZKP authentication system must be optimized for performance to ensure a good
 5. **Caching**: The system should cache verification keys and other static data to improve performance.
 6. **Parallelization**: The system should use parallelization where possible to improve performance.
 
+## Security Improvements
+
+The ZKP authentication system has undergone several security improvements to enhance its cryptographic properties and protect against various attacks. For detailed information about each improvement, refer to the following documentation:
+
+1. [Password Hashing Improvements](./security/password-hashing.md) - Replacing SHA-256 with bcrypt for password hashing
+2. [ZKP Circuit Privacy](./security/zkp-circuit-privacy.md) - Ensuring private inputs remain private in ZKP circuits
+3. [TypeScript Type Definitions](./security/typescript-definitions.md) - Fixing reserved keyword issues in TypeScript definitions
+4. [HTTP Headers Implementation](./security/http-headers.md) - Properly implementing HTTP headers for rate limiting
+5. [Division by Zero Protection](./security/division-by-zero.md) - Adding protection against division by zero in Montgomery curve operations
+6. [File Integrity Checks](./security/file-integrity.md) - Adding integrity checks for cryptographic files
+7. [Poseidon Hash Constants](./security/poseidon-constants.md) - Implementing proper cryptographically secure constants
+8. [Hash Truncation Fix](./security/hash-truncation.md) - Fixing hash truncation issues to use full hash values
+9. [Poseidon Round Parameters](./security/poseidon-rounds.md) - Increasing round parameters for better security
+
+A comprehensive security checklist is available in [ZKP Security Checklist](./security/zkp-security-checklist.md).
+
 ## References
 
 1. [Circom Documentation](https://docs.circom.io/)
@@ -278,3 +295,5 @@ The ZKP authentication system must be optimized for performance to ensure a good
 4. [Introduction to zk-SNARKs](https://consensys.net/blog/blockchain-explained/zero-knowledge-proofs-starks-vs-snarks/)
 5. [The Poseidon Hash Function](https://www.poseidon-hash.info/)
 6. [Circomlib Poseidon Implementation](https://github.com/iden3/circomlib/blob/master/circuits/poseidon.circom)
+7. [NIST Cryptographic Standards](https://csrc.nist.gov/Projects/Cryptographic-Standards-and-Guidelines)
+8. [bcrypt: Password Security](https://en.wikipedia.org/wiki/Bcrypt)

@@ -40,8 +40,8 @@ template PoseidonPermutation(t) {
     signal output out[t];
 
     // Constants
-    var nRoundsF = 4; // Full rounds
-    var nRoundsP = 3; // Partial rounds
+    var nRoundsF = 8; // Full rounds (increased from 4)
+    var nRoundsP = 57; // Partial rounds (increased from 3)
 
     // Initial state
     component sboxes[nRoundsF + nRoundsP][t];
@@ -70,7 +70,7 @@ template PoseidonPermutation(t) {
         // Add constants and apply S-box
         for (var j = 0; j < t; j++) {
             var constIdx = i * t + j;
-            var constVal = POSEIDON_CONSTANT(constIdx % 10);
+            var constVal = POSEIDON_CONSTANT(constIdx % 21);
             sboxes[i][j].in <== state[i][j] + constVal;
         }
 
@@ -91,13 +91,13 @@ template PoseidonPermutation(t) {
 
         // Apply S-box to first element only
         var constIdx1 = roundOffset;
-        var constVal1 = POSEIDON_CONSTANT(constIdx1 % 10);
+        var constVal1 = POSEIDON_CONSTANT(constIdx1 % 21);
         sboxes[i][0].in <== state[i][0] + constVal1;
 
         // Pass through other elements
         for (var j = 1; j < t; j++) {
             var constIdx2 = roundOffset + j;
-            var constVal2 = POSEIDON_CONSTANT(constIdx2 % 10);
+            var constVal2 = POSEIDON_CONSTANT(constIdx2 % 21);
             sboxes[i][j].in <== state[i][j] + constVal2;
         }
 
@@ -146,8 +146,8 @@ template Poseidon(nInputs) {
 // ===== Authentication Circuit =====
 template SecureAuth() {
     // Private inputs (known only to the prover)
-    signal input username;
-    signal input password;
+    signal private input username;
+    signal private input password;
 
     // Public inputs (known to both prover and verifier)
     signal input publicSalt;

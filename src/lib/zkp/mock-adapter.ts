@@ -1,5 +1,6 @@
 // Mock ZKP Adapter for testing
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 import { ZKPAdapter, ZKPInput, ZKPProof } from './adapter';
 
 export class MockZKPAdapter implements ZKPAdapter {
@@ -17,11 +18,14 @@ export class MockZKPAdapter implements ZKPAdapter {
    * @returns The derived public key
    */
   derivePublicKey(input: ZKPInput): string {
-    const { username, password, salt } = input;
+    const { username, password } = input;
 
-    // Create a hash of the credentials
-    const combined = `${username}:${password}:${salt}`;
-    return crypto.createHash('sha256').update(combined).digest('hex');
+    // Combine the inputs (excluding salt as bcrypt will handle it)
+    const combined = `${username}:${password}`;
+
+    // Use bcrypt for secure hashing with salt
+    const saltRounds = 12;
+    return bcrypt.hashSync(combined, saltRounds);
   }
 
   /**

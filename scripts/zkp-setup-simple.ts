@@ -16,6 +16,17 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 
+// Check Node.js version
+try {
+  // Use require to import the check-node-version.js script
+  const checkNodeVersion = require('./check-node-version');
+  checkNodeVersion();
+} catch (error) {
+  console.error('\x1b[31m%s\x1b[0m', 'Error checking Node.js version:');
+  console.error(error);
+  process.exit(1);
+}
+
 // Define paths
 const circuitsDir = path.join(process.cwd(), 'circuits');
 const zkpAuthDir = path.join(circuitsDir, 'zkp_auth');

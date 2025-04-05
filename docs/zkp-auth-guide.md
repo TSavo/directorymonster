@@ -37,6 +37,9 @@ The Zero-Knowledge Proof (ZKP) Authentication System provides a secure way to au
 
 3. Set up the ZKP authentication system:
    ```bash
+   npm run setup
+
+   # Or use the detailed setup command
    npm run zkp:setup
    ```
 
@@ -57,17 +60,17 @@ To run the ZKP authentication system in Docker:
 
 1. Start the Docker container:
    ```bash
-   npm run zkp:docker
+   npm run docker:zkp:up
    ```
 
 2. To stop the Docker container:
    ```bash
-   npm run zkp:docker:down
+   npm run docker:zkp:down
    ```
 
 3. To view logs:
    ```bash
-   npm run zkp:docker:logs
+   npm run docker:zkp:logs
    ```
 
 ## Usage
@@ -102,18 +105,18 @@ async function login(username, password) {
     // Get the salt for the user
     const response = await fetch(`/api/auth/salt?username=${encodeURIComponent(username)}`);
     const { salt } = await response.json();
-    
+
     // Generate a proof
     const input = { username, password, salt };
     const { proof, publicSignals } = await zkp.generateProof(input);
-    
+
     // Send the proof to the server
     const loginResponse = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, proof, publicSignals })
     });
-    
+
     return await loginResponse.json();
   } catch (error) {
     console.error('Login error:', error);
@@ -142,7 +145,7 @@ const captchaService = new CaptchaService();
 async function verifyLogin(req, res) {
   const { username, proof, publicSignals } = req.body;
   const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  
+
   try {
     // Check if IP is blocked
     const isBlocked = await ipBlocker.isBlocked(ip);
@@ -155,7 +158,7 @@ async function verifyLogin(req, res) {
       });
       return res.status(403).json({ success: false, error: 'IP address is blocked' });
     }
-    
+
     // Check if CAPTCHA is required
     const isCaptchaRequired = await captchaService.isCaptchaRequired(ip);
     if (isCaptchaRequired && !req.body.captchaToken) {
@@ -165,13 +168,13 @@ async function verifyLogin(req, res) {
         username,
         timestamp: new Date().toISOString()
       });
-      return res.status(400).json({ 
-        success: false, 
-        error: 'CAPTCHA verification required', 
-        captchaRequired: true 
+      return res.status(400).json({
+        success: false,
+        error: 'CAPTCHA verification required',
+        captchaRequired: true
       });
     }
-    
+
     // Verify CAPTCHA if provided
     if (req.body.captchaToken) {
       const isValidCaptcha = await captchaService.verifyCaptcha(req.body.captchaToken, ip);
@@ -185,19 +188,19 @@ async function verifyLogin(req, res) {
         return res.status(400).json({ success: false, error: 'Invalid CAPTCHA' });
       }
     }
-    
+
     // Apply progressive delay
     const delay = await ipBlocker.getProgressiveDelay(ip);
     if (delay > 0) {
       await new Promise(resolve => setTimeout(resolve, delay));
     }
-    
+
     // Get the user
     const user = await userService.getUserByUsername(username);
     if (!user) {
       await ipBlocker.recordFailedAttempt(ip);
       await captchaService.recordFailedAttempt(ip);
-      
+
       auditService.logAuthenticationAttempt({
         username,
         ip,
@@ -205,10 +208,10 @@ async function verifyLogin(req, res) {
         reason: 'User not found',
         timestamp: new Date().toISOString()
       });
-      
+
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
-    
+
     // Verify the proof
     try {
       const isValid = await zkp.verifyProof({
@@ -216,12 +219,12 @@ async function verifyLogin(req, res) {
         publicSignals,
         publicKey: user.publicKey
       });
-      
+
       if (isValid) {
         // Record successful login
         await ipBlocker.recordSuccessfulLogin(ip);
         await captchaService.recordSuccessfulVerification(ip);
-        
+
         // Log successful authentication
         auditService.logAuthenticationAttempt({
           username,
@@ -229,7 +232,7 @@ async function verifyLogin(req, res) {
           success: true,
           timestamp: new Date().toISOString()
         });
-        
+
         // Generate a token
         const token = generateAuthToken(user);
         return res.status(200).json({ success: true, token });
@@ -240,7 +243,7 @@ async function verifyLogin(req, res) {
       // Record failed attempt
       await ipBlocker.recordFailedAttempt(ip);
       await captchaService.recordFailedAttempt(ip);
-      
+
       // Log failed authentication
       auditService.logAuthenticationAttempt({
         username,
@@ -249,7 +252,7 @@ async function verifyLogin(req, res) {
         reason: error.message,
         timestamp: new Date().toISOString()
       });
-      
+
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
   } catch (error) {
@@ -306,20 +309,19 @@ The ZKP Authentication System includes several security features:
 To run the ZKP authentication tests:
 
 ```bash
-# Run all crypto tests
+# Run all tests with simplified command
+npm run test
+
+# Run verification tests
+npm run verify
+
+# Run specific crypto tests
 npm run test:crypto
-
-# Run secure ZKP tests
-npm run test:crypto:secure
-
-# Run simplified ZKP tests
-npm run test:crypto:simplified
-
-# Run ZKP security measures tests
+npm run test:crypto:core
 npm run test:crypto:security
 
-# Run dynamic salt generation tests
-npm run test:crypto:salt
+# Run security verification
+npm run security:verify
 ```
 
 ### Test Coverage

@@ -42,12 +42,14 @@ zkpIndex = zkpIndex.replace(
 );
 
 // Update the input format for the circuit
+// Use full hash values without truncation for better security
 zkpIndex = zkpIndex.replace(
   /const input = \{[^}]+\};/s,
   `const input = {
-      username: BigInt('0x' + crypto.createHash('sha256').update(username).digest('hex')) % BigInt(2**64),
-      password: BigInt('0x' + crypto.createHash('sha256').update(password).digest('hex')) % BigInt(2**64),
-      publicSalt: BigInt('0x' + crypto.createHash('sha256').update(salt).digest('hex')) % BigInt(2**64)
+      // Use full SHA-256 hash values without truncation for better security
+      username: BigInt('0x' + crypto.createHash('sha256').update(username).digest('hex')),
+      password: BigInt('0x' + crypto.createHash('sha256').update(password).digest('hex')),
+      publicSalt: BigInt('0x' + crypto.createHash('sha256').update(salt).digest('hex'))
     };`
 );
 
