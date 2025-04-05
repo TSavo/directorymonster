@@ -38,33 +38,33 @@ export function TenantGuard({
   const { tenant } = useTenant();
   const [hasAccess, setHasAccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
+
   useEffect(() => {
     async function checkAccess() {
       if (isAuthenticated && user && tenant) {
         try {
           // First check tenant membership
           const isMember = await TenantMembershipService.isTenantMember(
-            user.id, 
+            user.id,
             tenant.id
           );
-          
+
           if (!isMember) {
             setHasAccess(false);
             setIsLoading(false);
             return;
           }
-          
+
           // If no permission checks required, grant access based on membership
           if (!resourceType) {
             setHasAccess(true);
             setIsLoading(false);
             return;
           }
-          
+
           // Check permissions if resourceType is specified
           let hasPermission = false;
-          
+
           if (permissions && permissions.length > 0) {
             // Check multiple permissions
             if (requireAll) {
@@ -105,7 +105,7 @@ export function TenantGuard({
               resourceId
             );
           }
-          
+
           setHasAccess(hasPermission);
         } catch (error) {
           console.error('Error checking tenant access:', error);
@@ -118,24 +118,30 @@ export function TenantGuard({
         setIsLoading(false);
       }
     }
-    
+
     checkAccess();
   }, [isAuthenticated, user, tenant, resourceType, permission, permissions, resourceId, requireAll]);
-  
+
   // Show loading state if enabled
   if (isLoading && showLoading) {
     return (
       <div className="flex items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div
+          className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"
+          role="status"
+          aria-label="Loading"
+        >
+          <span className="sr-only">Loading...</span>
+        </div>
       </div>
     );
   }
-  
+
   // Show fallback if no access
   if (isLoading || !hasAccess) {
     return <>{fallback}</>;
   }
-  
+
   // User has access, show children
   return <>{children}</>;
 }
