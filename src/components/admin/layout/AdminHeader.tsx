@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { MenuIcon, BellIcon, UserIcon } from './icons';
+import { TenantSelector } from '@/components/admin/tenant/TenantSelector';
+import { SiteSelector } from '@/components/admin/tenant/SiteSelector';
+import { useTenantSite } from '@/contexts/TenantSiteContext';
 
 interface AdminHeaderProps {
   toggleSidebar: () => void;
@@ -11,6 +14,9 @@ interface AdminHeaderProps {
 export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  // Get tenant and site context
+  const { hasMultipleTenants, hasMultipleSites } = useTenantSite();
 
   const toggleUserMenu = () => {
     if (notificationsOpen) setNotificationsOpen(false);
@@ -44,7 +50,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
             </div>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
+            {/* Tenant and site selectors */}
+            {hasMultipleTenants && <TenantSelector className="mr-2" />}
+            {hasMultipleSites && <SiteSelector className="mr-2" />}
+
             {/* Notifications dropdown */}
             <div className="relative">
               <button
