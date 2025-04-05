@@ -19,14 +19,16 @@ DirectoryMonster is a comprehensive platform combining:
    - Automated data extraction and categorization
    - Flexible data export options
 
-3. **Zero-Knowledge Proof Authentication**
+3. **Zero-Knowledge Proof Authentication with bcrypt Integration**
    - Cryptographically secure authentication without password transmission
    - Poseidon hash function from circomlib for secure hashing
    - Dynamic salt generation for enhanced security
-   - Rate limiting, IP blocking, and exponential backoff for brute force protection
+   - Enhanced security with bcrypt password hashing integration
+   - Configurable bcrypt work factor for adaptive security
+   - Rate limiting with exponential backoff for brute force protection
+   - IP blocking with risk-based thresholds for suspicious activity
    - CAPTCHA verification after multiple failed attempts
-   - Docker-ready deployment for production environments
-   - Enhanced security with bcrypt password hashing
+   - Worker pool for concurrent authentication processing
    - Full hash values without truncation for maximum security
    - Cryptographic file integrity verification
    - Protection against division by zero attacks
@@ -383,18 +385,21 @@ DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) 
 1. **First User Setup**:
    - First user provides username and password
    - System generates a cryptographically secure random salt
-   - System computes the public key using the ZKP circuit
+   - Password is hashed using bcrypt with configurable work factor
+   - System computes the public key using the ZKP circuit with the bcrypt-hashed password
    - System stores the username, salt, and public key (but not the password)
 
 2. **User Authentication**:
    - User provides username and password
-   - Password is hashed using bcrypt for additional security
+   - System checks if IP is blocked due to suspicious activity
+   - System checks if CAPTCHA verification is required based on previous failed attempts
+   - Password is hashed using bcrypt with the same work factor
    - System retrieves the salt for the username
-   - Client generates a proof that it knows the password that corresponds to the public key
-   - Server verifies the proof without learning the password
-   - System checks for rate limiting, IP blocking, and other security measures
-   - System implements exponential backoff for failed login attempts
-   - CAPTCHA verification is required after multiple failed attempts
+   - Client generates a ZKP proof using the bcrypt-hashed password
+   - Server uses a worker pool to verify the proof without learning the password
+   - System implements rate limiting with exponential backoff for failed login attempts
+   - System tracks IP risk levels and adjusts security measures accordingly
+   - CAPTCHA verification is required after multiple failed attempts based on IP risk level
    - All authentication events are logged for security auditing
 
 3. **Password Reset**:
@@ -409,13 +414,19 @@ DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) 
 
 ```typescript
 import { generateProof, verifyProof, generateSalt, derivePublicKey } from '@/lib/zkp';
-import { hashPassword, verifyPassword, generateZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
+import { hashPassword, verifyPassword, generateZKPWithBcrypt, verifyZKPWithBcrypt, getBcryptWorkFactor, generateBcryptSalt } from '@/lib/zkp/zkp-bcrypt';
+import { verifyCaptcha, getCaptchaThreshold, recordFailedAttemptForCaptcha, resetCaptchaRequirement } from '@/lib/auth/captcha-service';
+import { isIpBlocked, recordFailedAttempt, resetFailedAttempts, getIpRiskLevel, setIpRiskLevel } from '@/lib/auth/ip-blocker';
+import { getAuthWorkerPool } from '@/lib/auth/worker-pool';
 
 // Generate a salt
 const salt = generateSalt();
 
 // Generate a bcrypt salt with custom rounds
 const bcryptSalt = await generateBcryptSalt(12); // 12 salt rounds
+
+// Get the configured bcrypt work factor (from BCRYPT_WORK_FACTOR env var or default 10)
+const workFactor = getBcryptWorkFactor();
 
 // Hash a password with bcrypt (uses BCRYPT_WORK_FACTOR env var or defaults to 10)
 const hashedPassword = await hashPassword('password');
@@ -426,25 +437,51 @@ const customHashedPassword = await hashPassword('password', 12);
 // Verify a password against a hash
 const isPasswordValid = await verifyPassword('password', hashedPassword);
 
-// Generate a public key
-const publicKey = await generatePublicKey('username', 'password', salt);
+// Generate a public key with bcrypt integration
+const publicKey = await derivePublicKey('username', hashedPassword, salt);
 
-// Generate a proof with bcrypt integration
-const { proof, publicSignals } = await generateZKPWithBcrypt('username', 'password', salt);
+// Generate a ZKP proof with bcrypt integration
+const proof = await generateZKPWithBcrypt('username', 'password', salt);
 
-// Generate a standard proof
-const standardProof = await generateProof({
-  username: 'username',
-  password: hashedPassword, // Use the hashed password
-  salt: salt
-});
+// Verify a ZKP proof with bcrypt
+const isValid = await verifyZKPWithBcrypt(proof.proof, proof.publicSignals, publicKey);
 
-// Verify a proof
-const isValid = await verifyProof({
-  proof,
-  publicSignals,
+// Use the worker pool for concurrent verification
+const workerPool = getAuthWorkerPool();
+const verificationResult = await workerPool.executeTask({
+  type: 'verify',
+  proof: proof.proof,
+  publicSignals: proof.publicSignals,
   publicKey
 });
+
+// Check if CAPTCHA is required for an IP address
+const ipAddress = '192.168.1.1';
+const captchaThreshold = await getCaptchaThreshold(ipAddress);
+const failedAttempts = 3; // Example value
+const isCaptchaRequired = failedAttempts >= captchaThreshold;
+
+// Verify a CAPTCHA token
+const isCaptchaValid = await verifyCaptcha('captcha-token', ipAddress);
+
+// Record a failed login attempt for CAPTCHA tracking
+await recordFailedAttemptForCaptcha(ipAddress);
+
+// Reset CAPTCHA requirement after successful login
+await resetCaptchaRequirement(ipAddress);
+
+// Check if an IP is blocked
+const isBlocked = await isIpBlocked(ipAddress);
+
+// Record a failed login attempt for IP blocking
+await recordFailedAttempt(ipAddress, 'username', 'user-agent');
+
+// Reset failed attempts after successful login
+await resetFailedAttempts(ipAddress);
+
+// Get and set IP risk level
+const riskLevel = await getIpRiskLevel(ipAddress);
+await setIpRiskLevel(ipAddress, 'medium');
 ```
 
 ### Setup
@@ -460,7 +497,16 @@ npm run test:crypto
 npx jest tests/crypto/zkp-security-measures.test.ts
 
 # Run bcrypt integration tests
-npx jest tests/lib/zkp-bcrypt.test.ts
+npx jest tests/lib/zkp/zkp-bcrypt.test.ts
+
+# Run authentication flow tests
+npx jest tests/integration/auth/authentication-flow.test.ts
+
+# Run security measures tests
+npx jest tests/integration/auth/security-measures.test.ts
+
+# Run all security tests
+npm run test:all-security
 
 # Run the application with ZKP authentication
 npm run dev

@@ -25,31 +25,44 @@ The ZKP authentication system consists of the following components:
 3. **Verifier**: Server-side code that verifies proofs without learning the password.
 4. **Key Management**: System for generating and managing proving and verification keys.
 5. **Salt Management**: System for generating and retrieving cryptographically secure salts.
+6. **bcrypt Integration**: System for securely hashing passwords with bcrypt before ZKP generation.
+7. **Worker Pool**: System for concurrent processing of authentication requests.
+8. **CAPTCHA Service**: System for CAPTCHA verification after multiple failed attempts.
+9. **IP Blocker**: System for blocking IP addresses after too many failed attempts.
+10. **Rate Limiter**: System for implementing rate limiting with exponential backoff.
 
 ### Component Diagram
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│             │     │             │     │             │
-│   Client    │────▶│    Prover   │────▶│  Verifier   │
-│             │     │             │     │             │
-└─────────────┘     └─────────────┘     └─────────────┘
-       │                   │                   │
-       │                   │                   │
-       ▼                   ▼                   ▼
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│             │     │             │     │             │
-│  Password   │     │   Circuit   │     │    Keys     │
-│             │     │             │     │             │
-└─────────────┘     └─────────────┘     └─────────────┘
-                          │                   │
-                          │                   │
-                          ▼                   ▼
-                    ┌─────────────┐     ┌─────────────┐
-                    │             │     │             │
-                    │    Salt    │     │   Redis     │
-                    │             │     │             │
-                    └─────────────┘     └─────────────┘
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│             │     │             │     │             │     │             │
+│   Client    │────▶│    Prover   │────▶│  Verifier   │────▶│ Worker Pool │
+│             │     │             │     │             │     │             │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+       │                   │                   │                   │
+       │                   │                   │                   │
+       ▼                   ▼                   ▼                   ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│             │     │             │     │             │     │             │
+│  Password   │────▶│   bcrypt    │────▶│   Circuit   │     │    Keys     │
+│             │     │             │     │             │     │             │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+                          │                   │                   │
+                          │                   │                   │
+                          ▼                   ▼                   ▼
+                    ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+                    │             │     │             │     │             │
+                    │    Salt    │     │ IP Blocker  │     │   Redis     │
+                    │             │     │             │     │             │
+                    └─────────────┘     └─────────────┘     └─────────────┘
+                                              │
+                                              │
+                                              ▼
+                                        ┌─────────────┐     ┌─────────────┐
+                                        │             │     │             │
+                                        │ Rate Limiter│────▶│   CAPTCHA   │
+                                        │             │     │             │
+                                        └─────────────┘     └─────────────┘
 ```
 
 ## Circuit Design
@@ -110,21 +123,29 @@ The authentication flow consists of the following steps:
 1. **First User Setup**:
    - First user provides username and password
    - System generates a cryptographically secure random salt
-   - System computes the public key using the ZKP circuit
+   - Password is hashed using bcrypt with configurable work factor
+   - System computes the public key using the ZKP circuit with the bcrypt-hashed password
    - System stores the username, salt, and public key (but not the password)
 
 2. **User Registration**:
    - User provides username and password
    - System generates a cryptographically secure random salt
-   - System computes the public key using the ZKP circuit
+   - Password is hashed using bcrypt with configurable work factor
+   - System computes the public key using the ZKP circuit with the bcrypt-hashed password
    - System stores the username, salt, and public key (but not the password)
 
 3. **Authentication**:
    - User provides username and password
+   - System checks if IP is blocked due to suspicious activity
+   - System checks if CAPTCHA verification is required based on previous failed attempts
+   - Password is hashed using bcrypt with the same work factor
    - System retrieves the salt for the username
-   - Client generates a proof that it knows the password that corresponds to the public key
-   - Server verifies the proof without learning the password
-   - System implements rate limiting, IP blocking, and progressive delays for security
+   - Client generates a ZKP proof using the bcrypt-hashed password
+   - Server uses a worker pool to verify the proof without learning the password
+   - System implements rate limiting with exponential backoff for failed login attempts
+   - System tracks IP risk levels and adjusts security measures accordingly
+   - CAPTCHA verification is required after multiple failed attempts based on IP risk level
+   - All authentication events are logged for security auditing
 
 4. **Password Reset**:
    - User requests password reset
@@ -183,15 +204,19 @@ The ZKP authentication system provides the following security properties:
 4. **Forward Secrecy**: If a password is compromised, previous authentication sessions remain secure.
 5. **Domain Separation**: The system prevents length extension attacks through domain separation.
 6. **Dynamic Salt Generation**: Each user has a unique, cryptographically secure salt.
-7. **Rate Limiting**: The system implements rate limiting to prevent brute force attacks.
-8. **IP Blocking**: The system blocks IP addresses after too many failed attempts.
-9. **Progressive Delays**: The system implements exponential backoff for login attempts.
-10. **Audit Logging**: The system logs authentication events for security auditing.
-11. **bcrypt Password Hashing**: The system uses bcrypt for secure password hashing before ZKP generation.
-12. **CAPTCHA Integration**: The system requires CAPTCHA verification after multiple failed attempts.
+7. **Rate Limiting**: The system implements rate limiting with configurable thresholds to prevent brute force attacks.
+8. **IP Blocking**: The system blocks IP addresses after too many failed attempts based on risk level.
+9. **Progressive Delays**: The system implements exponential backoff for login attempts with configurable parameters.
+10. **Audit Logging**: The system logs authentication events for security auditing with severity levels.
+11. **bcrypt Password Hashing**: The system uses bcrypt with configurable work factor for secure password hashing before ZKP generation.
+12. **CAPTCHA Integration**: The system requires CAPTCHA verification after multiple failed attempts based on IP risk level.
 13. **Replay Attack Prevention**: The system prevents replay attacks by binding proofs to specific sessions.
 14. **Man-in-the-Middle Protection**: The system prevents MITM attacks through username verification.
-15. **Concurrent Authentication**: The system supports multiple authentication requests simultaneously.
+15. **Concurrent Authentication**: The system supports multiple authentication requests simultaneously using a worker pool.
+16. **Risk-Based Security**: The system adjusts security measures based on IP risk levels.
+17. **Adaptive Security**: The system can adjust bcrypt work factor as hardware improves.
+18. **Worker Pool**: The system uses a worker pool for concurrent processing of authentication requests.
+19. **Graceful Degradation**: The system fails securely when components are unavailable.
 
 ## Implementation Details
 
@@ -208,25 +233,33 @@ The circuit is implemented in Circom and compiled to WebAssembly for execution i
 
 The client-side implementation is written in TypeScript and uses the snarkjs library to generate proofs. The implementation includes:
 
-- A function to generate proofs
+- A function to generate proofs with bcrypt integration
 - A function to verify proofs
-- A function to derive public keys from username, password, and salt
+- A function to derive public keys from username, bcrypt-hashed password, and salt
 - A function to generate cryptographically secure salts
-- Integration with bcrypt for secure password hashing
+- Integration with bcrypt for secure password hashing with configurable work factor
 - Support for concurrent proof generation
 - Protection against replay attacks
+- CAPTCHA widget integration for user verification
+- Exponential backoff for failed login attempts
+- Client-side validation of authentication inputs
 
 ### Server-Side Implementation
 
 The server-side implementation is written in TypeScript and uses the snarkjs library to verify proofs. The implementation includes:
 
-- A function to verify proofs
+- A function to verify proofs with bcrypt integration
 - A function to retrieve the salt for a username
 - A function to store the public key for a username
 - A function to generate cryptographically secure salts
-- Rate limiting, IP blocking, and exponential backoff for security
-- Comprehensive audit logging for security events
-- CAPTCHA verification after multiple failed attempts
+- A worker pool for concurrent processing of authentication requests
+- Rate limiting with configurable thresholds and exponential backoff
+- IP blocking with risk-based thresholds and configurable durations
+- CAPTCHA verification with risk-based thresholds
+- Comprehensive audit logging with severity levels
+- Concurrency management to prevent resource exhaustion
+- Risk-based security measures that adapt to threat levels
+- Graceful degradation when components are unavailable
 - Protection against replay attacks
 - Support for concurrent verification
 - Integration with bcrypt for secure password verification

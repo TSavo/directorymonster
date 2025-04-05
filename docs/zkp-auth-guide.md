@@ -48,6 +48,10 @@ The Zero-Knowledge Proof (ZKP) Authentication System provides a secure way to au
    - Creates the ZKP authentication circuit
    - Compiles the circuit
    - Generates the proving key
+   - Sets up bcrypt integration with configurable work factor
+   - Configures the worker pool for concurrent authentication
+   - Sets up CAPTCHA verification with risk-based thresholds
+   - Configures IP blocking with risk-based security measures
    - Exports the verification key
    - Creates a test input file
    - Generates a witness
@@ -95,29 +99,63 @@ To run the ZKP authentication system in Docker:
 
 ```javascript
 import { ZKPProvider } from '../lib/zkp/provider';
+import { generateZKPWithBcrypt } from '../lib/zkp/zkp-bcrypt';
+import { CaptchaWidget } from '../components/admin/auth/CaptchaWidget';
 
 // Get the ZKP provider instance
 const zkp = ZKPProvider.getInstance();
 
-// Generate a proof
-async function login(username, password) {
+// Generate a proof with bcrypt integration
+async function login(username, password, captchaToken) {
   try {
     // Get the salt for the user
     const response = await fetch(`/api/auth/salt?username=${encodeURIComponent(username)}`);
-    const { salt } = await response.json();
+    const { salt, requireCaptcha } = await response.json();
 
-    // Generate a proof
-    const input = { username, password, salt };
-    const { proof, publicSignals } = await zkp.generateProof(input);
+    // Check if CAPTCHA is required
+    if (requireCaptcha && !captchaToken) {
+      return { success: false, requireCaptcha: true, message: 'CAPTCHA verification required' };
+    }
+
+    // Generate a proof with bcrypt integration
+    const proof = await generateZKPWithBcrypt(username, password, salt);
 
     // Send the proof to the server
-    const loginResponse = await fetch('/api/auth/login', {
+    const loginResponse = await fetch('/api/auth/verify', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, proof, publicSignals })
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+      },
+      body: JSON.stringify({
+        username,
+        proof: proof.proof,
+        publicSignals: proof.publicSignals,
+        captchaToken: captchaToken // Include CAPTCHA token if available
+      })
     });
 
-    return await loginResponse.json();
+    const result = await loginResponse.json();
+
+    // Handle rate limiting and IP blocking
+    if (!result.success) {
+      if (result.requireCaptcha) {
+        // Show CAPTCHA widget
+        return { ...result, requireCaptcha: true };
+      }
+
+      if (result.rateLimited) {
+        // Handle rate limiting with exponential backoff
+        return { ...result, rateLimited: true };
+      }
+
+      if (result.ipBlocked) {
+        // Handle IP blocking
+        return { ...result, ipBlocked: true };
+      }
+    }
+
+    return result;
   } catch (error) {
     console.error('Login error:', error);
     throw error;
@@ -129,292 +167,419 @@ async function login(username, password) {
 
 ```javascript
 import { ZKPProvider } from '../lib/zkp/provider';
+import { verifyZKPWithBcrypt } from '../lib/zkp/zkp-bcrypt';
 import { UserService } from '../lib/user-service';
-import { AuditService } from '../lib/auth/audit-service';
-import { IpBlocker } from '../lib/auth/ip-blocker';
-import { CaptchaService } from '../lib/auth/captcha-service';
+import { AuditService, AuditAction, AuditSeverity } from '../lib/audit/audit-service';
+import { isIpBlocked, recordFailedAttempt, resetFailedAttempts, getIpRiskLevel } from '../lib/auth/ip-blocker';
+import { verifyCaptcha, getCaptchaThreshold, recordFailedAttemptForCaptcha, resetCaptchaRequirement } from '../lib/auth/captcha-service';
+import { getAuthWorkerPool } from '../lib/auth/worker-pool';
+import { trackAuthRequest, completeAuthRequest } from '../lib/auth/concurrency';
+import { withRateLimit } from '../middleware/withRateLimit';
 
-// Get the ZKP provider instance
+// Get the ZKP provider instance and worker pool
 const zkp = ZKPProvider.getInstance();
+const workerPool = getAuthWorkerPool();
 const userService = new UserService();
-const auditService = new AuditService();
-const ipBlocker = new IpBlocker();
-const captchaService = new CaptchaService();
 
-// Verify a proof
-async function verifyLogin(req, res) {
-  const { username, proof, publicSignals } = req.body;
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+// Verify a proof with bcrypt integration
+async function verifyAuth(req) {
+  const { username, proof, publicSignals, captchaToken } = req.body;
+  const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+  const userAgent = req.headers['user-agent'] || 'unknown';
 
   try {
     // Check if IP is blocked
-    const isBlocked = await ipBlocker.isBlocked(ip);
+    const isBlocked = await isIpBlocked(ip);
     if (isBlocked) {
-      auditService.logSecurityEvent({
-        type: 'BLOCKED_IP_ATTEMPT',
+      // Log the blocked attempt
+      await AuditService.logEvent({
+        action: AuditAction.IP_BLOCKED,
         ip,
-        username,
-        timestamp: new Date().toISOString()
+        userAgent,
+        severity: AuditSeverity.MEDIUM,
+        details: { reason: 'IP address is blocked' }
       });
-      return res.status(403).json({ success: false, error: 'IP address is blocked' });
+
+      return { success: false, error: 'IP address is blocked', ipBlocked: true };
     }
 
     // Check if CAPTCHA is required
-    const isCaptchaRequired = await captchaService.isCaptchaRequired(ip);
-    if (isCaptchaRequired && !req.body.captchaToken) {
-      auditService.logSecurityEvent({
-        type: 'CAPTCHA_REQUIRED',
-        ip,
-        username,
-        timestamp: new Date().toISOString()
-      });
-      return res.status(400).json({
-        success: false,
-        error: 'CAPTCHA verification required',
-        captchaRequired: true
-      });
+    const captchaThreshold = await getCaptchaThreshold(ip);
+    const failedAttempts = await getFailedAttempts(ip, username);
+    const requireCaptcha = failedAttempts >= captchaThreshold;
+
+    if (requireCaptcha && !captchaToken) {
+      return { success: false, requireCaptcha: true, message: 'CAPTCHA verification required' };
     }
 
     // Verify CAPTCHA if provided
-    if (req.body.captchaToken) {
-      const isValidCaptcha = await captchaService.verifyCaptcha(req.body.captchaToken, ip);
-      if (!isValidCaptcha) {
-        auditService.logSecurityEvent({
-          type: 'INVALID_CAPTCHA',
-          ip,
-          username,
-          timestamp: new Date().toISOString()
-        });
-        return res.status(400).json({ success: false, error: 'Invalid CAPTCHA' });
+    if (captchaToken) {
+      const isCaptchaValid = await verifyCaptcha(captchaToken, ip);
+      if (!isCaptchaValid) {
+        await recordFailedAttemptForCaptcha(ip);
+        return { success: false, error: 'Invalid CAPTCHA', requireCaptcha: true };
       }
     }
 
-    // Apply progressive delay
-    const delay = await ipBlocker.getProgressiveDelay(ip);
-    if (delay > 0) {
-      await new Promise(resolve => setTimeout(resolve, delay));
+    // Track concurrent authentication requests
+    const canProceed = await trackAuthRequest(username);
+    if (!canProceed) {
+      return { success: false, error: 'Authentication system is busy. Please try again later.', rateLimited: true };
     }
-
-    // Get the user
-    const user = await userService.getUserByUsername(username);
-    if (!user) {
-      await ipBlocker.recordFailedAttempt(ip);
-      await captchaService.recordFailedAttempt(ip);
-
-      auditService.logAuthenticationAttempt({
-        username,
-        ip,
-        success: false,
-        reason: 'User not found',
-        timestamp: new Date().toISOString()
-      });
-
-      return res.status(401).json({ success: false, error: 'Invalid credentials' });
-    }
-
-    // Verify the proof
     try {
-      const isValid = await zkp.verifyProof({
+      // Get the user from the database
+      const user = await userService.getUserByUsername(username);
+      if (!user) {
+        // Complete the authentication request to release resources
+        await completeAuthRequest(username);
+
+        // Record failed attempt
+        await recordFailedAttempt(ip, username, userAgent);
+        await recordFailedAttemptForCaptcha(ip);
+
+        // Log the failed attempt
+        await AuditService.logEvent({
+          action: AuditAction.FAILED_LOGIN,
+          username,
+          ip,
+          userAgent,
+          severity: AuditSeverity.LOW,
+          details: { reason: 'User not found' }
+        });
+
+        return { success: false, error: 'Invalid username or password' };
+      }
+
+      // Use the worker pool to verify the proof
+      const verificationResult = await workerPool.executeTask({
+        type: 'verify',
         proof,
         publicSignals,
         publicKey: user.publicKey
       });
 
-      if (isValid) {
-        // Record successful login
-        await ipBlocker.recordSuccessfulLogin(ip);
-        await captchaService.recordSuccessfulVerification(ip);
+      // Complete the authentication request to release resources
+      await completeAuthRequest(username);
 
-        // Log successful authentication
-        auditService.logAuthenticationAttempt({
+      if (!verificationResult.success || !verificationResult.result) {
+        // Record failed attempt
+        await recordFailedAttempt(ip, username, userAgent);
+        await recordFailedAttemptForCaptcha(ip);
+
+        // Log the failed attempt
+        await AuditService.logEvent({
+          action: AuditAction.FAILED_LOGIN,
           username,
           ip,
-          success: true,
-          timestamp: new Date().toISOString()
+          userAgent,
+          severity: AuditSeverity.LOW,
+          details: { reason: 'Invalid proof' }
         });
 
-        // Generate a token
-        const token = generateAuthToken(user);
-        return res.status(200).json({ success: true, token });
-      } else {
-        throw new Error('Invalid proof');
+        return { success: false, error: 'Invalid username or password' };
       }
-    } catch (error) {
-      // Record failed attempt
-      await ipBlocker.recordFailedAttempt(ip);
-      await captchaService.recordFailedAttempt(ip);
 
-      // Log failed authentication
-      auditService.logAuthenticationAttempt({
+      // Authentication successful
+      // Reset failed attempts
+      await resetFailedAttempts(ip);
+      await resetCaptchaRequirement(ip);
+
+      // Update last login time
+      const updatedUser = await userService.updateLastLogin(username);
+
+      // Log the successful login
+      await AuditService.logEvent({
+        action: AuditAction.SUCCESSFUL_LOGIN,
         username,
         ip,
-        success: false,
-        reason: error.message,
-        timestamp: new Date().toISOString()
+        userAgent,
+        severity: AuditSeverity.INFO,
+        details: { userId: user.id }
       });
 
-      return res.status(401).json({ success: false, error: 'Invalid credentials' });
-    }
+      // Generate a JWT token
+      const token = generateToken(user);
+
+      return {
+        success: true,
+        token,
+        user: {
+          username: user.username,
+          role: user.role,
+          id: user.id,
+          lastLogin: updatedUser.lastLogin,
+        },
+      };
+    } catch (error) {
+      // Complete the authentication request to release resources
+      await completeAuthRequest(username);
+
+      // Log the error
+      console.error('Error during authentication:', error);
+
+      // Log the error to the audit service
+      await AuditService.logEvent({
+        action: AuditAction.AUTHENTICATION_ERROR,
+        username,
+        ip,
+        userAgent,
+        severity: AuditSeverity.HIGH,
+        details: { error: error.message }
+      });
+
+      return { success: false, error: 'Authentication error' };
   } catch (error) {
-    console.error('Authentication error:', error);
-    return res.status(500).json({ success: false, error: 'Authentication error' });
+    // Complete the authentication request to release resources
+    if (username) {
+      await completeAuthRequest(username);
+    }
+
+    // Log the error
+    console.error('Error during authentication:', error);
+
+    return { success: false, error: 'Authentication error' };
   }
 }
+
+// Wrap the verification function with rate limiting
+export const POST = withRateLimit(
+  async (req) => {
+    return verifyAuth(req);
+  },
+  {
+    limit: 10,
+    windowInSeconds: 60,
+    identifierFn: (req) => {
+      const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+      return `login:${ip}`;
+    }
+  }
+);
+```
+
+## Security Features
+
+The ZKP Authentication System includes several security features to protect against various attacks:
+
+### bcrypt Password Hashing
+
+Passwords are hashed using bcrypt before being used in the ZKP system. This provides defense in depth:
+
+- If the ZKP system is compromised, passwords remain protected by bcrypt
+- Configurable bcrypt work factor can be adjusted as hardware improves
+- Industry-standard password hashing algorithm with proven security properties
+
+### Rate Limiting
+
+To prevent brute force attacks, the system implements rate limiting with exponential backoff:
+
+- Failed login attempts are limited with configurable thresholds
+- Exponential backoff increases delays between attempts
+- Rate limits are tracked per IP address and username
+
+### IP Blocking
+
+The system implements IP blocking to prevent malicious access attempts:
+
+- IP addresses are blocked after multiple failed login attempts
+- Block duration is based on IP risk level
+- Risk levels are dynamically adjusted based on behavior
+
+### CAPTCHA Verification
+
+The system requires CAPTCHA verification after multiple failed attempts:
+
+- CAPTCHA threshold is based on IP risk level
+- Multiple CAPTCHA providers are supported
+- CAPTCHA verification is required for high-risk IPs
+
+### Worker Pool
+
+The system uses a worker pool for concurrent processing of authentication requests:
+
+- Multiple authentication requests can be processed simultaneously
+- Configurable concurrency limits prevent resource exhaustion
+- Graceful degradation when limits are reached
+- Fair scheduling of authentication requests
+
+### Audit Logging
+
+The system logs authentication events for security auditing:
+
+- Successful and failed login attempts are logged
+- IP blocking events are logged
+- CAPTCHA verification events are logged
+- Authentication errors are logged
+- Logs include severity levels for filtering
+
+### Concurrency Management
+
+The system manages concurrent authentication requests to prevent resource exhaustion:
+
+- Limits the number of concurrent authentication requests
+- Tracks authentication requests per username
+- Releases resources after authentication completes
+- Prevents denial-of-service attacks
+
+## Testing
+
+The ZKP Authentication System includes comprehensive tests to ensure security and functionality:
+
+### Unit Tests
+
+```bash
+# Run bcrypt integration tests
+npx jest tests/lib/zkp/zkp-bcrypt.test.ts
+
+# Run worker pool tests
+npx jest tests/lib/auth/worker-pool.test.ts
+
+# Run CAPTCHA service tests
+npx jest tests/lib/auth/captcha-service.test.ts
+
+# Run IP blocker tests
+npx jest tests/lib/auth/ip-blocker.test.ts
+```
+
+### Integration Tests
+
+```bash
+# Run authentication flow tests
+npx jest tests/integration/auth/authentication-flow.test.ts
+
+# Run security measures tests
+npx jest tests/integration/auth/security-measures.test.ts
+
+# Run edge cases tests
+npx jest tests/integration/auth/edge-cases.test.ts
+```
+
+### Security Tests
+
+```bash
+# Run all security tests
+npm run test:all-security
+
+# Run ZKP security measures tests
+npx jest tests/crypto/zkp-security-measures.test.ts
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### CAPTCHA Verification Failed
+
+If CAPTCHA verification fails, check the following:
+
+- Ensure the CAPTCHA token is valid and not expired
+- Verify that the correct CAPTCHA provider is configured
+- Check that the CAPTCHA secret key is correctly set in environment variables
+
+#### IP Blocking
+
+If an IP address is blocked, you can unblock it using the admin interface or directly through Redis:
+
+```bash
+# Connect to Redis
+redis-cli
+
+# List all blocked IPs
+KEYS auth:blocked:ip:*
+
+# Unblock a specific IP
+DEL auth:blocked:ip:192.168.1.1
+```
+
+#### Worker Pool Errors
+
+If you encounter worker pool errors, check the following:
+
+- Ensure the worker pool is properly initialized
+- Check that the concurrency limits are appropriate for your hardware
+- Verify that the worker pool is properly shut down when not in use
+
+## Advanced Configuration
+
+### Environment Variables
+
+The ZKP Authentication System can be configured using the following environment variables:
+
+```
+# bcrypt Configuration
+BCRYPT_WORK_FACTOR=12  # Default is 10 if not specified
+
+# CAPTCHA Configuration
+RECAPTCHA_SITE_KEY=your-site-key
+RECAPTCHA_SECRET_KEY=your-secret-key
+CAPTCHA_THRESHOLD=3  # Number of failed attempts before CAPTCHA is required
+
+# IP Blocking Configuration
+IP_BLOCK_DURATION=86400  # Duration in seconds (24 hours)
+MAX_FAILED_ATTEMPTS=5  # Number of failed attempts before IP is blocked
+
+# Worker Pool Configuration
+WORKER_POOL_SIZE=4  # Number of workers in the pool
+MAX_CONCURRENT_AUTH=10  # Maximum number of concurrent authentication requests
 ```
 
 ## Security Features
 
 The ZKP Authentication System includes several security features:
 
-### 1. Zero-Knowledge Proofs
+### 1. Zero-Knowledge Proofs with bcrypt Integration
 
-- **What it is**: A cryptographic method that allows one party to prove to another that they know a value without revealing the value itself.
-- **How it works**: The system uses the Poseidon hash function with a secure MDS matrix to create a circuit that can verify a password without revealing it.
-- **Benefits**: Even if the server is compromised, user passwords remain secure.
+- **What it is**: A cryptographic method that allows one party to prove to another that they know a value without revealing the value itself, enhanced with bcrypt password hashing.
+- **How it works**: The system hashes passwords with bcrypt before using them in the ZKP circuit, which uses the Poseidon hash function with a secure MDS matrix.
+- **Benefits**: Even if the server is compromised, user passwords remain secure with multiple layers of protection.
 
-### 2. Domain Separation
+### 2. bcrypt Password Hashing
 
-- **What it is**: A technique to ensure that proofs generated for one purpose cannot be reused for another purpose.
-- **How it works**: The system uses different domain constants for authentication and password reset operations.
-- **Benefits**: Prevents replay attacks and ensures that proofs are used only for their intended purpose.
+- **What it is**: An industry-standard password hashing algorithm designed to be slow and computationally intensive.
+- **How it works**: The system hashes passwords using bcrypt with a configurable work factor before using them in the ZKP system.
+- **Benefits**: Provides defense in depth, with the work factor adjustable as hardware improves.
 
-### 3. IP-Based Blocking
+### 3. Worker Pool for Concurrent Authentication
 
-- **What it is**: A mechanism to block IP addresses that make too many failed login attempts.
-- **How it works**: The system tracks failed login attempts by IP address and blocks IPs that exceed a threshold.
-- **Benefits**: Prevents brute-force attacks and protects user accounts.
+- **What it is**: A system for processing multiple authentication requests simultaneously.
+- **How it works**: The system maintains a pool of worker threads that can process authentication requests concurrently.
+- **Benefits**: Improves performance and prevents denial-of-service attacks by managing resources efficiently.
 
-### 4. CAPTCHA Verification
+### 4. Risk-Based IP Blocking
 
-- **What it is**: A challenge-response test to determine if the user is human.
-- **How it works**: After a few failed login attempts, the system requires CAPTCHA verification.
-- **Benefits**: Prevents automated attacks and adds an additional layer of security.
+- **What it is**: A mechanism to block IP addresses that make too many failed login attempts, with block duration based on risk level.
+- **How it works**: The system tracks failed login attempts by IP address, assigns risk levels, and blocks IPs that exceed thresholds.
+- **Benefits**: Prevents brute-force attacks and adapts security measures based on threat levels.
 
-### 5. Progressive Delays
+### 5. CAPTCHA Verification with Risk-Based Thresholds
+
+- **What it is**: A challenge-response test to determine if the user is human, with thresholds based on IP risk level.
+- **How it works**: After a few failed login attempts, the system requires CAPTCHA verification, with the threshold adjusted based on IP risk level.
+- **Benefits**: Prevents automated attacks and adds an additional layer of security that adapts to threat levels.
+
+### 6. Exponential Backoff for Rate Limiting
 
 - **What it is**: A mechanism to add increasing delays after failed login attempts.
-- **How it works**: The system adds a delay that increases with each failed attempt.
+- **How it works**: The system implements rate limiting with exponential backoff, increasing delays between attempts.
 - **Benefits**: Makes brute-force attacks impractical by significantly increasing the time required.
 
-### 6. Audit Logging
+### 7. Comprehensive Audit Logging
 
-- **What it is**: A system to log authentication attempts and security events.
-- **How it works**: The system logs all authentication attempts, including successful and failed attempts, with details such as username, IP address, and timestamp.
+- **What it is**: A system to log authentication attempts and security events with severity levels.
+- **How it works**: The system logs all authentication events, including successful and failed attempts, IP blocking, CAPTCHA verification, and errors.
 - **Benefits**: Provides a trail of evidence for security incidents and helps identify patterns of suspicious activity.
 
-## Testing
+### 8. Concurrency Management
 
-### Running Tests
-
-To run the ZKP authentication tests:
-
-```bash
-# Run all tests with simplified command
-npm run test
-
-# Run verification tests
-npm run verify
-
-# Run specific crypto tests
-npm run test:crypto
-npm run test:crypto:core
-npm run test:crypto:security
-
-# Run security verification
-npm run security:verify
-```
-
-### Test Coverage
-
-The tests cover the following scenarios:
-
-1. **Authentication Flow**: Tests the complete authentication flow from registration to login.
-2. **Security Measures**: Tests IP blocking, CAPTCHA verification, and progressive delays.
-3. **Salt Generation**: Tests dynamic salt generation and rotation.
-4. **Error Handling**: Tests how the system handles various error conditions.
-5. **Performance**: Tests the performance of proof generation and verification.
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Circuit Compilation Errors**:
-   - **Problem**: Errors when compiling the circuit.
-   - **Solution**: Ensure you have the correct version of Circom installed and that the circuit syntax is correct.
-
-2. **Proof Verification Failures**:
-   - **Problem**: Proofs are not being verified correctly.
-   - **Solution**: Check that the salt and public key match, and that the proof was generated with the correct inputs.
-
-3. **Performance Issues**:
-   - **Problem**: Proof generation or verification is slow.
-   - **Solution**: Optimize the circuit, use a smaller circuit, or use a more powerful machine.
-
-4. **Path Issues**:
-   - **Problem**: Files not found or incorrect paths.
-   - **Solution**: Ensure all paths use `process.cwd()` for consistent access from the project root.
-
-### Debugging
-
-To debug the ZKP authentication system:
-
-1. Enable debug logging:
-   ```javascript
-   // In src/lib/zkp/index.js
-   const DEBUG = true;
-   ```
-
-2. Check the logs:
-   ```bash
-   npm run zkp:docker:logs
-   ```
-
-3. Use the test scripts:
-   ```bash
-   npm run test:crypto:secure -- --verbose
-   ```
-
-## Advanced Configuration
-
-### Customizing Security Parameters
-
-You can customize the security parameters in the `config.js` file:
-
-```javascript
-// In src/config.js
-module.exports = {
-  // ...
-  ipBlocker: {
-    maxFailedAttempts: 5,        // Number of failed attempts before blocking
-    blockDuration: 15 * 60,      // Block duration in seconds (15 minutes)
-    adminUsername: 'admin',      // Admin username that can bypass IP blocking
-  },
-  captcha: {
-    enabled: true,               // Enable CAPTCHA verification
-    siteKey: 'your-site-key',    // reCAPTCHA site key
-    secretKey: 'your-secret-key', // reCAPTCHA secret key
-    threshold: 3,                // Number of failed attempts before requiring CAPTCHA
-  },
-  audit: {
-    enabled: true,               // Enable audit logging
-    logLevel: 'info',            // Log level (debug, info, warn, error)
-  },
-  // ...
-};
-```
-
-### Using a Different Hash Function
-
-The system uses the Poseidon hash function by default, but you can use a different hash function by modifying the circuit:
-
-1. Create a new circuit file with your hash function.
-2. Update the `zkp-setup.ts` script to use your circuit.
-3. Regenerate the proving and verification keys.
+- **What it is**: A system to manage concurrent authentication requests and prevent resource exhaustion.
+- **How it works**: The system tracks authentication requests per username and limits the number of concurrent requests.
+- **Benefits**: Prevents denial-of-service attacks and ensures fair access to authentication resources.
 
 ## References
 
-1. [Circom Documentation](https://docs.circom.io/)
-2. [SnarkJS Documentation](https://github.com/iden3/snarkjs)
-3. [Poseidon Hash Function](https://www.poseidon-hash.info/)
-4. [Zero-Knowledge Proofs: An Illustrated Primer](https://blog.cryptographyengineering.com/2014/11/27/zero-knowledge-proofs-illustrated-primer/)
-5. [Introduction to zk-SNARKs](https://consensys.net/blog/blockchain-explained/zero-knowledge-proofs-starks-vs-snarks/)
+- [bcrypt-ZKP Integration Specification](../specs/security/bcrypt-zkp-integration.md)
+- [ZKP Authentication Specification](./zkp-authentication.md)
+- [Security Documentation](./security.md)
+- [bcrypt-ZKP Improvements](../specs/security/bcrypt-zkp-improvements.md)
+- [Security Components Test Coverage](../specs/security/security-components-test-coverage.md)
+
