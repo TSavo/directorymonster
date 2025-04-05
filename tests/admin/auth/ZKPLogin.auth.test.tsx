@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import ZKPLogin from '@/components/admin/auth/ZKPLogin';
-import * as zkpLib from '@/lib/zkp';
+import * as zkpBcryptLib from '@/lib/zkp/zkp-bcrypt';
 
 // Mock the Next.js router
 const mockPush = jest.fn();
@@ -16,12 +16,13 @@ jest.mock('next/navigation', () => ({
   useRouter: () => mockRouter
 }));
 
-// Mock the ZKP library functions
-jest.mock('@/lib/zkp', () => ({
-  generateProof: jest.fn(),
-  verifyProof: jest.fn(),
-  generateSalt: jest.fn().mockReturnValue('test-salt-value'),
-  derivePublicKey: jest.fn().mockReturnValue('test-derived-public-key'),
+// Mock the ZKP-Bcrypt library functions
+jest.mock('@/lib/zkp/zkp-bcrypt', () => ({
+  generateZKPWithBcrypt: jest.fn(),
+  verifyZKPWithBcrypt: jest.fn(),
+  hashPassword: jest.fn().mockResolvedValue('$2b$10$mockedhash'),
+  verifyPassword: jest.fn().mockResolvedValue(true),
+  generateBcryptSalt: jest.fn().mockReturnValue('$2b$10$mockedsalt'),
 }));
 
 // Mock fetch for API calls
@@ -32,8 +33,8 @@ describe('ZKPLogin Authentication Flow Tests', () => {
     jest.clearAllMocks();
     (global.fetch as jest.Mock).mockReset();
 
-    // Default mock implementation for generateProof
-    (zkpLib.generateProof as jest.Mock).mockResolvedValue({
+    // Default mock implementation for generateZKPWithBcrypt
+    (zkpBcryptLib.generateZKPWithBcrypt as jest.Mock).mockResolvedValue({
       proof: 'mock-proof-string',
       publicSignals: ['mock-public-signal-1', 'mock-public-signal-2'],
     });
@@ -67,14 +68,14 @@ describe('ZKPLogin Authentication Flow Tests', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }));
 
     // Verify ZKP functions were called
-    expect(zkpLib.generateProof).toHaveBeenCalled();
+    expect(zkpBcryptLib.generateZKPWithBcrypt).toHaveBeenCalled();
 
     // Get the first call arguments
-    const callArgs = (zkpLib.generateProof as jest.Mock).mock.calls[0][0];
+    const callArgs = (zkpBcryptLib.generateZKPWithBcrypt as jest.Mock).mock.calls[0];
 
     // Verify username and password were passed correctly
-    expect(callArgs.username).toBe('testuser');
-    expect(callArgs.password).toBe('SecurePassword123');
+    expect(callArgs[0]).toBe('testuser');
+    expect(callArgs[1]).toBe('SecurePassword123');
     // Note: We don't check the salt value as it might be undefined in the test environment
 
     // Verify fetch was called with correct data

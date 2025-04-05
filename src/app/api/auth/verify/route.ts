@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { kv } from '@/lib/redis-client';
-import { verifyProof } from '@/lib/zkp';
+import { verifyZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 import jwt from 'jsonwebtoken';
 import { withRateLimit } from '@/middleware/withRateLimit';
 import { withAuthSecurity } from '@/middleware/withAuthSecurity';
@@ -110,12 +110,12 @@ export const POST = withRateLimit(
     // Log for debugging
     console.log(`Verifying proof for user ${body.username}`);
 
-    // Verify the proof using ZKP
-    const isValid = await verifyProof({
-      proof: body.proof,
-      publicSignals: body.publicSignals,
-      publicKey: user.publicKey,
-    });
+    // Verify the proof using ZKP with bcrypt
+    const isValid = await verifyZKPWithBcrypt(
+      body.proof,
+      body.publicSignals,
+      user.publicKey
+    );
 
     if (!isValid) {
       console.warn(`Invalid proof for user ${body.username}`);

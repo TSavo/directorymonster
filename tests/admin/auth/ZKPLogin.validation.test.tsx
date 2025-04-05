@@ -11,9 +11,9 @@ global.TextEncoder = class TextEncoder {
   }
 };
 
-// Mock the generateProof function to avoid crypto.subtle issues
-jest.mock('@/lib/zkp', () => ({
-  generateProof: jest.fn().mockImplementation(() => {
+// Mock the ZKP-Bcrypt library functions
+jest.mock('@/lib/zkp/zkp-bcrypt', () => ({
+  generateZKPWithBcrypt: jest.fn().mockImplementation(() => {
     return Promise.resolve({
       proof: {
         pi_a: ['mock_proof_a', '2', '3'],
@@ -24,10 +24,10 @@ jest.mock('@/lib/zkp', () => ({
       publicSignals: ['mock_public_signal_1', 'mock_public_signal_2']
     });
   }),
-  generatePublicKey: jest.fn().mockImplementation(() => {
-    return Promise.resolve('mock_public_key');
-  }),
-  generateSalt: jest.fn().mockReturnValue('mock-salt')
+  verifyZKPWithBcrypt: jest.fn().mockResolvedValue(true),
+  hashPassword: jest.fn().mockResolvedValue('$2b$10$mockedhash'),
+  verifyPassword: jest.fn().mockResolvedValue(true),
+  generateBcryptSalt: jest.fn().mockReturnValue('$2b$10$mockedsalt')
 }));
 
 // Mock the Next.js router

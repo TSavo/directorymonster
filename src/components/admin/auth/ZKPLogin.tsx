@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { generateProof } from '@/lib/zkp';
+import { generateZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 import { getSalt, clearSaltCache } from '@/lib/auth/salt-cache';
 import { getAuthErrorMessage, AuthErrorType } from '@/lib/auth/error-handler';
 
@@ -106,12 +106,12 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
         salt: salt ? 'Retrieved' : 'Missing'
       });
 
-      // Generate ZKP
-      const { proof, publicSignals } = await generateProof({
+      // Generate ZKP with bcrypt
+      const { proof, publicSignals } = await generateZKPWithBcrypt(
         username,
         password,
-        salt,
-      });
+        salt
+      );
 
       // Get CSRF token
       const csrfToken = getCsrfToken();

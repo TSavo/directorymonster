@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { kv } from '@/lib/redis-client';
 import { verifyProof } from '@/lib/zkp';
+import { verifyZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 import { withRateLimit } from '@/middleware/withRateLimit';
 
 export const POST = withRateLimit(
@@ -48,12 +49,12 @@ export const POST = withRateLimit(
 
       const { key, user } = userMatch;
 
-      // Verify the proof using ZKP
-      const isValid = await verifyProof({
+      // Verify the proof using ZKP with bcrypt
+      const isValid = await verifyZKPWithBcrypt(
         proof,
         publicSignals,
-        publicKey: user.publicKey, // We verify against the old public key
-      });
+        user.publicKey // We verify against the old public key
+      );
 
       if (!isValid) {
         console.warn(`Invalid proof for password reset: ${email}`);

@@ -23,13 +23,17 @@ DirectoryMonster is a comprehensive platform combining:
    - Cryptographically secure authentication without password transmission
    - Poseidon hash function from circomlib for secure hashing
    - Dynamic salt generation for enhanced security
-   - Rate limiting, IP blocking, and progressive delays for brute force protection
+   - Rate limiting, IP blocking, and exponential backoff for brute force protection
+   - CAPTCHA verification after multiple failed attempts
    - Docker-ready deployment for production environments
    - Enhanced security with bcrypt password hashing
    - Full hash values without truncation for maximum security
    - Cryptographic file integrity verification
    - Protection against division by zero attacks
    - Comprehensive security testing and verification
+   - Replay attack prevention through session binding
+   - Man-in-the-middle protection through username verification
+   - Concurrent authentication support without security degradation
 
 ## Requirements
 
@@ -177,6 +181,7 @@ DirectoryMonster implements advanced security features, particularly in the Zero
 - Replaced SHA-256 with bcrypt for password hashing
 - Implemented proper salt generation and management
 - Added protection against timing attacks
+- Integrated bcrypt with ZKP for a defense-in-depth approach
 
 ### Cryptographic Improvements
 
@@ -184,6 +189,16 @@ DirectoryMonster implements advanced security features, particularly in the Zero
 - Implemented proper Poseidon hash constants
 - Increased Poseidon round parameters for enhanced security
 - Added protection against division by zero attacks
+- Implemented replay attack prevention through session binding
+- Added man-in-the-middle protection through username verification
+
+### Brute Force Protection
+
+- Implemented rate limiting for authentication attempts
+- Added IP blocking after too many failed attempts
+- Implemented exponential backoff for login attempts
+- Added CAPTCHA verification after multiple failed attempts
+- Implemented comprehensive audit logging for security events
 
 ### Implementation Security
 
@@ -191,6 +206,8 @@ DirectoryMonster implements advanced security features, particularly in the Zero
 - Fixed privacy issues in ZKP circuits
 - Fixed TypeScript reserved keyword issues
 - Improved HTTP headers implementation
+- Added support for concurrent authentication requests
+- Implemented proper error handling for all security-related operations
 
 ### Security Verification
 
@@ -205,9 +222,15 @@ npm run security:verify    # Verify file integrity
 npm run security:check     # Run security tests and verify integrity
 npm run security:audit     # Run security audit on dependencies
 npm run security:all       # Run all security checks
+
+# Run ZKP security measures tests
+npx jest tests/crypto/zkp-security-measures.test.ts
+
+# Run bcrypt integration tests
+npx jest tests/lib/zkp-bcrypt.test.ts
 ```
 
-For detailed information about security improvements, see [Security Documentation](docs/security/README.md).
+For detailed information about security improvements, see [Security Documentation](docs/security/README.md) and [ZKP Security Checklist](docs/security/zkp-security-checklist.md).
 
 ## Testing
 
@@ -235,6 +258,8 @@ npm run test:components:listings    # Listing tests
 npm run test:crypto          # All crypto tests
 npm run test:crypto:core     # Core ZKP tests
 npm run test:crypto:security # Security tests
+npm run test:crypto:bcrypt   # bcrypt integration tests
+npm run test:crypto:measures # Security measures tests
 
 # Run end-to-end tests
 npm run test:e2e             # Basic E2E tests
@@ -251,6 +276,14 @@ The test suite covers:
 - End-to-end user workflows
 - ZKP authentication and security measures
 - Dynamic salt generation and verification
+- bcrypt integration with ZKP
+- Rate limiting and IP blocking
+- Exponential backoff for login attempts
+- CAPTCHA verification
+- Audit logging for security events
+- Replay attack prevention
+- Man-in-the-middle protection
+- Concurrent authentication support
 
 ### Test-Driven Development
 
@@ -335,10 +368,15 @@ DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) 
 - **Secure Authentication**: Users can authenticate without transmitting passwords
 - **Cryptographic Security**: Uses the Poseidon hash function from circomlib
 - **Dynamic Salt Generation**: Each user has a unique, cryptographically secure salt
-- **Security Measures**: Rate limiting, IP blocking, progressive delays, and CAPTCHA verification
+- **bcrypt Integration**: Passwords are securely hashed with bcrypt before ZKP generation
+- **Security Measures**: Rate limiting, IP blocking, exponential backoff, and CAPTCHA verification
 - **Audit Logging**: Comprehensive logging of authentication events
 - **Docker Integration**: Ready for production deployment with Docker
 - **TypeScript Implementation**: Fully typed implementation for better developer experience
+- **Replay Attack Prevention**: Proofs are bound to specific sessions to prevent replay attacks
+- **Man-in-the-Middle Protection**: Username verification prevents MITM attacks
+- **Concurrent Authentication**: Multiple authentication requests can be handled simultaneously
+- **Admin Bypass**: Administrators can bypass IP blocking for legitimate purposes
 
 ### Authentication Flow
 
@@ -350,10 +388,14 @@ DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) 
 
 2. **User Authentication**:
    - User provides username and password
+   - Password is hashed using bcrypt for additional security
    - System retrieves the salt for the username
    - Client generates a proof that it knows the password that corresponds to the public key
    - Server verifies the proof without learning the password
-   - System implements rate limiting, IP blocking, and progressive delays for security
+   - System checks for rate limiting, IP blocking, and other security measures
+   - System implements exponential backoff for failed login attempts
+   - CAPTCHA verification is required after multiple failed attempts
+   - All authentication events are logged for security auditing
 
 3. **Password Reset**:
    - User requests password reset
@@ -367,17 +409,27 @@ DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) 
 
 ```typescript
 import { generateProof, verifyProof, generateSalt, derivePublicKey } from '@/lib/zkp';
+import { hashPassword, verifyPassword, generateZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 
 // Generate a salt
 const salt = generateSalt();
 
-// Derive a public key
-const publicKey = await derivePublicKey('username', 'password', salt);
+// Hash a password with bcrypt
+const hashedPassword = await hashPassword('password', 12); // 12 salt rounds
 
-// Generate a proof
-const { proof, publicSignals } = await generateProof({
+// Verify a password against a hash
+const isPasswordValid = await verifyPassword('password', hashedPassword);
+
+// Derive a public key
+const publicKey = await derivePublicKey('username', hashedPassword, salt);
+
+// Generate a proof with bcrypt integration
+const { proof, publicSignals } = await generateZKPWithBcrypt('username', 'password', salt);
+
+// Generate a standard proof
+const standardProof = await generateProof({
   username: 'username',
-  password: 'password',
+  password: hashedPassword, // Use the hashed password
   salt: salt
 });
 
@@ -398,6 +450,12 @@ npm run zkp:setup
 # Run tests to verify the setup
 npm run test:crypto
 
+# Run security measures tests
+npx jest tests/crypto/zkp-security-measures.test.ts
+
+# Run bcrypt integration tests
+npx jest tests/lib/zkp-bcrypt.test.ts
+
 # Run the application with ZKP authentication
 npm run dev
 ```
@@ -405,9 +463,16 @@ npm run dev
 ### Security Considerations
 
 - The ZKP authentication system is designed to be secure against various attacks, including brute force attacks, timing attacks, and replay attacks.
-- The system implements rate limiting, IP blocking, and progressive delays to prevent brute force attacks.
+- The system implements rate limiting, IP blocking, and exponential backoff to prevent brute force attacks.
+- The system requires CAPTCHA verification after multiple failed attempts.
+- The system uses bcrypt for secure password hashing before ZKP generation.
 - The system uses dynamic salt generation to prevent precomputed table attacks.
-- The system logs authentication events for security auditing.
+- The system logs all authentication events for comprehensive security auditing.
+- The system prevents replay attacks by binding proofs to specific sessions.
+- The system prevents man-in-the-middle attacks through username verification.
+- The system supports concurrent authentication requests without security degradation.
+- The system allocates resources efficiently to prevent denial-of-service attacks.
+- The system has been thoroughly tested under high load to ensure security measures remain effective.
 
 For more information, see the [ZKP Authentication Specification](docs/zkp-authentication.md) and the [Production Deployment Guide](docs/production-deployment.md).
 

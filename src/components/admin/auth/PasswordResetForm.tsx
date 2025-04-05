@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { generateProof } from '@/lib/zkp';
+import { generateZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 import { getSalt } from '@/lib/auth/salt-cache';
 import { getAuthErrorMessage, AuthErrorType } from '@/lib/auth/error-handler';
 
@@ -145,12 +145,12 @@ export function PasswordResetForm({
       // Get salt from cache or server API
       const salt = await getSalt(email);
 
-      // Generate ZKP for new password
-      const { proof, publicSignals } = await generateProof({
-        username: email,
-        password: newPassword,
-        salt,
-      });
+      // Generate ZKP for new password with bcrypt
+      const { proof, publicSignals } = await generateZKPWithBcrypt(
+        email,
+        newPassword,
+        salt
+      );
 
       const response = await fetch('/api/auth/confirm-reset', {
         method: 'POST',

@@ -1,5 +1,6 @@
 import { ZKPAdapter, ZKPInput, ZKPProof } from './adapter';
 import crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 
 /**
  * SnarkJS Adapter Implementation
@@ -139,17 +140,20 @@ export class SnarkAdapter implements ZKPAdapter {
   }
 
   /**
-   * Helper method to hash credentials
+   * Helper method to hash credentials with bcrypt
    * @param input User credentials
    * @returns Hashed credentials
    */
   private hashCredentials(input: ZKPInput): string {
     const { username, password, salt } = input;
 
-    // Create a hash of the credentials
+    // First hash the password with bcrypt (synchronous version for simplicity)
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    // Create a hash of the credentials using the hashed password
     const hash = crypto
       .createHmac('sha256', salt)
-      .update(`${username}:${password}`)
+      .update(`${username}:${hashedPassword}`)
       .digest('hex');
 
     return hash;

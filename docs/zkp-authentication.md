@@ -185,8 +185,13 @@ The ZKP authentication system provides the following security properties:
 6. **Dynamic Salt Generation**: Each user has a unique, cryptographically secure salt.
 7. **Rate Limiting**: The system implements rate limiting to prevent brute force attacks.
 8. **IP Blocking**: The system blocks IP addresses after too many failed attempts.
-9. **Progressive Delays**: The system implements progressive delays for login attempts.
+9. **Progressive Delays**: The system implements exponential backoff for login attempts.
 10. **Audit Logging**: The system logs authentication events for security auditing.
+11. **bcrypt Password Hashing**: The system uses bcrypt for secure password hashing before ZKP generation.
+12. **CAPTCHA Integration**: The system requires CAPTCHA verification after multiple failed attempts.
+13. **Replay Attack Prevention**: The system prevents replay attacks by binding proofs to specific sessions.
+14. **Man-in-the-Middle Protection**: The system prevents MITM attacks through username verification.
+15. **Concurrent Authentication**: The system supports multiple authentication requests simultaneously.
 
 ## Implementation Details
 
@@ -207,6 +212,9 @@ The client-side implementation is written in TypeScript and uses the snarkjs lib
 - A function to verify proofs
 - A function to derive public keys from username, password, and salt
 - A function to generate cryptographically secure salts
+- Integration with bcrypt for secure password hashing
+- Support for concurrent proof generation
+- Protection against replay attacks
 
 ### Server-Side Implementation
 
@@ -216,8 +224,12 @@ The server-side implementation is written in TypeScript and uses the snarkjs lib
 - A function to retrieve the salt for a username
 - A function to store the public key for a username
 - A function to generate cryptographically secure salts
-- Rate limiting, IP blocking, and progressive delays for security
-- Audit logging for security events
+- Rate limiting, IP blocking, and exponential backoff for security
+- Comprehensive audit logging for security events
+- CAPTCHA verification after multiple failed attempts
+- Protection against replay attacks
+- Support for concurrent verification
+- Integration with bcrypt for secure password verification
 
 ### Security Measures
 
@@ -225,11 +237,16 @@ The system implements the following security measures:
 
 1. **Rate Limiting**: The system limits the number of login attempts per username.
 2. **IP Blocking**: The system blocks IP addresses after too many failed attempts.
-3. **Progressive Delays**: The system implements progressive delays for login attempts.
-4. **CAPTCHA Verification**: The system requires CAPTCHA verification after a few failed attempts.
-5. **Audit Logging**: The system logs authentication events for security auditing.
+3. **Exponential Backoff**: The system implements exponential backoff for login attempts, doubling the delay after each failed attempt.
+4. **CAPTCHA Verification**: The system requires CAPTCHA verification after a configurable threshold of failed attempts.
+5. **Comprehensive Audit Logging**: The system logs all authentication events, security incidents, and ZKP verifications for security auditing.
 6. **Dynamic Salt Generation**: Each user has a unique, cryptographically secure salt.
 7. **Secure Password Reset**: The password reset flow uses secure tokens with expiration times.
+8. **bcrypt Password Hashing**: The system uses bcrypt with configurable salt rounds for secure password hashing.
+9. **Admin Bypass**: Administrators can bypass IP blocking for legitimate administrative purposes.
+10. **Replay Attack Prevention**: The system prevents replay attacks by binding proofs to specific sessions.
+11. **Man-in-the-Middle Protection**: The system prevents MITM attacks through username verification.
+12. **Concurrent Authentication Support**: The system handles multiple authentication requests simultaneously without degradation.
 
 ## Testing Requirements
 
@@ -242,8 +259,14 @@ The ZKP authentication system must be tested to ensure it meets the following re
 5. **Salt Generation**: The system must generate cryptographically secure salts.
 6. **Rate Limiting**: The system must implement rate limiting correctly.
 7. **IP Blocking**: The system must implement IP blocking correctly.
-8. **Progressive Delays**: The system must implement progressive delays correctly.
+8. **Exponential Backoff**: The system must implement exponential backoff correctly.
 9. **Audit Logging**: The system must log authentication events correctly.
+10. **CAPTCHA Integration**: The system must require CAPTCHA verification after multiple failed attempts.
+11. **bcrypt Integration**: The system must correctly hash passwords using bcrypt.
+12. **Replay Attack Prevention**: The system must prevent replay attacks.
+13. **Man-in-the-Middle Protection**: The system must prevent MITM attacks.
+14. **Concurrent Authentication**: The system must handle multiple authentication requests simultaneously.
+15. **Admin Bypass**: Administrators must be able to bypass IP blocking.
 
 ### Test Cases
 
@@ -255,10 +278,18 @@ The ZKP authentication system must be tested to ensure it meets the following re
 6. **Salt Generation**: Test that salts are cryptographically secure and random.
 7. **Rate Limiting**: Test that rate limiting prevents brute force attacks.
 8. **IP Blocking**: Test that IP blocking prevents brute force attacks.
-9. **Progressive Delays**: Test that progressive delays prevent brute force attacks.
+9. **Exponential Backoff**: Test that exponential backoff prevents brute force attacks.
 10. **Audit Logging**: Test that authentication events are logged correctly.
 11. **Password Reset**: Test that the password reset flow works correctly.
 12. **First User Setup**: Test that the first user setup flow works correctly.
+13. **CAPTCHA Integration**: Test that CAPTCHA verification is required after multiple failed attempts.
+14. **bcrypt Integration**: Test that passwords are correctly hashed using bcrypt.
+15. **Replay Attack Prevention**: Test that replay attacks are prevented.
+16. **Man-in-the-Middle Protection**: Test that MITM attacks are prevented.
+17. **Concurrent Authentication**: Test that multiple authentication requests can be handled simultaneously.
+18. **Admin Bypass**: Test that administrators can bypass IP blocking.
+19. **Security Under Load**: Test that security measures remain effective under high load.
+20. **ZKP with bcrypt**: Test that ZKP works correctly with bcrypt-hashed passwords.
 
 ## Performance Considerations
 
@@ -270,6 +301,12 @@ The ZKP authentication system must be optimized for performance to ensure a good
 4. **Memory Usage**: The memory usage should be minimized to ensure the system can run on resource-constrained devices.
 5. **Caching**: The system should cache verification keys and other static data to improve performance.
 6. **Parallelization**: The system should use parallelization where possible to improve performance.
+7. **bcrypt Work Factor**: The bcrypt work factor should be balanced between security and performance.
+8. **Concurrent Processing**: The system should handle multiple authentication requests concurrently.
+9. **Progressive Enhancement**: The system should work even if JavaScript is disabled, falling back to traditional authentication.
+10. **Resource Allocation**: The system should allocate resources efficiently to prevent denial-of-service attacks.
+11. **Load Testing**: The system should be tested under high load to ensure it remains responsive.
+12. **Mobile Performance**: The system should be optimized for mobile devices with limited resources.
 
 ## Security Improvements
 
@@ -284,6 +321,13 @@ The ZKP authentication system has undergone several security improvements to enh
 7. [Poseidon Hash Constants](./security/poseidon-constants.md) - Implementing proper cryptographically secure constants
 8. [Hash Truncation Fix](./security/hash-truncation.md) - Fixing hash truncation issues to use full hash values
 9. [Poseidon Round Parameters](./security/poseidon-rounds.md) - Increasing round parameters for better security
+10. [IP Blocking and Rate Limiting](../specs/security-improvements-zkp-auth.md#ip-blocking-and-rate-limiting) - Implementing IP blocking and rate limiting
+11. [CAPTCHA Integration](../specs/security-improvements-zkp-auth.md#captcha-integration) - Adding CAPTCHA verification after multiple failed attempts
+12. [Exponential Backoff](../specs/security-improvements-zkp-auth.md#exponential-backoff) - Implementing exponential backoff for login attempts
+13. [Comprehensive Audit Logging](../specs/security-improvements-zkp-auth.md#audit-logging) - Adding detailed logging for security events
+14. [Replay Attack Prevention](../specs/security-improvements-zkp-auth.md#replay-attack-prevention) - Preventing replay attacks
+15. [Man-in-the-Middle Protection](../specs/security-improvements-zkp-auth.md#mitm-protection) - Preventing MITM attacks
+16. [Concurrent Authentication Support](../specs/security-improvements-zkp-auth.md#concurrent-authentication) - Supporting multiple authentication requests
 
 A comprehensive security checklist is available in [ZKP Security Checklist](./security/zkp-security-checklist.md).
 
@@ -297,3 +341,9 @@ A comprehensive security checklist is available in [ZKP Security Checklist](./se
 6. [Circomlib Poseidon Implementation](https://github.com/iden3/circomlib/blob/master/circuits/poseidon.circom)
 7. [NIST Cryptographic Standards](https://csrc.nist.gov/Projects/Cryptographic-Standards-and-Guidelines)
 8. [bcrypt: Password Security](https://en.wikipedia.org/wiki/Bcrypt)
+9. [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
+10. [CAPTCHA: Telling Humans and Computers Apart](https://www.captcha.net/)
+11. [Rate Limiting and Brute Force Protection](https://owasp.org/www-community/controls/Rate_limiting)
+12. [Exponential Backoff Algorithm](https://en.wikipedia.org/wiki/Exponential_backoff)
+13. [Replay Attack Prevention](https://en.wikipedia.org/wiki/Replay_attack)
+14. [Man-in-the-Middle Attack Prevention](https://en.wikipedia.org/wiki/Man-in-the-middle_attack)

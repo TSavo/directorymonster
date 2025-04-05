@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { generateSalt } from '@/lib/zkp';
+import { generateZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 
 interface FirstUserSetupProps {
   // Optional props for customization
@@ -15,12 +17,12 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [siteName, setSiteName] = useState('');
-  
+
   // Error and loading state
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
-  
+
   // Form validation state
   const [validationErrors, setValidationErrors] = useState<{
     username?: string;
@@ -29,10 +31,10 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
     email?: string;
     siteName?: string;
   }>({});
-  
+
   // Router for redirecting
   const router = useRouter();
-  
+
   /**
    * Validate the form inputs
    * @returns True if the form is valid, false otherwise
@@ -45,42 +47,42 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
       email?: string;
       siteName?: string;
     } = {};
-    
+
     // Validate username
     if (!username.trim()) {
       errors.username = 'Username is required';
     } else if (username.length < 3) {
       errors.username = 'Username must be at least 3 characters long';
     }
-    
+
     // Validate password
     if (!password) {
       errors.password = 'Password is required';
     } else if (password.length < 8) {
       errors.password = 'Password must be at least 8 characters long';
     }
-    
+
     // Validate password confirmation
     if (!confirmPassword) {
       errors.confirmPassword = 'Please confirm your password';
     } else if (password !== confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
     }
-    
+
     // Validate email (optional but must be valid if provided)
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errors.email = 'Please enter a valid email address';
     }
-    
+
     // Validate site name
     if (!siteName.trim()) {
       errors.siteName = 'Site name is required';
     }
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
-  
+
   /**
    * Get CSRF token from cookies or generate a new one
    * @returns The CSRF token
@@ -95,38 +97,48 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
     }
 
     // If no CSRF token is found, generate one and set it
-    const newToken = Math.random().toString(36).substring(2, 15) + 
+    const newToken = Math.random().toString(36).substring(2, 15) +
                      Math.random().toString(36).substring(2, 15);
-    
+
     // Set the cookie
     document.cookie = `csrf_token=${newToken}; path=/; max-age=3600; SameSite=Strict`;
-    
+
     return newToken;
   };
-  
+
   /**
    * Handle form submission
    * @param e The form event
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Reset error state
     setError(null);
-    
+
     // Validate form
     if (!validateForm()) {
       return;
     }
-    
+
     // Show loading state
     setIsLoading(true);
-    
+
     try {
       // Get CSRF token
       const csrfToken = getCsrfToken();
-      
-      // Send user creation request
+
+      // Generate salt for ZKP
+      const salt = generateSalt();
+
+      // Generate ZKP with bcrypt
+      const { proof, publicSignals } = await generateZKPWithBcrypt(
+        username,
+        password,
+        salt
+      );
+
+      // Send user creation request with ZKP
       const response = await fetch('/api/auth/setup', {
         method: 'POST',
         headers: {
@@ -135,20 +147,22 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
         },
         body: JSON.stringify({
           username,
-          password,
+          proof,
+          publicSignals,
+          salt,
           email: email || undefined, // Only send if provided
           siteName,
         }),
       });
-      
+
       // Handle response
       if (response.ok) {
         // User created successfully
         const data = await response.json();
-        
+
         // Store token in localStorage
         localStorage.setItem('authToken', data.token);
-        
+
         // Redirect to admin dashboard
         router.push(redirectPath);
       } else {
@@ -163,17 +177,17 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md" data-testid="setup-form-container">
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-800" data-testid="setup-title">Create First Admin User</h2>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded" data-testid="setup-error">
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="space-y-6" data-testid="setup-form">
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-700">
@@ -194,7 +208,7 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
             <p className="mt-1 text-sm text-red-600" data-testid="username-error">{validationErrors.username}</p>
           )}
         </div>
-        
+
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
             Password
@@ -214,7 +228,7 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
             <p className="mt-1 text-sm text-red-600" data-testid="password-error">{validationErrors.password}</p>
           )}
         </div>
-        
+
         <div>
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
             Confirm Password
@@ -236,7 +250,7 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
             </p>
           )}
         </div>
-        
+
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email (Optional)
@@ -256,7 +270,7 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
             <p className="mt-1 text-sm text-red-600" data-testid="email-error">{validationErrors.email}</p>
           )}
         </div>
-        
+
         <div>
           <label htmlFor="siteName" className="block text-sm font-medium text-gray-700">
             Site Name
@@ -276,7 +290,7 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
             <p className="mt-1 text-sm text-red-600" data-testid="site-name-error">{validationErrors.siteName}</p>
           )}
         </div>
-        
+
         <div>
           <button
             type="submit"
@@ -322,7 +336,7 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
           </button>
         </div>
       </form>
-      
+
       <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -332,7 +346,7 @@ export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps)
             <span className="px-2 bg-white text-gray-500">System Setup</span>
           </div>
         </div>
-        
+
         <div className="mt-6">
           <p className="text-xs text-center text-gray-600">
             You are creating the first admin user for this system. This user will have full administrative privileges.

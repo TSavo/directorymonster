@@ -69,6 +69,44 @@ This checklist provides a comprehensive set of security checks for the Zero-Know
 - [ ] Balance security with performance considerations
 - [ ] Stay updated with the latest cryptanalysis
 
+## Rate Limiting and IP Blocking
+
+- [ ] Implement rate limiting for authentication attempts per username
+- [ ] Implement IP blocking after a configurable number of failed attempts
+- [ ] Use exponential backoff for login attempts (doubling delay after each failure)
+- [ ] Allow administrators to bypass IP blocking for legitimate purposes
+- [ ] Store rate limiting data in Redis with appropriate expiration times
+- [ ] Implement proper HTTP headers for rate limiting responses
+- [ ] Log all rate limiting and IP blocking events
+
+## CAPTCHA Integration
+
+- [ ] Require CAPTCHA verification after a configurable threshold of failed attempts
+- [ ] Use a secure CAPTCHA implementation (reCAPTCHA or equivalent)
+- [ ] Verify CAPTCHA tokens server-side before processing authentication
+- [ ] Reset CAPTCHA requirement after successful authentication
+- [ ] Log all CAPTCHA verification events
+- [ ] Provide accessible alternatives for users with disabilities
+
+## Audit Logging
+
+- [ ] Log all authentication attempts (successful and failed)
+- [ ] Log all security events (IP blocking, CAPTCHA requirements, etc.)
+- [ ] Log all ZKP verification events
+- [ ] Include relevant information in logs (timestamp, username, IP, result, reason)
+- [ ] Protect logs from unauthorized access
+- [ ] Implement log rotation and retention policies
+- [ ] Use structured logging for easier analysis
+
+## Attack Prevention
+
+- [ ] Implement replay attack prevention by binding proofs to specific sessions
+- [ ] Implement man-in-the-middle protection through username verification
+- [ ] Support concurrent authentication requests without security degradation
+- [ ] Allocate resources efficiently to prevent denial-of-service attacks
+- [ ] Test security measures under high load
+- [ ] Implement proper error handling for all security-related operations
+
 ## General Security Measures
 
 - [ ] Run all security tests before deployment
@@ -87,8 +125,13 @@ This checklist provides a comprehensive set of security checks for the Zero-Know
 - [ ] Run `npm run security:test` to verify all security improvements
 - [ ] Run `npm run security:verify` to check cryptographic file integrity
 - [ ] Run `npm audit --production` to check for vulnerabilities in dependencies
+- [ ] Run `npx jest tests/crypto` to verify ZKP security measures
+- [ ] Run `npx jest tests/lib/zkp-bcrypt.test.ts` to verify bcrypt integration
+- [ ] Run `npx jest tests/crypto/zkp-security-measures.test.ts` to verify security measures
 - [ ] Verify that all security checks pass in the CI/CD pipeline
 - [ ] Document any security exceptions and their mitigations
 - [ ] Perform a final security review before deployment
 - [ ] Monitor security-relevant logs after deployment
 - [ ] Have a plan for responding to security incidents
+- [ ] Test the system under high load to ensure security measures remain effective
+- [ ] Verify that all rate limiting and IP blocking configurations are appropriate for production

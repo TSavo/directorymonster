@@ -2,8 +2,7 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ZKPLogin from '@/components/admin/auth/ZKPLogin';
-import { generateProof, verifyProof } from '@/lib/zkp';
-import * as zkpLib from '@/lib/zkp';
+import * as zkpBcryptLib from '@/lib/zkp/zkp-bcrypt';
 
 // Mock the Next.js router
 const mockPush = jest.fn();
@@ -23,13 +22,14 @@ jest.mock('next/navigation', () => ({
   useRouter: () => mockRouter
 }));
 
-// Mock the ZKP library functions
-jest.mock('@/lib/zkp', () => ({
+// Mock the ZKP-Bcrypt library functions
+jest.mock('@/lib/zkp/zkp-bcrypt', () => ({
   __esModule: true,
-  generateProof: jest.fn(),
-  verifyProof: jest.fn(),
-  generateSalt: jest.fn().mockReturnValue('test-salt-value'),
-  derivePublicKey: jest.fn().mockReturnValue('test-derived-public-key'),
+  generateZKPWithBcrypt: jest.fn(),
+  verifyZKPWithBcrypt: jest.fn(),
+  hashPassword: jest.fn().mockResolvedValue('$2b$10$mockedhash'),
+  verifyPassword: jest.fn().mockResolvedValue(true),
+  generateBcryptSalt: jest.fn().mockReturnValue('$2b$10$mockedsalt'),
 }));
 
 // Mock fetch for API calls
@@ -63,8 +63,8 @@ describe('ZKPLogin Component', () => {
     // Reset localStorage mock
     localStorageMock.clear();
 
-    // Default mock implementation for generateProof
-    (zkpLib.generateProof as jest.Mock).mockResolvedValue({
+    // Default mock implementation for generateZKPWithBcrypt
+    (zkpBcryptLib.generateZKPWithBcrypt as jest.Mock).mockResolvedValue({
       proof: 'mock-proof-string',
       publicSignals: ['mock-public-signal-1', 'mock-public-signal-2'],
     });
@@ -108,7 +108,7 @@ describe('ZKPLogin Component', () => {
 
       // In a real implementation, we would check for loading state
       // but for this test we'll just verify the form submission was triggered
-      expect(zkpLib.generateProof).toHaveBeenCalled();
+      expect(zkpBcryptLib.generateZKPWithBcrypt).toHaveBeenCalled();
     });
   });
 
@@ -124,12 +124,11 @@ describe('ZKPLogin Component', () => {
       // Submit the form
       await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
-      // Check that generateProof was called with correct parameters
-      expect(zkpLib.generateProof).toHaveBeenCalledWith(
-        expect.objectContaining({
-          username: 'testuser',
-          password: 'password123'
-        })
+      // Check that generateZKPWithBcrypt was called with correct parameters
+      expect(zkpBcryptLib.generateZKPWithBcrypt).toHaveBeenCalledWith(
+        'testuser',
+        'password123',
+        undefined // Salt might be undefined in tests
       );
 
       // Check that fetch was called with correct parameters
@@ -218,8 +217,8 @@ describe('ZKPLogin Component', () => {
     });
 
     it('handles ZKP generation errors', async () => {
-      // Mock generateProof to throw an error
-      (zkpLib.generateProof as jest.Mock).mockImplementationOnce(() =>
+      // Mock generateZKPWithBcrypt to throw an error
+      (zkpBcryptLib.generateZKPWithBcrypt as jest.Mock).mockImplementationOnce(() =>
         Promise.reject(new Error('ZKP generation failed'))
       );
 

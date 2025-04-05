@@ -457,6 +457,619 @@ template Edwards2Montgomery() {
 }
 ```
 
+## 10. IP Blocking and Rate Limiting
+
+### Current Implementation
+The current implementation lacks robust protection against brute force attacks:
+
+```typescript
+// File: src/lib/auth.ts
+// Basic rate limiting without IP blocking
+export async function authenticateUser(username: string, password: string) {
+  // Simple counter-based rate limiting
+  const attempts = await getLoginAttempts(username);
+  if (attempts > MAX_LOGIN_ATTEMPTS) {
+    throw new Error('Too many login attempts');
+  }
+
+  // Increment attempt counter
+  await incrementLoginAttempts(username);
+
+  // Rest of authentication logic
+  // ...
+}
+```
+
+### Required Changes
+Implement IP blocking and enhanced rate limiting in `src/lib/auth.ts`:
+
+```typescript
+// File: src/lib/auth.ts
+import { Redis } from '@/lib/redis';
+
+// Constants
+const MAX_LOGIN_ATTEMPTS = 5;
+const IP_BLOCK_THRESHOLD = 10;
+const IP_BLOCK_DURATION = 60 * 60; // 1 hour in seconds
+const CAPTCHA_THRESHOLD = 3;
+
+export async function authenticateUser(username: string, password: string, ip: string, captchaToken?: string) {
+  const redis = Redis.getInstance();
+
+  // Check if IP is blocked
+  const ipKey = `auth:ip:${ip}:blocked`;
+  const ipBlocked = await redis.get(ipKey);
+  if (ipBlocked) {
+    throw new Error('IP address is blocked due to too many failed attempts');
+  }
+
+  // Check username-based rate limiting
+  const userAttemptsKey = `auth:user:${username}:attempts`;
+  const userAttempts = parseInt(await redis.get(userAttemptsKey) || '0');
+
+  // Check if CAPTCHA is required
+  if (userAttempts >= CAPTCHA_THRESHOLD) {
+    if (!captchaToken) {
+      throw new Error('CAPTCHA verification required');
+    }
+
+    // Verify CAPTCHA token
+    const isCaptchaValid = await verifyCaptcha(captchaToken);
+    if (!isCaptchaValid) {
+      throw new Error('Invalid CAPTCHA');
+    }
+  }
+
+  // Implement exponential backoff
+  if (userAttempts > 0) {
+    const backoffTime = Math.pow(2, userAttempts - 1) * 1000; // Exponential backoff in milliseconds
+    await new Promise(resolve => setTimeout(resolve, backoffTime));
+  }
+
+  // Increment attempt counters before authentication
+  await redis.incr(userAttemptsKey);
+  await redis.expire(userAttemptsKey, 60 * 60); // Expire after 1 hour
+
+  // Track IP-based attempts
+  const ipAttemptsKey = `auth:ip:${ip}:attempts`;
+  const ipAttempts = parseInt(await redis.incr(ipAttemptsKey));
+  await redis.expire(ipAttemptsKey, 60 * 60); // Expire after 1 hour
+
+  // Block IP if too many attempts
+  if (ipAttempts >= IP_BLOCK_THRESHOLD) {
+    await redis.set(ipKey, '1', 'EX', IP_BLOCK_DURATION);
+  }
+
+  // Log the authentication attempt
+  await logAuthAttempt({
+    username,
+    ip,
+    timestamp: new Date().toISOString(),
+    userAttempts,
+    ipAttempts,
+    captchaRequired: userAttempts >= CAPTCHA_THRESHOLD,
+    captchaProvided: !!captchaToken
+  });
+
+  // Perform actual authentication
+  // ...
+
+  // If authentication is successful, reset counters
+  if (authSuccessful) {
+    await redis.del(userAttemptsKey);
+    // Don't reset IP counter to prevent distributed attacks
+  }
+
+  return authResult;
+}
+```
+
+## 11. CAPTCHA Integration
+
+### Current Implementation
+The current implementation does not include CAPTCHA verification:
+
+```typescript
+// File: src/app/api/auth/login/route.ts
+export async function POST(req: Request) {
+  const { username, password } = await req.json();
+
+  // No CAPTCHA verification
+  try {
+    const result = await authenticateUser(username, password);
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
+  }
+}
+```
+
+### Required Changes
+Implement CAPTCHA verification in the authentication flow:
+
+```typescript
+// File: src/app/api/auth/login/route.ts
+import { verifyCaptcha } from '@/lib/captcha';
+
+export async function POST(req: Request) {
+  const { username, password, captchaToken } = await req.json();
+  const ip = req.headers.get('x-forwarded-for') || 'unknown';
+
+  try {
+    // Get login attempts to determine if CAPTCHA is needed
+    const userAttemptsKey = `auth:user:${username}:attempts`;
+    const redis = Redis.getInstance();
+    const userAttempts = parseInt(await redis.get(userAttemptsKey) || '0');
+
+    // Require CAPTCHA after threshold
+    if (userAttempts >= CAPTCHA_THRESHOLD) {
+      if (!captchaToken) {
+        return NextResponse.json({
+          error: 'CAPTCHA verification required',
+          requireCaptcha: true
+        }, { status: 401 });
+      }
+
+      // Verify CAPTCHA token
+      const isCaptchaValid = await verifyCaptcha(captchaToken);
+      if (!isCaptchaValid) {
+        return NextResponse.json({
+          error: 'Invalid CAPTCHA',
+          requireCaptcha: true
+        }, { status: 401 });
+      }
+    }
+
+    // Proceed with authentication
+    const result = await authenticateUser(username, password, ip, captchaToken);
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json({
+      error: error.message,
+      requireCaptcha: error.message.includes('CAPTCHA')
+    }, { status: 401 });
+  }
+}
+```
+
+Implement the CAPTCHA verification function:
+
+```typescript
+// File: src/lib/captcha.ts
+import axios from 'axios';
+
+export async function verifyCaptcha(token: string): Promise<boolean> {
+  try {
+    const response = await axios.post(
+      'https://www.google.com/recaptcha/api/siteverify',
+      null,
+      {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: token
+        }
+      }
+    );
+
+    return response.data.success === true;
+  } catch (error) {
+    console.error('CAPTCHA verification error:', error);
+    return false;
+  }
+}
+```
+
+## 12. Exponential Backoff
+
+### Current Implementation
+The current implementation does not include exponential backoff for login attempts:
+
+```typescript
+// File: src/lib/auth.ts
+export async function authenticateUser(username: string, password: string) {
+  // Simple counter-based rate limiting without backoff
+  const attempts = await getLoginAttempts(username);
+  if (attempts > MAX_LOGIN_ATTEMPTS) {
+    throw new Error('Too many login attempts');
+  }
+
+  // No delay based on previous attempts
+
+  // Rest of authentication logic
+  // ...
+}
+```
+
+### Required Changes
+Implement exponential backoff for login attempts:
+
+```typescript
+// File: src/lib/auth.ts
+export async function authenticateUser(username: string, password: string) {
+  const redis = Redis.getInstance();
+
+  // Get current attempt count
+  const userAttemptsKey = `auth:user:${username}:attempts`;
+  const userAttempts = parseInt(await redis.get(userAttemptsKey) || '0');
+
+  // Implement exponential backoff
+  if (userAttempts > 0) {
+    // Calculate delay: 2^(attempts-1) seconds
+    // 1st attempt: 0s, 2nd: 1s, 3rd: 2s, 4th: 4s, 5th: 8s, 6th: 16s, etc.
+    const backoffTime = Math.pow(2, userAttempts - 1) * 1000; // milliseconds
+
+    // Add jitter to prevent timing attacks (±10%)
+    const jitter = Math.random() * 0.2 - 0.1; // -10% to +10%
+    const finalDelay = backoffTime * (1 + jitter);
+
+    // Delay the response
+    await new Promise(resolve => setTimeout(resolve, finalDelay));
+
+    // Log the backoff
+    console.log(`Applied exponential backoff for user ${username}: ${finalDelay}ms delay after ${userAttempts} attempts`);
+  }
+
+  // Rest of authentication logic
+  // ...
+}
+```
+
+## 13. Audit Logging
+
+### Current Implementation
+The current implementation has minimal logging:
+
+```typescript
+// File: src/lib/auth.ts
+export async function authenticateUser(username: string, password: string) {
+  try {
+    // Authentication logic
+    // ...
+
+    // Simple success log
+    console.log(`User ${username} authenticated successfully`);
+    return { success: true };
+  } catch (error) {
+    // Simple error log
+    console.error(`Authentication failed for user ${username}: ${error.message}`);
+    throw error;
+  }
+}
+```
+
+### Required Changes
+Implement comprehensive audit logging:
+
+```typescript
+// File: src/lib/audit-logger.ts
+import { Redis } from '@/lib/redis';
+
+interface AuthAttemptLog {
+  username: string;
+  ip: string;
+  timestamp: string;
+  success: boolean;
+  failureReason?: string;
+  userAttempts: number;
+  ipAttempts: number;
+  captchaRequired: boolean;
+  captchaProvided: boolean;
+  captchaValid?: boolean;
+  backoffApplied?: number; // milliseconds
+  adminBypass?: boolean;
+}
+
+export async function logAuthAttempt(log: AuthAttemptLog): Promise<void> {
+  try {
+    const redis = Redis.getInstance();
+
+    // Store in Redis for real-time analysis
+    const logKey = `audit:auth:${new Date().toISOString()}`;
+    await redis.set(logKey, JSON.stringify(log));
+    await redis.expire(logKey, 60 * 60 * 24 * 30); // 30 days retention
+
+    // Add to time-series for analytics
+    await redis.zadd('audit:auth:timeline', Date.now(), logKey);
+
+    // Add to user-specific logs
+    await redis.zadd(`audit:auth:user:${log.username}`, Date.now(), logKey);
+
+    // Add to IP-specific logs
+    await redis.zadd(`audit:auth:ip:${log.ip}`, Date.now(), logKey);
+
+    // Log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Auth attempt logged:', log);
+    }
+
+    // In production, you might want to send to a proper logging service
+    if (process.env.NODE_ENV === 'production' && process.env.LOG_SERVICE_URL) {
+      // Send to external logging service
+      // await fetch(process.env.LOG_SERVICE_URL, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(log)
+      // });
+    }
+  } catch (error) {
+    // Fallback to console logging if Redis fails
+    console.error('Failed to log auth attempt:', error);
+    console.log('Auth attempt details:', log);
+  }
+}
+
+export async function getAuthLogs(username?: string, ip?: string, limit = 100): Promise<AuthAttemptLog[]> {
+  const redis = Redis.getInstance();
+  let logKeys: string[] = [];
+
+  if (username) {
+    // Get user-specific logs
+    logKeys = await redis.zrevrange(`audit:auth:user:${username}`, 0, limit - 1);
+  } else if (ip) {
+    // Get IP-specific logs
+    logKeys = await redis.zrevrange(`audit:auth:ip:${ip}`, 0, limit - 1);
+  } else {
+    // Get all logs
+    logKeys = await redis.zrevrange('audit:auth:timeline', 0, limit - 1);
+  }
+
+  // Get the actual log entries
+  const logs: AuthAttemptLog[] = [];
+  for (const key of logKeys) {
+    const logJson = await redis.get(key);
+    if (logJson) {
+      logs.push(JSON.parse(logJson));
+    }
+  }
+
+  return logs;
+}
+```
+
+## 14. Replay Attack Prevention
+
+### Current Implementation
+The current implementation is vulnerable to replay attacks:
+
+```typescript
+// File: src/lib/zkp.ts
+export async function verifyProof(proof: ZKPProof, publicKey: string): Promise<boolean> {
+  // Verify the proof without any session binding
+  const adapter = getZKPProvider().getAdapter();
+  return adapter.verifyProof(proof, publicKey);
+}
+```
+
+### Required Changes
+Implement replay attack prevention by binding proofs to specific sessions:
+
+```typescript
+// File: src/lib/zkp.ts
+export async function generateProof(input: ZKPInput, sessionId: string): Promise<ZKPProof> {
+  // Include session ID in the proof generation
+  const sessionBoundInput = {
+    ...input,
+    sessionId // Add session ID to the input
+  };
+
+  const adapter = getZKPProvider().getAdapter();
+  return adapter.generateProof(sessionBoundInput);
+}
+
+export async function verifyProof(proof: ZKPProof, publicKey: string, sessionId: string): Promise<boolean> {
+  // Verify that the proof was generated for this specific session
+  if (proof.sessionId !== sessionId) {
+    throw new Error('Invalid session ID in proof (possible replay attack)');
+  }
+
+  const adapter = getZKPProvider().getAdapter();
+  return adapter.verifyProof(proof, publicKey);
+}
+
+// Generate a unique session ID for each authentication attempt
+export function generateSessionId(): string {
+  return crypto.randomUUID();
+}
+```
+
+Update the authentication API to use session IDs:
+
+```typescript
+// File: src/app/api/auth/login/route.ts
+export async function POST(req: Request) {
+  const { username, password, captchaToken } = await req.json();
+  const ip = req.headers.get('x-forwarded-for') || 'unknown';
+
+  // Generate a unique session ID for this authentication attempt
+  const sessionId = generateSessionId();
+
+  try {
+    // First, send the session ID to the client
+    const sessionResponse = NextResponse.json({ sessionId });
+
+    // Then, when the client sends the proof, verify it with the session ID
+    const proof = await getProofFromClient();
+    const isValid = await verifyProof(proof, publicKey, sessionId);
+
+    if (isValid) {
+      // Authentication successful
+      return NextResponse.json({ success: true, token: generateAuthToken(username) });
+    } else {
+      // Authentication failed
+      return NextResponse.json({ error: 'Invalid proof' }, { status: 401 });
+    }
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
+  }
+}
+```
+
+## 15. Concurrent Authentication
+
+### Current Implementation
+The current implementation may not handle multiple authentication requests efficiently:
+
+```typescript
+// File: src/lib/auth.ts
+// Global lock mechanism that could block concurrent requests
+let isProcessingAuth = false;
+
+export async function authenticateUser(username: string, password: string) {
+  if (isProcessingAuth) {
+    throw new Error('Authentication system is busy');
+  }
+
+  try {
+    isProcessingAuth = true;
+    // Authentication logic
+    // ...
+  } finally {
+    isProcessingAuth = false;
+  }
+}
+```
+
+### Required Changes
+Implement support for concurrent authentication requests:
+
+```typescript
+// File: src/lib/auth.ts
+import { Redis } from '@/lib/redis';
+
+export async function authenticateUser(username: string, password: string, ip: string, captchaToken?: string) {
+  const redis = Redis.getInstance();
+
+  // Generate a unique request ID for this authentication attempt
+  const requestId = crypto.randomUUID();
+
+  // Use Redis to track rate limiting per username without blocking other requests
+  const userAttemptsKey = `auth:user:${username}:attempts`;
+  const userAttempts = parseInt(await redis.get(userAttemptsKey) || '0');
+
+  // Use atomic operations to prevent race conditions
+  const pipeline = redis.pipeline();
+  pipeline.incr(userAttemptsKey);
+  pipeline.expire(userAttemptsKey, 60 * 60); // 1 hour expiration
+  await pipeline.exec();
+
+  // Log the authentication attempt with the request ID
+  await logAuthAttempt({
+    requestId,
+    username,
+    ip,
+    timestamp: new Date().toISOString(),
+    // ... other log fields
+  });
+
+  // Rest of authentication logic
+  // ...
+
+  return authResult;
+}
+```
+
+Implement a worker pool for proof verification to handle multiple requests:
+
+```typescript
+// File: src/lib/zkp/worker-pool.ts
+import { Worker } from 'worker_threads';
+import { ZKPProof } from './types';
+
+class ZKPWorkerPool {
+  private workers: Worker[] = [];
+  private taskQueue: Array<{ task: any, resolve: Function, reject: Function }> = [];
+  private availableWorkers: Worker[] = [];
+
+  constructor(size = 4) {
+    // Create a pool of workers
+    for (let i = 0; i < size; i++) {
+      const worker = new Worker('./zkp-worker.js');
+      worker.on('message', this.handleWorkerMessage.bind(this, worker));
+      worker.on('error', this.handleWorkerError.bind(this, worker));
+      this.workers.push(worker);
+      this.availableWorkers.push(worker);
+    }
+  }
+
+  async verifyProof(proof: ZKPProof, publicKey: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const task = { type: 'verify', proof, publicKey };
+
+      if (this.availableWorkers.length > 0) {
+        // If a worker is available, use it immediately
+        const worker = this.availableWorkers.pop()!;
+        worker.postMessage(task);
+        worker.taskResolve = resolve;
+        worker.taskReject = reject;
+      } else {
+        // Otherwise, queue the task
+        this.taskQueue.push({ task, resolve, reject });
+      }
+    });
+  }
+
+  private handleWorkerMessage(worker: Worker, result: any) {
+    // Resolve the current task
+    if (worker.taskResolve) {
+      worker.taskResolve(result);
+      worker.taskResolve = null;
+      worker.taskReject = null;
+    }
+
+    // Process the next task in the queue if any
+    if (this.taskQueue.length > 0) {
+      const nextTask = this.taskQueue.shift()!;
+      worker.postMessage(nextTask.task);
+      worker.taskResolve = nextTask.resolve;
+      worker.taskReject = nextTask.reject;
+    } else {
+      // If no tasks, mark the worker as available
+      this.availableWorkers.push(worker);
+    }
+  }
+
+  private handleWorkerError(worker: Worker, error: Error) {
+    // Reject the current task
+    if (worker.taskReject) {
+      worker.taskReject(error);
+      worker.taskResolve = null;
+      worker.taskReject = null;
+    }
+
+    // Replace the failed worker
+    const index = this.workers.indexOf(worker);
+    if (index !== -1) {
+      this.workers.splice(index, 1);
+      const newWorker = new Worker('./zkp-worker.js');
+      newWorker.on('message', this.handleWorkerMessage.bind(this, newWorker));
+      newWorker.on('error', this.handleWorkerError.bind(this, newWorker));
+      this.workers.push(newWorker);
+      this.availableWorkers.push(newWorker);
+    }
+  }
+
+  shutdown() {
+    // Terminate all workers
+    for (const worker of this.workers) {
+      worker.terminate();
+    }
+    this.workers = [];
+    this.availableWorkers = [];
+    this.taskQueue = [];
+  }
+}
+
+// Singleton instance
+let workerPool: ZKPWorkerPool | null = null;
+
+export function getZKPWorkerPool(): ZKPWorkerPool {
+  if (!workerPool) {
+    workerPool = new ZKPWorkerPool();
+  }
+  return workerPool;
+}
+```
+
 ## Implementation Timeline
 
 1. **Phase 1: Critical Security Fixes**
@@ -468,11 +1081,20 @@ template Edwards2Montgomery() {
    - Implement proper Poseidon hash constants
    - Fix hash truncation issues
    - Increase Poseidon round parameters
+   - Add division by zero protection
 
 3. **Phase 3: Implementation Improvements**
    - Add integrity checks for cryptographic files
    - Fix HTTP headers implementation
-   - Add division by zero protection
+   - Implement IP blocking and rate limiting
+   - Add CAPTCHA verification
+
+4. **Phase 4: Advanced Security Measures**
+   - Implement exponential backoff for login attempts
+   - Add comprehensive audit logging
+   - Implement replay attack prevention
+   - Add man-in-the-middle protection
+   - Support concurrent authentication requests
 
 ## Testing Requirements
 
@@ -480,16 +1102,27 @@ template Edwards2Montgomery() {
    - Verify bcrypt implementation with different password strengths
    - Test integrity checks with valid and invalid checksums
    - Verify privacy of sensitive information in ZKP proofs
+   - Test IP blocking and rate limiting functionality
+   - Verify CAPTCHA integration works correctly
+   - Test exponential backoff implementation
+   - Verify replay attack prevention
+   - Test man-in-the-middle protection
 
 2. **Functional Testing**
    - Ensure authentication still works after all changes
    - Test edge cases for all fixed issues
    - Verify backward compatibility with existing user accounts
+   - Test audit logging functionality
+   - Verify concurrent authentication works correctly
+   - Test admin bypass functionality
 
 3. **Performance Testing**
    - Measure impact of bcrypt on authentication performance
    - Evaluate increased Poseidon rounds on proof generation time
    - Benchmark full hash vs. truncated hash performance
+   - Test system performance under high load
+   - Measure impact of exponential backoff on response times
+   - Evaluate worker pool performance for concurrent requests
 
 ### Running Tests
 
@@ -508,7 +1141,19 @@ npm run test:crypto:security
 Specific tests can be run with:
 
 ```bash
-npx jest tests/crypto/file-name.test.ts
+# Run all ZKP security measures tests
+npx jest tests/crypto/zkp-security-measures.test.ts
+
+# Run bcrypt integration tests
+npx jest tests/lib/zkp-bcrypt.test.ts
+
+# Run specific security feature tests
+npx jest tests/crypto/ip-blocking.test.ts
+npx jest tests/crypto/captcha-verification.test.ts
+npx jest tests/crypto/exponential-backoff.test.ts
+npx jest tests/crypto/audit-logging.test.ts
+npx jest tests/crypto/replay-attack-prevention.test.ts
+npx jest tests/crypto/concurrent-authentication.test.ts
 ```
 
 ## Security Considerations
@@ -516,15 +1161,47 @@ npx jest tests/crypto/file-name.test.ts
 1. **Migration Strategy**
    - Existing user passwords need to be migrated from SHA-256 to bcrypt
    - Consider a phased approach where users are migrated upon next login
+   - Implement a flag in user records to indicate which security features are enabled
 
 2. **Backward Compatibility**
    - Maintain support for both old and new hashing methods during transition
    - Implement a flag in user records to indicate hashing method used
+   - Ensure API endpoints support both authentication methods during transition
 
 3. **Key Management**
    - Ensure secure storage of cryptographic keys and constants
    - Implement proper key rotation procedures
+   - Store CAPTCHA secrets securely in environment variables
+
+4. **Rate Limiting Configuration**
+   - Configure appropriate thresholds for rate limiting and IP blocking
+   - Implement different thresholds for different environments (dev, test, prod)
+   - Consider geolocation-based rate limiting for additional security
+
+5. **Audit Log Management**
+   - Implement proper retention policies for audit logs
+   - Ensure logs are stored securely and cannot be tampered with
+   - Consider using a dedicated logging service for production
+
+6. **Concurrent Authentication**
+   - Monitor worker pool performance and adjust pool size as needed
+   - Implement circuit breakers to prevent resource exhaustion
+   - Consider using a dedicated service for high-volume authentication
 
 ## Conclusion
 
 These security improvements address critical vulnerabilities in the current ZKP authentication system. Implementing these changes will significantly enhance the security posture of the application and protect user credentials against various attack vectors.
+
+The comprehensive approach includes:
+
+1. **Cryptographic Improvements**: Replacing SHA-256 with bcrypt, fixing hash truncation, implementing proper Poseidon constants, and increasing round parameters.
+
+2. **Implementation Security**: Adding integrity checks, fixing privacy issues, addressing TypeScript issues, and implementing proper HTTP headers.
+
+3. **Brute Force Protection**: Implementing rate limiting, IP blocking, exponential backoff, and CAPTCHA verification.
+
+4. **Comprehensive Logging**: Adding detailed audit logging for security events and authentication attempts.
+
+5. **Attack Prevention**: Implementing replay attack prevention, man-in-the-middle protection, and concurrent authentication support.
+
+By implementing these improvements in a phased approach, we can ensure a smooth transition while significantly enhancing the security of the authentication system. The result will be a robust, modern authentication system that protects user credentials even in the event of server compromise, while also defending against common attack patterns like brute force attempts, replay attacks, and man-in-the-middle attacks.

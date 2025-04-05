@@ -26,11 +26,16 @@ jest.mock('@/lib/redis-client', () => {
   };
 });
 
-// Mock the ZKP library
-jest.mock('@/lib/zkp', () => ({
-  verifyProof: jest.fn(),
-  generateSalt: jest.fn().mockReturnValue('mock-salt'),
-  derivePublicKey: jest.fn().mockReturnValue('mock-public-key'),
+// Mock the ZKP-Bcrypt library
+jest.mock('@/lib/zkp/zkp-bcrypt', () => ({
+  verifyZKPWithBcrypt: jest.fn().mockResolvedValue(true),
+  generateZKPWithBcrypt: jest.fn().mockResolvedValue({
+    proof: 'mock-proof-string',
+    publicSignals: ['mock-public-signal-1', 'mock-public-signal-2'],
+  }),
+  hashPassword: jest.fn().mockResolvedValue('$2b$10$mockedhash'),
+  verifyPassword: jest.fn().mockResolvedValue(true),
+  generateBcryptSalt: jest.fn().mockReturnValue('$2b$10$mockedsalt'),
 }));
 
 // Mock the jsonwebtoken library
@@ -95,9 +100,9 @@ describe('Auth Verification API', () => {
       return null;
     });
 
-    // Configure ZKP verifyProof mock
-    const { verifyProof } = require('@/lib/zkp');
-    verifyProof.mockImplementation(async ({ proof, publicSignals, publicKey }) => {
+    // Configure ZKP verifyZKPWithBcrypt mock
+    const { verifyZKPWithBcrypt } = require('@/lib/zkp/zkp-bcrypt');
+    verifyZKPWithBcrypt.mockImplementation(async (proof, publicSignals, publicKey) => {
       // Only return true for testuser with correct public key
       if (publicKey === 'test-public-key') {
         return true;
@@ -178,9 +183,9 @@ describe('Auth Verification API', () => {
   });
 
   it('should reject invalid proofs', async () => {
-    // Force verifyProof to return false for this test
-    const { verifyProof } = require('@/lib/zkp');
-    verifyProof.mockImplementationOnce(async () => false);
+    // Force verifyZKPWithBcrypt to return false for this test
+    const { verifyZKPWithBcrypt } = require('@/lib/zkp/zkp-bcrypt');
+    verifyZKPWithBcrypt.mockImplementationOnce(async () => false);
 
     // Create request with invalid proof
     const request = createMockRequest('/api/auth/verify', {
@@ -317,9 +322,9 @@ describe('Auth Verification API', () => {
   });
 
   it('should handle ZKP verification errors gracefully', async () => {
-    // Force verifyProof to throw an error
-    const { verifyProof } = require('@/lib/zkp');
-    verifyProof.mockImplementationOnce(async () => {
+    // Force verifyZKPWithBcrypt to throw an error
+    const { verifyZKPWithBcrypt } = require('@/lib/zkp/zkp-bcrypt');
+    verifyZKPWithBcrypt.mockImplementationOnce(async () => {
       throw new Error('ZKP verification error');
     });
 

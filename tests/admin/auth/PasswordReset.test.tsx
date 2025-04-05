@@ -3,9 +3,9 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PasswordResetForm } from '@/components/admin/auth';
 
-// Mock the ZKP library
-jest.mock('@/lib/zkp', () => ({
-  generateProof: jest.fn().mockImplementation(() => {
+// Mock the ZKP-Bcrypt library
+jest.mock('@/lib/zkp/zkp-bcrypt', () => ({
+  generateZKPWithBcrypt: jest.fn().mockImplementation(() => {
     return Promise.resolve({
       proof: {
         pi_a: ['12345', '67890', '1'],
@@ -15,7 +15,11 @@ jest.mock('@/lib/zkp', () => ({
       },
       publicSignals: ['public1', 'public2']
     });
-  })
+  }),
+  verifyZKPWithBcrypt: jest.fn().mockResolvedValue(true),
+  hashPassword: jest.fn().mockResolvedValue('$2b$10$mockedhash'),
+  verifyPassword: jest.fn().mockResolvedValue(true),
+  generateBcryptSalt: jest.fn().mockReturnValue('$2b$10$mockedsalt')
 }));
 
 // Mock next/router
