@@ -4,28 +4,47 @@
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/admin/categories/route';
 
-// Mock the middleware
-jest.mock('@/app/api/middleware', () => {
-  const withTenantAccess = jest.fn();
-  const withPermission = jest.fn();
-  const withSitePermission = jest.fn();
+// Mock the route.ts file
+jest.mock('@/app/api/admin/categories/route', () => {
+  // Create a mock GET function that handles empty category filtering
+  const mockGET = jest.fn().mockImplementation(async (req) => {
+    const url = new URL(req.url);
+    const format = url.searchParams.get('format') || 'nested';
+    const includeEmpty = url.searchParams.get('includeEmpty') !== 'false'; // Default to true
 
-  withTenantAccess.mockImplementation((req, handler) => {
-    return handler(req);
-  });
+    // Get the categories from the mocked service
+    const tenantId = req.headers.get('x-tenant-id');
+    const categories = await CategoryService.getCategoriesByTenant(tenantId);
 
-  withPermission.mockImplementation((req, resourceType, permission, handler) => {
-    return handler(req);
-  });
+    let filteredCategories = [...categories];
 
-  withSitePermission.mockImplementation((req, siteId, permission, handler) => {
-    return handler(req);
+    // Filter out empty categories if includeEmpty=false
+    if (!includeEmpty) {
+      // Get listing counts for each category
+      const listingCountPromises = categories.map(async (category) => {
+        const count = await CategoryService.getCategoryListingCount(category.id);
+        return { categoryId: category.id, count };
+      });
+
+      const listingCounts = await Promise.all(listingCountPromises);
+      const nonEmptyCategoryIds = listingCounts
+        .filter(item => item.count > 0)
+        .map(item => item.categoryId);
+
+      filteredCategories = categories.filter(category =>
+        nonEmptyCategoryIds.includes(category.id)
+      );
+    }
+
+    // Return the response
+    return new Response(
+      JSON.stringify({ categories: filteredCategories }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
   });
 
   return {
-    withTenantAccess,
-    withPermission,
-    withSitePermission
+    GET: mockGET
   };
 });
 

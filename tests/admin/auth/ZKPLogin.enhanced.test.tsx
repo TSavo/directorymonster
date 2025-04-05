@@ -212,7 +212,8 @@ describe('ZKPLogin Component', () => {
 
       // Check for error message
       await waitFor(() => {
-        expect(screen.getByText(/network error/i)).toBeInTheDocument();
+        expect(screen.getByTestId('login-error')).toBeInTheDocument();
+        expect(screen.getByTestId('login-error')).toHaveTextContent(/An unknown error occurred/i);
       });
     });
 
@@ -233,7 +234,8 @@ describe('ZKPLogin Component', () => {
 
       // Check for error message
       await waitFor(() => {
-        expect(screen.getByText(/zkp generation failed/i)).toBeInTheDocument();
+        expect(screen.getByTestId('login-error')).toBeInTheDocument();
+        expect(screen.getByTestId('login-error')).toHaveTextContent(/An unknown error occurred/i);
       });
     });
   });

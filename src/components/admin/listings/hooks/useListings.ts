@@ -80,6 +80,16 @@ export const useListings = ({
   }, [initialListings]);
 
   /**
+   * Fetch listings when component mounts or when dependencies change
+   */
+  useEffect(() => {
+    // Skip if we already have initialListings
+    if (!initialListings?.length) {
+      fetchListings();
+    }
+  }, [fetchListings, initialListings, siteSlug, filters, sort, pagination.page, pagination.perPage]);
+
+  /**
    * Fetch listings from the API
    */
   const fetchListings = useCallback(async () => {

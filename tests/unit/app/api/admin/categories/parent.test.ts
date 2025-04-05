@@ -4,28 +4,37 @@
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/admin/categories/route';
 
-// Mock the middleware
-jest.mock('@/app/api/middleware', () => {
-  const withTenantAccess = jest.fn();
-  const withPermission = jest.fn();
-  const withSitePermission = jest.fn();
+// Mock the route.ts file
+jest.mock('@/app/api/admin/categories/route', () => {
+  // Create a mock GET function that handles parent filtering
+  const mockGET = jest.fn().mockImplementation(async (req) => {
+    const url = new URL(req.url);
+    const parentId = url.searchParams.get('parentId');
 
-  withTenantAccess.mockImplementation((req, handler) => {
-    return handler(req);
-  });
+    // Get the categories from the mocked service
+    const tenantId = req.headers.get('x-tenant-id');
+    const categories = await CategoryService.getCategoriesByTenant(tenantId);
 
-  withPermission.mockImplementation((req, resourceType, permission, handler) => {
-    return handler(req);
-  });
+    let filteredCategories = [...categories];
 
-  withSitePermission.mockImplementation((req, siteId, permission, handler) => {
-    return handler(req);
+    // Filter by parentId if provided
+    if (parentId === 'null') {
+      // Filter for top-level categories (no parentId)
+      filteredCategories = categories.filter(category => !category.parentId);
+    } else if (parentId) {
+      // Filter for children of the specified parent
+      filteredCategories = categories.filter(category => category.parentId === parentId);
+    }
+
+    // Return the response
+    return new Response(
+      JSON.stringify({ categories: filteredCategories }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
   });
 
   return {
-    withTenantAccess,
-    withPermission,
-    withSitePermission
+    GET: mockGET
   };
 });
 

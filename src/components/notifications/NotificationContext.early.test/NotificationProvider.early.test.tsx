@@ -1,14 +1,28 @@
 import "@testing-library/jest-dom";
 import { useContext } from "react";
-import { NotificationProvider } from "../NotificationContext";
+import { NotificationProvider, NotificationContext } from "../NotificationContext";
 
 import { act, render, screen } from "@testing-library/react";
 
 // Mocking React components and hooks
-jest.mock("react", () => ({
-  ...jest.requireActual("react"),
-  useContext: jest.fn(),
-}));
+jest.mock("react", () => {
+  const originalReact = jest.requireActual("react");
+  return {
+    ...originalReact,
+    useContext: jest.fn((context) => {
+      // If it's the NotificationContext, return a mock implementation
+      if (context === originalReact.createContext()) {
+        return {
+          notifications: [],
+          showNotification: jest.fn(),
+          dismissNotification: jest.fn(),
+        };
+      }
+      // Otherwise, use the original implementation
+      return originalReact.useContext(context);
+    }),
+  };
+});
 
 describe("NotificationProvider() NotificationProvider method", () => {
   let mockUseContext: jest.Mock;
@@ -29,7 +43,7 @@ describe("NotificationProvider() NotificationProvider method", () => {
 
       const TestComponent = () => {
         const { showNotification, notifications } = useContext(
-          NotificationContextType,
+          NotificationContext
         )!;
         return (
           <div>
@@ -74,7 +88,7 @@ describe("NotificationProvider() NotificationProvider method", () => {
 
       const TestComponent = () => {
         const { showNotification, notifications } = useContext(
-          NotificationContextType,
+          NotificationContext
         )!;
         return (
           <div>
@@ -121,7 +135,7 @@ describe("NotificationProvider() NotificationProvider method", () => {
     it("should handle dismissing a non-existent notification gracefully", () => {
       // Arrange
       const TestComponent = () => {
-        const { dismissNotification } = useContext(NotificationContextType)!;
+        const { dismissNotification } = useContext(NotificationContext)!;
         return (
           <div>
             <button onClick={() => dismissNotification("non-existent-id")}>
@@ -157,7 +171,7 @@ describe("NotificationProvider() NotificationProvider method", () => {
 
       const TestComponent = () => {
         const { showNotification, notifications } = useContext(
-          NotificationContextType,
+          NotificationContext
         )!;
         return (
           <div>

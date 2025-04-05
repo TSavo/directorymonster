@@ -13,7 +13,6 @@
     "app:format": "prettier --write .",
     "app:typecheck": "tsc --noEmit",
     "app:all": "bash scripts/do-it-all.sh",
-
     "// DOCKER COMMANDS": "Commands for Docker operations",
     "docker:build": "docker-compose -f docker/docker-compose.yml build",
     "docker:build:python": "docker build -t directorymonster-python -f docker/Dockerfile.pythondev .",
@@ -24,7 +23,6 @@
     "docker:zkp:up": "docker-compose -f docker-compose.zkp.yml up -d",
     "docker:zkp:down": "docker-compose -f docker-compose.zkp.yml down",
     "docker:zkp:logs": "docker-compose -f docker-compose.zkp.yml logs -f",
-
     "// ZKP COMMANDS": "Commands for Zero-Knowledge Proof operations",
     "zkp:setup": "ts-node scripts/zkp-setup-simple.ts",
     "zkp:update": "node scripts/update-zkp-implementation.js",
@@ -32,21 +30,18 @@
     "zkp:test:poseidon": "ts-node scripts/test-poseidon-direct.ts",
     "zkp:test:passwords": "ts-node scripts/test-different-passwords.ts",
     "zkp:verify": "npm run test:crypto:setup",
-
     "// SECURITY COMMANDS": "Commands for security operations",
     "security:verify": "ts-node scripts/verify-checksums.ts",
     "security:generate": "ts-node scripts/generate-checksums.ts",
     "security:check": "npm run test:crypto:security && npm run security:verify",
     "security:audit": "npm audit --production",
     "security:all": "npm run test:crypto && npm run security:check && npm run security:audit",
-
     "// DATA COMMANDS": "Commands for data operations",
     "data:seed": "bash scripts/unix/run-seed.sh",
     "data:seed:js": "node seed-script.js",
     "data:seed:docker": "bash scripts/unix/run-seed-docker.sh",
     "data:seed:auth": "node scripts/seed-with-auth.js",
     "data:clear:users": "bash scripts/unix/clear-redis-users.sh",
-
     "// TEST COMMANDS": "Commands for testing",
     "test:all": "jest",
     "test:all-security": "powershell -File scripts/test-all-security.ps1",
@@ -68,7 +63,6 @@
     "test:with:seed:docker": "npm run data:seed:docker && npm run test",
     "test:docker": "bash scripts/unix/docker-test-suite.sh",
     "test:no-e2e": "jest --testPathIgnorePatterns=\"/node_modules/|/.next/|/tests/e2e/\"",
-
     "// SIMPLE COMMANDS": "Simple commands for common operations",
     "run": "npm run app:dev",
     "build": "npm run app:build && npm run app:start",
@@ -77,7 +71,6 @@
     "verify": "powershell -File scripts/verify-all.ps1",
     "docker": "powershell -File scripts/docker-do-it-all.ps1",
     "setup": "powershell -File scripts/do-it-all.ps1",
-
     "// WINDOWS COMMANDS": "Windows-specific commands",
     "win:test": "jest",
     "win:test:security": "powershell -File scripts/test-all-security.ps1",
@@ -107,7 +100,8 @@
     "redux-mock-store": "^1.5.5",
     "snarkjs": "^0.7.3",
     "tailwind-merge": "^3.1.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.9",

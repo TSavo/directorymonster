@@ -242,7 +242,7 @@ describe('Category API Tenant Validation', () => {
       // Import the route handler
       const { PUT } = require('@/app/api/admin/categories/[id]/route');
 
-      const updateData = { name: 'Updated Category' };
+      const updateData = { name: 'Updated Category', order: 1 };
 
       // Create a test request with the matching tenant
       const req = new NextRequest('https://example.com/api/admin/categories/test-category-id', {
@@ -263,11 +263,16 @@ describe('Category API Tenant Validation', () => {
 
       // Verify the response status and data
       expect(response.status).toBe(200);
-      expect(responseData.category).toMatchObject({
-        ...mockCategory,
-        ...updateData,
-        tenantId: 'test-tenant' // Ensure tenant ID remains unchanged
-      });
+
+      // Check each property individually, ignoring the updatedAt timestamp
+      const category = responseData.category;
+      expect(category.id).toBe(mockCategory.id);
+      expect(category.name).toBe(updateData.name);
+      expect(category.slug).toBe(mockCategory.slug);
+      expect(category.order).toBe(updateData.order);
+      expect(category.siteId).toBe(mockCategory.siteId);
+      expect(category.tenantId).toBe('test-tenant'); // Ensure tenant ID remains unchanged
+      expect(category.updatedAt).toBeDefined(); // Just check that updatedAt exists
     });
   });
 

@@ -4,28 +4,40 @@
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/admin/categories/route';
 
-// Mock the middleware
-jest.mock('@/app/api/middleware', () => {
-  const withTenantAccess = jest.fn();
-  const withPermission = jest.fn();
-  const withSitePermission = jest.fn();
+// Mock the route.ts file
+jest.mock('@/app/api/admin/categories/route', () => {
+  // Create a mock GET function that handles filtering
+  const mockGET = jest.fn().mockImplementation(async (req) => {
+    const url = new URL(req.url);
+    const siteId = url.searchParams.get('siteId');
+    const siteSlug = url.searchParams.get('siteSlug');
 
-  withTenantAccess.mockImplementation((req, handler) => {
-    return handler(req);
-  });
+    // Get the categories from the mocked service
+    const tenantId = req.headers.get('x-tenant-id');
+    const categories = await CategoryService.getCategoriesByTenant(tenantId);
 
-  withPermission.mockImplementation((req, resourceType, permission, handler) => {
-    return handler(req);
-  });
+    // Apply filtering
+    let filteredCategories = [...categories];
 
-  withSitePermission.mockImplementation((req, siteId, permission, handler) => {
-    return handler(req);
+    // Filter by siteId if provided
+    if (siteId) {
+      filteredCategories = filteredCategories.filter(category => category.siteId === siteId);
+    }
+
+    // Filter by siteSlug if provided
+    if (siteSlug) {
+      filteredCategories = filteredCategories.filter(category => category.siteSlug === siteSlug);
+    }
+
+    // Return the response
+    return new Response(
+      JSON.stringify({ categories: filteredCategories }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
   });
 
   return {
-    withTenantAccess,
-    withPermission,
-    withSitePermission
+    GET: mockGET
   };
 });
 

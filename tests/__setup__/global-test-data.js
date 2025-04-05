@@ -135,6 +135,3 @@ global.__TEST_DATA__ = {
 
 // Additional helper for checking if TEST_DATA is available
 global.__HAS_TEST_DATA__ = true;
-
-// Log that test data has been initialized
-console.log('Global test data initialized');
