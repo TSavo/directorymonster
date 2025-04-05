@@ -48,7 +48,8 @@
     "data:clear:users": "bash scripts/unix/clear-redis-users.sh",
 
     "// TEST COMMANDS": "Commands for testing",
-    "test:all": "powershell -File scripts/test-all.ps1",
+    "test:all": "jest",
+    "test:all-security": "powershell -File scripts/test-all-security.ps1",
     "test:verify": "powershell -File scripts/verify-all.ps1",
     "test:unit": "jest \"tests/unit/**/*.test.ts\"",
     "test:integration": "jest \"tests/integration/**/*.test.ts\" \"tests/multitenancy-integration.test.ts\" \"tests/page-rendering.test.ts\"",
@@ -71,13 +72,15 @@
     "// SIMPLE COMMANDS": "Simple commands for common operations",
     "run": "npm run app:dev",
     "build": "npm run app:build && npm run app:start",
-    "test": "powershell -File scripts/test-all.ps1",
+    "test": "jest",
+    "test:security": "npm run test:all-security",
     "verify": "powershell -File scripts/verify-all.ps1",
     "docker": "powershell -File scripts/docker-do-it-all.ps1",
     "setup": "powershell -File scripts/do-it-all.ps1",
 
     "// WINDOWS COMMANDS": "Windows-specific commands",
-    "win:test": "powershell -File scripts/test-all.ps1",
+    "win:test": "jest",
+    "win:test:security": "powershell -File scripts/test-all-security.ps1",
     "win:verify": "powershell -File scripts/verify-all.ps1",
     "win:docker": "powershell -File scripts/docker-do-it-all.ps1",
     "win:setup": "powershell -File scripts/do-it-all.ps1"
