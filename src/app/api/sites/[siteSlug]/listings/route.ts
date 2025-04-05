@@ -3,6 +3,10 @@ import { redis, kv } from '@/lib/redis-client';
 import { Listing, SiteConfig, Category } from '@/types';
 import { withRedis } from '@/middleware/withRedis';
 import { searchIndexer } from '@/lib/search-indexer';
+import { createLogger } from '@/lib/logger';
+
+// Create a route-specific logger
+const logger = createLogger('ListingsRoute');
 
 export const GET = withRedis(async (request: NextRequest, { params }: { params: { siteSlug: string } }) => {
   // Parse query parameters
@@ -15,7 +19,7 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
   const keyPrefix = isTestMode ? 'test:' : '';
 
   // Get site by slug
-  console.log(`Looking for site with slug: ${siteSlug} using key: ${keyPrefix}site:slug:${siteSlug}`);
+  logger.info(`Looking for site with slug: ${siteSlug} using key: ${keyPrefix}site:slug:${siteSlug}`);
   let site = await kv.get<SiteConfig>(`${keyPrefix}site:slug:${siteSlug}`);
 
   // Parse the site if it's a string (sometimes Redis returns JSON strings)
@@ -23,11 +27,11 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
     try {
       site = JSON.parse(site);
     } catch (e) {
-      console.error('Error parsing site JSON:', e);
+      logger.error(`Error parsing site JSON: ${e}`);
     }
   }
 
-  console.log('Site found:', site);
+  logger.info(`Site found: ${JSON.stringify(site, null, 2)}`);
 
   if (!site) {
     return NextResponse.json(
@@ -43,7 +47,7 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
 
     // Get all listings for this site
     const siteId = site.id || (typeof site === 'object' && 'id' in site ? site.id : null);
-    console.log(`Getting listings for site ID: ${siteId}`);
+    logger.info(`Getting listings for site ID: ${siteId}`);
     const listingKeys = await kv.keys(`${keyPrefix}listing:site:${siteId}:*`);
     const listingsPromises = listingKeys.map(async (key) => await kv.get<Listing>(key));
 
@@ -71,12 +75,12 @@ export const GET = withRedis(async (request: NextRequest, { params }: { params: 
           listings.push(listing);
         }
       } catch (error) {
-        console.error(`Error fetching listing at index ${i}:`, error);
+        logger.error(`Error fetching listing at index ${i}: ${error}`);
         // Continue with other listings
       }
     }
 
-    console.log('Retrieved listings:', listings);
+    logger.info(`Retrieved listings: ${JSON.stringify(listings)}`);
 
     // Filter by category if categoryId is provided
     let filteredListings = listings;
@@ -133,7 +137,7 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
   const keyPrefix = isTestMode ? 'test:' : '';
 
   // Get site by slug
-  console.log(`[POST] Looking for site with slug: ${siteSlug} using key: ${keyPrefix}site:slug:${siteSlug}`);
+  logger.info(`[POST] Looking for site with slug: ${siteSlug} using key: ${keyPrefix}site:slug:${siteSlug}`);
   let site = await kv.get<SiteConfig>(`${keyPrefix}site:slug:${siteSlug}`);
 
   // Parse the site if it's a string (sometimes Redis returns JSON strings)
@@ -141,11 +145,11 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
     try {
       site = JSON.parse(site);
     } catch (e) {
-      console.error('Error parsing site JSON:', e);
+      logger.error(`Error parsing site JSON: ${e}`);
     }
   }
 
-  console.log('[POST] Site found:', site);
+  logger.info(`[POST] Site found: ${JSON.stringify(site, null, 2)}`);
 
   if (!site) {
     return NextResponse.json(
@@ -231,7 +235,7 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
       // Execute the transaction
       await transaction.exec();
     } catch (error) {
-      console.error('Transaction error:', error);
+      logger.error(`Transaction error: ${error}`);
       return NextResponse.json(
         { error: 'Failed to save listing data' },
         { status: 500 }
@@ -261,7 +265,7 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
         categorySlug = parsedCategory.slug;
       }
     } catch (e) {
-      console.error('Error parsing category:', e);
+      logger.error(`Error parsing category: ${e}`);
     }
 
     const responseData = {
@@ -269,11 +273,11 @@ export const POST = withRedis(async (request: NextRequest, { params }: { params:
       url: `${baseUrl}/${categorySlug}/${listing.slug}`,
     };
 
-    console.log('Returning response data:', responseData);
+    logger.info(`Returning response data: ${JSON.stringify(responseData)}`);
 
     return NextResponse.json(responseData, { status: 201 });
   } catch (error) {
-    console.error('Error creating listing:', error);
+    logger.error(`Error creating listing: ${error}`);
     return NextResponse.json(
       { error: 'Failed to save listing data' },
       { status: 500 }

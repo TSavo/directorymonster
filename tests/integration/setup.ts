@@ -9,6 +9,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { kv, redis } from '../../src/lib/redis-client';
 import { SiteConfig, Category, Listing } from '../../src/types';
+import { createLogger } from '../../src/lib/logger';
+
+// Create a test-specific logger
+const logger = createLogger('TestSetup');
 
 /**
  * Creates a standard test environment with predefined test sites
@@ -40,7 +44,7 @@ export async function setupTestEnvironment() {
  * Verifies that test data was properly stored in Redis
  */
 async function verifyTestData(sites: SiteConfig[], categories: Category[], listings: Listing[]) {
-  console.log('Verifying test data in Redis...');
+  logger.info('Verifying test data in Redis...');
 
   // Verify sites
   for (const site of sites) {
@@ -114,7 +118,7 @@ async function verifyTestData(sites: SiteConfig[], categories: Category[], listi
 
   // Verify Redis has the expected number of keys
   const allKeys = await kv.keys('test:*');
-  console.log(`Redis has ${allKeys.length} test keys`);
+  logger.info(`Redis has ${allKeys.length} test keys`);
 
   // Expected number of keys:
   // - Sites: 2 keys per site (id, slug) + 1 key per domain
@@ -125,10 +129,10 @@ async function verifyTestData(sites: SiteConfig[], categories: Category[], listi
     categories.length * 2 +
     listings.length * 3;
 
-  console.log(`Expected ${expectedKeyCount} keys, found ${allKeys.length} keys`);
+  logger.info(`Expected ${expectedKeyCount} keys, found ${allKeys.length} keys`);
 
   if (allKeys.length < expectedKeyCount) {
-    console.warn('Some keys may be missing from Redis');
+    logger.warn('Some keys may be missing from Redis');
   }
 }
 
@@ -181,26 +185,26 @@ export async function createTestSites(): Promise<SiteConfig[]> {
     }
   ];
 
-  console.log(`Creating ${sites.length} test sites...`);
+  logger.info(`Creating ${sites.length} test sites...`);
 
   // Store sites in Redis
   const multi = redis.multi();
 
-  console.log('Storing sites with the following data:');
+  logger.info('Storing sites with the following data:');
   sites.forEach(site => {
-    console.log(`Site: ${site.name}, slug: ${site.slug}, domain: ${site.domain}`);
+    logger.info(`Site: ${site.name}, slug: ${site.slug}, domain: ${site.domain}`);
 
     // Store by ID
     multi.set(`test:site:${site.id}`, JSON.stringify(site));
 
     // Store by slug - this is used by getSiteByHostname
     multi.set(`site:slug:${site.slug}`, JSON.stringify(site));
-    console.log(`Setting key: site:slug:${site.slug}`);
+    logger.debug(`Setting key: site:slug:${site.slug}`);
 
     // Store by domain - this is used by getSiteByHostname
     if (site.domain) {
       multi.set(`site:domain:${site.domain}`, JSON.stringify(site));
-      console.log(`Setting key: site:domain:${site.domain}`);
+      logger.debug(`Setting key: site:domain:${site.domain}`);
     }
 
     // Also store with test prefix for cleanup
@@ -218,9 +222,9 @@ export async function createTestSites(): Promise<SiteConfig[]> {
   // Check for errors in the transaction
   const errors = results.filter(([err]) => err !== null);
   if (errors.length > 0) {
-    console.error('Error storing test sites:', errors);
+    logger.error(`Error storing test sites: ${JSON.stringify(errors)}`);
   } else {
-    console.log(`Successfully stored ${sites.length} test sites in Redis`);
+    logger.info(`Successfully stored ${sites.length} test sites in Redis`);
   }
 
   return sites;
@@ -233,7 +237,7 @@ export async function createTestCategories(sites: SiteConfig[]): Promise<Categor
   const timestamp = Date.now();
   const categories: Category[] = [];
 
-  console.log(`Creating test categories for ${sites.length} sites...`);
+  logger.info(`Creating test categories for ${sites.length} sites...`);
 
   // Create categories for each site
   for (const site of sites) {
@@ -275,7 +279,7 @@ export async function createTestCategories(sites: SiteConfig[]): Promise<Categor
     categories.push(...siteCategories);
   }
 
-  console.log(`Created ${categories.length} test categories in memory`);
+  logger.info(`Created ${categories.length} test categories in memory`);
 
   // Store categories in Redis
   const multi = redis.multi();
@@ -296,9 +300,9 @@ export async function createTestCategories(sites: SiteConfig[]): Promise<Categor
   // Check for errors in the transaction
   const errors = results.filter(([err]) => err !== null);
   if (errors.length > 0) {
-    console.error('Error storing test categories:', errors);
+    logger.error(`Error storing test categories: ${JSON.stringify(errors)}`);
   } else {
-    console.log(`Successfully stored ${categories.length} test categories in Redis`);
+    logger.info(`Successfully stored ${categories.length} test categories in Redis`);
   }
 
   return categories;
@@ -311,7 +315,7 @@ export async function createTestListings(sites: SiteConfig[], categories: Catego
   const timestamp = Date.now();
   const listings: Listing[] = [];
 
-  console.log(`Creating test listings for ${categories.length} categories...`);
+  logger.info(`Creating test listings for ${categories.length} categories...`);
 
   // Create listings for each category
   for (const category of categories) {
@@ -341,7 +345,7 @@ export async function createTestListings(sites: SiteConfig[], categories: Catego
     }
   }
 
-  console.log(`Created ${listings.length} test listings in memory`);
+  logger.info(`Created ${listings.length} test listings in memory`);
 
   // Store listings in Redis
   const multi = redis.multi();
@@ -368,9 +372,9 @@ export async function createTestListings(sites: SiteConfig[], categories: Catego
   // Check for errors in the transaction
   const errors = results.filter(([err]) => err !== null);
   if (errors.length > 0) {
-    console.error('Error storing test listings:', errors);
+    logger.error(`Error storing test listings: ${JSON.stringify(errors)}`);
   } else {
-    console.log(`Successfully stored ${listings.length} test listings in Redis`);
+    logger.info(`Successfully stored ${listings.length} test listings in Redis`);
   }
 
   return listings;

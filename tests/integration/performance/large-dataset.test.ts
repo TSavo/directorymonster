@@ -14,6 +14,10 @@ import { SiteConfig, Category, Listing } from '@/types';
 import { GET as getListings } from '@/app/api/sites/[siteSlug]/listings/route';
 import { GET as getSearchResults } from '@/app/api/search/route';
 import { kv, redis } from '@/lib/redis-client';
+import { createLogger } from '@/lib/logger';
+
+// Create a test-specific logger
+const logger = createLogger('LargeDatasetTest');
 
 // Constants for large dataset tests
 const DATASET_SIZES = {
@@ -31,7 +35,7 @@ async function createLargeDataset(
   category: Category,
   count: number
 ): Promise<Listing[]> {
-  console.log(`Generating dataset with ${count} listings for site ${site.slug}, category ${category.slug}`);
+  logger.info(`Generating dataset with ${count} listings for site ${site.slug}, category ${category.slug}`);
 
   const listings: Listing[] = [];
   const multi = redis.multi();
@@ -383,14 +387,14 @@ describe('Large Dataset Handling', () => {
       const heapUsedIncrease = finalMemoryUsage.heapUsed - initialMemoryUsage.heapUsed;
 
       // Log memory usage statistics
-      console.log('Memory usage statistics:');
-      console.log(`- Initial heap used: ${Math.round(initialMemoryUsage.heapUsed / (1024 * 1024))} MB`);
-      console.log(`- Final heap used: ${Math.round(finalMemoryUsage.heapUsed / (1024 * 1024))} MB`);
-      console.log(`- Increase: ${Math.round(heapUsedIncrease / (1024 * 1024))} MB`);
+      logger.info('Memory usage statistics:');
+      logger.info(`- Initial heap used: ${Math.round(initialMemoryUsage.heapUsed / (1024 * 1024))} MB`);
+      logger.info(`- Final heap used: ${Math.round(finalMemoryUsage.heapUsed / (1024 * 1024))} MB`);
+      logger.info(`- Increase: ${Math.round(heapUsedIncrease / (1024 * 1024))} MB`);
 
       // Memory increase per listing should be reasonable (rough heuristic)
       const memoryPerListing = heapUsedIncrease / data.results.length;
-      console.log(`- Memory per listing: ${Math.round(memoryPerListing / 1024)} KB`);
+      logger.info(`- Memory per listing: ${Math.round(memoryPerListing / 1024)} KB`);
 
       // We expect memory usage to be reasonable - less than 50KB per listing
       // This is a heuristic and may need adjustment based on application specifics
@@ -437,7 +441,7 @@ describe('Large Dataset Handling', () => {
         };
 
         // Log performance result
-        console.log(`Dataset size ${sizeKey} (${size} listings): ${responseTime.toFixed(2)}ms`);
+        logger.info(`Dataset size ${sizeKey} (${size} listings): ${responseTime.toFixed(2)}ms`);
       }
     });
 
@@ -460,8 +464,8 @@ describe('Large Dataset Handling', () => {
       const responseTimeRatio = largeResult.responseTime / mediumResult.responseTime;
 
       // Log scaling metrics
-      console.log(`Dataset size ratio (LARGE/MEDIUM): ${datasetRatio.toFixed(2)}`);
-      console.log(`Response time ratio (LARGE/MEDIUM): ${responseTimeRatio.toFixed(2)}`);
+      logger.info(`Dataset size ratio (LARGE/MEDIUM): ${datasetRatio.toFixed(2)}`);
+      logger.info(`Response time ratio (LARGE/MEDIUM): ${responseTimeRatio.toFixed(2)}`);
 
       // The response time should scale reasonably with dataset size
       // In an efficient implementation, it should be sublinear (less than 1:1)
@@ -567,7 +571,7 @@ describe('Large Dataset Handling', () => {
       const searchTime = endTime - startTime;
 
       // Log search performance
-      console.log(`Search time for term "${searchTerm}": ${searchTime.toFixed(2)}ms`);
+      logger.info(`Search time for term "${searchTerm}": ${searchTime.toFixed(2)}ms`);
 
       // Verify response is successful
       expect(response.status).toBe(200);
@@ -580,7 +584,7 @@ describe('Large Dataset Handling', () => {
 
       // In test mode, we'll skip the actual results check since we're using a mock
       // and just verify the structure of the response
-      console.log('Search results:', data);
+      logger.debug(`Search results: ${JSON.stringify(data, null, 2)}`);
       expect(data).toHaveProperty('results');
       expect(data).toHaveProperty('pagination');
       expect(data).toHaveProperty('query');
