@@ -14,9 +14,19 @@ if (!parentPort) {
 }
 
 /**
- * Handle a verification task
- * @param {Object} data The task data
- * @returns {Object} The result
+ * Verifies a cryptographic proof using a bcrypt-based zero-knowledge proof verifier.
+ *
+ * This asynchronous function extracts the proof, public signals, and public key from the supplied data object
+ * and asynchronously validates the proof. It returns an object indicating whether the verification was successful.
+ * On success, the returned object contains a `result` property with the verification outcome;
+ * on failure, it contains an `error` property with the error message.
+ *
+ * @param {Object} data - The task payload containing verification parameters.
+ * @param {*} data.proof - The cryptographic proof to be verified.
+ * @param {*} data.publicSignals - The public signals required for verification.
+ * @param {*} data.publicKey - The public key against which the proof is verified.
+ * @returns {Object} An object with a `success` flag. If true, a `result` boolean indicates the verification outcome;
+ * if false, an `error` string describes the encountered issue.
  */
 async function handleVerifyTask(data) {
   try {
@@ -38,9 +48,15 @@ async function handleVerifyTask(data) {
 }
 
 /**
- * Handle a generation task
- * @param {Object} data The task data
- * @returns {Object} The result
+ * Simulate cryptographic proof generation for an authentication task.
+ *
+ * This asynchronous function returns a mock proof and public signals as a placeholder for a real generation process.
+ * On success, it returns an object with a true success flag and a result containing the mock proof and public signals.
+ * If an error occurs, it returns an object with a false success flag and an error message.
+ *
+ * @param {Object} data - The task input for generating the proof.
+ * @returns {Object} An object with a 'success' property; on success, a 'result' with a proof and public signals is provided,
+ *                   otherwise an 'error' message is included.
  */
 async function handleGenerateTask(data) {
   try {

@@ -17,11 +17,15 @@ const LOCK_EXPIRY = 10; // 10 seconds
 const MAX_CONCURRENT_REQUESTS = 100;
 
 /**
- * Acquire a distributed lock
- * 
- * @param resource The resource to lock
- * @param ttl The time-to-live for the lock in seconds
- * @returns The lock identifier if successful, null otherwise
+ * Attempts to acquire a distributed lock for a specified resource.
+ *
+ * Generates a unique lock identifier and sets a Redis key with a given time-to-live (TTL)
+ * if the key does not already exist. If successful, the function returns the generated identifier;
+ * otherwise, it returns null.
+ *
+ * @param resource - The resource to lock.
+ * @param ttl - The time-to-live for the lock in seconds.
+ * @returns The unique lock identifier if the lock is acquired, null otherwise.
  */
 export async function acquireLock(resource: string, ttl: number = LOCK_EXPIRY): Promise<string | null> {
   try {
@@ -41,11 +45,15 @@ export async function acquireLock(resource: string, ttl: number = LOCK_EXPIRY): 
 }
 
 /**
- * Release a distributed lock
- * 
- * @param resource The resource to unlock
- * @param lockId The lock identifier
- * @returns Whether the lock was released
+ * Releases a distributed lock for a specified resource.
+ *
+ * The lock is released only if the current lock identifier in Redis matches the provided lockId.
+ * If the identifiers match, the lock is deleted, and the function returns true; otherwise, it returns false.
+ * In case of any errors during the process, the function logs the error and returns false.
+ *
+ * @param resource - The identifier of the resource whose lock is to be released.
+ * @param lockId - The unique lock identifier that must match the current lock value.
+ * @returns A boolean indicating whether the lock was successfully released.
  */
 export async function releaseLock(resource: string, lockId: string): Promise<boolean> {
   try {
@@ -69,10 +77,15 @@ export async function releaseLock(resource: string, lockId: string): Promise<boo
 }
 
 /**
- * Track a new authentication request
- * 
- * @param username The username for the request
- * @returns Whether the request was successfully tracked
+ * Tracks an authentication request for the specified user.
+ *
+ * This function atomically increments the global concurrent request count and the user-specific request count.
+ * Before incrementing, it verifies that the global count does not exceed the maximum concurrent requests limit.
+ * If the limit is reached, it returns false; otherwise, it applies a fixed expiry to both counters.
+ * In case of an error, the function logs the error and returns true to fail open.
+ *
+ * @param username - Identifier of the user initiating the authentication request.
+ * @returns A promise that resolves to true if the request is tracked or if the function fails open, or false if the request limit is reached.
  */
 export async function trackAuthRequest(username: string): Promise<boolean> {
   try {
@@ -108,9 +121,11 @@ export async function trackAuthRequest(username: string): Promise<boolean> {
 }
 
 /**
- * Complete an authentication request
- * 
- * @param username The username for the request
+ * Completes an authentication request.
+ *
+ * Decrements both the global concurrent request count and the specific user's request count in the key-value store. Any errors encountered during the operation are caught and logged.
+ *
+ * @param username - The username whose authentication request is being completed.
  */
 export async function completeAuthRequest(username: string): Promise<void> {
   try {
@@ -129,10 +144,13 @@ export async function completeAuthRequest(username: string): Promise<void> {
 }
 
 /**
- * Get the number of concurrent requests for a user
- * 
- * @param username The username to check
- * @returns The number of concurrent requests
+ * Retrieves the current number of concurrent authentication requests for the specified user.
+ *
+ * This function queries the key-value store with a user-specific key to obtain the count of active requests.
+ * If the key is not found or an error occurs during retrieval, it returns 0.
+ *
+ * @param username - The username whose concurrent request count is queried.
+ * @returns The number of concurrent requests for the specified user, or 0 if not found or on error.
  */
 export async function getUserConcurrentRequests(username: string): Promise<number> {
   try {
@@ -148,9 +166,12 @@ export async function getUserConcurrentRequests(username: string): Promise<numbe
 }
 
 /**
- * Get the total number of concurrent authentication requests
- * 
- * @returns The number of concurrent requests
+ * Retrieves the total number of concurrent authentication requests.
+ *
+ * This function queries the datastore for the current count of active authentication requests.
+ * It returns 0 if the count is not set or an error occurs during retrieval.
+ *
+ * @returns The total count of concurrent authentication requests, or 0 on error.
  */
 export async function getTotalConcurrentRequests(): Promise<number> {
   try {

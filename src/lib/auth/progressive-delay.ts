@@ -18,11 +18,16 @@ const BACKOFF_FACTOR = 2; // Exponential backoff factor
 const JITTER_FACTOR = 0.1; // Add random jitter to prevent timing attacks
 
 /**
- * Calculate the delay for an IP address based on failed attempts
- * with exponential backoff and jitter
+ * Computes the progressive delay for an IP address based on its failed authentication attempts.
  *
- * @param ipAddress The IP address to calculate the delay for
- * @returns The delay in milliseconds
+ * The function retrieves the number of failed attempts from a key-value store. If no failed attempts are recorded,
+ * it immediately returns 0. Otherwise, it calculates a base delay using an exponential backoff strategy—multiplying
+ * the base delay by the backoff factor raised to the number of attempts minus one—and limits the delay to a defined maximum.
+ * A random jitter, scaled by a jitter factor, is then added to the base delay to mitigate timing attacks.
+ * In case of any errors during delay calculation, the function logs the error and returns 0.
+ *
+ * @param ipAddress The IP address for which to compute the delay.
+ * @returns The computed delay in milliseconds.
  */
 export async function getProgressiveDelay(ipAddress: string): Promise<number> {
   try {
@@ -67,11 +72,15 @@ export async function getProgressiveDelay(ipAddress: string): Promise<number> {
 }
 
 /**
- * Record a failed attempt for delay calculation
- * with exponential backoff and jitter
+ * Records a failed authentication attempt for the specified IP address and computes a progressive delay.
  *
- * @param ipAddress The IP address to record the failed attempt for
- * @returns The new delay in milliseconds
+ * The function increments the failure count stored for the IP address and applies exponential backoff
+ * paired with a random jitter. The backoff increases the delay for each subsequent failed attempt, capped
+ * at a maximum threshold, while the jitter helps prevent timing attacks. If the operation fails (e.g.,
+ * due to datastore issues), the function logs the error and returns a delay of 0.
+ *
+ * @param ipAddress - The IP address for which the failed attempt is being recorded.
+ * @returns The computed delay in milliseconds to be applied before the next authentication attempt.
  */
 export async function recordFailedAttemptForDelay(ipAddress: string): Promise<number> {
   try {
@@ -109,9 +118,12 @@ export async function recordFailedAttemptForDelay(ipAddress: string): Promise<nu
 }
 
 /**
- * Reset delay for an IP address
+ * Resets the progressive delay for a specified IP address.
  *
- * @param ipAddress The IP address to reset
+ * Removes any stored delay associated with the IP, allowing future authentication
+ * attempts to proceed without the imposed delay.
+ *
+ * @param ipAddress - The IP address to reset.
  */
 export async function resetDelay(ipAddress: string): Promise<void> {
   try {
@@ -126,10 +138,13 @@ export async function resetDelay(ipAddress: string): Promise<void> {
 }
 
 /**
- * Apply the progressive delay
+ * Applies the calculated progressive delay for the specified IP address.
  *
- * @param ipAddress The IP address to apply the delay for
- * @returns A promise that resolves after the delay
+ * This function retrieves the computed delay—based on exponential backoff with jitter—and pauses execution for that duration.
+ * If the delay is zero or an error occurs during its retrieval, the function resolves immediately after logging the error.
+ *
+ * @param ipAddress - The IP address for which the delay is enforced.
+ * @returns A promise that resolves after the progressive delay has been applied.
  */
 export async function applyProgressiveDelay(ipAddress: string): Promise<void> {
   try {

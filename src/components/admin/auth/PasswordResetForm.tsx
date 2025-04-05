@@ -11,6 +11,16 @@ interface PasswordResetFormProps {
   searchParams?: URLSearchParams;
 }
 
+/**
+ * Renders a password reset component that handles both reset requests and confirmations.
+ *
+ * When in request mode (i.e. `isConfirmation` is false), the component displays a form to enter an email address to initiate a password reset. In confirmation mode (i.e. `isConfirmation` is true), it renders a form for setting a new password and confirming it, including generating a zero-knowledge proof via {@link generateZKPWithBcrypt}. The component validates inputs, manages loading and error states, and communicates with backend endpoints to complete the reset process.
+ *
+ * @param isConfirmation - Indicates whether the form is for confirming a password reset.
+ * @param searchParams - URL search parameters containing the reset token and email used in confirmation.
+ *
+ * @returns A React component that renders the appropriate password reset form.
+ */
 export function PasswordResetForm({
   isConfirmation = false,
   searchParams = new URLSearchParams(),

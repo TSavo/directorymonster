@@ -18,6 +18,20 @@ export interface UseSecurityMetricsProps {
   endDate?: string;
 }
 
+/**
+ * Custom hook to fetch and manage security metrics data based on an optional date range.
+ *
+ * This hook constructs a query string from the provided `startDate` and `endDate`, sends a GET request
+ * to the `/api/admin/security/metrics` endpoint, and maintains local state for the retrieved metrics,
+ * the loading status, and any errors encountered during the operation.
+ *
+ * @param props - An object with optional `startDate` and `endDate` properties used to filter the security metrics.
+ * @returns An object containing:
+ *   - `metrics`: The security metrics data or null if not yet fetched.
+ *   - `isLoading`: A boolean that is true while the metrics are being fetched.
+ *   - `error`: The error encountered during the fetch, or null if no error occurred.
+ *   - `refetch`: A function to manually trigger a re-fetch of the metrics.
+ */
 export function useSecurityMetrics({ startDate, endDate }: UseSecurityMetricsProps) {
   const [metrics, setMetrics] = useState<SecurityMetrics | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);

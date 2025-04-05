@@ -16,11 +16,32 @@ interface SetupRequestBody {
 }
 
 /**
- * Setup the first admin user
+ * Creates the first administrative user and initial site during system setup.
  *
- * This endpoint handles the creation of the first admin user
- * when the system is freshly installed. It will only work if
- * no users currently exist in the system.
+ * This endpoint processes a POST request to establish the system's first admin user and its corresponding site. It requires a JSON body that includes a username and a site name, as well as either a password or zero-knowledge proof credentials (proof, publicSignals, and salt). Upon successful validation, it creates an admin user with a generated public key, sets up the initial site, stores them in the database, and returns a JSON response containing a JWT token alongside non-sensitive user and site details.
+ *
+ * In a testing context, the CSRF token check can be bypassed if the request header includes the appropriate flag. If any required information is missing, or if users already exist, the function responds with an appropriate error status (400 or 403). Unexpected errors yield a 500 response.
+ *
+ * @example
+ * // Using password authentication:
+ * {
+ *   "username": "admin",
+ *   "siteName": "MySite",
+ *   "password": "secret"
+ * }
+ *
+ * @example
+ * // Using zero-knowledge proof credentials:
+ * {
+ *   "username": "admin",
+ *   "siteName": "MySite",
+ *   "proof": { ... },
+ *   "publicSignals": ["derivedPublicKey"],
+ *   "salt": "providedSalt"
+ * }
+ *
+ * @remarks
+ * This endpoint enforces a CSRF token check unless running in a test environment with the X-Test-CSRF-Check header set.
  */
 export async function POST(request: NextRequest) {
   try {
