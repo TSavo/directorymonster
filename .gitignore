@@ -170,3 +170,5 @@ scripts/compare-*.js
 
 # Generated WebAssembly files
 *.wasm
+
+.early.coverage
