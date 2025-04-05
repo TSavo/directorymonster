@@ -3,6 +3,7 @@
  *
  * This module provides functions to track failed login attempts and
  * block IP addresses that exceed a threshold of failures.
+ * Supports configurable thresholds based on IP reputation and risk factors.
  */
 
 import { kv } from '@/lib/redis-client';
@@ -12,11 +13,138 @@ import { AuditAction, AuditSeverity } from '@/lib/audit/types';
 // Key prefixes
 const FAILED_ATTEMPTS_PREFIX = 'auth:failed:';
 const BLOCKED_IP_PREFIX = 'auth:blocked:';
+const IP_REPUTATION_PREFIX = 'auth:reputation:';
+const IP_RISK_PREFIX = 'auth:risk:';
 
-// Configuration
-const MAX_FAILED_ATTEMPTS = 10; // Block after 10 failed attempts
+// Configuration with defaults
+const DEFAULT_MAX_FAILED_ATTEMPTS = 10; // Block after 10 failed attempts
 const FAILED_ATTEMPT_EXPIRY = 60 * 60; // 1 hour (in seconds)
-const BLOCK_DURATION = 24 * 60 * 60; // 24 hours (in seconds)
+const DEFAULT_BLOCK_DURATION = 24 * 60 * 60; // 24 hours (in seconds)
+
+// Risk-based configuration
+const HIGH_RISK_MAX_ATTEMPTS = 5; // Block high-risk IPs after 5 failed attempts
+const MEDIUM_RISK_MAX_ATTEMPTS = 8; // Block medium-risk IPs after 8 failed attempts
+const LOW_RISK_MAX_ATTEMPTS = 15; // Block low-risk IPs after 15 failed attempts
+
+// Block duration based on risk
+const HIGH_RISK_BLOCK_DURATION = 48 * 60 * 60; // 48 hours for high-risk IPs
+const MEDIUM_RISK_BLOCK_DURATION = 24 * 60 * 60; // 24 hours for medium-risk IPs
+const LOW_RISK_BLOCK_DURATION = 12 * 60 * 60; // 12 hours for low-risk IPs
+
+// Risk levels
+export enum RiskLevel {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high'
+}
+
+/**
+ * Get the risk level for an IP address
+ *
+ * @param ipAddress The IP address to check
+ * @returns The risk level for the IP
+ */
+export async function getIpRiskLevel(ipAddress: string): Promise<RiskLevel> {
+  try {
+    // Get the key for this IP's risk level
+    const key = `${IP_RISK_PREFIX}${ipAddress}`;
+
+    // Get the current risk level
+    const riskLevel = await kv.get(key) as RiskLevel | null;
+
+    // Return the risk level or default to medium
+    return riskLevel || RiskLevel.MEDIUM;
+  } catch (error) {
+    console.error('Error getting IP risk level:', error);
+    return RiskLevel.MEDIUM; // Default to medium risk
+  }
+}
+
+/**
+ * Set the risk level for an IP address
+ *
+ * @param ipAddress The IP address to set the risk level for
+ * @param riskLevel The risk level to set
+ */
+export async function setIpRiskLevel(ipAddress: string, riskLevel: RiskLevel): Promise<void> {
+  try {
+    // Get the key for this IP's risk level
+    const key = `${IP_RISK_PREFIX}${ipAddress}`;
+
+    // Set the risk level
+    await kv.set(key, riskLevel);
+    await kv.expire(key, 30 * 24 * 60 * 60); // 30 days expiry
+
+    // Log the risk level change
+    try {
+      await AuditService.logEvent({
+        action: AuditAction.IP_RISK_LEVEL_CHANGED,
+        severity: AuditSeverity.INFO,
+        ipAddress,
+        details: {
+          riskLevel,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (auditError) {
+      console.error('Error logging to audit service:', auditError);
+    }
+  } catch (error) {
+    console.error('Error setting IP risk level:', error);
+  }
+}
+
+/**
+ * Get the maximum failed attempts allowed for an IP based on its risk level
+ *
+ * @param ipAddress The IP address to check
+ * @returns The maximum failed attempts allowed
+ */
+export async function getMaxFailedAttempts(ipAddress: string): Promise<number> {
+  try {
+    const riskLevel = await getIpRiskLevel(ipAddress);
+
+    switch (riskLevel) {
+      case RiskLevel.HIGH:
+        return HIGH_RISK_MAX_ATTEMPTS;
+      case RiskLevel.MEDIUM:
+        return MEDIUM_RISK_MAX_ATTEMPTS;
+      case RiskLevel.LOW:
+        return LOW_RISK_MAX_ATTEMPTS;
+      default:
+        return DEFAULT_MAX_FAILED_ATTEMPTS;
+    }
+  } catch (error) {
+    console.error('Error getting max failed attempts:', error);
+    return DEFAULT_MAX_FAILED_ATTEMPTS;
+  }
+}
+
+/**
+ * Get the block duration for an IP based on its risk level
+ *
+ * @param ipAddress The IP address to check
+ * @returns The block duration in seconds
+ */
+export async function getBlockDuration(ipAddress: string): Promise<number> {
+  try {
+    const riskLevel = await getIpRiskLevel(ipAddress);
+
+    switch (riskLevel) {
+      case RiskLevel.HIGH:
+        return HIGH_RISK_BLOCK_DURATION;
+      case RiskLevel.MEDIUM:
+        return MEDIUM_RISK_BLOCK_DURATION;
+      case RiskLevel.LOW:
+        return LOW_RISK_BLOCK_DURATION;
+      default:
+        return DEFAULT_BLOCK_DURATION;
+    }
+  } catch (error) {
+    console.error('Error getting block duration:', error);
+    return DEFAULT_BLOCK_DURATION;
+  }
+}
 
 /**
  * Record a failed login attempt for an IP address
@@ -78,9 +206,13 @@ export async function recordFailedAttempt(
     const currentAttempts = await kv.get(key) || 0;
     const newAttempts = currentAttempts + 1;
 
-    // Update failed attempts
+    // Update failed attempts with atomic operation
     await kv.set(key, newAttempts);
     await kv.expire(key, FAILED_ATTEMPT_EXPIRY);
+
+    // Get the maximum allowed attempts for this IP based on risk level
+    const maxAttempts = await getMaxFailedAttempts(ipAddress);
+    const riskLevel = await getIpRiskLevel(ipAddress);
 
     // Log to the audit system
     try {
@@ -108,7 +240,9 @@ export async function recordFailedAttempt(
           username,
           reason: 'Invalid credentials',
           attemptCount: newAttempts,
-          maxAttempts: MAX_FAILED_ATTEMPTS
+          maxAttempts: maxAttempts,
+          riskLevel: riskLevel,
+          remainingAttempts: Math.max(0, maxAttempts - newAttempts)
         },
         success: false
       });
@@ -116,8 +250,8 @@ export async function recordFailedAttempt(
       console.error('Error logging to audit service:', error);
     }
 
-    // Check if we should block the IP
-    if (newAttempts >= MAX_FAILED_ATTEMPTS) {
+    // Check if we should block the IP based on risk-adjusted threshold
+    if (newAttempts >= maxAttempts) {
       await blockIp(ipAddress, username, userAgent);
       return true;
     }
@@ -145,16 +279,22 @@ export async function blockIp(
     // Get the key for this IP
     const key = `${BLOCKED_IP_PREFIX}${ipAddress}`;
 
+    // Get the risk level and block duration for this IP
+    const riskLevel = await getIpRiskLevel(ipAddress);
+    const blockDuration = await getBlockDuration(ipAddress);
+
     // Block the IP
     await kv.set(key, {
       blockedAt: Date.now(),
       reason: 'Too many failed login attempts',
       username,
-      userAgent
+      userAgent,
+      riskLevel,
+      blockDuration
     });
 
-    // Set expiration
-    await kv.expire(key, BLOCK_DURATION);
+    // Set expiration based on risk level
+    await kv.expire(key, blockDuration);
 
     // Log to the audit system
     try {
@@ -181,8 +321,10 @@ export async function blockIp(
         details: {
           username,
           reason: 'IP address blocked due to too many failed attempts',
-          blockDuration: BLOCK_DURATION,
-          blockDurationHours: BLOCK_DURATION / 3600
+          riskLevel: await getIpRiskLevel(ipAddress),
+          blockDuration: blockDuration,
+          blockDurationHours: blockDuration / 3600,
+          blockedUntil: new Date(Date.now() + blockDuration * 1000).toISOString()
         },
         success: false
       });
@@ -190,7 +332,7 @@ export async function blockIp(
       console.error('Error logging to audit service:', error);
     }
 
-    console.warn(`Blocked IP address ${ipAddress} for ${BLOCK_DURATION / 3600} hours due to too many failed login attempts`);
+    console.warn(`Blocked IP address ${ipAddress} for ${blockDuration / 3600} hours due to too many failed login attempts (risk level: ${riskLevel})`);
   } catch (error) {
     console.error('Error blocking IP:', error);
   }

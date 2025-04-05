@@ -7,28 +7,28 @@ export enum AuditAction {
   // Permission-related actions
   ACCESS_GRANTED = 'access_granted',
   ACCESS_DENIED = 'access_denied',
-  
+
   // Role management actions
   ROLE_CREATED = 'role_created',
   ROLE_UPDATED = 'role_updated',
   ROLE_DELETED = 'role_deleted',
-  
+
   // Role assignment actions
   ROLE_ASSIGNED = 'role_assigned',
   ROLE_REMOVED = 'role_removed',
-  
+
   // Tenant membership actions
   USER_ADDED_TO_TENANT = 'user_added_to_tenant',
   USER_REMOVED_FROM_TENANT = 'user_removed_from_tenant',
-  
+
   // Tenant management actions
   TENANT_CREATED = 'tenant_created',
   TENANT_UPDATED = 'tenant_updated',
   TENANT_DELETED = 'tenant_deleted',
-  
+
   // Cross-tenant actions
   CROSS_TENANT_ACCESS_ATTEMPT = 'cross_tenant_access_attempt',
-  
+
   // User actions
   USER_LOGIN = 'user_login',
   USER_LOGOUT = 'user_logout',
@@ -36,10 +36,17 @@ export enum AuditAction {
   USER_CREATED = 'user_created',
   USER_UPDATED = 'user_updated',
   USER_DELETED = 'user_deleted',
-  
+
   // Other security events
   SETTINGS_CHANGED = 'settings_changed',
-  CONFIG_UPDATED = 'config_updated'
+  CONFIG_UPDATED = 'config_updated',
+
+  // Security protection events
+  RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded',
+  IP_BLOCKED = 'ip_blocked',
+  IP_RISK_LEVEL_CHANGED = 'ip_risk_level_changed',
+  CAPTCHA_REQUIRED = 'captcha_required',
+  CAPTCHA_VERIFIED = 'captcha_verified'
 }
 
 /**

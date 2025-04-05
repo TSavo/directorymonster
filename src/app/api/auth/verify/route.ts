@@ -4,16 +4,19 @@ import { verifyZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 import jwt from 'jsonwebtoken';
 import { withRateLimit } from '@/middleware/withRateLimit';
 import { withAuthSecurity } from '@/middleware/withAuthSecurity';
-import { recordFailedAttempt, resetFailedAttempts } from '@/lib/auth/ip-blocker';
-import { recordFailedAttemptForCaptcha } from '@/lib/auth/captcha-service';
+import { recordFailedAttempt, resetFailedAttempts, getIpRiskLevel } from '@/lib/auth/ip-blocker';
+import { recordFailedAttemptForCaptcha, verifyCaptcha, resetCaptchaRequirement } from '@/lib/auth/captcha-service';
 import { recordFailedAttemptForDelay, resetDelay } from '@/lib/auth/progressive-delay';
 import { AuditService } from '@/lib/audit/audit-service';
 import { AuditAction, AuditSeverity } from '@/lib/audit/types';
+import { getAuthWorkerPool } from '@/lib/auth/worker-pool';
+import { trackAuthRequest, completeAuthRequest } from '@/lib/auth/concurrency';
 
 interface VerifyRequestBody {
   username: string;
   proof: any;
   publicSignals: any;
+  captchaToken?: string; // Optional CAPTCHA token
 }
 
 /**
@@ -52,33 +55,62 @@ export const POST = withRateLimit(
     // Parse request body
     const body = await request.json() as VerifyRequestBody;
 
-    // Log for debugging (in production, you would not log the proof)
-    console.log('Verification request body received:', {
-      username: body.username,
-      proofReceived: body.proof ? 'Yes' : 'No',
-      publicSignalsReceived: body.publicSignals ? 'Yes' : 'No'
-    });
+    // Get IP address for tracking
+    const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
 
-    // Validate required fields
-    if (!body.username || !body.proof || !body.publicSignals) {
-      console.warn('Missing required fields in request');
+    // Track this authentication request for concurrency management
+    const canProceed = await trackAuthRequest(body.username);
+    if (!canProceed) {
+      console.warn(`Too many concurrent authentication requests for user ${body.username}`);
       return NextResponse.json(
-        { success: false, error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
-
-    // Check rate limiting
-    const rateLimitKey = `ratelimit:login:${body.username}`;
-    const failedAttempts = await kv.get(rateLimitKey) as number || 0;
-
-    if (failedAttempts >= 5) {
-      console.warn(`Rate limit exceeded for user ${body.username}`);
-      return NextResponse.json(
-        { success: false, error: 'Too many login attempts. Please try again later.' },
+        { success: false, error: 'Authentication system is busy. Please try again in a moment.' },
         { status: 429 }
       );
     }
+
+    try {
+      // Log for debugging (in production, you would not log the proof)
+      console.log('Verification request body received:', {
+        username: body.username,
+        proofReceived: body.proof ? 'Yes' : 'No',
+        publicSignalsReceived: body.publicSignals ? 'Yes' : 'No',
+        captchaReceived: body.captchaToken ? 'Yes' : 'No',
+        ipAddress: ipAddress
+      });
+
+      // Validate required fields
+      if (!body.username || !body.proof || !body.publicSignals) {
+        console.warn('Missing required fields in request');
+        return NextResponse.json(
+          { success: false, error: 'Missing required fields' },
+          { status: 400 }
+        );
+      }
+
+      // Check if CAPTCHA is required and verify it
+      const captchaRequired = await verifyCaptcha(body.captchaToken || '', ipAddress);
+      if (captchaRequired === false) {
+        console.warn(`CAPTCHA verification failed for user ${body.username} from IP ${ipAddress}`);
+
+        // Record failed attempt for CAPTCHA tracking
+        await recordFailedAttemptForCaptcha(ipAddress);
+
+        // Record failed attempt for progressive delay
+        await recordFailedAttemptForDelay(ipAddress);
+
+        // Record failed attempt for IP blocking
+        await recordFailedAttempt(ipAddress, body.username, userAgent);
+
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'CAPTCHA verification failed',
+            requireCaptcha: true
+          },
+          { status: 403 }
+        );
+      }
 
     // Get user from database
     const userKey = `user:${body.username}`;
@@ -88,12 +120,20 @@ export const POST = withRateLimit(
     if (!user) {
       console.warn(`User not found: ${body.username}`);
 
-      // Increment failed attempts
-      await kv.set(rateLimitKey, failedAttempts + 1);
-      await kv.expire(rateLimitKey, 60 * 15); // 15 minutes
+      // Record failed attempts for security measures
+      await recordFailedAttempt(ipAddress, body.username, userAgent);
+      await recordFailedAttemptForCaptcha(ipAddress);
+      await recordFailedAttemptForDelay(ipAddress);
+
+      // Complete the authentication request to release resources
+      await completeAuthRequest(body.username);
 
       return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
+        {
+          success: false,
+          error: 'Invalid credentials',
+          requireCaptcha: await verifyCaptcha('', ipAddress) === false
+        },
         { status: 401 }
       );
     }
@@ -101,6 +141,26 @@ export const POST = withRateLimit(
     // Check if account is locked
     if (user.locked) {
       console.warn(`Locked account attempt: ${body.username}`);
+
+      // Record the attempt in audit logs
+      await AuditService.logEvent({
+        userId: user.id,
+        tenantId: 'global',
+        action: AuditAction.USER_LOGIN,
+        severity: AuditSeverity.WARNING,
+        ipAddress,
+        userAgent,
+        details: {
+          username: body.username,
+          reason: 'Account locked',
+          riskLevel: await getIpRiskLevel(ipAddress)
+        },
+        success: false
+      });
+
+      // Complete the authentication request to release resources
+      await completeAuthRequest(body.username);
+
       return NextResponse.json(
         { success: false, error: 'Account locked. Please contact an administrator.' },
         { status: 403 }
@@ -108,25 +168,46 @@ export const POST = withRateLimit(
     }
 
     // Log for debugging
-    console.log(`Verifying proof for user ${body.username}`);
+    console.log(`Verifying proof for user ${body.username} using worker pool`);
 
-    // Verify the proof using ZKP with bcrypt
-    const isValid = await verifyZKPWithBcrypt(
-      body.proof,
-      body.publicSignals,
-      user.publicKey
-    );
+    // Use the worker pool to verify the proof
+    const workerPool = getAuthWorkerPool();
+    const verificationResult = await workerPool.executeTask({
+      type: 'verify',
+      data: {
+        proof: body.proof,
+        publicSignals: body.publicSignals,
+        publicKey: user.publicKey
+      }
+    });
+
+    // Check if verification was successful
+    if (!verificationResult.success || !verificationResult.result) {
+      console.warn(`Worker pool verification error for user ${body.username}: ${verificationResult.error || 'Unknown error'}`);
+
+      // Record failed attempts for security measures
+      await recordFailedAttempt(ipAddress, body.username, userAgent);
+      await recordFailedAttemptForCaptcha(ipAddress);
+      await recordFailedAttemptForDelay(ipAddress);
+
+      // Complete the authentication request to release resources
+      await completeAuthRequest(body.username);
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Verification error',
+          requireCaptcha: await verifyCaptcha('', ipAddress) === false
+        },
+        { status: 500 }
+      );
+    }
+
+    // Check if the proof is valid
+    const isValid = verificationResult.result;
 
     if (!isValid) {
       console.warn(`Invalid proof for user ${body.username}`);
-
-      // Get IP address and user agent for logging
-      const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
-      const userAgent = request.headers.get('user-agent') || 'unknown';
-
-      // Increment failed attempts for rate limiting
-      await kv.set(rateLimitKey, failedAttempts + 1);
-      await kv.expire(rateLimitKey, 60 * 15); // 15 minutes
 
       // Record failed attempts for security measures
       await recordFailedAttempt(ipAddress, body.username, userAgent);
@@ -143,28 +224,32 @@ export const POST = withRateLimit(
         userAgent,
         details: {
           username: body.username,
-          reason: 'Invalid proof'
+          reason: 'Invalid proof',
+          riskLevel: await getIpRiskLevel(ipAddress)
         },
         success: false
       });
 
+      // Complete the authentication request to release resources
+      await completeAuthRequest(body.username);
+
       return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
+        {
+          success: false,
+          error: 'Invalid credentials',
+          requireCaptcha: await verifyCaptcha('', ipAddress) === false
+        },
         { status: 401 }
       );
     }
 
     // Authentication successful, reset failed attempts
     console.log(`Authentication successful for user ${body.username}`);
-    await kv.del(rateLimitKey);
-
-    // Get IP address and user agent for logging
-    const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
-    const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Reset security counters
     await resetFailedAttempts(ipAddress);
     await resetDelay(ipAddress);
+    await resetCaptchaRequirement(ipAddress);
 
     // Log the successful login to the audit system
     await AuditService.logEvent({
@@ -204,6 +289,9 @@ export const POST = withRateLimit(
     // Log for debugging
     console.log(`Generated JWT token for user ${body.username}`);
 
+    // Complete the authentication request to release resources
+    await completeAuthRequest(body.username);
+
     // Return success with token and user info (exclude sensitive info)
     return NextResponse.json({
       success: true,
@@ -215,8 +303,13 @@ export const POST = withRateLimit(
         lastLogin: updatedUser.lastLogin,
       },
     });
+
     } catch (error) {
-      console.error('Authentication error:', error);
+      // Handle any errors
+      console.error(`Error during authentication for user ${body.username}:`, error);
+
+      // Complete the authentication request to release resources
+      await completeAuthRequest(body.username);
 
       return NextResponse.json(
         { success: false, error: 'Authentication error' },
@@ -225,8 +318,8 @@ export const POST = withRateLimit(
     }
   },
   {
-    // Rate limit to 5 login attempts per minute per IP address
-    limit: 5,
+    // Rate limit to 10 login attempts per minute per IP address
+    limit: 10,
     windowInSeconds: 60,
     // Use IP address for rate limiting login attempts
     identifierFn: (req: NextRequest) => {
@@ -234,12 +327,48 @@ export const POST = withRateLimit(
       return `login:${ip}`;
     },
     // Custom response when rate limit is exceeded
-    onRateLimitExceeded: (req: NextRequest, resetInSeconds: number) => {
+    onRateLimitExceeded: async (req: NextRequest, resetInSeconds: number) => {
+      // Get IP address for tracking
+      const ipAddress = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+      const userAgent = req.headers.get('user-agent') || 'unknown';
+
+      // Record failed attempts for security measures
+      try {
+        // Extract username from request body if available
+        let username = 'unknown';
+        try {
+          const body = await req.clone().json() as { username?: string };
+          username = body.username || 'unknown';
+        } catch (parseError) {
+          console.error('Error parsing request body:', parseError);
+        }
+
+        await recordFailedAttempt(ipAddress, username, userAgent);
+        await recordFailedAttemptForCaptcha(ipAddress);
+        await recordFailedAttemptForDelay(ipAddress);
+
+        // Log the rate limit exceeded event
+        await AuditService.logEvent({
+          action: AuditAction.RATE_LIMIT_EXCEEDED,
+          severity: AuditSeverity.WARNING,
+          ipAddress,
+          userAgent,
+          details: {
+            username,
+            resetInSeconds,
+            riskLevel: await getIpRiskLevel(ipAddress)
+          }
+        });
+      } catch (error) {
+        console.error('Error recording rate limit exceeded:', error);
+      }
+
       return NextResponse.json(
         {
           success: false,
           error: 'Too many login attempts',
-          message: `Rate limit exceeded. Please try again in ${resetInSeconds} seconds.`
+          message: `Rate limit exceeded. Please try again in ${resetInSeconds} seconds.`,
+          requireCaptcha: true
         },
         {
           status: 429,

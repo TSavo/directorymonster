@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 import { getSalt, clearSaltCache } from '@/lib/auth/salt-cache';
 import { getAuthErrorMessage, AuthErrorType } from '@/lib/auth/error-handler';
+import CaptchaWidget from './CaptchaWidget';
 
 interface ZKPLoginProps {
   // Optional props for customization
@@ -22,10 +23,16 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
+  // CAPTCHA state
+  const [requireCaptcha, setRequireCaptcha] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<{ reset: () => void; execute: () => void } | null>(null);
+
   // Form validation state
   const [validationErrors, setValidationErrors] = useState<{
     username?: string;
     password?: string;
+    captcha?: string;
   }>({});
 
   // Router for redirecting
@@ -36,7 +43,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
    * @returns True if the form is valid, false otherwise
    */
   const validateForm = (): boolean => {
-    const errors: { username?: string; password?: string } = {};
+    const errors: { username?: string; password?: string; captcha?: string } = {};
 
     // Validate username
     if (!username.trim()) {
@@ -48,6 +55,11 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
       errors.password = 'Password is required';
     } else if (password.length < 8) {
       errors.password = 'Password must be at least 8 characters long';
+    }
+
+    // Validate CAPTCHA if required
+    if (requireCaptcha && !captchaToken) {
+      errors.captcha = 'Please complete the CAPTCHA verification';
     }
 
     setValidationErrors(errors);
@@ -133,6 +145,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
           username,
           proof,
           publicSignals,
+          captchaToken: requireCaptcha ? captchaToken : undefined,
         }),
       });
 
@@ -163,6 +176,17 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
         }
 
         const data = await response.json();
+
+        // Check if CAPTCHA is required
+        if (data.requireCaptcha) {
+          setRequireCaptcha(true);
+          // Reset CAPTCHA if it was already shown
+          if (captchaRef.current) {
+            captchaRef.current.reset();
+          }
+          setCaptchaToken(null);
+        }
+
         setError(data.error || 'Authentication failed');
       }
     } catch (err) {
@@ -252,6 +276,33 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
             <p className="mt-1 text-sm text-red-600" data-testid="password-error">{validationErrors.password}</p>
           )}
         </div>
+
+        {requireCaptcha && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Security Verification
+            </label>
+            <CaptchaWidget
+              onVerify={(token) => {
+                setCaptchaToken(token);
+                setValidationErrors({ ...validationErrors, captcha: undefined });
+              }}
+              onExpire={() => {
+                setCaptchaToken(null);
+                setValidationErrors({ ...validationErrors, captcha: 'CAPTCHA expired, please verify again' });
+              }}
+              onError={() => {
+                setCaptchaToken(null);
+                setValidationErrors({ ...validationErrors, captcha: 'CAPTCHA verification failed, please try again' });
+              }}
+              useCustomCaptcha={!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+              ref={(ref) => { captchaRef.current = ref; }}
+            />
+            {validationErrors.captcha && (
+              <p className="mt-1 text-sm text-red-600" data-testid="captcha-error">{validationErrors.captcha}</p>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center justify-between">
           <div className="flex items-center">
