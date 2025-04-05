@@ -35,7 +35,7 @@ jest.mock('@/lib/zkp/zkp-bcrypt', () => ({
   }),
   hashPassword: jest.fn().mockResolvedValue('$2b$10$mockedhash'),
   verifyPassword: jest.fn().mockResolvedValue(true),
-  generateBcryptSalt: jest.fn().mockReturnValue('$2b$10$mockedsalt'),
+  generateBcryptSalt: jest.fn().mockResolvedValue('$2b$10$mockedsalt'),
 }));
 
 // Mock the jsonwebtoken library

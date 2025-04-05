@@ -414,14 +414,20 @@ import { hashPassword, verifyPassword, generateZKPWithBcrypt } from '@/lib/zkp/z
 // Generate a salt
 const salt = generateSalt();
 
-// Hash a password with bcrypt
-const hashedPassword = await hashPassword('password', 12); // 12 salt rounds
+// Generate a bcrypt salt with custom rounds
+const bcryptSalt = await generateBcryptSalt(12); // 12 salt rounds
+
+// Hash a password with bcrypt (uses BCRYPT_WORK_FACTOR env var or defaults to 10)
+const hashedPassword = await hashPassword('password');
+
+// Hash with custom salt rounds
+const customHashedPassword = await hashPassword('password', 12);
 
 // Verify a password against a hash
 const isPasswordValid = await verifyPassword('password', hashedPassword);
 
-// Derive a public key
-const publicKey = await derivePublicKey('username', hashedPassword, salt);
+// Generate a public key
+const publicKey = await generatePublicKey('username', 'password', salt);
 
 // Generate a proof with bcrypt integration
 const { proof, publicSignals } = await generateZKPWithBcrypt('username', 'password', salt);
@@ -466,13 +472,18 @@ npm run dev
 - The system implements rate limiting, IP blocking, and exponential backoff to prevent brute force attacks.
 - The system requires CAPTCHA verification after multiple failed attempts.
 - The system uses bcrypt for secure password hashing before ZKP generation.
+- Configurable bcrypt work factor via `BCRYPT_WORK_FACTOR` environment variable.
 - The system uses dynamic salt generation to prevent precomputed table attacks.
 - The system logs all authentication events for comprehensive security auditing.
 - The system prevents replay attacks by binding proofs to specific sessions.
 - The system prevents man-in-the-middle attacks through username verification.
-- The system supports concurrent authentication requests without security degradation.
-- The system allocates resources efficiently to prevent denial-of-service attacks.
-- The system has been thoroughly tested under high load to ensure security measures remain effective.
+
+### Environment Variables
+
+- `BCRYPT_WORK_FACTOR`: Controls the computational cost of bcrypt hashing (default: 10)
+  - Higher values increase security but also increase CPU usage
+  - Recommended to increase as hardware improves
+  - Example: `BCRYPT_WORK_FACTOR=12`
 
 For more information, see the [ZKP Authentication Specification](docs/zkp-authentication.md) and the [Production Deployment Guide](docs/production-deployment.md).
 

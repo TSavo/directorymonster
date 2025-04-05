@@ -30,7 +30,7 @@ jest.mock('@/lib/zkp/zkp-bcrypt', () => ({
   verifyZKPWithBcrypt: jest.fn().mockResolvedValue(true),
   hashPassword: jest.fn().mockResolvedValue('$2b$10$mockedhash'),
   verifyPassword: jest.fn().mockResolvedValue(true),
-  generateBcryptSalt: jest.fn().mockReturnValue('$2b$10$mockedsalt'),
+  generateBcryptSalt: jest.fn().mockResolvedValue('$2b$10$mockedsalt'),
 }));
 
 // Mock fetch for API calls

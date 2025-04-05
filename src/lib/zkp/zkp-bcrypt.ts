@@ -10,14 +10,24 @@ import { ZKPInput, ZKPProof } from './adapter';
 import { getZKPProvider } from './provider';
 
 /**
+ * Get the bcrypt work factor from environment variables or use default
+ * @returns The bcrypt work factor to use
+ */
+export function getBcryptWorkFactor(): number {
+  return parseInt(process.env.BCRYPT_WORK_FACTOR || '10', 10);
+}
+
+/**
  * Generate a bcrypt hash for a password
  * @param password The password to hash
- * @param saltRounds The number of salt rounds to use (default: 10)
+ * @param saltRounds The number of salt rounds to use (defaults to environment variable or 10)
  * @returns A promise that resolves to the bcrypt hash
  */
-export async function hashPassword(password: string, saltRounds: number = 10): Promise<string> {
+export async function hashPassword(password: string, saltRounds?: number): Promise<string> {
+  // Use provided saltRounds or get from environment
+  const rounds = saltRounds || getBcryptWorkFactor();
   // Directly call bcrypt.hash to ensure it's properly tracked by spies in tests
-  return bcrypt.hash(password, saltRounds);
+  return bcrypt.hash(password, rounds);
 }
 
 /**
@@ -42,8 +52,8 @@ export async function generateZKPWithBcrypt(
   password: string,
   salt: string
 ): Promise<ZKPProof> {
-  // Hash the password with bcrypt - explicitly call bcrypt.hash to ensure spies work
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // Hash the password with bcrypt using the configurable work factor
+  const hashedPassword = await hashPassword(password);
 
   // Generate a ZKP proof using the hashed password
   const input: ZKPInput = {
@@ -78,10 +88,12 @@ export async function verifyZKPWithBcrypt(
 
 /**
  * Generate a salt for use with bcrypt
- * @param rounds The number of rounds to use (default: 10)
- * @returns A bcrypt salt
+ * @param rounds The number of rounds to use (defaults to environment variable or 10)
+ * @returns A promise that resolves to a bcrypt salt
  */
-export function generateBcryptSalt(rounds: number = 10): string {
-  // Directly call genSaltSync to ensure it's properly tracked by spies in tests
-  return bcrypt.genSaltSync(rounds);
+export async function generateBcryptSalt(rounds?: number): Promise<string> {
+  // Use provided rounds or get from environment
+  const saltRounds = rounds || getBcryptWorkFactor();
+  // Use async genSalt to avoid blocking the event loop
+  return bcrypt.genSalt(saltRounds);
 }

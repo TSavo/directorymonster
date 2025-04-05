@@ -184,15 +184,15 @@ describe('ZKP-Bcrypt Client Integration', () => {
   });
 
   describe('generateBcryptSalt', () => {
-    it('should generate a valid bcrypt salt', () => {
+    it('should generate a valid bcrypt salt', async () => {
       // Act
-      const salt = generateBcryptSalt();
+      const salt = await generateBcryptSalt();
 
       // Assert
       expect(salt).toMatch(/^\$2b\$/); // bcrypt salt format
     });
 
-    it('should use the specified rounds', () => {
+    it('should use the specified rounds', async () => {
       // Arrange
       const rounds = 12;
 
@@ -200,7 +200,7 @@ describe('ZKP-Bcrypt Client Integration', () => {
       mockGenSaltSync.mockClear();
 
       // Act
-      generateBcryptSalt(rounds);
+      await generateBcryptSalt(rounds);
 
       // Assert
       expect(mockGenSaltSync).toHaveBeenCalledWith(rounds);

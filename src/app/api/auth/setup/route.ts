@@ -87,11 +87,11 @@ export async function POST(request: NextRequest) {
       salt = generateSalt();
 
       // Generate public key from password and salt
-      publicKey = await generatePublicKey({
-        username: body.username,
-        password: body.password!,
-        salt,
-      });
+      publicKey = await generatePublicKey(
+        body.username,
+        body.password!,
+        salt
+      );
     }
 
     // Generate unique ID for user
