@@ -265,6 +265,6 @@ const CaptchaWidget = React.forwardRef<
       <div ref={captchaRef} className="g-recaptcha" data-sitekey={siteKey} />
     </>
   );
-}));
+});
 
 export default CaptchaWidget;
