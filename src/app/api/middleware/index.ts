@@ -16,3 +16,5 @@ export {
   withSecureTenantPermission,
   TenantContext
 } from './secureTenantContext';
+export { withTenantSiteContext } from './withTenantSiteContext';
+export { validateTenantSiteContext } from './validateTenantSiteContext';
