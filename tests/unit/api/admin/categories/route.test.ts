@@ -9,20 +9,18 @@ describe('Admin Categories Route Implementation', () => {
   const mockResponse = { data: 'test-response' };
 
   // Mock the middleware modules
-  jest.mock('@/middleware/tenant-validation', () => ({
+  jest.mock('@/app/api/middleware/index', () => ({
     withTenantAccess: (req, handler) => {
       withTenantAccessSpy(req);
-      // Just return a mock response instead of calling the handler
-      return mockResponse;
-    }
-  }));
-
-  jest.mock('@/middleware/withPermission', () => ({
+      // Call the handler with the request
+      return handler(req);
+    },
     withPermission: (req, resourceType, permission, handler) => {
       withPermissionSpy(req, resourceType, permission);
-      // Just return a mock response instead of calling the handler
+      // Return the mock response instead of calling the handler
       return mockResponse;
-    }
+    },
+    withSitePermission: jest.fn()
   }));
 
   beforeEach(() => {

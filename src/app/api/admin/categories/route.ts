@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenantAccess, withPermission, withSitePermission } from '@/app/api/middleware';
+import { withTenantAccess, withPermission, withSitePermission } from '@/app/api/middleware/index';
 import { CategoryService } from '@/lib/category-service';
 import { SiteService } from '@/lib/site-service';
 import { Category } from '@/types';
