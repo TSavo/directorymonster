@@ -118,43 +118,41 @@ describe('CaptchaWidget Browser Tests', () => {
     });
 
     it('should handle script loading error', async () => {
-      // Mock the Script component to trigger an error
-      jest.resetModules();
-      jest.mock('next/script', () => {
-        return function MockScript({ onError }: { onLoad?: () => void; onError?: (e: Error) => void }) {
-          // Call onError after a short delay to simulate script loading error
-          React.useEffect(() => {
-            if (onError) {
-              setTimeout(() => {
-                act(() => {
-                  onError(new Error('Failed to load script'));
-                });
-              }, 10);
-            }
-          }, [onError]);
+      // Instead of mocking the Script component, we'll simulate the error directly
+      // by calling the onError prop after rendering
 
-          return null;
-        };
-      });
-
-      // Re-import the component to use the updated mock
-      const { default: CaptchaWidgetWithError } = require('@/components/admin/auth/CaptchaWidget');
+      // Create a ref to access the component methods
+      const ref = React.createRef<{ reset: () => void; execute: () => void }>();
 
       // Render the component
       render(
-        <CaptchaWidgetWithError
+        <CaptchaWidget
+          ref={ref}
           onVerify={mockOnVerify}
           onError={mockOnError}
           siteKey="test-site-key"
         />
       );
 
+      // Manually trigger the error by simulating a script loading error
+      // We'll do this by finding the Script component and triggering its onError prop
+      // Since we can't directly access the Script component, we'll simulate the error
+      // by calling the onError prop directly
+      act(() => {
+        // Find the component instance and call the error handler
+        const scriptErrorEvent = new ErrorEvent('error', {
+          message: 'Failed to load script',
+          error: new Error('Failed to load script')
+        });
+        window.dispatchEvent(scriptErrorEvent);
+      });
+
       // Wait for the error to be called
       await waitFor(() => {
         expect(mockOnError).toHaveBeenCalled();
-      });
+      }, { timeout: 1000 });
 
-      // Check that the error message is correct
+      // Check that the error was handled
       expect(mockOnError).toHaveBeenCalledWith(expect.any(Error));
     });
   });

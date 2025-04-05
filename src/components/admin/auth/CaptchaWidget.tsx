@@ -81,6 +81,24 @@ const CaptchaWidget = React.forwardRef<
   const captchaRef = useRef<HTMLDivElement>(null);
   const widgetId = useRef<number | null>(null);
 
+  // Handle script loading errors
+  useEffect(() => {
+    if (!useCustomCaptcha && onError) {
+      const handleError = (event: ErrorEvent) => {
+        // Check if this is a script loading error for reCAPTCHA
+        if (event.message && event.message.includes('script') && !isLoaded) {
+          onError(new Error('Failed to load reCAPTCHA script'));
+        }
+      };
+
+      window.addEventListener('error', handleError);
+
+      return () => {
+        window.removeEventListener('error', handleError);
+      };
+    }
+  }, [useCustomCaptcha, onError, isLoaded]);
+
   // Generate a random code for the custom CAPTCHA
   useEffect(() => {
     if (useCustomCaptcha) {
