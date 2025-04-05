@@ -72,13 +72,43 @@ const fetchTenantSites = async (tenantId: string): Promise<Site[]> => {
 
 // Provider component
 export function TenantSiteProvider({ children }: { children: ReactNode }) {
-  const [currentTenantId, setCurrentTenantId] = useState<string | null>(null);
-  const [currentSiteId, setCurrentSiteId] = useState<string | null>(null);
+  const [currentTenantId, setCurrentTenantIdState] = useState<string | null>(null);
+  const [currentSiteId, setCurrentSiteIdState] = useState<string | null>(null);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMultipleTenants, setHasMultipleTenants] = useState(false);
   const [hasMultipleSites, setHasMultipleSites] = useState(false);
+
+  // Function to set tenant ID with page refresh
+  const setCurrentTenantId = (id: string | null) => {
+    if (id !== currentTenantId) {
+      // Save selection to localStorage
+      if (id) localStorage.setItem('currentTenantId', id);
+      else localStorage.removeItem('currentTenantId');
+
+      // Update state
+      setCurrentTenantIdState(id);
+
+      // Refresh page to update context
+      window.location.reload();
+    }
+  };
+
+  // Function to set site ID with page refresh
+  const setCurrentSiteId = (id: string | null) => {
+    if (id !== currentSiteId && currentTenantId) {
+      // Save selection to localStorage
+      if (id) localStorage.setItem(`${currentTenantId}_currentSiteId`, id);
+      else localStorage.removeItem(`${currentTenantId}_currentSiteId`);
+
+      // Update state
+      setCurrentSiteIdState(id);
+
+      // Refresh page to update context
+      window.location.reload();
+    }
+  };
 
   // Load user's tenants on initial render
   useEffect(() => {
@@ -103,7 +133,8 @@ export function TenantSiteProvider({ children }: { children: ReactNode }) {
           : editableTenants[0]?.id || null;
 
         if (initialTenantId) {
-          setCurrentTenantId(initialTenantId);
+          // Use setState directly to avoid page refresh during initialization
+          setCurrentTenantIdState(initialTenantId);
           // Load sites for the selected tenant
           const fetchedSites = await fetchTenantSites(initialTenantId);
           setSites(fetchedSites);
@@ -112,9 +143,11 @@ export function TenantSiteProvider({ children }: { children: ReactNode }) {
           // Set current site from storage or default to first site
           const savedSiteId = localStorage.getItem(`${initialTenantId}_currentSiteId`);
           if (savedSiteId && fetchedSites.some(s => s.id === savedSiteId)) {
-            setCurrentSiteId(savedSiteId);
+            // Use setState directly to avoid page refresh during initialization
+            setCurrentSiteIdState(savedSiteId);
           } else if (fetchedSites.length > 0) {
-            setCurrentSiteId(fetchedSites[0].id);
+            // Use setState directly to avoid page refresh during initialization
+            setCurrentSiteIdState(fetchedSites[0].id);
           }
         }
       } catch (error) {
@@ -140,11 +173,14 @@ export function TenantSiteProvider({ children }: { children: ReactNode }) {
           // Check if current site selection is valid for new tenant
           const savedSiteId = localStorage.getItem(`${currentTenantId}_currentSiteId`);
           if (savedSiteId && fetchedSites.some(s => s.id === savedSiteId)) {
-            setCurrentSiteId(savedSiteId);
+            // Use setState directly to avoid page refresh during initialization
+            setCurrentSiteIdState(savedSiteId);
           } else if (fetchedSites.length > 0) {
-            setCurrentSiteId(fetchedSites[0].id);
+            // Use setState directly to avoid page refresh during initialization
+            setCurrentSiteIdState(fetchedSites[0].id);
           } else {
-            setCurrentSiteId(null);
+            // Use setState directly to avoid page refresh during initialization
+            setCurrentSiteIdState(null);
           }
         } catch (error) {
           console.error('Error loading sites:', error);
