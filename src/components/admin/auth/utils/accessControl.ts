@@ -53,36 +53,36 @@ export function hasPermission(
   siteId?: string
 ): boolean {
   // Check for exact resource match first
-  const hasExactPermission = acl.entries.some(entry => 
+  const hasExactPermission = acl.entries.some(entry =>
     entry.resource.type === resourceType &&
     entry.permission === permission &&
     entry.resource.tenantId === tenantId &&
     entry.resource.id === resourceId &&
     entry.resource.siteId === siteId
   );
-  
+
   if (hasExactPermission) return true;
-  
+
   // Check for specific resource type with site-wide permission
-  const hasSiteWidePermission = siteId && acl.entries.some(entry => 
+  const hasSiteWidePermission = siteId && acl.entries.some(entry =>
     entry.resource.type === resourceType &&
     entry.permission === permission &&
     entry.resource.tenantId === tenantId &&
     !entry.resource.id &&
     entry.resource.siteId === siteId
   );
-  
+
   if (hasSiteWidePermission) return true;
-  
+
   // Check for tenant-wide permission for this resource type
-  const hasTenantWidePermission = acl.entries.some(entry => 
+  const hasTenantWidePermission = acl.entries.some(entry =>
     entry.resource.type === resourceType &&
     entry.permission === permission &&
     entry.resource.tenantId === tenantId &&
     !entry.resource.id &&
     !entry.resource.siteId
   );
-  
+
   return hasTenantWidePermission;
 }
 
@@ -116,20 +116,20 @@ export function grantPermission(
     id: resourceId,
     siteId: siteId
   };
-  
+
   // Check if permission already exists
-  const permissionExists = acl.entries.some(entry => 
+  const permissionExists = acl.entries.some(entry =>
     entry.resource.type === resource.type &&
     entry.permission === permission &&
     entry.resource.tenantId === resource.tenantId &&
     entry.resource.id === resource.id &&
     entry.resource.siteId === resource.siteId
   );
-  
+
   if (permissionExists) {
     return acl;
   }
-  
+
   // Add new permission
   return {
     ...acl,
@@ -161,7 +161,7 @@ export function revokePermission(
 ): ACL {
   return {
     ...acl,
-    entries: acl.entries.filter(entry => 
+    entries: acl.entries.filter(entry =>
       !(entry.resource.type === resourceType &&
         entry.permission === permission &&
         entry.resource.tenantId === tenantId &&
@@ -185,67 +185,67 @@ export function revokePermission(
  */
 export function createSiteAdminACL(userId: string, tenantId: string, siteId: string): ACL {
   const acl: ACL = { userId, entries: [] };
-  
+
   // Site management permissions
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'site', id: siteId, tenantId },
     permission: 'manage'
   });
-  
+
   // Category management for this site
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'category', siteId, tenantId },
     permission: 'create'
   });
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'category', siteId, tenantId },
     permission: 'read'
   });
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'category', siteId, tenantId },
     permission: 'update'
   });
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'category', siteId, tenantId },
     permission: 'delete'
   });
-  
+
   // Listing management for this site
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'listing', siteId, tenantId },
     permission: 'create'
   });
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'listing', siteId, tenantId },
     permission: 'read'
   });
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'listing', siteId, tenantId },
     permission: 'update'
   });
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'listing', siteId, tenantId },
     permission: 'delete'
   });
-  
+
   // User management for this site
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'user', siteId, tenantId },
     permission: 'create'
   });
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'user', siteId, tenantId },
     permission: 'read'
   });
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'user', siteId, tenantId },
     permission: 'update'
   });
-  acl.entries.push({ 
+  acl.entries.push({
     resource: { type: 'user', siteId, tenantId },
     permission: 'delete'
   });
-  
+
   return acl;
 }
 
@@ -261,11 +261,11 @@ export function createSiteAdminACL(userId: string, tenantId: string, siteId: str
  */
 export function createTenantAdminACL(userId: string, tenantId: string): ACL {
   const acl: ACL = { userId, entries: [] };
-  
+
   // Tenant-wide permissions for all resource types
   const resourceTypes: ResourceType[] = ['user', 'site', 'category', 'listing', 'setting', 'audit', 'role'];
   const permissions: Permission[] = ['create', 'read', 'update', 'delete', 'manage'];
-  
+
   resourceTypes.forEach(type => {
     permissions.forEach(permission => {
       acl.entries.push({
@@ -274,7 +274,7 @@ export function createTenantAdminACL(userId: string, tenantId: string): ACL {
       });
     });
   });
-  
+
   return acl;
 }
 
@@ -289,20 +289,20 @@ export function createTenantAdminACL(userId: string, tenantId: string): ACL {
  */
 export function createSuperAdminACL(userId: string): ACL {
   const acl: ACL = { userId, entries: [] };
-  
+
   // System tenant ID for global permissions
   const systemTenantId = 'system';
-  
+
   // Global permissions for all resource types
   const resourceTypes: ResourceType[] = ['user', 'site', 'category', 'listing', 'setting', 'audit', 'role'];
   const permissions: Permission[] = ['create', 'read', 'update', 'delete', 'manage'];
-  
+
   // Add tenant management permission (special case for super admin)
   acl.entries.push({
     resource: { type: 'tenant' as ResourceType, tenantId: systemTenantId },
     permission: 'manage'
   });
-  
+
   resourceTypes.forEach(type => {
     permissions.forEach(permission => {
       acl.entries.push({
@@ -311,7 +311,7 @@ export function createSuperAdminACL(userId: string): ACL {
       });
     });
   });
-  
+
   return acl;
 }
 
@@ -324,7 +324,7 @@ export function createSuperAdminACL(userId: string): ACL {
  *
  * @param acl - The access control list to inspect.
  * @param tenantId - The tenant ID that the ACL is expected to be associated with.
- * @returns True if there's no authorized access for the specified tenant; otherwise, false.
+ * @returns False if the user has explicit access to the requested tenant; otherwise, true.
  */
 export function detectCrossTenantAccess(
   acl: ACL,
@@ -332,19 +332,19 @@ export function detectCrossTenantAccess(
 ): boolean {
   // Only check ACLs that have entries
   if (!acl.entries.length) return false;
-  
-  // Get all unique tenant IDs referenced in the ACL
-  const referencedTenantIds = new Set<string>();
-  acl.entries.forEach(entry => {
-    referencedTenantIds.add(entry.resource.tenantId);
-  });
-  
-  // Filter out the specified tenant and the system tenant (which is allowed)
-  referencedTenantIds.delete(tenantId);
-  referencedTenantIds.delete('system');
-  
-  // If there are any remaining tenant IDs, this indicates cross-tenant access
-  return referencedTenantIds.size > 0;
+
+  // Check if the user has any entries for the requested tenant
+  const hasAccessToRequestedTenant = acl.entries.some(entry =>
+    entry.resource.tenantId === tenantId || entry.resource.tenantId === 'system'
+  );
+
+  // If the user has access to the requested tenant, return false (no cross-tenant access)
+  if (hasAccessToRequestedTenant) {
+    return false;
+  }
+
+  // If the user doesn't have access to the requested tenant, return true (cross-tenant access)
+  return true;
 }
 
 /**
@@ -358,10 +358,10 @@ export function detectCrossTenantAccess(
  */
 export function getReferencedTenants(acl: ACL): string[] {
   const tenantIds = new Set<string>();
-  
+
   acl.entries.forEach(entry => {
     tenantIds.add(entry.resource.tenantId);
   });
-  
+
   return Array.from(tenantIds);
 }
