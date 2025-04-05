@@ -26,6 +26,22 @@ jest.mock('@/lib/redis-client', () => {
   };
 });
 
+// Mock the worker pool
+jest.mock('@/lib/auth/worker-pool', () => {
+  const mockWorkerPool = {
+    executeTask: jest.fn().mockResolvedValue({
+      id: 'task-1',
+      success: true,
+      result: true
+    }),
+    shutdown: jest.fn().mockResolvedValue(undefined)
+  };
+
+  return {
+    getAuthWorkerPool: jest.fn().mockReturnValue(mockWorkerPool)
+  };
+});
+
 // Mock the ZKP-Bcrypt library
 jest.mock('@/lib/zkp/zkp-bcrypt', () => ({
   verifyZKPWithBcrypt: jest.fn().mockResolvedValue(true),
@@ -82,6 +98,13 @@ const mockUsers = {
 };
 
 describe('Auth Verification API', () => {
+  // Shutdown the worker pool after all tests
+  afterAll(async () => {
+    const { getAuthWorkerPool } = require('@/lib/auth/worker-pool');
+    const workerPool = getAuthWorkerPool();
+    await workerPool.shutdown();
+  });
+
   // Reset all mocks before each test
   beforeEach(() => {
     jest.clearAllMocks();
@@ -187,6 +210,15 @@ describe('Auth Verification API', () => {
     const { verifyZKPWithBcrypt } = require('@/lib/zkp/zkp-bcrypt');
     verifyZKPWithBcrypt.mockImplementationOnce(async () => false);
 
+    // Mock worker pool to return false for this test
+    const { getAuthWorkerPool } = require('@/lib/auth/worker-pool');
+    const mockWorkerPool = getAuthWorkerPool();
+    mockWorkerPool.executeTask.mockImplementationOnce(async () => ({
+      id: 'task-1',
+      success: true,
+      result: false
+    }));
+
     // Create request with invalid proof
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
@@ -243,10 +275,10 @@ describe('Auth Verification API', () => {
     // Verify Redis was called to update the last login time
     const { kv } = require('@/lib/redis-client');
     expect(kv.set).toHaveBeenCalledWith(
-      'user:testuser',
+      `user:${mockUsers['testuser'].username}`,
       expect.objectContaining({
         ...mockUsers['testuser'],
-        lastLogin: expect.any(Number)
+        lastLogin: expect.any(String)
       })
     );
   });
@@ -255,8 +287,8 @@ describe('Auth Verification API', () => {
     // Mock Redis to simulate rate limiting
     const { kv } = require('@/lib/redis-client');
     kv.get.mockImplementation(async (key: string) => {
-      if (key === 'ratelimit:login:testuser') {
-        return 5; // 5 failed attempts
+      if (key === 'rate-limit:login:testuser') {
+        return 10; // 10 failed attempts, above threshold
       }
       if (key.startsWith('user:')) {
         const username = key.replace('user:', '');
@@ -264,6 +296,13 @@ describe('Auth Verification API', () => {
       }
       return null;
     });
+
+    // Mock the progressive delay module
+    jest.mock('@/lib/auth/progressive-delay', () => ({
+      shouldRateLimit: jest.fn().mockReturnValue(true),
+      getDelaySeconds: jest.fn().mockReturnValue(30),
+      recordFailedAttempt: jest.fn()
+    }));
 
     // Create request
     const request = createMockRequest('/api/auth/verify', {
@@ -328,6 +367,13 @@ describe('Auth Verification API', () => {
       throw new Error('ZKP verification error');
     });
 
+    // Mock worker pool to throw an error for this test
+    const { getAuthWorkerPool } = require('@/lib/auth/worker-pool');
+    const mockWorkerPool = getAuthWorkerPool();
+    mockWorkerPool.executeTask.mockImplementationOnce(async () => {
+      throw new Error('Worker error');
+    });
+
     // Create request
     const request = createMockRequest('/api/auth/verify', {
       method: 'POST',
@@ -352,6 +398,6 @@ describe('Auth Verification API', () => {
 
     // Verify the error message
     expect(data).toHaveProperty('error');
-    expect(data.error).toContain('Authentication error');
+    expect(data.error).toContain('Verification error');
   });
 });

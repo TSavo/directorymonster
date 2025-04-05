@@ -1,25 +1,20 @@
 import { generateSalt } from '@/lib/zkp';
 
 // Mock bcrypt module
-jest.mock('bcrypt', () => {
-  const mockHash = jest.fn().mockImplementation((password, saltRounds) => {
+jest.mock('bcrypt', () => ({
+  hash: jest.fn().mockImplementation((password, saltRounds) => {
     return Promise.resolve(`$2b$${saltRounds}$mockedhash`);
-  });
-
-  const mockCompare = jest.fn().mockImplementation((password, hash) => {
+  }),
+  compare: jest.fn().mockImplementation((password, hash) => {
     return Promise.resolve(password === 'testpassword');
-  });
-
-  const mockGenSaltSync = jest.fn().mockImplementation((rounds) => {
+  }),
+  genSaltSync: jest.fn().mockImplementation((rounds) => {
     return `$2b$${rounds}$mockedsalt`;
-  });
-
-  return {
-    hash: mockHash,
-    compare: mockCompare,
-    genSaltSync: mockGenSaltSync
-  };
-});
+  }),
+  genSalt: jest.fn().mockImplementation((rounds) => {
+    return Promise.resolve(`$2b$${rounds}$mockedsalt`);
+  })
+}));
 
 // Import after mocking
 import { generateZKPWithBcrypt, verifyZKPWithBcrypt, hashPassword, verifyPassword, generateBcryptSalt } from '@/lib/zkp/zkp-bcrypt';
@@ -197,13 +192,14 @@ describe('ZKP-Bcrypt Client Integration', () => {
       const rounds = 12;
 
       // Reset mock counters
-      mockGenSaltSync.mockClear();
+      const bcrypt = require('bcrypt');
+      bcrypt.genSalt.mockClear();
 
       // Act
       await generateBcryptSalt(rounds);
 
       // Assert
-      expect(mockGenSaltSync).toHaveBeenCalledWith(rounds);
+      expect(bcrypt.genSalt).toHaveBeenCalledWith(rounds);
 
       // No need to clean up with our mock approach
     });
