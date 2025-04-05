@@ -66,6 +66,7 @@
     "test:with:seed": "npm run data:seed && npm run test",
     "test:with:seed:docker": "npm run data:seed:docker && npm run test",
     "test:docker": "bash scripts/unix/docker-test-suite.sh",
+    "test:no-e2e": "jest --testPathIgnorePatterns=\"/node_modules/|/.next/|/tests/e2e/\"",
 
     "// SIMPLE COMMANDS": "Simple commands for common operations",
     "run": "npm run app:dev",

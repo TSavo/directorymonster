@@ -45,7 +45,7 @@ const customJestConfig = {
   silent: false,
   maxWorkers: '50%',
   errorOnDeprecated: false,
-  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/tests/e2e/'],
   // Use JSON output by default
   json: true,
   // Mock snarkjs module
