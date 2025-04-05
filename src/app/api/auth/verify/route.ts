@@ -316,8 +316,8 @@ export const POST = withRateLimit(
         { status: 500 }
       );
     }
-  },
-  {
+  }, {
+    // Rate limit configuration
     // Rate limit to 10 login attempts per minute per IP address
     limit: 10,
     windowInSeconds: 60,
