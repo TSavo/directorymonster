@@ -45,7 +45,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const token = authHeader.replace('Bearer ', '');
         const decoded = verify(token, JWT_SECRET) as JwtPayload;
         const userId = decoded.userId;
-        
+
         // Parse query parameters
         const url = new URL(validatedReq.url);
         const actionParam = url.searchParams.get('action');
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         const limitParam = url.searchParams.get('limit');
         const offsetParam = url.searchParams.get('offset');
         const successParam = url.searchParams.get('success');
-        
+
 
         // Validate date parameters
         if (startDateParam && !isValidISOString(startDateParam)) {
@@ -67,42 +67,42 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             { status: 400 }
           );
         }
-        
+
         if (endDateParam && !isValidISOString(endDateParam)) {
           return NextResponse.json(
             { error: 'Invalid endDate format. Use ISO date string.' },
             { status: 400 }
           );
         }
-        
+
 
         // Check if user is a global admin (can see cross-tenant events)
         const isGlobalAdmin = await RoleService.hasGlobalRole(userId);
-        
+
         // Map string parameters to typed values
-        const action = actionParam ? 
-          (actionParam.includes(',') ? 
-            actionParam.split(',').map(a => a as AuditAction) : 
-            actionParam as AuditAction) : 
+        const action = actionParam ?
+          (actionParam.includes(',') ?
+            actionParam.split(',').map(a => a as AuditAction) :
+            actionParam as AuditAction) :
           undefined;
-        
-        const severity = severityParam ? 
-          (severityParam.includes(',') ? 
-            severityParam.split(',').map(s => s as AuditSeverity) : 
-            severityParam as AuditSeverity) : 
+
+        const severity = severityParam ?
+          (severityParam.includes(',') ?
+            severityParam.split(',').map(s => s as AuditSeverity) :
+            severityParam as AuditSeverity) :
           undefined;
-        
-        const success = successParam !== null ? 
-          successParam === 'true' : 
+
+        const success = successParam !== null ?
+          successParam === 'true' :
           undefined;
-        
+
         // Validate and apply limits for pagination to prevent unbounded queries
         const parsedLimit = limitParam ? parseInt(limitParam, 10) : 50;
         const limit = isNaN(parsedLimit) ? 50 : Math.min(parsedLimit, 1000); // Maximum 1000 results
-        
+
         const parsedOffset = offsetParam ? parseInt(offsetParam, 10) : 0;
         const offset = isNaN(parsedOffset) ? 0 : Math.max(parsedOffset, 0); // Non-negative offset
-        
+
         // Build query object
         const query = {
           tenantId: isGlobalAdmin ? undefined : tenantId, // Global admins can see all tenants
@@ -117,14 +117,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           offset,
           success
         };
-        
+
         // Query events
         const events = await AuditService.queryEvents(
           query,
           tenantId,
           isGlobalAdmin
         );
-        
+
         return NextResponse.json({ events });
       } catch (error) {
         console.error('Error retrieving audit logs:', error);
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const token = authHeader.replace('Bearer ', '');
         const decoded = verify(token, JWT_SECRET) as JwtPayload;
         const userId = decoded.userId;
-        
+
         // Parse request body
         let body;
         try {
@@ -175,7 +175,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             { status: 400 }
           );
         }
-        
+
         // Validate required fields
         if (!body.action) {
           return NextResponse.json(
@@ -183,28 +183,30 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             { status: 400 }
           );
         }
-        
+
 
         // Validate resourceType if provided
-        if (body.resourceType && !Object.values(ResourceType).includes(body.resourceType)) {
+        const validResourceTypes = ['user', 'site', 'category', 'listing', 'setting', 'audit', 'role'];
+        if (body.resourceType && !validResourceTypes.includes(body.resourceType)) {
           return NextResponse.json(
             { error: 'Invalid resourceType value' },
             { status: 400 }
           );
         }
-        
+
         // Validate severity if provided
-        if (body.severity && !Object.values(AuditSeverity).includes(body.severity)) {
+        const validSeverities = ['info', 'warning', 'error', 'critical'];
+        if (body.severity && !validSeverities.includes(body.severity)) {
           return NextResponse.json(
             { error: 'Invalid severity value' },
             { status: 400 }
           );
         }
-        
+
 
         // Check if user is a global admin (can create cross-tenant events)
         const isGlobalAdmin = await RoleService.hasGlobalRole(userId);
-        
+
         // Enforce tenant isolation unless user is global admin
         if (!isGlobalAdmin && body.tenantId && body.tenantId !== tenantId) {
           return NextResponse.json(
@@ -212,7 +214,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             { status: 403 }
           );
         }
-        
+
         // Create the audit event
         const event = await AuditService.logEvent({
           userId: body.userId || userId, // Default to current user
@@ -224,7 +226,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
           details: body.details || {},
           success: body.success !== undefined ? body.success : true
         });
-        
+
         return NextResponse.json({ event });
       } catch (error) {
         console.error('Error creating audit event:', error);

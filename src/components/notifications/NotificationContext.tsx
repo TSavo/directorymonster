@@ -30,7 +30,7 @@ interface NotificationContextType {
 }
 
 // Create notification context
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 // Create notification reducer
 const notificationReducer = (state: NotificationState, action: NotificationAction): NotificationState => {
@@ -63,7 +63,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const showNotification = (notification: Omit<Notification, 'id'>) => {
     const id = generateId();
     const newNotification = { ...notification, id };
-    
+
     dispatch({ type: 'ADD_NOTIFICATION', payload: newNotification });
 
     // Auto-dismiss notification after duration (if provided)
@@ -95,10 +95,10 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
 // Create notification hook
 export const useNotifications = (): NotificationContextType => {
   const context = useContext(NotificationContext);
-  
+
   if (context === undefined) {
     throw new Error('useNotifications must be used within a NotificationProvider');
   }
-  
+
   return context;
 };
