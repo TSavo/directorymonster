@@ -55,6 +55,70 @@ global.fetch = jest.fn(() =>
   })
 ) as jest.Mock;
 
+// Mock the useListings hook
+jest.mock('@/components/admin/listings/hooks/useListings', () => ({
+  useListings: jest.fn().mockImplementation(({ initialListings = [] } = {}) => {
+    const [listings, setListings] = React.useState(initialListings);
+    const [loading, setLoading] = React.useState(!initialListings.length);
+    const [error, setError] = React.useState(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
+    const [listingToDelete, setListingToDelete] = React.useState(null);
+
+    // Define fetchListings before it's used
+    const fetchListings = jest.fn();
+
+    const confirmDelete = (listing) => {
+      setListingToDelete(listing);
+      setIsDeleteModalOpen(true);
+    };
+
+    const handleDelete = jest.fn();
+    const cancelDelete = () => {
+      setIsDeleteModalOpen(false);
+      setListingToDelete(null);
+    };
+
+    return {
+      listings,
+      loading,
+      error,
+      filters: {},
+      setSearchTerm: jest.fn(),
+      filterByCategory: jest.fn(),
+      filterBySite: jest.fn(),
+      sort: { field: 'updatedAt', direction: 'desc' },
+      setSorting: jest.fn(),
+      pagination: { page: 1, perPage: 10, total: listings.length, totalPages: 1 },
+      setPage: jest.fn(),
+      setPerPage: jest.fn(),
+      toggleSelection: jest.fn(),
+      deleteListing: jest.fn(),
+      fetchListings,
+      // Additional properties used by ListingTable
+      currentListings: listings,
+      filteredListings: listings,
+      categories: [],
+      sites: [],
+      searchTerm: '',
+      categoryFilter: null,
+      siteFilter: null,
+      sortField: 'updatedAt',
+      sortOrder: 'desc',
+      currentPage: 1,
+      totalPages: 1,
+      itemsPerPage: 10,
+      setItemsPerPage: jest.fn(),
+      goToPage: jest.fn(),
+      isDeleteModalOpen,
+      listingToDelete,
+      confirmDelete,
+      handleDelete,
+      cancelDelete,
+      handleSort: jest.fn()
+    };
+  })
+}));
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -74,62 +138,62 @@ describe('ListingTable Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  
+
   it('renders loading state initially when no data is provided', () => {
     render(<ListingTable />);
-    
+
     expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.getByText('Loading listings data, please wait...', { selector: '.sr-only' })).toBeInTheDocument();
   });
-  
+
   it('renders the table with provided listings data', () => {
     render(<ListingTable initialListings={mockListings} />);
-    
+
     expect(screen.getByText('Listings (2)')).toBeInTheDocument();
     // Use getAllByText to handle multiple matching elements
     expect(screen.getAllByText('Test Listing 1')[0]).toBeInTheDocument();
     expect(screen.getAllByText('Test Listing 2')[0]).toBeInTheDocument();
   });
-  
+
   it('handles search filtering correctly', () => {
     render(<ListingTable initialListings={mockListings} />);
-    
+
     // Get the search input
     const searchInput = screen.getByPlaceholderText('Search listings...');
-    
-    // Type in the search box 
+
+    // Type in the search box
     fireEvent.change(searchInput, { target: { value: 'Listing 1' } });
-    
+
     // For this test, we'll just make sure the first listing is still visible
     // because the search filtering is handled by the component but not reflected in the test
     // due to how the mock data is structured
     expect(screen.getAllByText('Test Listing 1')[0]).toBeInTheDocument();
-    
+
     // Clear the search
     fireEvent.change(searchInput, { target: { value: '' } });
-    
+
     // Should show both listings again
     expect(screen.getAllByText('Test Listing 1')[0]).toBeInTheDocument();
     expect(screen.getAllByText('Test Listing 2')[0]).toBeInTheDocument();
   });
-  
+
   it('changes sort order when clicking on column headers', () => {
     render(<ListingTable initialListings={mockListings} />);
-    
+
     // Find the Title column header button by partial text match
     const titleHeaders = screen.getAllByText('Title');
     const titleHeader = titleHeaders[0].closest('button');
     expect(titleHeader).not.toBeNull();
-    
+
     if (titleHeader) {
       // Click to sort by title
       fireEvent.click(titleHeader);
-      
+
       // Verify sort operation happened (we can't check exact order without more mocking)
       expect(titleHeader).toBeInTheDocument();
     }
   });
-  
+
   // Simplified test for empty state - note the issue in PR comments
   it('displays an empty state when there are no listings', () => {
     // TODO: This test needs to be improved with proper mocking
@@ -137,26 +201,26 @@ describe('ListingTable Component', () => {
     // See issue #37 for details on the fix
     expect(true).toBe(true);
   });
-  
-  // Simplified test for error state - note the issue in PR comments 
+
+  // Simplified test for error state - note the issue in PR comments
   it('displays an error state when fetch fails', () => {
     // TODO: This test needs to be improved with proper error state testing
     // Currently testing the error state requires more advanced mocking
     // See issue #37 for details on the fix
     expect(true).toBe(true);
   });
-  
+
   it('shows delete confirmation dialog when delete is clicked', async () => {
     render(<ListingTable initialListings={mockListings} />);
-    
+
     // Find delete buttons by their aria-label that contains "Delete Test Listing"
     const deleteButtons = screen.getAllByLabelText((content, element) => {
       return content.includes('Delete Test Listing');
     });
-    
+
     // Click the first delete button
     fireEvent.click(deleteButtons[0]);
-    
+
     // Wait for the dialog to appear
     await waitFor(() => {
       const dialogText = screen.getByText((content, element) => {
@@ -164,13 +228,13 @@ describe('ListingTable Component', () => {
       });
       expect(dialogText).toBeInTheDocument();
     }, { timeout: 3000 });
-    
+
     // Look for confirmation buttons by text content
-    const confirmButton = screen.getByText('Delete', { 
+    const confirmButton = screen.getByText('Delete', {
       selector: 'button.bg-red-600'  // Target specific Delete button with the red background
     });
     const cancelButton = screen.getByText('Cancel');
-    
+
     expect(confirmButton).toBeInTheDocument();
     expect(cancelButton).toBeInTheDocument();
   });
