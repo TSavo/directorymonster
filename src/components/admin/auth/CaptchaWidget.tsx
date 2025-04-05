@@ -63,16 +63,17 @@ interface CaptchaWidgetProps {
 const CaptchaWidget = React.forwardRef<
   { reset: () => void; execute: () => void },
   CaptchaWidgetProps
->(({
-  onVerify,
-  onExpire,
-  onError,
-  siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
-  theme = 'light',
-  size = 'normal',
-  invisible = false,
-  useCustomCaptcha = false,
-}) => {
+>(function CaptchaWidget(props, ref) {
+  const {
+    onVerify,
+    onExpire,
+    onError,
+    siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '',
+    theme = 'light',
+    size = 'normal',
+    invisible = false,
+    useCustomCaptcha = false
+  } = props;
   const [isLoaded, setIsLoaded] = useState(false);
   const [customCaptchaCode, setCustomCaptchaCode] = useState('');
   const [customCaptchaInput, setCustomCaptchaInput] = useState('');
@@ -171,7 +172,7 @@ const CaptchaWidget = React.forwardRef<
 
   // Public method to reset the CAPTCHA
   React.useImperativeHandle(
-    captchaRef,
+    ref,
     () => ({
       reset: () => {
         if (useCustomCaptcha) {
@@ -199,7 +200,7 @@ const CaptchaWidget = React.forwardRef<
     return (
       <div className="custom-captcha-container p-4 border rounded-md bg-gray-50 dark:bg-gray-800">
         <div className="mb-4">
-          <div className="captcha-code p-2 bg-white dark:bg-gray-700 rounded-md text-center font-mono text-lg tracking-wider select-none"
+          <div data-testid="captcha-code" className="captcha-code p-2 bg-white dark:bg-gray-700 rounded-md text-center font-mono text-lg tracking-wider select-none"
                style={{
                  background: `linear-gradient(45deg, #f0f0f0, #e0e0e0)`,
                  textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
