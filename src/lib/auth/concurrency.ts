@@ -41,11 +41,17 @@ export async function acquireLock(resource: string, ttl: number = LOCK_EXPIRY): 
 }
 
 /**
- * Release a distributed lock
- * 
- * @param resource The resource to unlock
- * @param lockId The lock identifier
- * @returns Whether the lock was released
+ * Releases a distributed lock for the specified resource if the provided lock identifier matches
+ * the current lock value.
+ *
+ * The function retrieves the lock value from the datastore using a generated key based on the resource.
+ * If the stored lock identifier matches the provided one, it deletes the key to release the lock.
+ * If the lock identifier does not match or an error occurs, the lock is not released and the function
+ * returns false.
+ *
+ * @param resource - The resource key to unlock.
+ * @param lockId - The identifier to verify lock ownership.
+ * @returns True if the lock was successfully released; otherwise, false.
  */
 export async function releaseLock(resource: string, lockId: string): Promise<boolean> {
   try {
@@ -69,10 +75,14 @@ export async function releaseLock(resource: string, lockId: string): Promise<boo
 }
 
 /**
- * Track a new authentication request
- * 
- * @param username The username for the request
- * @returns Whether the request was successfully tracked
+ * Tracks a new authentication request for a given user.
+ *
+ * This function increments both the global authentication request counter and the individual user's request count, provided
+ * the global count is below a predefined limit. It sets a one-minute expiration on the counters when they are first initialized.
+ * In case of an error, the function logs the issue and returns true to allow the authentication process to continue (fail open).
+ *
+ * @param username - The username associated with the authentication request.
+ * @returns True if the request is tracked (or on error), or false if the global concurrency limit is reached.
  */
 export async function trackAuthRequest(username: string): Promise<boolean> {
   try {
@@ -108,9 +118,12 @@ export async function trackAuthRequest(username: string): Promise<boolean> {
 }
 
 /**
- * Complete an authentication request
- * 
- * @param username The username for the request
+ * Completes an authentication request by decrementing both the total and the user-specific concurrent request counts in Redis.
+ *
+ * This function atomically decrements the counter for total concurrent requests as well as the counter for the
+ * specified user's requests. Any errors encountered during the process are caught and logged.
+ *
+ * @param username - The username associated with the authentication request.
  */
 export async function completeAuthRequest(username: string): Promise<void> {
   try {
@@ -129,10 +142,13 @@ export async function completeAuthRequest(username: string): Promise<void> {
 }
 
 /**
- * Get the number of concurrent requests for a user
- * 
- * @param username The username to check
- * @returns The number of concurrent requests
+ * Retrieves the current number of concurrent authentication requests for a specified user.
+ *
+ * This function constructs a user-specific key and queries the key-value store to obtain the count of ongoing requests.
+ * If no count is found or an error occurs during retrieval, it returns 0.
+ *
+ * @param username The username for which to retrieve the concurrent request count.
+ * @returns The current number of concurrent requests for the user, or 0 if none are registered or an error occurs.
  */
 export async function getUserConcurrentRequests(username: string): Promise<number> {
   try {
@@ -148,9 +164,13 @@ export async function getUserConcurrentRequests(username: string): Promise<numbe
 }
 
 /**
- * Get the total number of concurrent authentication requests
- * 
- * @returns The number of concurrent requests
+ * Retrieves the total number of concurrent authentication requests.
+ *
+ * This function constructs a key using a predefined prefix to query a key-value store for the current
+ * total count of concurrent authentication requests. If the key is not set or an error occurs during
+ * the retrieval, it returns 0.
+ *
+ * @returns The total concurrent authentication requests, or 0 if the count is unavailable or an error occurs.
  */
 export async function getTotalConcurrentRequests(): Promise<number> {
   try {

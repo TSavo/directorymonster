@@ -16,11 +16,24 @@ interface SetupRequestBody {
 }
 
 /**
- * Setup the first admin user
+ * Handles initial system setup by creating the first admin user and its associated site.
  *
- * This endpoint handles the creation of the first admin user
- * when the system is freshly installed. It will only work if
- * no users currently exist in the system.
+ * This endpoint initializes the application when no users exist. It validates that the request includes a CSRF token (with a test bypass available)
+ * and verifies that the required fields (`username` and `siteName`) are present in the request body. The request must provide either Zero-Knowledge Proof (ZKP)
+ * parameters (`proof`, `publicSignals`, and `salt`) or a `password` for authentication. If using ZKP, the provided salt is used and the public key is taken
+ * from the first element of `publicSignals`; otherwise, a new salt is generated and a public key is derived based on the username and password.
+ *
+ * The function checks that no users exist before proceeding and then creates an admin user and a corresponding site. These entities are stored in the key-value
+ * database, and a JSON Web Token (JWT) with a 1-hour expiration is generated for the new admin user.
+ *
+ * Returns a JSON response with:
+ * - A success status, JWT token, and basic user and site details on success.
+ * - A 403 status when the CSRF token is missing or when users already exist.
+ * - A 400 status for missing required fields or authentication credentials.
+ * - A 500 status for internal errors during setup.
+ *
+ * @param request - The incoming request containing the setup payload.
+ * @returns A JSON response representing the outcome of the setup operation.
  */
 export async function POST(request: NextRequest) {
   try {

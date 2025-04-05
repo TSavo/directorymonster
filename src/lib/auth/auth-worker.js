@@ -14,9 +14,21 @@ if (!parentPort) {
 }
 
 /**
- * Handle a verification task
- * @param {Object} data The task data
- * @returns {Object} The result
+ * Asynchronously verifies a cryptographic proof using bcrypt-based verification.
+ *
+ * This function extracts the proof, public signals, and public key from the provided data object
+ * and validates the proof using `verifyZKPWithBcrypt`. It returns an object indicating whether the
+ * verification succeeded. On success, the result includes the verification outcome; on failure, it
+ * includes an error message.
+ *
+ * @param {Object} data - The verification task parameters.
+ * @param {*} data.proof - The cryptographic proof to be verified.
+ * @param {*} data.publicSignals - Public signals required for verification.
+ * @param {*} data.publicKey - The public key used to verify the proof.
+ * @returns {Object} An object containing:
+ *   - `success` {boolean}: True if verification succeeded; false otherwise.
+ *   - `result` {*} [if success]: The result from the proof verification.
+ *   - `error` {string} [if not success]: The error message in case of failure.
  */
 async function handleVerifyTask(data) {
   try {
@@ -38,9 +50,17 @@ async function handleVerifyTask(data) {
 }
 
 /**
- * Handle a generation task
- * @param {Object} data The task data
- * @returns {Object} The result
+ * Simulate the generation of a zero-knowledge proof for a given task.
+ *
+ * This asynchronous function returns a mock proof generation result. On success, it returns an object with a
+ * "success" flag set to true alongside a result object containing a placeholder proof and public signals.
+ * If an error occurs during the process, it returns an object with "success" set to false and an error message.
+ *
+ * @param {Object} data - The task data; currently unused.
+ * @returns {Object} An object representing the outcome of the generation task. On success:
+ *                   { success: true, result: { proof: Object, publicSignals: Array } }
+ *                   On failure:
+ *                   { success: false, error: string }
  */
 async function handleGenerateTask(data) {
   try {

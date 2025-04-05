@@ -10,8 +10,12 @@ import { ZKPInput, ZKPProof } from './adapter';
 import { getZKPProvider } from './provider';
 
 /**
- * Get the bcrypt work factor from environment variables or use default
- * @returns The bcrypt work factor to use
+ * Retrieves the work factor for bcrypt hashing from the environment configuration.
+ *
+ * This function reads the 'BCRYPT_WORK_FACTOR' environment variable and converts it to a base-10 number.
+ * If the environment variable is not set, it defaults to a work factor of 10.
+ *
+ * @returns The numeric work factor for bcrypt operations.
  */
 export function getBcryptWorkFactor(): number {
   return parseInt(process.env.BCRYPT_WORK_FACTOR || '10', 10);
@@ -31,21 +35,27 @@ export async function hashPassword(password: string, saltRounds?: number): Promi
 }
 
 /**
- * Verify a password against a bcrypt hash
- * @param password The password to verify
- * @param hash The bcrypt hash to verify against
- * @returns A promise that resolves to true if the password matches the hash
+ * Asynchronously verifies if a plaintext password matches the provided bcrypt hash.
+ *
+ * @param password - The plaintext password to verify.
+ * @param hash - The bcrypt hash to compare against.
+ * @returns A promise that resolves to a boolean, where true indicates a match and false otherwise.
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
 
 /**
- * Generate a ZKP proof using bcrypt for the password
- * @param username The username
- * @param password The password
- * @param salt The salt
- * @returns A promise that resolves to the ZKP proof
+ * Generates a zero-knowledge proof (ZKP) for a user based on their credentials.
+ *
+ * This function hashes the provided plaintext password using bcrypt with a configurable
+ * work factor, then creates a ZKP input object including the username, hashed password, and salt.
+ * It retrieves the current ZKP provider's adapter and generates the corresponding proof.
+ *
+ * @param username - The unique identifier for the user.
+ * @param password - The plaintext password which is securely hashed.
+ * @param salt - The cryptographic salt used during password hashing.
+ * @returns A promise that resolves to the generated ZKP proof.
  */
 export async function generateZKPWithBcrypt(
   username: string,
@@ -67,11 +77,16 @@ export async function generateZKPWithBcrypt(
 }
 
 /**
- * Verify a ZKP proof with bcrypt
- * @param proof The proof to verify
- * @param publicSignals The public signals
- * @param storedHash The stored bcrypt hash
- * @returns A promise that resolves to true if the proof is valid
+ * Verifies a Zero-Knowledge Proof (ZKP) using bcrypt.
+ *
+ * This asynchronous function delegates the verification to the ZKP provider's adapter. It validates
+ * the provided proof and associated public signals against a stored bcrypt hash (used as the public key)
+ * and returns a boolean indicating the proof's validity.
+ *
+ * @param proof - The ZKP proof to verify.
+ * @param publicSignals - The public signals required for verification.
+ * @param storedHash - The stored bcrypt hash that acts as the public key in the verification process.
+ * @returns A promise that resolves to a boolean indicating whether the provided proof is valid.
  */
 export async function verifyZKPWithBcrypt(
   proof: unknown,
@@ -87,9 +102,12 @@ export async function verifyZKPWithBcrypt(
 }
 
 /**
- * Generate a salt for use with bcrypt
- * @param rounds The number of rounds to use (defaults to environment variable or 10)
- * @returns A promise that resolves to a bcrypt salt
+ * Generates a bcrypt salt.
+ *
+ * If the number of rounds is not provided, the function retrieves the default work factor from the environment (defaulting to 10).
+ *
+ * @param rounds - Optional number of rounds to use in salt generation.
+ * @returns A promise that resolves to the generated bcrypt salt.
  */
 export async function generateBcryptSalt(rounds?: number): Promise<string> {
   // Use provided rounds or get from environment

@@ -18,6 +18,20 @@ export interface UseLoginAttemptsMapProps {
   filter?: LoginAttemptsFilter;
 }
 
+/**
+ * Manages fetching and state for login attempt data used in a map visualization.
+ *
+ * This custom React hook retrieves login attempt data from an API based on an optional filter
+ * that can include criteria such as date range, status, IP risk level, and user ID. Data is fetched
+ * automatically on the initial render or when the filter changes, and a manual refresh function is provided.
+ *
+ * @param filter - Optional filter criteria to specify which login attempts to fetch.
+ * @returns An object containing:
+ *  - mapData: Array of map data points representing login attempts.
+ *  - isLoading: Boolean indicating whether the data is currently being fetched.
+ *  - error: The error encountered during fetching, or null if no error occurred.
+ *  - refresh: Function to manually trigger re-fetching of the data.
+ */
 export function useLoginAttemptsMap({ filter = {} }: UseLoginAttemptsMapProps) {
   const [mapData, setMapData] = useState<MapDataPoint[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);

@@ -10,6 +10,19 @@ interface FirstUserSetupProps {
   redirectPath?: string;
 }
 
+/**
+ * Renders a form for creating the first admin user.
+ *
+ * This component manages the setup process by collecting details such as username, password,
+ * email (optional), and site name. It validates the form inputs, generates a CSRF token, salt,
+ * and a zero-knowledge proof (ZKP) for secure account creation, then submits the data to the
+ * /api/auth/setup endpoint. Upon successful creation, it stores an authentication token in
+ * localStorage and redirects the user to the specified admin dashboard.
+ *
+ * @param redirectPath - Optional redirect destination after a successful setup (default: '/admin').
+ *
+ * @returns A React element containing the admin user setup form, along with its associated error and loading states.
+ */
 export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps) {
   // Form state
   const [username, setUsername] = useState('');
