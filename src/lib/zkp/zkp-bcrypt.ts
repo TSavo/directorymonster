@@ -10,8 +10,12 @@ import { ZKPInput, ZKPProof } from './adapter';
 import { getZKPProvider } from './provider';
 
 /**
- * Get the bcrypt work factor from environment variables or use default
- * @returns The bcrypt work factor to use
+ * Retrieves the bcrypt work factor from the environment.
+ *
+ * This function reads the BCRYPT_WORK_FACTOR environment variable and converts it to an integer.
+ * If the environment variable is not set or is empty, it defaults to 10.
+ *
+ * @returns The number of salt rounds to use for bcrypt hashing.
  */
 export function getBcryptWorkFactor(): number {
   return parseInt(process.env.BCRYPT_WORK_FACTOR || '10', 10);
@@ -31,21 +35,27 @@ export async function hashPassword(password: string, saltRounds?: number): Promi
 }
 
 /**
- * Verify a password against a bcrypt hash
- * @param password The password to verify
- * @param hash The bcrypt hash to verify against
- * @returns A promise that resolves to true if the password matches the hash
+ * Verifies that a plaintext password matches a bcrypt hash.
+ *
+ * This function compares the provided plaintext password with the specified bcrypt hash and returns a boolean indicating whether they match.
+ *
+ * @param password - The plaintext password to verify.
+ * @param hash - The bcrypt hash to compare against.
+ * @returns A promise that resolves to true if the password matches the hash, or false otherwise.
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
 
 /**
- * Generate a ZKP proof using bcrypt for the password
- * @param username The username
- * @param password The password
- * @param salt The salt
- * @returns A promise that resolves to the ZKP proof
+ * Generates a zero-knowledge proof (ZKP) for a user by securely hashing the password and incorporating it with a salt into the proof input.
+ *
+ * This function accepts a username, a plaintext password, and a salt to construct the input for generating a ZKP. It hashes the password using bcrypt (with a configurable work factor) and then uses the resulting hash, along with the username and salt, to generate the proof via the ZKP provider's adapter.
+ *
+ * @param username - The username for which the proof is generated.
+ * @param password - The plaintext password to be securely hashed.
+ * @param salt - A unique salt that is included in the proof input to enhance security.
+ * @returns A promise that resolves to the generated ZKP proof.
  */
 export async function generateZKPWithBcrypt(
   username: string,
@@ -67,11 +77,14 @@ export async function generateZKPWithBcrypt(
 }
 
 /**
- * Verify a ZKP proof with bcrypt
- * @param proof The proof to verify
- * @param publicSignals The public signals
- * @param storedHash The stored bcrypt hash
- * @returns A promise that resolves to true if the proof is valid
+ * Verifies a zero-knowledge proof using a stored bcrypt hash.
+ *
+ * This function retrieves a ZKP adapter from the provider and uses it to validate the provided proof along with its associated public signals. The stored bcrypt hash is utilized as the public key during the verification process.
+ *
+ * @param proof - The zero-knowledge proof to verify.
+ * @param publicSignals - The public signals corresponding to the proof.
+ * @param storedHash - The bcrypt hash used as the public key for verification.
+ * @returns A promise that resolves to true if the proof is valid, otherwise false.
  */
 export async function verifyZKPWithBcrypt(
   proof: unknown,
@@ -87,9 +100,11 @@ export async function verifyZKPWithBcrypt(
 }
 
 /**
- * Generate a salt for use with bcrypt
- * @param rounds The number of rounds to use (defaults to environment variable or 10)
- * @returns A promise that resolves to a bcrypt salt
+ * Generates a bcrypt salt using the specified salt rounds.
+ * If rounds is not provided, the default work factor from the environment (or 10 if not set) is used.
+ *
+ * @param rounds Optional number of rounds for salt generation.
+ * @returns A promise that resolves to the generated bcrypt salt.
  */
 export async function generateBcryptSalt(rounds?: number): Promise<string> {
   // Use provided rounds or get from environment

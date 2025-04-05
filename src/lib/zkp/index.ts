@@ -22,11 +22,14 @@ import * as bcrypt from 'bcrypt';
 import { generateZKPWithBcrypt, verifyZKPWithBcrypt, hashPassword } from './zkp-bcrypt';
 
 /**
- * Generate a Zero-Knowledge Proof with bcrypt integration
- * @param username The username
- * @param password The password
- * @param salt The salt
- * @returns A promise that resolves to the proof and public signals
+ * Generates a zero-knowledge proof using bcrypt-integrated password hashing.
+ *
+ * This function computes a proof that securely validates user credentials by first hashing the password with bcrypt before generating the corresponding zero-knowledge proof.
+ *
+ * @param username - The user's identifier.
+ * @param password - The user's plain text password.
+ * @param salt - A unique salt used in the hashing process.
+ * @returns A promise that resolves to a ZKPProof containing the generated proof and its associated public signals.
  */
 export async function generateProof(
   username: string,
@@ -63,12 +66,15 @@ export function generateSalt(): string {
 }
 
 /**
- * Generate a public key from user credentials using bcrypt
- * This is stored server-side for verification
- * @param username The username
- * @param password The password
- * @param salt The salt
- * @returns Public key derived from credentials (bcrypt hash)
+ * Derives a public key from user credentials by hashing the password with bcrypt and generating a Zero-Knowledge Proof (ZKP).
+ *
+ * This function first hashes the provided password using bcrypt. It then uses the username, hashed password, and salt to generate a ZKP,
+ * returning the first public signal as the public key. This public key is intended for server-side verification.
+ *
+ * @param username - The user's identifier.
+ * @param password - The user's password, which is hashed before proof generation.
+ * @param salt - A unique salt ensuring the proof's distinctiveness.
+ * @returns A promise that resolves to the derived public key.
  */
 export async function generatePublicKey(
   username: string,
@@ -86,11 +92,14 @@ export async function generatePublicKey(
 }
 
 /**
- * Derive a public key from user credentials
- * This is stored server-side for verification
- * @param input User credentials
- * @returns Public key derived from credentials
- * @deprecated Use generatePublicKey instead
+ * Derives a public key from provided user credentials for server-side verification.
+ *
+ * Given user credentials, this function returns the corresponding public key used for verifying the user's identity.
+ *
+ * @param input - An object containing the user credentials.
+ * @returns The public key derived from the provided credentials.
+ *
+ * @deprecated Use generatePublicKey instead.
  */
 export function derivePublicKey(input: ZKPInput): string {
   console.warn('derivePublicKey is deprecated, use generatePublicKey instead');

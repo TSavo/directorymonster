@@ -24,10 +24,14 @@ const MEDIUM_RISK_CAPTCHA_THRESHOLD = 2; // Require CAPTCHA after 2 failed attem
 const LOW_RISK_CAPTCHA_THRESHOLD = 5; // Require CAPTCHA after 5 failed attempts for low-risk IPs
 
 /**
- * Get the CAPTCHA threshold for an IP address based on its risk level
+ * Determines the CAPTCHA threshold for a given IP address based on its risk level.
  *
- * @param ipAddress The IP address to check
- * @returns The CAPTCHA threshold
+ * This function retrieves the risk level using an external assessment method and assigns a corresponding
+ * CAPTCHA threshold. The thresholds vary by risk level—high, medium, or low—and if the risk level is not
+ * recognized or an error occurs, a default threshold is returned.
+ *
+ * @param ipAddress - The IP address for which the CAPTCHA threshold is determined.
+ * @returns A promise that resolves to the determined CAPTCHA threshold.
  */
 export async function getCaptchaThreshold(ipAddress: string): Promise<number> {
   try {
@@ -50,10 +54,15 @@ export async function getCaptchaThreshold(ipAddress: string): Promise<number> {
 }
 
 /**
- * Check if CAPTCHA is required for an IP address
+ * Determines whether a CAPTCHA challenge is required for the given IP address.
  *
- * @param ipAddress The IP address to check
- * @returns Whether CAPTCHA is required
+ * The function retrieves the recorded count of failed login attempts from a key-value store and compares it
+ * against a risk-based threshold obtained from `getCaptchaThreshold`. A CAPTCHA is deemed necessary if the
+ * number of failed attempts is greater than or equal to the risk-based threshold. In case of any error,
+ * the function logs the error and returns false.
+ *
+ * @param ipAddress The IP address to evaluate.
+ * @returns True if a CAPTCHA is required; otherwise, false.
  */
 export async function isCaptchaRequired(ipAddress: string): Promise<boolean> {
   try {
@@ -72,10 +81,12 @@ export async function isCaptchaRequired(ipAddress: string): Promise<boolean> {
 }
 
 /**
- * Record a failed attempt for CAPTCHA tracking
+ * Records a failed CAPTCHA-related authentication attempt for the specified IP address and checks if a CAPTCHA challenge is now required.
  *
- * @param ipAddress The IP address to record the failed attempt for
- * @returns Whether CAPTCHA is now required
+ * This function retrieves the current count of failed attempts for the IP address, increments it, and updates the count in persistent storage with an expiry time. It then obtains a dynamic CAPTCHA threshold based on the IP's risk level and compares it with the updated count. The function returns true if the count meets or exceeds the threshold, indicating that a CAPTCHA challenge should be initiated; otherwise, it returns false. In case of errors during the process, it logs the error and returns false.
+ *
+ * @param ipAddress - The IP address for which to record the failed authentication attempt.
+ * @returns True if the updated attempt count meets or exceeds the risk-based CAPTCHA threshold; false otherwise.
  */
 export async function recordFailedAttemptForCaptcha(ipAddress: string): Promise<boolean> {
   try {
@@ -122,11 +133,16 @@ export async function resetCaptchaRequirement(ipAddress: string): Promise<void> 
 }
 
 /**
- * Verify a CAPTCHA response
+ * Verifies the CAPTCHA response for the provided IP address.
  *
- * @param token The CAPTCHA token to verify
- * @param ipAddress The IP address of the client
- * @returns Whether the CAPTCHA is valid
+ * The function first determines whether CAPTCHA verification is necessary for the given IP based on its risk profile.
+ * If verification is needed, it attempts to validate the provided token using a CAPTCHA service (such as reCAPTCHA, when configured).
+ * If the service is not configured or an error occurs during provider verification, it falls back to a simple length check.
+ * Upon successful verification, it records a truncated version of the token along with a timestamp and resets the CAPTCHA requirement.
+ *
+ * @param token - The CAPTCHA token provided by the client; must be non-empty for verification.
+ * @param ipAddress - The client's IP address used to determine CAPTCHA necessity and to record verification.
+ * @returns A boolean indicating whether the CAPTCHA was successfully verified.
  */
 export async function verifyCaptcha(token: string, ipAddress: string): Promise<boolean> {
   try {

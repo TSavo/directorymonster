@@ -259,8 +259,11 @@ export class AuthWorkerPool {
 let workerPool: AuthWorkerPool | null = null;
 
 /**
- * Get the authentication worker pool instance
- * @returns The worker pool instance
+ * Retrieves the singleton instance of the authentication worker pool.
+ *
+ * If the worker pool has not been instantiated yet, this function creates a new instance.
+ *
+ * @returns The singleton AuthWorkerPool instance used for managing concurrent authentication tasks.
  */
 export function getAuthWorkerPool(): AuthWorkerPool {
   if (!workerPool) {

@@ -16,11 +16,22 @@ interface SetupRequestBody {
 }
 
 /**
- * Setup the first admin user
+ * Creates the initial admin user and default site.
  *
- * This endpoint handles the creation of the first admin user
- * when the system is freshly installed. It will only work if
- * no users currently exist in the system.
+ * This endpoint processes a POST request to set up the first admin account in a freshly installed system,
+ * ensuring that no users already exist. It validates the presence of a CSRF token (with a test environment
+ * bypass under specific conditions) and required fields (username and siteName). Authentication must be provided
+ * either as a traditional password or via zero-knowledge proof parameters (proof, publicSignals, and salt). Based
+ * on the provided credentials, a public key is generated or extracted, and a new admin user along with a default
+ * site is created and stored in the database. A JWT token with a one-hour expiry is generated and returned along
+ * with non-sensitive user and site details.
+ *
+ * @returns A JSON response indicating success with a JWT token and the created user's and site's non-sensitive details,
+ * or an error response with an appropriate HTTP status code if validations fail or a server error occurs.
+ *
+ * @remarks
+ * The setup will be rejected if the CSRF token is missing (unless bypassed under test conditions), if essential fields
+ * are missing, if authentication credentials are absent, or if any users already exist in the system.
  */
 export async function POST(request: NextRequest) {
   try {

@@ -10,6 +10,16 @@ interface FirstUserSetupProps {
   redirectPath?: string;
 }
 
+/**
+ * Renders a form for setting up the first admin user.
+ *
+ * This component displays a form that allows the creation of the initial admin account. It validates
+ * user inputs (username, password, confirmation, email, and site name), generates a CSRF token, and uses
+ * a zero-knowledge proof (ZKP) with bcrypt to securely process the password. On successful submission,
+ * it stores an authentication token in local storage and redirects the user to the specified path.
+ *
+ * @param redirectPath - Optional path to redirect to after a successful setup, defaults to '/admin'.
+ */
 export function FirstUserSetup({ redirectPath = '/admin' }: FirstUserSetupProps) {
   // Form state
   const [username, setUsername] = useState('');

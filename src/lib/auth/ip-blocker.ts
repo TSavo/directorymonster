@@ -39,10 +39,12 @@ export enum RiskLevel {
 }
 
 /**
- * Get the risk level for an IP address
+ * Retrieves the risk level for a given IP address.
  *
- * @param ipAddress The IP address to check
- * @returns The risk level for the IP
+ * The risk level is fetched from a key-value store using an IP-based key. If no risk level is found or an error occurs during retrieval, the function logs the error and returns the default risk level, MEDIUM.
+ *
+ * @param ipAddress - The IP address to evaluate.
+ * @returns The risk level for the IP, defaulting to MEDIUM if not explicitly set or in case of an error.
  */
 export async function getIpRiskLevel(ipAddress: string): Promise<RiskLevel> {
   try {
@@ -61,10 +63,15 @@ export async function getIpRiskLevel(ipAddress: string): Promise<RiskLevel> {
 }
 
 /**
- * Set the risk level for an IP address
+ * Sets the risk level for a specified IP address and logs the change for auditing.
  *
- * @param ipAddress The IP address to set the risk level for
- * @param riskLevel The risk level to set
+ * This function creates a datastore entry by combining a predefined prefix with the IP address, assigns the provided
+ * risk level, and sets an expiration of 30 days for the record. It also attempts to log the change using the audit service.
+ * All errors encountered during the process (both while updating the datastore and logging the event) are caught and
+ * logged to the console.
+ *
+ * @param ipAddress - The IP address for which the risk level is being updated.
+ * @param riskLevel - The new risk level to assign (e.g., LOW, MEDIUM, HIGH).
  */
 export async function setIpRiskLevel(ipAddress: string, riskLevel: RiskLevel): Promise<void> {
   try {
@@ -95,10 +102,13 @@ export async function setIpRiskLevel(ipAddress: string, riskLevel: RiskLevel): P
 }
 
 /**
- * Get the maximum failed attempts allowed for an IP based on its risk level
+ * Determines the maximum allowed failed login attempts for a given IP address based on its risk level.
  *
- * @param ipAddress The IP address to check
- * @returns The maximum failed attempts allowed
+ * This function retrieves the IP's risk level and returns a corresponding threshold: a risk-specific maximum for HIGH, MEDIUM, or LOW levels.
+ * If the risk level is unrecognized or an error occurs during retrieval, it logs the error and returns a default value.
+ *
+ * @param ipAddress - The IP address to evaluate.
+ * @returns The allowed number of failed login attempts.
  */
 export async function getMaxFailedAttempts(ipAddress: string): Promise<number> {
   try {
@@ -121,10 +131,14 @@ export async function getMaxFailedAttempts(ipAddress: string): Promise<number> {
 }
 
 /**
- * Get the block duration for an IP based on its risk level
+ * Determines the block duration for an IP address based on its risk level.
  *
- * @param ipAddress The IP address to check
- * @returns The block duration in seconds
+ * Retrieves the risk level for the given IP address and returns the corresponding
+ * block duration in seconds as defined by risk-specific constants. If the risk level is
+ * unrecognized or an error occurs during retrieval, the default block duration is used.
+ *
+ * @param ipAddress - The IP address to evaluate.
+ * @returns The block duration in seconds.
  */
 export async function getBlockDuration(ipAddress: string): Promise<number> {
   try {
@@ -147,12 +161,16 @@ export async function getBlockDuration(ipAddress: string): Promise<number> {
 }
 
 /**
- * Record a failed login attempt for an IP address
+ * Records a failed login attempt for the specified IP address and determines if it should be blocked.
  *
- * @param ipAddress The IP address to record the failed attempt for
- * @param username The username that was attempted
- * @param userAgent The user agent of the client
- * @returns Whether the IP is now blocked
+ * The function first checks if the IP address is already blocked. If it is, an audit log is recorded and the function returns true.
+ * Otherwise, it increments the failed attempt count and logs the failed login event along with related risk level details.
+ * When the number of failed attempts reaches a risk-adjusted threshold, the IP address is blocked.
+ *
+ * @param ipAddress - The IP address where the failed login occurred.
+ * @param username - The username or email used during the failed login attempt.
+ * @param userAgent - The client user agent responsible for the request.
+ * @returns True if the IP address is blocked as a result of this attempt or was already blocked; otherwise, false.
  */
 export async function recordFailedAttempt(
   ipAddress: string,
@@ -264,11 +282,16 @@ export async function recordFailedAttempt(
 }
 
 /**
- * Block an IP address
+ * Blocks an IP address by recording the block details in the key-value store and logging the event.
  *
- * @param ipAddress The IP address to block
- * @param username The username associated with the blocking event
- * @param userAgent The user agent of the client
+ * This function retrieves the IP’s risk level to determine the appropriate block duration,
+ * stores the block information—including the timestamp, username, user agent, and risk level—
+ * and sets an expiration for the block. It then logs the blocking event to the audit service.
+ * All errors encountered during these operations are caught and logged to the console.
+ *
+ * @param ipAddress - The IP address to block.
+ * @param username - The username associated with the blocking event.
+ * @param userAgent - The user agent of the client that triggered the block.
  */
 export async function blockIp(
   ipAddress: string,

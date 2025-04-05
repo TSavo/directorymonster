@@ -12,6 +12,16 @@ interface ZKPLoginProps {
   redirectPath?: string;
 }
 
+/**
+ * Renders an admin login form that uses Zero-Knowledge Proof (ZKP) authentication with optional CAPTCHA verification.
+ *
+ * This component validates the username and password inputs (and CAPTCHA when required), generates a ZKP proof using bcrypt,
+ * and handles CSRF tokens to securely authenticate administrators. Upon successful authentication, it saves the authentication
+ * token (and "remember me" preference if selected) to localStorage and redirects the user to the specified path.
+ *
+ * @param redirectPath - The path to redirect to after successful authentication (defaults to '/admin').
+ * @returns A React element representing the login form.
+ */
 export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
   // Form state
   const [username, setUsername] = useState('');

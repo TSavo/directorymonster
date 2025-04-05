@@ -32,6 +32,25 @@ export interface UseLoginAttemptsProps {
   filter?: LoginAttemptsFilter;
 }
 
+/**
+ * A custom React hook that fetches and manages login attempts with pagination.
+ *
+ * This hook retrieves login attempts from the security API endpoint, applying optional filters and a limit per request.
+ * It manages state for the login attempts, loading status, error handling, and pagination, and provides methods to load more data or refresh the list.
+ * The hook automatically triggers fetching on the initial render and when the filter or limit changes.
+ *
+ * @param props - Configuration options for fetching login attempts.
+ *   - limit: Maximum number of login attempts to fetch per request (default is 10).
+ *   - filter: Optional criteria to filter login attempts, which may include status, IP risk level, user ID, start date, and end date.
+ *
+ * @returns An object containing:
+ *   - loginAttempts: Array of fetched login attempts.
+ *   - isLoading: Boolean indicating whether data is currently being loaded.
+ *   - error: An error object if fetching fails, or null if no error occurred.
+ *   - hasMore: Boolean indicating whether more login attempts can be fetched.
+ *   - loadMore: Function to load the next set of login attempts.
+ *   - refresh: Function to refresh the login attempts list by resetting the offset.
+ */
 export function useLoginAttempts({ limit = 10, filter = {} }: UseLoginAttemptsProps) {
   const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
