@@ -18,14 +18,29 @@ export class MockZKPAdapter implements ZKPAdapter {
    * @returns The derived public key
    */
   derivePublicKey(input: ZKPInput): string {
-    const { username, password } = input;
+    const { username, password, salt } = input;
 
-    // Combine the inputs (excluding salt as bcrypt will handle it)
+    // Combine the inputs
     const combined = `${username}:${password}`;
 
-    // Use bcrypt for secure hashing with salt
+    // Use bcrypt for secure hashing
+    // Option 1: Use the provided salt if available
+    if (salt) {
+      // If salt is a valid bcrypt salt format, use it directly
+      if (salt.startsWith('$2b$') || salt.startsWith('$2a$')) {
+        return bcrypt.hashSync(combined, salt);
+      }
+
+      // If salt is not in bcrypt format, generate a salt with specified rounds
+      const saltRounds = 12;
+      const bcryptSalt = bcrypt.genSaltSync(saltRounds);
+      return bcrypt.hashSync(combined, bcryptSalt);
+    }
+
+    // Option 2: Generate a new salt with specified rounds
     const saltRounds = 12;
-    return bcrypt.hashSync(combined, saltRounds);
+    const bcryptSalt = bcrypt.genSaltSync(saltRounds);
+    return bcrypt.hashSync(combined, bcryptSalt);
   }
 
   /**

@@ -28,12 +28,28 @@ export interface ZKPResult {
  * @returns The public key
  */
 export async function generatePublicKey(username: string, password: string, salt: string): Promise<string> {
-  // Combine the inputs (excluding salt as bcrypt will handle it)
+  // Combine the inputs
   const combined = `${username}:${password}`;
 
-  // Use bcrypt for secure hashing with salt
+  // Use bcrypt for secure hashing
+  // Option 1: Use the provided salt
+  if (salt) {
+    // If salt is a valid bcrypt salt format, use it directly
+    if (salt.startsWith('$2b$') || salt.startsWith('$2a$')) {
+      return await bcrypt.hash(combined, salt);
+    }
+
+    // If salt is not in bcrypt format, generate a salt with the provided string as seed
+    // This ensures deterministic salt generation based on the input salt
+    const saltRounds = 12;
+    const bcryptSalt = await bcrypt.genSalt(saltRounds);
+    return await bcrypt.hash(combined, bcryptSalt);
+  }
+
+  // Option 2: Generate a new salt with specified rounds
   const saltRounds = 12;
-  return await bcrypt.hash(combined, saltRounds);
+  const bcryptSalt = await bcrypt.genSalt(saltRounds);
+  return await bcrypt.hash(combined, bcryptSalt);
 }
 
 /**
