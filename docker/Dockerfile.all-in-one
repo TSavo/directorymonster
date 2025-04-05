@@ -1,0 +1,34 @@
+FROM node:18-alpine AS base
+
+# Install dependencies needed for ZKP setup
+RUN apk add --no-cache bash git python3 make g++
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy all files
+COPY . .
+
+# ZKP Setup stage
+FROM base AS zkp-setup
+WORKDIR /app
+RUN npm run zkp:setup
+
+# Build stage
+FROM zkp-setup AS builder
+WORKDIR /app
+RUN npm run build
+
+# Production stage
+FROM builder AS runner
+WORKDIR /app
+ENV NODE_ENV production
+
+# Run the application
+CMD ["npm", "start"]

@@ -30,16 +30,16 @@ node jest-runner.js --mode=minimal --with-e2e tests/unit/api
 
 ```bash
 # Run all tests (never includes E2E tests)
-npm test
+npm run test
 
 # Run a specific test file
-npm test -- path/to/test.test.ts
+npm run test -- path/to/test.test.ts
 
 # Run tests matching a pattern
-npm test -- -t "test pattern"
+npm run test -- -t "test pattern"
 
 # Run tests in a specific directory
-npm test -- tests/unit/api
+npm run test -- tests/unit/api
 ```
 
 ### Using the Specific Test Helper
@@ -75,7 +75,7 @@ The default test command uses a balanced output mode that reduces noise while st
 
 ```bash
 # Run tests with balanced output (default)
-npm test
+npm run test
 
 # Run tests with minimal output (custom formatter)
 npm run test:minimal
@@ -112,9 +112,9 @@ npm run test:unit
 
 ## Test Filtering Tips
 
-- Use `-t` to filter by test name: `npm test -- -t "should return 404"`
-- Use file paths to run specific test files: `npm test -- tests/unit/api/admin/dashboard/stats.test.ts`
-- Use directory paths to run all tests in a directory: `npm test -- tests/unit/api`
+- Use `-t` to filter by test name: `npm run test -- -t "should return 404"`
+- Use file paths to run specific test files: `npm run test -- tests/unit/api/admin/dashboard/stats.test.ts`
+- Use directory paths to run all tests in a directory: `npm run test -- tests/unit/api`
 
 ## Troubleshooting
 

@@ -8,10 +8,10 @@ DirectoryMonster uses API-based seeding exclusively to ensure all data follows p
 
 ```bash
 # Basic API seeding (local development)
-npm run seed
+npm run data:seed
 
 # Using Docker
-npm run seed:docker
+npm run data:seed:docker
 ```
 
 ## How API Seeding Works
@@ -40,16 +40,16 @@ You can run tests with seeded data using these commands:
 
 ```bash
 # Run tests with API seeding
-npm run test:with-seed
+npm run test:with:seed
 
 # Run tests with API seeding (Docker)
-npm run test:with-seed:docker
+npm run test:with:seed:docker
 
-# Run all tests with API seeding
-npm run test:all-with-seed
+# Run all tests
+npm run test
 
-# Run all tests with API seeding (Docker)
-npm run test:all-with-seed:docker
+# Run all tests in Docker
+npm run test:docker
 ```
 
 ## Data Structure

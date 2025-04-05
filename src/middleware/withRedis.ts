@@ -13,23 +13,23 @@ export function withRedis(handler: Function) {
       } catch (pingError) {
         console.warn('[withRedis] Redis ping failed, using degraded functionality:', pingError.message);
       }
-      
+
       // If Redis is connected, proceed with the handler normally
       // Otherwise, add a header and proceed anyway, letting the handler
       // use fallback mechanisms if available
       const response = await handler(req, ...args);
-      
+
       // Add Redis status header to the response if it exists
-      if (response && response.headers) {
+      if (response?.headers) {
         if (!isConnected) {
           response.headers.set('x-redis-unavailable', 'true');
         }
       }
-      
+
       return response;
     } catch (error) {
       console.error('Redis connection error:', error);
-      
+
       // Return a 503 Service Unavailable response
       return NextResponse.json(
         {

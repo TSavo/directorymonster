@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  zkp-auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.zkp
+    container_name: directorymonster-zkp-auth
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./circuits:/app/circuits
+      - ./src:/app/src
+      - ./scripts:/app/scripts
+      - ./tests:/app/tests
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - ZKP_AUTH_ENABLED=true
+      - ZKP_AUTH_CIRCUIT_PATH=/app/circuits/zkp_auth
+      - ZKP_AUTH_WASM_PATH=/app/circuits/zkp_auth/zkp_auth_js/zkp_auth.wasm
+      - ZKP_AUTH_ZKEY_PATH=/app/circuits/zkp_auth/zkp_auth_final.zkey
+      - ZKP_AUTH_VKEY_PATH=/app/circuits/zkp_auth/verification_key.json
+    command: >
+      sh -c "npm run zkp:setup && npm run dev"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health/zkp"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - zkp-network
+
+  zkp-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.zkp
+    container_name: directorymonster-zkp-test
+    depends_on:
+      - zkp-auth
+    volumes:
+      - ./circuits:/app/circuits
+      - ./src:/app/src
+      - ./scripts:/app/scripts
+      - ./tests:/app/tests
+    environment:
+      - NODE_ENV=test
+      - ZKP_AUTH_ENABLED=true
+      - ZKP_AUTH_CIRCUIT_PATH=/app/circuits/zkp_auth
+      - ZKP_AUTH_WASM_PATH=/app/circuits/zkp_auth/zkp_auth_js/zkp_auth.wasm
+      - ZKP_AUTH_ZKEY_PATH=/app/circuits/zkp_auth/zkp_auth_final.zkey
+      - ZKP_AUTH_VKEY_PATH=/app/circuits/zkp_auth/verification_key.json
+    command: >
+      sh -c "npm run test:crypto"
+    networks:
+      - zkp-network
+
+networks:
+  zkp-network:
+    driver: bridge

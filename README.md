@@ -12,13 +12,79 @@ DirectoryMonster is a comprehensive platform combining:
    - Multi-tenant directory sites with custom domains
    - Redis-based data storage
    - SEO optimization with backlink management
+   - Secure Zero-Knowledge Proof (ZKP) authentication
 
 2. **AI-Powered Python Scraper**
    - Selenium-based web scraping with LLM analysis
    - Automated data extraction and categorization
    - Flexible data export options
 
+3. **Zero-Knowledge Proof Authentication**
+   - Cryptographically secure authentication without password transmission
+   - Poseidon hash function from circomlib for secure hashing
+   - Dynamic salt generation for enhanced security
+   - Rate limiting, IP blocking, and progressive delays for brute force protection
+   - Docker-ready deployment for production environments
+   - Enhanced security with bcrypt password hashing
+   - Full hash values without truncation for maximum security
+   - Cryptographic file integrity verification
+   - Protection against division by zero attacks
+   - Comprehensive security testing and verification
+
+## Requirements
+
+- **Node.js**: Version 14 or higher
+- **npm**: Version 6 or higher
+- **Docker** (optional): For containerized development and deployment
+- **Redis** (optional): For production deployments
+
 ## Quick Start
+
+### Simple Commands
+
+Use these commands if you just want things to work without understanding all the details:
+
+```bash
+# Run the app in development mode
+npm run run
+
+# Build and run the app in production mode
+npm run build
+
+# Run all the tests
+npm run test
+
+# Verify everything is working
+npm run verify
+
+# Run everything in Docker
+npm run docker
+
+# Set up ZKP authentication
+npm run setup
+```
+
+#### Windows-Specific Commands
+
+For Windows users, PowerShell-based commands are available:
+
+```powershell
+# Run all tests (Windows)
+npm run win:test
+
+# Verify everything is working (Windows)
+npm run win:verify
+
+# Run everything in Docker (Windows)
+npm run win:docker
+
+# Set up ZKP authentication (Windows)
+npm run win:setup
+```
+
+For a complete reference of all commands, see [Commands Documentation](docs/COMMANDS.md).
+
+### Detailed Setup
 
 ### Docker Development (Recommended)
 
@@ -102,20 +168,79 @@ Data can be saved via:
 - **APIEndpointSaver**: Direct API integration
 - **EnhancedFileEndpointSaver**: Advanced file operations
 
+## Security Improvements
+
+DirectoryMonster implements advanced security features, particularly in the Zero-Knowledge Proof (ZKP) authentication system:
+
+### Password Hashing
+
+- Replaced SHA-256 with bcrypt for password hashing
+- Implemented proper salt generation and management
+- Added protection against timing attacks
+
+### Cryptographic Improvements
+
+- Fixed hash truncation issues to use full hash values
+- Implemented proper Poseidon hash constants
+- Increased Poseidon round parameters for enhanced security
+- Added protection against division by zero attacks
+
+### Implementation Security
+
+- Added integrity checks for cryptographic files
+- Fixed privacy issues in ZKP circuits
+- Fixed TypeScript reserved keyword issues
+- Improved HTTP headers implementation
+
+### Security Verification
+
+Verify the security of your installation with:
+
+```bash
+# Run all security checks
+npm run verify
+
+# Run specific security checks
+npm run security:verify    # Verify file integrity
+npm run security:check     # Run security tests and verify integrity
+npm run security:audit     # Run security audit on dependencies
+npm run security:all       # Run all security checks
+```
+
+For detailed information about security improvements, see [Security Documentation](docs/security/README.md).
+
 ## Testing
 
 ```bash
-# Run all tests with auto-seeding
-npm run test:all-with-seed
+# Run all tests
+npm run test
 
-# Component tests
-npx jest -t "ComponentName"
+# Run verification tests
+npm run verify
 
-# Domain and multitenancy tests
-npm run test:domain
-npm run test:multitenancy
+# Run tests with seeded data
+npm run test:with:seed
 
-# Docker tests (complete environment)
+# Run specific test types
+npm run test:unit            # Unit tests
+npm run test:integration     # Integration tests
+npm run test:api             # API tests
+npm run test:components      # Component tests
+
+# Run specific component tests
+npm run test:components:categories  # Category tests
+npm run test:components:listings    # Listing tests
+
+# Run crypto and security tests
+npm run test:crypto          # All crypto tests
+npm run test:crypto:core     # Core ZKP tests
+npm run test:crypto:security # Security tests
+
+# Run end-to-end tests
+npm run test:e2e             # Basic E2E tests
+npm run test:e2e:all         # All E2E tests
+
+# Run tests in Docker
 npm run test:docker
 ```
 
@@ -124,6 +249,8 @@ The test suite covers:
 - Domain resolution and multi-site isolation
 - API endpoints and data management
 - End-to-end user workflows
+- ZKP authentication and security measures
+- Dynamic salt generation and verification
 
 ### Test-Driven Development
 
@@ -197,6 +324,92 @@ The project documentation is organized into implementation guides and specificat
 - [TDD Testing Specification](specs/TDD_TESTING_SPEC.md)
 - [Cross-Tenant Security Specification](specs/CROSS_TENANT_SECURITY_SPEC.md)
 - [Multi-Tenant ACL Specification](specs/MULTI_TENANT_ACL_SPEC.md)
+- [ZKP Authentication Specification](docs/zkp-authentication.md)
+
+## Zero-Knowledge Proof Authentication
+
+DirectoryMonster includes a cryptographically secure Zero-Knowledge Proof (ZKP) authentication system that allows users to prove they know their password without revealing it, providing a secure authentication mechanism that protects user credentials even in the event of a server compromise.
+
+### Features
+
+- **Secure Authentication**: Users can authenticate without transmitting passwords
+- **Cryptographic Security**: Uses the Poseidon hash function from circomlib
+- **Dynamic Salt Generation**: Each user has a unique, cryptographically secure salt
+- **Security Measures**: Rate limiting, IP blocking, progressive delays, and CAPTCHA verification
+- **Audit Logging**: Comprehensive logging of authentication events
+- **Docker Integration**: Ready for production deployment with Docker
+- **TypeScript Implementation**: Fully typed implementation for better developer experience
+
+### Authentication Flow
+
+1. **First User Setup**:
+   - First user provides username and password
+   - System generates a cryptographically secure random salt
+   - System computes the public key using the ZKP circuit
+   - System stores the username, salt, and public key (but not the password)
+
+2. **User Authentication**:
+   - User provides username and password
+   - System retrieves the salt for the username
+   - Client generates a proof that it knows the password that corresponds to the public key
+   - Server verifies the proof without learning the password
+   - System implements rate limiting, IP blocking, and progressive delays for security
+
+3. **Password Reset**:
+   - User requests password reset
+   - System generates a reset token and sends it to the user's email
+   - User provides new password and reset token
+   - System verifies the reset token
+   - System generates a new salt and public key
+   - System updates the user's salt and public key
+
+### Usage
+
+```typescript
+import { generateProof, verifyProof, generateSalt, derivePublicKey } from '@/lib/zkp';
+
+// Generate a salt
+const salt = generateSalt();
+
+// Derive a public key
+const publicKey = await derivePublicKey('username', 'password', salt);
+
+// Generate a proof
+const { proof, publicSignals } = await generateProof({
+  username: 'username',
+  password: 'password',
+  salt: salt
+});
+
+// Verify a proof
+const isValid = await verifyProof({
+  proof,
+  publicSignals,
+  publicKey
+});
+```
+
+### Setup
+
+```bash
+# Set up the ZKP authentication system
+npm run zkp:setup
+
+# Run tests to verify the setup
+npm run test:crypto
+
+# Run the application with ZKP authentication
+npm run dev
+```
+
+### Security Considerations
+
+- The ZKP authentication system is designed to be secure against various attacks, including brute force attacks, timing attacks, and replay attacks.
+- The system implements rate limiting, IP blocking, and progressive delays to prevent brute force attacks.
+- The system uses dynamic salt generation to prevent precomputed table attacks.
+- The system logs authentication events for security auditing.
+
+For more information, see the [ZKP Authentication Specification](docs/zkp-authentication.md) and the [Production Deployment Guide](docs/production-deployment.md).
 
 ## Troubleshooting
 

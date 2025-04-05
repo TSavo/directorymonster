@@ -8,16 +8,16 @@
  *
  * Options:
  *   --mode=<mode>  Run tests in a specific mode (balanced, quiet, minimal, failures-only, default)
- *   --with-e2e     Include e2e tests (by default they are excluded)
+ *   --with-e2e     Flag kept for backward compatibility (e2e tests are now included by default)
  *
  * Examples:
- *   node jest-runner.js                                  # Run all tests (excluding e2e) in balanced mode
+ *   node jest-runner.js                                  # Run all tests in balanced mode
  *   node jest-runner.js --mode=balanced                  # Run all tests with balanced output (default)
  *   node jest-runner.js --mode=quiet                     # Run all tests with minimal console output
  *   node jest-runner.js --mode=minimal                   # Run all tests with custom minimal formatter
  *   node jest-runner.js --mode=failures-only             # Run only tests that failed in the previous run
- *   node jest-runner.js --with-e2e                       # Run all tests including e2e tests
- *   node jest-runner.js tests/unit/api/admin             # Run specific tests (excluding e2e)
+ *   node jest-runner.js --with-e2e                       # Run all tests (including e2e tests - kept for backward compatibility)
+ *   node jest-runner.js tests/unit/api/admin             # Run specific tests
  */
 
 const { spawnSync } = require('child_process');
@@ -25,7 +25,7 @@ const { spawnSync } = require('child_process');
 // Parse command line arguments
 const args = process.argv.slice(2);
 let mode = 'balanced';
-let includeE2E = false;
+// E2E tests are now included by default
 let testArgs = [];
 
 // Process arguments to extract mode and other options
@@ -33,7 +33,7 @@ args.forEach(arg => {
   if (arg.startsWith('--mode=')) {
     mode = arg.replace('--mode=', '');
   } else if (arg === '--with-e2e') {
-    includeE2E = true;
+    // E2E tests are now included by default - flag is kept for backward compatibility
   } else {
     testArgs.push(arg);
   }
@@ -42,10 +42,8 @@ args.forEach(arg => {
 // Base Jest arguments
 let jestArgs = [];
 
-// Add e2e exclusion unless explicitly included
-if (!includeE2E) {
-  jestArgs.push('--testPathIgnorePatterns=tests/e2e');
-}
+// E2E tests are now included by default
+// No exclusion needed
 
 // Configure mode-specific arguments
 switch (mode) {
@@ -65,10 +63,8 @@ switch (mode) {
     // This is a special case that uses a custom output processor
     const { spawn } = require('child_process');
 
-    // Add e2e exclusion to testArgs if needed
-    if (!includeE2E && !testArgs.includes('--testPathIgnorePatterns=tests/e2e')) {
-      testArgs.push('--testPathIgnorePatterns=tests/e2e');
-    }
+    // E2E tests are now included by default
+    // No exclusion needed
 
     // Execute Jest with verbose flag to get more test information
     const minimalArgs = [

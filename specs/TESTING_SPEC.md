@@ -178,8 +178,8 @@ DirectoryMonster uses the following testing tools:
   - Install dependencies: `npm install`
 
 - For HTTP/domain tests:
-  - Running application (`npm run dev &` or Docker) - always run development servers with `&` to keep them in the background
-  - Seeded data (run `npm run seed` before testing)
+  - Running application (`npm run app:dev &` or Docker) - always run development servers with `&` to keep them in the background
+  - Seeded data (run `npm run data:seed` before testing)
   - Local hosts file entries or `?hostname=` parameter
 
 ### Available Scripts
@@ -199,11 +199,10 @@ The following scripts are available in `package.json`:
     "test:domain": "bash tests/scripts/domain-tests.sh",
     "test:rendering": "bash tests/scripts/rendering-tests.sh",
     "test:multitenancy": "bash tests/scripts/multitenancy-tests.sh",
-    "test:all": "npm run test:components && npm run test:api && npm run test:integration && npm run test:domain && npm run test:rendering && npm run test:multitenancy",
-    "test:docker": "docker-compose -f docker-compose.test.yml up --build --exit-code-from test",
-    "test:with-seed": "node scripts/seed.js && npm test",
-    "test:all-with-seed": "node scripts/seed.js && npm run test:all",
-    "test:with-server": "node scripts/seed.js && (npm run dev &) && sleep 5 && npm test && kill %1"
+    "test:all": "npm run test:components && npm run test:api && npm run test:integration && npm run test:e2e:all",
+    "test:docker": "npm run test:docker",
+    "test:with:seed": "npm run data:seed && npm run test",
+    "test:with:seed:docker": "npm run data:seed:docker && npm run test"
   }
 }
 ```
@@ -214,10 +213,9 @@ For tests to pass, they require:
 
 1. **In-memory Redis Fallback**: When Redis is not available, the application automatically uses an in-memory fallback. This is configured in `src/lib/redis-client.ts` with `USE_MEMORY_FALLBACK = true`.
 
-2. **Seeded Data**: Many tests rely on seeded sample data. When using the in-memory Redis implementation, you must run `npm run seed` before testing, or use these convenience scripts:
-   - `npm run test:with-seed`: Seeds data and runs unit tests
-   - `npm run test:all-with-seed`: Seeds data and runs all tests 
-   - `npm run test:with-server`: Seeds data, starts the server, and runs tests
+2. **Seeded Data**: Many tests rely on seeded sample data. When using the in-memory Redis implementation, you must run `npm run data:seed` before testing, or use these convenience scripts:
+   - `npm run test:with:seed`: Seeds data and runs unit tests
+   - `npm run test:with:seed:docker`: Seeds data and runs tests with Docker
 
 This fallback makes development easier by eliminating the need for Redis installation.
 
@@ -227,7 +225,7 @@ This fallback makes development easier by eliminating the need for Redis install
 
 1. **React Component Errors**:
    - Error: "Functions are not valid as a child of Client Components"
-   - Solution: Avoid using async functions directly within React components 
+   - Solution: Avoid using async functions directly within React components
    - Fix: Fetch all data at the top level of server components and pass it as props
 
 2. **Missing Jest Environment**

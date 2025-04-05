@@ -1,0 +1,78 @@
+FROM node:18-slim AS builder
+
+# Install required packages
+RUN apt-get update && \
+    apt-get install -y git python3 build-essential curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy the rest of the application
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p circuits/ptau
+
+# Download Powers of Tau file if it doesn't exist
+RUN if [ ! -f circuits/ptau/pot12_final.ptau ]; then \
+    curl -L -o circuits/ptau/pot12_final.ptau https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_12.ptau; \
+    fi
+
+# Build the application
+RUN npm run build
+
+# Second stage: runtime
+FROM node:18-slim
+
+# Install required packages for runtime
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# Copy built application from builder stage
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/circuits ./circuits
+COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/src ./src
+
+# Create a non-root user
+RUN groupadd -r zkpuser && useradd -r -g zkpuser zkpuser
+RUN chown -R zkpuser:zkpuser /app
+USER zkpuser
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV ZKP_AUTH_ENABLED=true
+ENV ZKP_AUTH_CIRCUIT_PATH=/app/circuits/zkp_auth
+ENV ZKP_AUTH_WASM_PATH=/app/circuits/zkp_auth/zkp_auth_js/zkp_auth.wasm
+ENV ZKP_AUTH_ZKEY_PATH=/app/circuits/zkp_auth/zkp_auth_final.zkey
+ENV ZKP_AUTH_VKEY_PATH=/app/circuits/zkp_auth/verification_key.json
+
+# Expose port for the API
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 CMD [ "curl", "-f", "http://localhost:3000/api/health/zkp" ]
+
+# Default command
+CMD ["npm", "start"]
