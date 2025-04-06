@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { generateZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 import { getSalt, clearSaltCache } from '@/lib/auth/salt-cache';
 import { getAuthErrorMessage, AuthErrorType } from '@/lib/auth/error-handler';
@@ -13,6 +13,9 @@ interface ZKPLoginProps {
 }
 
 export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   // Form state
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -35,8 +38,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
     captcha?: string;
   }>({});
 
-  // Router for redirecting
-  const router = useRouter();
+  // Router for redirecting was moved to the top of the component
 
   /**
    * Validate the form inputs
@@ -166,8 +168,15 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
           localStorage.removeItem('rememberMe');
         }
 
-        // Redirect to admin dashboard
-        router.push(redirectPath);
+        // Check if there's a returnUrl in the search params
+        const returnUrl = searchParams.get('returnUrl');
+
+        // Redirect to returnUrl if available, otherwise use the default redirectPath
+        if (returnUrl) {
+          router.push(decodeURIComponent(returnUrl));
+        } else {
+          router.push(redirectPath);
+        }
       } else {
         // Handle different error types
         if (response.status === 429) {
