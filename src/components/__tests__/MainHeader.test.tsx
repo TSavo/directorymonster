@@ -31,6 +31,11 @@ jest.mock('@/components/admin/auth/hooks/useAuth', () => ({
   useAuth: jest.fn(),
 }));
 
+// Mock the UnifiedAuthComponent
+jest.mock('@/components/auth', () => ({
+  UnifiedAuthComponent: () => <div data-testid="unified-auth-component">UnifiedAuthComponent</div>
+}));
+
 // Mock the SearchBar component
 jest.mock('../SearchBar', () => ({
   __esModule: true,
@@ -87,14 +92,11 @@ describe('MainHeader', () => {
     expect(screen.getByText('Category 2')).toBeInTheDocument();
   });
 
-  it('shows login and register links for unauthenticated users', () => {
+  it('includes the UnifiedAuthComponent', () => {
     render(<MainHeader site={mockSite} categories={mockCategories} />);
 
-    // Open user menu
-    fireEvent.click(screen.getByTestId('user-menu-button'));
-
-    expect(screen.getByTestId('login-link')).toBeInTheDocument();
-    expect(screen.getByTestId('register-link')).toBeInTheDocument();
+    // Check that the UnifiedAuthComponent is included
+    expect(screen.getByTestId('unified-auth-component')).toBeInTheDocument();
   });
 
   it('shows tenant and site selectors for authenticated users with multiple tenants and sites', () => {
@@ -197,21 +199,5 @@ describe('MainHeader', () => {
     expect(screen.queryByTestId('site-selector-container')).not.toBeInTheDocument();
   });
 
-  it('shows admin dashboard link for authenticated users', () => {
-    // Mock authenticated user
-    (useAuth as jest.Mock).mockReturnValue({
-      isAuthenticated: true,
-      user: { id: 'user-1', name: 'Test User', email: 'test@example.com' },
-      isLoading: false,
-    });
-
-    render(<MainHeader site={mockSite} categories={mockCategories} />);
-
-    // Open user menu
-    fireEvent.click(screen.getByTestId('user-menu-button'));
-
-    expect(screen.getByTestId('admin-link')).toBeInTheDocument();
-    expect(screen.getByTestId('profile-link')).toBeInTheDocument();
-    expect(screen.getByTestId('logout-link')).toBeInTheDocument();
-  });
+  // Authentication is now handled by the UnifiedAuthComponent
 });
