@@ -1,8 +1,13 @@
-export { default as BasicInfoStep } from './BasicInfoStep';
-export { default as CategorySelectionStep } from './CategorySelectionStep';
-export { default as MediaUploadStep } from './MediaUploadStep';
-export { default as PricingStep } from './PricingStep';
-export { default as BacklinkStep } from './BacklinkStep';
+import BasicInfoStep from './BasicInfoStep';
+export { BasicInfoStep };
+import CategorySelectionStep from './CategorySelectionStep';
+export { CategorySelectionStep };
+import MediaUploadStep from './MediaUploadStep';
+export { MediaUploadStep };
+import PricingStep from './PricingStep';
+export { PricingStep };
+import BacklinkStep from './BacklinkStep';
+export { BacklinkStep };
 export { default as FormProgress } from './FormProgress';
 export { default as StepControls } from './StepControls';
 export { default as TextInput } from './TextInput';

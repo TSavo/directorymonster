@@ -1,8 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { MediaUploadStep } from '@/components/admin/listings/components/form/MediaUploadStep';
-import { ListingFormData, ListingMedia, MediaType, ListingStatus } from '@/components/admin/listings/types';
+import MediaUploadStep from '@/components/admin/listings/components/form/MediaUploadStep';
+import { ListingFormData, ListingMedia } from '@/components/admin/listings/types';
+import { MediaType, ListingStatus } from '@/types/listing';
 
 // Mock next/image
 jest.mock('next/image', () => ({

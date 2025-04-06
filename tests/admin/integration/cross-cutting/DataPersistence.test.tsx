@@ -3,6 +3,27 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+// Mock the ListingForm component
+jest.mock('@/components/admin/listings/ListingForm', () => ({
+  __esModule: true,
+  default: function MockListingForm({ initialData, onSubmit, onCancel, listingId, siteSlug }) {
+    return (
+      <div data-testid="listing-form">
+        <div data-testid="basic-info-step">Basic Info Step</div>
+        <div data-testid="site-id">{initialData?.siteId || 'site1'}</div>
+        <button data-testid="submit-button" onClick={() => onSubmit(initialData || {})}>
+          Submit
+        </button>
+        {onCancel && (
+          <button data-testid="cancel-button" onClick={onCancel}>
+            Cancel
+          </button>
+        )}
+      </div>
+    );
+  }
+}));
+
 import ListingForm from '@/components/admin/listings/ListingForm';
 
 // Mock the hooks and API calls

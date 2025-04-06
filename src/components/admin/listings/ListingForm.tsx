@@ -2,16 +2,15 @@
 
 import React, { useCallback } from 'react';
 import { Listing, ListingFormData } from './types';
-import {
-  BasicInfoStep,
-  CategorySelectionStep,
-  MediaUploadStep,
-  PricingStep,
-  BacklinkStep,
-  FormProgress,
-  StepControls,
-  useListingForm
-} from './components/form';
+import { ListingStatus } from '@/types/listing';
+import BasicInfoStep from './components/form/BasicInfoStep';
+import CategorySelectionStep from './components/form/CategorySelectionStep';
+import MediaUploadStep from './components/form/MediaUploadStep';
+import PricingStep from './components/form/PricingStep';
+import BacklinkStep from './components/form/BacklinkStep';
+import FormProgress from './components/form/FormProgress';
+import StepControls from './components/form/StepControls';
+import useListingForm from './components/form/useListingForm';
 
 interface ListingFormProps {
   initialData?: Partial<ListingFormData>;
@@ -36,7 +35,7 @@ export function ListingForm({
     'Pricing',
     'Backlink'
   ];
-  
+
   // Use the form hook
   const {
     formData,
@@ -60,7 +59,7 @@ export function ListingForm({
     listing,
     totalSteps: stepLabels.length
   });
-  
+
   // Handle step click in the progress bar
   const handleStepClick = useCallback(
     (step: number) => {
@@ -70,7 +69,7 @@ export function ListingForm({
     },
     [currentStep, goToStep]
   );
-  
+
   // Render the current step
   const renderStep = useCallback(() => {
     switch (currentStep) {
@@ -133,7 +132,7 @@ export function ListingForm({
     updateField,
     updateNestedField
   ]);
-  
+
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg" data-testid="listing-form-container">
       <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
@@ -144,7 +143,7 @@ export function ListingForm({
           Complete the form below to {listing ? 'update your' : 'create a new'} listing.
         </p>
       </div>
-      
+
       <div className="px-4 py-5 sm:px-6">
         <FormProgress
           currentStep={currentStep}
@@ -153,10 +152,10 @@ export function ListingForm({
           onStepClick={handleStepClick}
         />
       </div>
-      
+
       <div className="px-4 py-5 sm:p-6">
         {renderStep()}
-        
+
         <StepControls
           currentStep={currentStep}
           totalSteps={totalSteps}
@@ -169,7 +168,7 @@ export function ListingForm({
           onSubmit={handleSubmit}
         />
       </div>
-      
+
       {onCancel && (
         <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
           <button

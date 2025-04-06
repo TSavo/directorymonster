@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { ListingFormData, ListingStatus } from '../../types';
+import { ListingFormData } from '../../types';
+import { ListingStatus } from '@/types/listing';
 import { TextInput } from './TextInput';
 import { TextArea } from './TextArea';
 import { SelectField } from './SelectField';
@@ -14,7 +15,7 @@ interface BasicInfoStepProps {
   isSubmitting: boolean;
 }
 
-export function BasicInfoStep({
+export default function BasicInfoStep({
   formData,
   errors,
   updateField,
@@ -125,4 +126,4 @@ export function BasicInfoStep({
   );
 }
 
-export default BasicInfoStep;
+
