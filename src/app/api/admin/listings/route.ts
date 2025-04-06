@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenantAccess } from '@/middleware/tenant-validation';
-import { withPermission } from '@/middleware/withPermission';
-import { ResourceType, Permission } from '@/types/permissions';
+import { withSecureTenantPermission } from '@/app/api/middleware/secureTenantContext';
+import { ResourceType, Permission } from '@/lib/role/types';
 import { kv } from '@/lib/redis-client';
 
 /**
@@ -16,13 +15,11 @@ import { kv } from '@/lib/redis-client';
  * @returns A response with a JSON object containing the listings data or an error message.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  return withTenantAccess(
+  return withSecureTenantPermission(
     req,
-    withPermission(
-      req,
-      'listing' as ResourceType,
-      'read' as Permission,
-      async (validatedReq) => {
+    'listing' as ResourceType,
+    'read' as Permission,
+    async (validatedReq, context) => {
         try {
           // Get tenant context
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
@@ -60,8 +57,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             { status: 500 }
           );
         }
-      }
-    )
+    }
   );
 }
 
@@ -81,13 +77,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
  * @returns A NextResponse with the created listing data or an error message.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  return withTenantAccess(
+  return withSecureTenantPermission(
     req,
-    withPermission(
-      req,
-      'listing' as ResourceType,
-      'create' as Permission,
-      async (validatedReq) => {
+    'listing' as ResourceType,
+    'create' as Permission,
+    async (validatedReq, context) => {
         try {
           // Get tenant context
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
@@ -139,7 +133,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             { status: 500 }
           );
         }
-      }
-    )
+    }
   );
 }

@@ -26,8 +26,9 @@ export enum AuditAction {
   TENANT_UPDATED = 'tenant_updated',
   TENANT_DELETED = 'tenant_deleted',
 
-  // Cross-tenant actions
+  // Cross-tenant and cross-site actions
   CROSS_TENANT_ACCESS_ATTEMPT = 'cross_tenant_access_attempt',
+  CROSS_SITE_ACCESS_ATTEMPT = 'cross_site_access_attempt',
 
   // User actions
   USER_LOGIN = 'user_login',
@@ -118,6 +119,7 @@ export const DEFAULT_SEVERITY_MAP: Record<AuditAction, AuditSeverity> = {
   [AuditAction.TENANT_UPDATED]: AuditSeverity.INFO,
   [AuditAction.TENANT_DELETED]: AuditSeverity.CRITICAL,
   [AuditAction.CROSS_TENANT_ACCESS_ATTEMPT]: AuditSeverity.ERROR,
+  [AuditAction.CROSS_SITE_ACCESS_ATTEMPT]: AuditSeverity.ERROR,
   [AuditAction.USER_LOGIN]: AuditSeverity.INFO,
   [AuditAction.USER_LOGOUT]: AuditSeverity.INFO,
   [AuditAction.USER_PASSWORD_CHANGED]: AuditSeverity.INFO,

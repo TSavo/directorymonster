@@ -13,39 +13,40 @@ The middleware in this directory provides:
 
 ## Available Middleware
 
-### `withTenantAccess`
+### `withSecureTenantContext`
 
 Validates that the authenticated user has access to the requested tenant.
 
 ```typescript
-import { withTenantAccess } from '@/app/api/middleware';
+import { withSecureTenantContext } from '@/app/api/middleware/secureTenantContext';
 
 export async function GET(req: NextRequest) {
-  return withTenantAccess(req, async (validatedReq) => {
+  return withSecureTenantContext(req, async (validatedReq, context) => {
     // This handler only runs if tenant access is valid
-    const tenantId = validatedReq.headers.get('x-tenant-id');
-    
+    const { tenantId, userId } = context;
+
     return NextResponse.json({ success: true });
   });
 }
 ```
 
-### `withPermission`
+### `withSecureTenantPermission`
 
 Validates both tenant access and specific permission for a resource type.
 
 ```typescript
-import { withPermission } from '@/app/api/middleware';
+import { withSecureTenantPermission } from '@/app/api/middleware/secureTenantContext';
+import { ResourceType, Permission } from '@/lib/role/types';
 
 export async function POST(req: NextRequest) {
-  return withPermission(
+  return withSecureTenantPermission(
     req,
-    'category',  // Resource type
-    'create',    // Permission
-    async (validatedReq) => {
+    'category' as ResourceType,
+    'create' as Permission,
+    async (validatedReq, context) => {
       // This handler only runs if permission check passes
-      const tenantId = validatedReq.headers.get('x-tenant-id');
-      
+      const { tenantId, userId } = context;
+
       return NextResponse.json({ success: true });
     }
   );
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
   return withTenantContext(req, async (reqWithTenant) => {
     // This handler gets a request with tenant context
     const tenantId = reqWithTenant.headers.get('x-tenant-id');
-    
+
     return NextResponse.json({ success: true });
   });
 }

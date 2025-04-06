@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenantAccess } from '@/middleware/tenant-validation';
-import { withPermission } from '@/middleware/withPermission';
-import { ResourceType, Permission } from '@/types/permissions';
+import { withSecureTenantPermission } from '@/app/api/middleware/secureTenantContext';
+import { ResourceType, Permission } from '@/lib/role/types';
 import { redis, kv } from '@/lib/redis-client';
 import { Category } from '@/types';
 import { AuditService } from '@/lib/audit/audit-service';
@@ -22,13 +21,11 @@ import { CategoryService } from '@/lib/category-service';
  * @returns A JSON response indicating success with the updated categories, or an error message.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  return withTenantAccess(
+  return withSecureTenantPermission(
     req,
-    withPermission(
-      req,
-      'category' as ResourceType,
-      'update' as Permission,
-      async (validatedReq) => {
+    'category' as ResourceType,
+    'update' as Permission,
+    async (validatedReq, context) => {
         try {
           // Get tenant context
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
@@ -84,7 +81,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             { status: 500 }
           );
         }
-      }
-    )
+    }
   );
 }

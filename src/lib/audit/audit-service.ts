@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import { 
-  AuditEvent, 
-  AuditEventInput, 
-  AuditEventQuery, 
-  AuditAction, 
+import {
+  AuditEvent,
+  AuditEventInput,
+  AuditEventQuery,
+  AuditAction,
   AuditSeverity,
   DEFAULT_SEVERITY_MAP
 } from './types';
@@ -25,7 +25,7 @@ export class AuditService {
 
   /**
    * Create a new audit event
-   * 
+   *
    * @param event Audit event details to log
    * @returns The created audit event
    */
@@ -34,11 +34,11 @@ export class AuditService {
       // Generate ID and timestamp
       const id = uuidv4();
       const timestamp = new Date().toISOString();
-      
+
       // Set default severity if not provided
-      const severity = event.severity || 
+      const severity = event.severity ||
         (event.action in DEFAULT_SEVERITY_MAP ? DEFAULT_SEVERITY_MAP[event.action] : AuditSeverity.INFO);
-      
+
       // Create the complete audit event
       const auditEvent: AuditEvent = {
         ...event,
@@ -46,38 +46,38 @@ export class AuditService {
         timestamp,
         severity
       };
-      
+
       // Store the audit event
       const key = AuditService.AUDIT_EVENT_PREFIX + id;
       await redis.set(key, JSON.stringify(auditEvent));
-      
+
       // Index by tenant
       const tenantKey = `${AuditService.AUDIT_TENANT_PREFIX}${event.tenantId}`;
       await redis.zadd(tenantKey, new Date(timestamp).getTime(), id);
-      
+
       // Index by user
       const userKey = `${AuditService.AUDIT_USER_PREFIX}${event.userId}`;
       await redis.zadd(userKey, new Date(timestamp).getTime(), id);
-      
+
       // Index by action
       const actionKey = `${AuditService.AUDIT_ACTION_PREFIX}${event.action}`;
       await redis.zadd(actionKey, new Date(timestamp).getTime(), id);
-      
+
       // Index by resource type and ID if provided
       if (event.resourceType) {
         const resourceTypeKey = `${AuditService.AUDIT_RESOURCE_PREFIX}${event.resourceType}`;
         await redis.zadd(resourceTypeKey, new Date(timestamp).getTime(), id);
-        
+
         if (event.resourceId) {
           const resourceIdKey = `${AuditService.AUDIT_RESOURCE_PREFIX}${event.resourceType}:${event.resourceId}`;
           await redis.zadd(resourceIdKey, new Date(timestamp).getTime(), id);
         }
       }
-      
+
       // Add to global index for cross-tenant viewing by global admins
       const globalIndexKey = `${AuditService.AUDIT_INDEX_PREFIX}all`;
       await redis.zadd(globalIndexKey, new Date(timestamp).getTime(), id);
-      
+
       return auditEvent;
     } catch (error) {
       console.error('Error logging audit event:', error);
@@ -86,7 +86,7 @@ export class AuditService {
       if (process.env.NODE_ENV === 'development') {
         throw error;
       }
-      
+
       // Return a minimal version of the event for production
       return {
         ...event,
@@ -100,7 +100,7 @@ export class AuditService {
 
   /**
    * Helper method to log permission-related events
-   * 
+   *
    * @param userId User ID
    * @param tenantId Tenant ID
    * @param resourceType Resource type
@@ -120,7 +120,7 @@ export class AuditService {
     details: Record<string, any> = {}
   ): Promise<AuditEvent> {
     const action = success ? AuditAction.ACCESS_GRANTED : AuditAction.ACCESS_DENIED;
-    
+
     return AuditService.logEvent({
       userId,
       tenantId,
@@ -138,7 +138,7 @@ export class AuditService {
 
   /**
    * Helper method to log user authentication events
-   * 
+   *
    * @param userId User ID
    * @param tenantId Tenant ID
    * @param success Whether authentication succeeded
@@ -163,7 +163,7 @@ export class AuditService {
 
   /**
    * Helper method to log role management events
-   * 
+   *
    * @param userId User ID performing the action
    * @param tenantId Tenant ID
    * @param action Role action (created, updated, deleted)
@@ -191,7 +191,7 @@ export class AuditService {
 
   /**
    * Helper method to log tenant membership events
-   * 
+   *
    * @param adminUserId User ID performing the action
    * @param tenantId Tenant ID
    * @param targetUserId User ID being added/removed
@@ -222,7 +222,7 @@ export class AuditService {
 
   /**
    * Helper method to log cross-tenant access attempts
-   * 
+   *
    * @param userId User ID attempting access
    * @param sourceTenantId Source tenant ID
    * @param targetTenantId Target tenant ID
@@ -249,8 +249,39 @@ export class AuditService {
   }
 
   /**
+   * Helper method to log cross-site access attempts
+   *
+   * @param userId User ID attempting access
+   * @param tenantId Tenant ID
+   * @param sourceSiteId Source site ID
+   * @param targetSiteId Target site ID
+   * @param details Additional details
+   * @returns The created audit event
+   */
+  public static async logCrossSiteAccessAttempt(
+    userId: string,
+    tenantId: string,
+    sourceSiteId: string | null,
+    targetSiteId: string,
+    details: Record<string, any> = {}
+  ): Promise<AuditEvent> {
+    return AuditService.logEvent({
+      userId,
+      tenantId,
+      action: AuditAction.CROSS_SITE_ACCESS_ATTEMPT,
+      severity: AuditSeverity.ERROR,
+      details: {
+        sourceSiteId,
+        targetSiteId,
+        ...details
+      },
+      success: false
+    });
+  }
+
+  /**
    * Get an audit event by ID
-   * 
+   *
    * @param id Audit event ID
    * @param tenantId Optional tenant ID for access control
    * @returns The audit event or null if not found or not accessible
@@ -259,19 +290,19 @@ export class AuditService {
     try {
       const key = AuditService.AUDIT_EVENT_PREFIX + id;
       const eventJson = await redis.get(key);
-      
+
       if (!eventJson) {
         return null;
       }
-      
+
       const event = JSON.parse(eventJson) as AuditEvent;
-      
+
       // If tenantId is provided, enforce tenant isolation
       if (tenantId && event.tenantId !== tenantId) {
         console.warn(`Tenant isolation violation: User from tenant ${tenantId} attempted to access event from tenant ${event.tenantId}`);
         return null;
       }
-      
+
       return event;
     } catch (error) {
       console.error('Error retrieving audit event:', error);
@@ -281,7 +312,7 @@ export class AuditService {
 
   /**
    * Query audit events with various filters
-   * 
+   *
    * @param query Query parameters
    * @param userTenantContext Tenant context of the requesting user (for security)
    * @param isGlobalAdmin Whether the user is a global admin
@@ -295,24 +326,24 @@ export class AuditService {
     try {
       // Enforce tenant isolation unless user is a global admin
       const tenantId = isGlobalAdmin ? (query.tenantId || 'all') : userTenantContext;
-      
+
       // Determine which index to use based on the most specific filter
       let indexKey: string;
       let eventIds: string[] = [];
-      
+
       // Default time range
-      const startTime = query.startDate 
-        ? new Date(query.startDate).getTime() 
+      const startTime = query.startDate
+        ? new Date(query.startDate).getTime()
         : 0;
-      
-      const endTime = query.endDate 
-        ? new Date(query.endDate).getTime() 
+
+      const endTime = query.endDate
+        ? new Date(query.endDate).getTime()
         : '+inf';
-      
+
       // Apply safe limits to prevent unbounded queries
       const limit = Math.min(query.limit || 50, 1000); // Maximum 1000 results
       const offset = Math.max(query.offset || 0, 0); // Non-negative offset
-      
+
       // If filtering by specific resource ID, use resource index
       if (query.resourceType && query.resourceId) {
         indexKey = `${AuditService.AUDIT_RESOURCE_PREFIX}${query.resourceType}:${query.resourceId}`;
@@ -331,11 +362,11 @@ export class AuditService {
       }
       // Otherwise, use tenant index
       else {
-        indexKey = tenantId === 'all' 
-          ? `${AuditService.AUDIT_INDEX_PREFIX}all` 
+        indexKey = tenantId === 'all'
+          ? `${AuditService.AUDIT_INDEX_PREFIX}all`
           : `${AuditService.AUDIT_TENANT_PREFIX}${tenantId}`;
       }
-      
+
       // Get IDs from the index
       eventIds = await redis.zrangebyscore(
         indexKey,
@@ -345,45 +376,45 @@ export class AuditService {
         offset,
         limit
       );
-      
+
       if (!eventIds.length) {
         return [];
       }
-      
+
       // Fetch all events
       const eventPromises = eventIds.map(id => AuditService.getEventById(id, isGlobalAdmin ? undefined : userTenantContext));
       const events = await Promise.all(eventPromises);
-      
+
       // Filter out nulls
       const validEvents = events.filter(e => e !== null) as AuditEvent[];
-      
+
       // Apply additional filters
       return validEvents.filter(event => {
         // Always enforce tenant isolation unless global admin
         if (!isGlobalAdmin && event.tenantId !== userTenantContext) {
           return false;
         }
-        
+
         // Filter by action (if array of actions)
         if (query.action && Array.isArray(query.action) && !query.action.includes(event.action)) {
           return false;
         }
-        
+
         // Filter by severity (if array of severities)
         if (query.severity && Array.isArray(query.severity) && !query.severity.includes(event.severity)) {
           return false;
         }
-        
+
         // Filter by single severity
         if (query.severity && !Array.isArray(query.severity) && event.severity !== query.severity) {
           return false;
         }
-        
+
         // Filter by success status
         if (query.success !== undefined && event.success !== query.success) {
           return false;
         }
-        
+
         return true;
       });
     } catch (error) {
@@ -398,7 +429,7 @@ export class AuditService {
 
   /**
    * Get recent audit events for a specific tenant
-   * 
+   *
    * @param tenantId Tenant ID
    * @param limit Maximum number of events to return
    * @param offset Offset for pagination
@@ -412,7 +443,7 @@ export class AuditService {
     // Apply safe limits
     const safeLimit = Math.min(limit, 1000);
     const safeOffset = Math.max(offset, 0);
-    
+
     return AuditService.queryEvents(
       {
         tenantId,
@@ -426,60 +457,60 @@ export class AuditService {
 
   /**
    * Delete audit events older than the retention period
-   * 
+   *
    * @param retentionDays Number of days to retain audit logs
    * @returns Number of events deleted
    */
   public static async pruneOldEvents(retentionDays: number = 90): Promise<number> {
     try {
       const cutoffTime = Date.now() - (retentionDays * 24 * 60 * 60 * 1000);
-      
+
       // Get all events older than the cutoff from the global index
       const globalIndexKey = `${AuditService.AUDIT_INDEX_PREFIX}all`;
       const oldEventIds = await redis.zrangebyscore(globalIndexKey, 0, cutoffTime);
-      
+
       if (!oldEventIds.length) {
         return 0;
       }
-      
+
       // Get all events to find their tenant IDs
       const eventsToDelete = await Promise.all(
         oldEventIds.map(id => AuditService.getEventById(id))
       );
-      
+
       // Delete each event and its indexes
       const deletePromises = eventsToDelete.filter(e => e !== null).map(async event => {
         try {
           const id = event!.id;
           const timestamp = new Date(event!.timestamp).getTime();
-          
+
           // Remove from all indexes
           await redis.zrem(`${AuditService.AUDIT_TENANT_PREFIX}${event!.tenantId}`, id);
           await redis.zrem(`${AuditService.AUDIT_USER_PREFIX}${event!.userId}`, id);
           await redis.zrem(`${AuditService.AUDIT_ACTION_PREFIX}${event!.action}`, id);
           await redis.zrem(globalIndexKey, id);
-          
+
           // Remove from resource indexes if applicable
           if (event!.resourceType) {
             await redis.zrem(`${AuditService.AUDIT_RESOURCE_PREFIX}${event!.resourceType}`, id);
-            
+
             if (event!.resourceId) {
               await redis.zrem(
-                `${AuditService.AUDIT_RESOURCE_PREFIX}${event!.resourceType}:${event!.resourceId}`, 
+                `${AuditService.AUDIT_RESOURCE_PREFIX}${event!.resourceType}:${event!.resourceId}`,
                 id
               );
             }
           }
-          
+
           // Delete the event itself
           await redis.del(`${AuditService.AUDIT_EVENT_PREFIX}${id}`);
-          
+
           return true;
         } catch {
           return false;
         }
       });
-      
+
       const results = await Promise.all(deletePromises);
       return results.filter(success => success).length;
     } catch (error) {

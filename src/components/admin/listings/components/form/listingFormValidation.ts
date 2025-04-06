@@ -1,11 +1,13 @@
 "use client";
 
-import { 
-  ListingFormData, 
-  ListingFormErrors,
+import {
+  ListingFormData,
+  ListingFormErrors
+} from '../../types';
+import {
   ListingStatus,
   PriceType
-} from '../../types';
+} from '@/types/listing';
 
 /**
  * Validates a string field with a minimum and maximum length
@@ -16,23 +18,23 @@ import {
  * @returns Error message or undefined if valid
  */
 export const validateString = (
-  value: string | undefined, 
-  minLength = 3, 
-  maxLength = 255, 
+  value: string | undefined,
+  minLength = 3,
+  maxLength = 255,
   fieldName = 'Field'
 ): string | undefined => {
   if (!value) {
     return `${fieldName} is required`;
   }
-  
+
   if (value.trim().length < minLength) {
     return `${fieldName} must be at least ${minLength} characters`;
   }
-  
+
   if (value.trim().length > maxLength) {
     return `${fieldName} cannot exceed ${maxLength} characters`;
   }
-  
+
   return undefined;
 };
 
@@ -46,7 +48,7 @@ export const validateUrl = (url: string | undefined, isRequired = true): string 
   if (!url) {
     return isRequired ? 'URL is required' : undefined;
   }
-  
+
   try {
     new URL(url);
     return undefined;
@@ -65,12 +67,12 @@ export const validateEmail = (email: string | undefined, isRequired = true): str
   if (!email) {
     return isRequired ? 'Email is required' : undefined;
   }
-  
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return 'Please enter a valid email address';
   }
-  
+
   return undefined;
 };
 
@@ -84,13 +86,13 @@ export const validatePhone = (phone: string | undefined, isRequired = true): str
   if (!phone) {
     return isRequired ? 'Phone number is required' : undefined;
   }
-  
+
   // Simple validation - more complex country-specific validation could be implemented
   const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
   if (!phoneRegex.test(phone)) {
     return 'Please enter a valid phone number';
   }
-  
+
   return undefined;
 };
 
@@ -101,25 +103,25 @@ export const validatePhone = (phone: string | undefined, isRequired = true): str
  * @returns Error message or undefined if valid
  */
 export const validatePrice = (
-  priceType: PriceType | undefined, 
+  priceType: PriceType | undefined,
   amount: number | undefined
 ): string | undefined => {
   if (!priceType) {
     return 'Price type is required';
   }
-  
+
   if (priceType === PriceType.FREE || priceType === PriceType.CONTACT) {
     return undefined;
   }
-  
+
   if (amount === undefined) {
     return 'Price amount is required';
   }
-  
+
   if (isNaN(amount) || amount < 0) {
     return 'Price must be a valid number greater than or equal to 0';
   }
-  
+
   return undefined;
 };
 
@@ -132,7 +134,7 @@ export const validateCategories = (categoryIds: string[] | undefined): string | 
   if (!categoryIds || categoryIds.length === 0) {
     return 'At least one category must be selected';
   }
-  
+
   return undefined;
 };
 
@@ -145,7 +147,7 @@ export const validateMedia = (media: any[] | undefined): string | undefined => {
   if (!media || media.length === 0) {
     return 'At least one image is required';
   }
-  
+
   return undefined;
 };
 
@@ -156,24 +158,24 @@ export const validateMedia = (media: any[] | undefined): string | undefined => {
  * @returns Error message or undefined if valid
  */
 export const validateFutureDate = (
-  date: string | undefined, 
+  date: string | undefined,
   isRequired = false
 ): string | undefined => {
   if (!date) {
     return isRequired ? 'Date is required' : undefined;
   }
-  
+
   const selectedDate = new Date(date);
   const now = new Date();
-  
+
   if (isNaN(selectedDate.getTime())) {
     return 'Please enter a valid date';
   }
-  
+
   if (selectedDate <= now) {
     return 'Date must be in the future';
   }
-  
+
   return undefined;
 };
 
@@ -184,18 +186,18 @@ export const validateFutureDate = (
  */
 export const validateListingForm = (formData: ListingFormData): ListingFormErrors => {
   const errors: ListingFormErrors = {};
-  
+
   // Validate basic info
   errors.title = validateString(formData.title, 5, 100, 'Title');
   errors.description = validateString(formData.description, 20, 5000, 'Description');
   errors.status = formData.status ? undefined : 'Status is required';
-  
+
   // Validate categories
   errors.categoryIds = validateCategories(formData.categoryIds);
-  
+
   // Validate media
   errors.media = validateMedia(formData.media);
-  
+
   // Validate price if present
   if (formData.price) {
     errors.price = {
@@ -203,7 +205,7 @@ export const validateListingForm = (formData: ListingFormData): ListingFormError
       amount: validatePrice(formData.price.priceType, formData.price.amount)
     };
   }
-  
+
   // Validate contact info if present
   if (formData.contactInfo) {
     errors.contactInfo = {
@@ -212,21 +214,21 @@ export const validateListingForm = (formData: ListingFormData): ListingFormError
       website: validateUrl(formData.contactInfo.website, false)
     };
   }
-  
+
   // Validate backlink info if present
   if (formData.backlinkInfo) {
     errors.backlinkInfo = {
       url: validateUrl(formData.backlinkInfo.url, true)
     };
   }
-  
+
   // Validate featured date if featured is true
   if (formData.featured && !formData.featuredUntil) {
     errors.featuredUntil = 'Featured end date is required for featured listings';
   } else if (formData.featured && formData.featuredUntil) {
     errors.featuredUntil = validateFutureDate(formData.featuredUntil);
   }
-  
+
   // Filter out undefined errors and empty sub-objects
   Object.keys(errors).forEach(key => {
     const error = errors[key];
@@ -240,7 +242,7 @@ export const validateListingForm = (formData: ListingFormData): ListingFormError
       }
     }
   });
-  
+
   return errors;
 };
 
@@ -253,34 +255,34 @@ export const validateListingForm = (formData: ListingFormData): ListingFormError
 export const validateStep = (formData: ListingFormData, step: number): ListingFormErrors => {
   const allErrors = validateListingForm(formData);
   const stepErrors: ListingFormErrors = {};
-  
+
   switch (step) {
     case 1: // Basic info step
       if (allErrors.title) stepErrors.title = allErrors.title;
       if (allErrors.description) stepErrors.description = allErrors.description;
       if (allErrors.status) stepErrors.status = allErrors.status;
       break;
-      
+
     case 2: // Category selection step
       if (allErrors.categoryIds) stepErrors.categoryIds = allErrors.categoryIds;
       break;
-      
+
     case 3: // Media upload step
       if (allErrors.media) stepErrors.media = allErrors.media;
       break;
-      
+
     case 4: // Pricing step
       if (allErrors.price) stepErrors.price = allErrors.price;
       break;
-      
+
     case 5: // Backlink step
       if (allErrors.backlinkInfo) stepErrors.backlinkInfo = allErrors.backlinkInfo;
       break;
-      
+
     default:
       return {};
   }
-  
+
   return stepErrors;
 };
 

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenantAccess } from '@/middleware/tenant-validation';
-import { withPermission } from '@/middleware/withPermission';
+import { withSecureTenantPermission } from '@/app/api/middleware/secureTenantContext';
 import { AuditService } from '@/lib/audit-service';
 import { RoleService } from '@/lib/role-service';
 import { verify } from 'jsonwebtoken';
-import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
+import { ResourceType, Permission } from '@/lib/role/types';
 
 // Get JWT secret from environment
 const JWT_SECRET = process.env.JWT_SECRET || 'development-secret';
@@ -28,13 +27,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'development-secret';
  * @returns A NextResponse containing the recent activity data or an error message.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  return withTenantAccess(
+  return withSecureTenantPermission(
     req,
-    withPermission(
-      req,
-      'audit' as ResourceType,
-      'read' as Permission,
-      async (validatedReq) => {
+    'audit' as ResourceType,
+    'read' as Permission,
+    async (validatedReq, context) => {
         try {
           // Get tenant context and user info
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
@@ -76,7 +73,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             { status: 500 }
           );
         }
-      }
-    )
+    }
   );
 }

@@ -12,7 +12,8 @@ import {
   isStepValid,
   isFormValid
 } from '@/components/admin/listings/components/form/listingFormValidation';
-import { ListingFormData, ListingStatus, PriceType, MediaType } from '@/components/admin/listings/types';
+import { ListingFormData } from '@/components/admin/listings/types';
+import { ListingStatus, PriceType, MediaType } from '@/types/listing';
 
 describe('Listing Form Validation', () => {
   describe('validateString', () => {

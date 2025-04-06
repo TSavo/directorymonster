@@ -1,20 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdminAuth } from '@/lib/auth/with-admin-auth';
+import { withSecureTenantPermission } from '@/app/api/middleware/secureTenantContext';
+import { ResourceType, Permission } from '@/lib/role/types';
 
-export const GET = withAdminAuth(async (req: NextRequest) => {
-  try {
-    // Get query parameters
-    const url = new URL(req.url);
-    const startDate = url.searchParams.get('startDate');
-    const endDate = url.searchParams.get('endDate');
-    const status = url.searchParams.getAll('status');
-    const ipRiskLevel = url.searchParams.getAll('ipRiskLevel');
-    const userId = url.searchParams.get('userId');
+/**
+ * GET handler for login attempts map data
+ *
+ * @param req - The incoming Next.js request
+ * @returns A JSON response containing login attempts map data or an error message
+ */
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  return withSecureTenantPermission(
+    req,
+    'security' as ResourceType,
+    'read' as Permission,
+    async (validatedReq, context) => {
+      try {
+        // Get query parameters
+        const url = new URL(validatedReq.url);
+        const startDate = url.searchParams.get('startDate');
+        const endDate = url.searchParams.get('endDate');
+        const status = url.searchParams.getAll('status');
+        const ipRiskLevel = url.searchParams.getAll('ipRiskLevel');
+        const userId = url.searchParams.get('userId');
 
-    // In a real implementation, you would fetch this data from your database
-    // For now, we'll return mock data
-    const mockMapData = [
-      {
+        // In a real implementation, you would fetch this data from your database
+        // For now, we'll return mock data
+        const mockMapData = [
+          {
         id: '1',
         latitude: 40.7128,
         longitude: -74.0060,
@@ -96,21 +108,23 @@ export const GET = withAdminAuth(async (req: NextRequest) => {
       }
     ];
 
-    // Apply filters
-    let filteredMapData = [...mockMapData];
+        // Apply filters
+        let filteredMapData = [...mockMapData];
 
-    if (ipRiskLevel.length > 0) {
-      filteredMapData = filteredMapData.filter(point => 
-        ipRiskLevel.includes(point.ipRiskLevel)
-      );
+        if (ipRiskLevel.length > 0) {
+          filteredMapData = filteredMapData.filter(point =>
+            ipRiskLevel.includes(point.ipRiskLevel)
+          );
+        }
+
+        return NextResponse.json({ mapData: filteredMapData });
+      } catch (error) {
+        console.error('Error fetching map data:', error);
+        return NextResponse.json(
+          { error: 'Failed to fetch map data' },
+          { status: 500 }
+        );
+      }
     }
-
-    return NextResponse.json({ mapData: filteredMapData });
-  } catch (error) {
-    console.error('Error fetching map data:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch map data' },
-      { status: 500 }
-    );
-  }
-});
+  );
+}

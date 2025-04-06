@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenantAccess } from '@/middleware/tenant-validation';
-import { withPermission } from '@/middleware/withPermission';
+import { withSecureTenantPermission } from '@/app/api/middleware/secureTenantContext';
 import { DashboardService } from '@/lib/dashboard-service';
-import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
+import { ResourceType, Permission } from '@/lib/role/types';
 
 /**
  * Handles GET requests to retrieve dashboard statistics for the admin interface.
@@ -20,13 +19,11 @@ import { ResourceType, Permission } from '@/components/admin/auth/utils/accessCo
  * @returns A promise resolving to a NextResponse with the dashboard statistics data or an error message.
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  return withTenantAccess(
+  return withSecureTenantPermission(
     req,
-    withPermission(
-      req,
-      'setting' as ResourceType,
-      'read' as Permission,
-      async (validatedReq) => {
+    'setting' as ResourceType,
+    'read' as Permission,
+    async (validatedReq, context) => {
         try {
           // Get tenant context
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
@@ -53,7 +50,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             { status: 500 }
           );
         }
-      }
-    )
+    }
   );
 }
