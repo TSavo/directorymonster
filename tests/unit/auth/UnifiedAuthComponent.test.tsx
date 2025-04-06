@@ -37,7 +37,7 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent />);
-      
+
       // Check for "Log In" text (not "Sign In" or "Login")
       const loginButton = screen.getByRole('button', { name: /log in/i });
       expect(loginButton).toBeInTheDocument();
@@ -54,13 +54,13 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent />);
-      
+
       // Open the dropdown
       const userButton = screen.getByText('testuser');
       fireEvent.click(userButton);
-      
+
       // Check for "Log Out" text (not "Sign Out" or "Logout")
-      const logoutButton = screen.getByRole('button', { name: /log out/i });
+      const logoutButton = screen.getByRole('menuitem', { name: /log out/i });
       expect(logoutButton).toBeInTheDocument();
       expect(logoutButton).not.toHaveTextContent(/sign out/i);
       expect(logoutButton).not.toHaveTextContent(/logout/i);
@@ -76,10 +76,10 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent />);
-      
+
       // Check for login button
       expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument();
-      
+
       // Verify user menu is not shown
       expect(screen.queryByText(/testuser/i)).not.toBeInTheDocument();
     });
@@ -93,10 +93,10 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent />);
-      
+
       // Check for user info
       expect(screen.getByText('testuser')).toBeInTheDocument();
-      
+
       // Verify login button is not shown
       expect(screen.queryByRole('button', { name: /log in/i })).not.toBeInTheDocument();
     });
@@ -111,15 +111,15 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent />);
-      
+
       // Open the dropdown
       const userButton = screen.getByText('testuser');
       fireEvent.click(userButton);
-      
+
       // Click logout
-      const logoutButton = screen.getByRole('button', { name: /log out/i });
+      const logoutButton = screen.getByRole('menuitem', { name: /log out/i });
       fireEvent.click(logoutButton);
-      
+
       // Verify logout was called
       expect(mockLogout).toHaveBeenCalled();
     });
@@ -135,13 +135,13 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent />);
-      
+
       // Open the dropdown
       const userButton = screen.getByText('adminuser');
       fireEvent.click(userButton);
-      
+
       // Check for admin indicator
-      expect(screen.getByText(/admin/i)).toBeInTheDocument();
+      expect(screen.getByText('Admin')).toBeInTheDocument();
     });
 
     it('should not show admin indicator for regular users', () => {
@@ -153,11 +153,11 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent />);
-      
+
       // Open the dropdown
       const userButton = screen.getByText('regularuser');
       fireEvent.click(userButton);
-      
+
       // Check that admin indicator is not present
       expect(screen.queryByText(/admin/i)).not.toBeInTheDocument();
     });
@@ -173,14 +173,14 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent />);
-      
+
       // Check for proper ARIA attributes on the dropdown button
       const userButton = screen.getByText('testuser');
       expect(userButton).toHaveAttribute('aria-haspopup', 'true');
-      
+
       // Open the dropdown
       fireEvent.click(userButton);
-      
+
       // Check that the dropdown has proper ARIA attributes
       const dropdown = screen.getByRole('menu');
       expect(dropdown).toBeInTheDocument();
@@ -196,19 +196,19 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent />);
-      
+
       // Focus the user button
       const userButton = screen.getByText('testuser');
       userButton.focus();
       expect(document.activeElement).toBe(userButton);
-      
+
       // Press Enter to open dropdown
       fireEvent.keyDown(userButton, { key: 'Enter', code: 'Enter' });
-      
+
       // Check that dropdown is open
       const dropdown = screen.getByRole('menu');
       expect(dropdown).toBeInTheDocument();
-      
+
       // Check that first menu item is focusable
       const firstMenuItem = screen.getByRole('menuitem', { name: /profile/i });
       firstMenuItem.focus();
@@ -225,7 +225,7 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent className="custom-class" />);
-      
+
       // Check that the component has the custom class
       const component = screen.getByTestId('unified-auth-component');
       expect(component).toHaveClass('custom-class');
@@ -239,7 +239,7 @@ describe('UnifiedAuthComponent', () => {
       });
 
       render(<UnifiedAuthComponent position="left" />);
-      
+
       // Check that the component has the left position class
       const component = screen.getByTestId('unified-auth-component');
       expect(component).toHaveClass('justify-start');
