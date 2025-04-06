@@ -46,7 +46,7 @@ src/components/admin/listings/
 The ListingForm component is a multi-step form for creating and editing listings. It provides step navigation, validation, and preview functionality.
 
 ```jsx
-import { ListingForm } from '@/components/admin/listings';
+import ListingForm from '@/components/admin/listings/ListingForm';
 
 export default function CreateListingPage({ params }) {
   const { siteSlug } = params;
@@ -168,7 +168,7 @@ Both components are designed to be responsive:
 
 Listings follow this data structure:
 
-The listing type is defined in `src/types/listing.ts` and includes the following key properties:
+The Listing type is defined in `src/types/listing.ts` and includes the following key properties:
 
 ```typescript
 interface Listing {
@@ -202,6 +202,8 @@ interface Listing {
   userDisplayName?: string;
 }
 ```
+
+This is the single, unified definition used throughout the application. All components import this type from `@/types/listing` or via the re-export in `@/types`.
 
 See the full definition in `src/types/listing.ts` for all related types and enums.
 

@@ -83,31 +83,31 @@ This specification outlines the implementation of tenant and site context integr
 // src/contexts/TenantSiteContext.tsx
 export function TenantSiteProvider({ children }: { children: React.ReactNode }) {
   // ... existing state ...
-  
+
   // Update setCurrentTenantId to trigger page refresh
   const setCurrentTenantId = (id: string | null) => {
     if (id !== currentTenantId) {
       // Save selection to localStorage
       if (id) localStorage.setItem('currentTenantId', id);
       else localStorage.removeItem('currentTenantId');
-      
+
       // Refresh page to update context
       window.location.reload();
     }
   };
-  
+
   // Update setCurrentSiteId to trigger page refresh
   const setCurrentSiteId = (id: string | null) => {
     if (id !== currentSiteId && currentTenantId) {
       // Save selection to localStorage
       if (id) localStorage.setItem(`${currentTenantId}_currentSiteId`, id);
       else localStorage.removeItem(`${currentTenantId}_currentSiteId`);
-      
+
       // Refresh page to update context
       window.location.reload();
     }
   };
-  
+
   // ... rest of implementation ...
 }
 ```
@@ -123,12 +123,12 @@ export function withTenantContext(
   // Extract tenant and site IDs from headers or cookies
   const tenantId = req.headers.get('x-tenant-id') || req.cookies.get('currentTenantId')?.value;
   const siteId = req.headers.get('x-site-id') || req.cookies.get(`${tenantId}_currentSiteId`)?.value;
-  
+
   // Clone request and add context headers
   const requestWithContext = new NextRequest(req);
   if (tenantId) requestWithContext.headers.set('x-tenant-id', tenantId);
   if (siteId) requestWithContext.headers.set('x-site-id', siteId);
-  
+
   // Pass to handler
   return handler(requestWithContext);
 }
@@ -142,12 +142,12 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   // Get context from localStorage
   const tenantId = localStorage.getItem('currentTenantId');
   const siteId = tenantId ? localStorage.getItem(`${tenantId}_currentSiteId`) : null;
-  
+
   // Add context headers
   const headers = new Headers(options.headers);
   if (tenantId) headers.set('x-tenant-id', tenantId);
   if (siteId) headers.set('x-site-id', siteId);
-  
+
   // Make request
   return fetch(endpoint, {
     ...options,
@@ -162,33 +162,33 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
 // src/contexts/PublicTenantSiteContext.tsx
 export function PublicTenantSiteProvider({ children }: { children: React.ReactNode }) {
   // ... existing state ...
-  
+
   // Handle tenant change with redirection
   const setTenantId = (id: string | null) => {
     if (id !== tenantId) {
       // Save selection
       if (id) localStorage.setItem('currentTenantId', id);
       else localStorage.removeItem('currentTenantId');
-      
+
       // Redirect to tenant's main site
       if (id) window.location.href = `/tenant/${id}`;
       else window.location.href = '/';
     }
   };
-  
+
   // Handle site change with redirection
   const setSiteId = (id: string | null) => {
     if (id !== siteId && tenantId) {
       // Save selection
       if (id) localStorage.setItem(`${tenantId}_currentSiteId`, id);
       else localStorage.removeItem(`${tenantId}_currentSiteId`);
-      
+
       // Redirect to specific site
       if (id) window.location.href = `/site/${id}`;
       else window.location.href = `/tenant/${tenantId}`;
     }
   };
-  
+
   // ... rest of implementation ...
 }
 ```
@@ -201,7 +201,7 @@ export function PublicTenantSiteProvider({ children }: { children: React.ReactNo
 // src/components/admin/layout/AdminHeader.tsx
 export function AdminHeader() {
   const { hasMultipleTenants, hasMultipleSites, currentTenant, currentSite } = useTenantSite();
-  
+
   return (
     <header className="bg-white shadow-sm">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -210,7 +210,7 @@ export function AdminHeader() {
           <div className="flex">
             {/* ... existing code ... */}
           </div>
-          
+
           {/* Context display and selectors */}
           <div className="flex items-center space-x-4">
             {/* Always show current context */}
@@ -222,11 +222,11 @@ export function AdminHeader() {
                 <span className="ml-2">Site: {currentSite.name}</span>
               )}
             </div>
-            
+
             {/* Only show selectors when multiple options exist */}
             {hasMultipleTenants && <TenantSelector />}
             {hasMultipleSites && <SiteSelector />}
-            
+
             {/* User menu, notifications, etc. */}
             {/* ... existing code ... */}
           </div>
@@ -244,14 +244,14 @@ export function AdminHeader() {
 export function ListingList() {
   const { currentTenantId, currentSiteId } = useTenantSite();
   const [listings, setListings] = useState<Listing[]>([]);
-  
+
   useEffect(() => {
     if (currentTenantId) {
       // Fetch listings with context
       fetchListings(currentTenantId, currentSiteId).then(setListings);
     }
   }, [currentTenantId, currentSiteId]);
-  
+
   return (
     <div className="listing-list">
       <h2>Listings for {currentSiteId ? `Site ${currentSite?.name}` : 'All Sites'}</h2>
@@ -284,6 +284,8 @@ export function ListingList() {
    - Update TenantSiteContext with page refresh logic
    - Update PublicTenantSiteContext with redirection logic
    - Test with different user scenarios
+   - Implement unified Listing type definition in `src/types/listing.ts`
+   - Ensure all components use the unified type definition
 
 2. **Phase 2: Admin Dashboard Integration**
    - Update AdminLayout and AdminHeader

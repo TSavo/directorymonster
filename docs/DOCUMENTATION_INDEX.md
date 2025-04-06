@@ -6,7 +6,7 @@ This document provides a comprehensive overview of all documentation and specifi
 
 - `/docs` - Implementation guides and how-to documentation
 - `/specs` - Specifications and design documents
-- `/specs/archived` - Archived specifications 
+- `/specs/archived` - Archived specifications
 - `/specs/docs-archive` - Archived documentation
 
 ## Documentation By Category
@@ -16,6 +16,7 @@ This document provides a comprehensive overview of all documentation and specifi
 | Document | Type | Description |
 |----------|------|-------------|
 | [TENANT_SECURITY_GUIDE.md](/docs/TENANT_SECURITY_GUIDE.md) | Guide | Implementation guide for tenant security |
+| [UNIFIED_LISTING_TYPE.md](/docs/UNIFIED_LISTING_TYPE.md) | Guide | Documentation for the unified Listing type |
 | [CROSS_TENANT_SECURITY_SPEC.md](/specs/CROSS_TENANT_SECURITY_SPEC.md) | Spec | Specification for preventing cross-tenant attacks |
 | [MULTI_TENANT_ACL_SPEC.md](/specs/MULTI_TENANT_ACL_SPEC.md) | Spec | Specification for multi-tenant access control |
 

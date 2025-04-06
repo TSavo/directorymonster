@@ -64,8 +64,10 @@ The Submission API implements several security measures:
 
 ## Implementation Guidelines
 
-- Store submissions separately from approved content
-- Implement proper tenant isolation for submissions
+- Store submissions separately from approved content using Redis-based persistence
+- Implement proper tenant and site isolation for submissions
+- Use the unified Listing type definition from `src/types/listing.ts`
+- Implement transformation from Submission to Listing upon approval
 - Provide clear feedback mechanisms for users
 - Implement notification systems for status changes
 - Support partial updates to submissions

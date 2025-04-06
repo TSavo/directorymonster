@@ -281,6 +281,9 @@ if (siteIdParam && siteIdParam !== context.siteId) {
 6. Security documentation is updated to reflect the changes
 7. Only a single permission checking method exists (`hasPermission`) that properly handles site context
 8. No redundant or deprecated methods remain in the codebase
+9. A unified Listing type definition exists in `src/types/listing.ts`
+10. All components use the unified type definition
+11. The submission system properly integrates with the site context
 
 ## Related Issues
 
