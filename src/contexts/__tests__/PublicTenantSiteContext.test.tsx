@@ -69,7 +69,7 @@ describe('PublicTenantSiteContext', () => {
     jest.clearAllMocks();
     localStorageMock.clear();
     mockLocation.href = '';
-    
+
     // Mock the useAuth hook to return an authenticated user
     (useAuth as jest.Mock).mockReturnValue({
       user: { id: 'user-123', name: 'Test User' },
@@ -79,6 +79,13 @@ describe('PublicTenantSiteContext', () => {
   });
 
   it('should load tenant and site context from localStorage', async () => {
+    // Mock the useAuth hook to return an authenticated user
+    (useAuth as jest.Mock).mockReturnValue({
+      user: { id: 'user-123', name: 'Test User' },
+      isAuthenticated: true,
+      isLoading: false,
+    });
+
     // Set up localStorage with tenant and site selections
     localStorageMock.getItem.mockImplementation((key: string) => {
       if (key === 'currentTenantId') return 'tenant-1';
@@ -86,83 +93,130 @@ describe('PublicTenantSiteContext', () => {
       return null;
     });
 
-    // Render the provider with a test component
-    await act(async () => {
-      render(
-        <PublicTenantSiteProvider>
-          <TestComponent />
-        </PublicTenantSiteProvider>
-      );
-    });
+    // Set process.env.NODE_ENV to 'test'
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'test';
 
-    // Wait for loading to complete
-    await waitFor(() => {
-      expect(screen.getByTestId('loading')).toHaveTextContent('false');
-    });
+    try {
+      // Render the provider with a test component
+      await act(async () => {
+        render(
+          <PublicTenantSiteProvider>
+            <TestComponent />
+          </PublicTenantSiteProvider>
+        );
+      });
 
-    // Check that the context values are set correctly
-    expect(screen.getByTestId('current-tenant-id')).toHaveTextContent('tenant-1');
-    expect(screen.getByTestId('current-site-id')).toHaveTextContent('site-1');
+      // Wait for loading to complete
+      await waitFor(() => {
+        expect(screen.getByTestId('loading')).toHaveTextContent('false');
+      });
+
+      // Check that the context values are set correctly
+      expect(screen.getByTestId('current-tenant-id')).toHaveTextContent('tenant-1');
+      expect(screen.getByTestId('current-site-id')).toHaveTextContent('site-1');
+    } finally {
+      // Restore original NODE_ENV
+      process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 
   it('should redirect to tenant page when changing tenant', async () => {
-    // Render the provider with a test component
-    await act(async () => {
-      render(
-        <PublicTenantSiteProvider>
-          <TestComponent />
-        </PublicTenantSiteProvider>
-      );
+    // Mock the useAuth hook to return an authenticated user
+    (useAuth as jest.Mock).mockReturnValue({
+      user: { id: 'user-123', name: 'Test User' },
+      isAuthenticated: true,
+      isLoading: false,
     });
 
-    // Wait for loading to complete
-    await waitFor(() => {
-      expect(screen.getByTestId('loading')).toHaveTextContent('false');
-    });
+    // Set process.env.NODE_ENV to 'test'
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'test';
 
-    // Click the change tenant button
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('change-tenant-button'));
-    });
+    try {
+      // Render the provider with a test component
+      await act(async () => {
+        render(
+          <PublicTenantSiteProvider>
+            <TestComponent />
+          </PublicTenantSiteProvider>
+        );
+      });
 
-    // Check that localStorage was updated
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('currentTenantId', 'tenant-2');
+      // Wait for loading to complete
+      await waitFor(() => {
+        expect(screen.getByTestId('loading')).toHaveTextContent('false');
+      });
 
-    // Check that the page was redirected
-    expect(mockLocation.href).toBe('/tenant/tenant-2');
+      // Reset mock calls before the action we want to test
+      localStorageMock.setItem.mockClear();
+
+      // Click the change tenant button
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('change-tenant-button'));
+      });
+
+      // Check that localStorage was updated
+      expect(localStorageMock.setItem).toHaveBeenCalledWith('currentTenantId', 'tenant-2');
+
+      // Check that the page was redirected
+      expect(mockLocation.href).toBe('/tenant/tenant-2');
+    } finally {
+      // Restore original NODE_ENV
+      process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 
   it('should redirect to site page when changing site', async () => {
+    // Mock the useAuth hook to return an authenticated user
+    (useAuth as jest.Mock).mockReturnValue({
+      user: { id: 'user-123', name: 'Test User' },
+      isAuthenticated: true,
+      isLoading: false,
+    });
+
     // Set up localStorage with tenant selection
     localStorageMock.getItem.mockImplementation((key: string) => {
       if (key === 'currentTenantId') return 'tenant-1';
       return null;
     });
 
-    // Render the provider with a test component
-    await act(async () => {
-      render(
-        <PublicTenantSiteProvider>
-          <TestComponent />
-        </PublicTenantSiteProvider>
-      );
-    });
+    // Set process.env.NODE_ENV to 'test'
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'test';
 
-    // Wait for loading to complete
-    await waitFor(() => {
-      expect(screen.getByTestId('loading')).toHaveTextContent('false');
-    });
+    try {
+      // Render the provider with a test component
+      await act(async () => {
+        render(
+          <PublicTenantSiteProvider>
+            <TestComponent />
+          </PublicTenantSiteProvider>
+        );
+      });
 
-    // Click the change site button
-    await act(async () => {
-      fireEvent.click(screen.getByTestId('change-site-button'));
-    });
+      // Wait for loading to complete
+      await waitFor(() => {
+        expect(screen.getByTestId('loading')).toHaveTextContent('false');
+      });
 
-    // Check that localStorage was updated
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('tenant-1_currentSiteId', 'site-2');
+      // Reset mock calls before the action we want to test
+      localStorageMock.setItem.mockClear();
 
-    // Check that the page was redirected
-    expect(mockLocation.href).toBe('/site/site-2');
+      // Click the change site button
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('change-site-button'));
+      });
+
+      // Check that localStorage was updated
+      expect(localStorageMock.setItem).toHaveBeenCalledWith('tenant-1_currentSiteId', 'site-2');
+
+      // Check that the page was redirected
+      expect(mockLocation.href).toBe('/site/site-2');
+    } finally {
+      // Restore original NODE_ENV
+      process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 
   it('should not load tenant context for unauthenticated users', async () => {
@@ -173,24 +227,33 @@ describe('PublicTenantSiteContext', () => {
       isLoading: false,
     });
 
-    // Render the provider with a test component
-    await act(async () => {
-      render(
-        <PublicTenantSiteProvider>
-          <TestComponent />
-        </PublicTenantSiteProvider>
-      );
-    });
+    // Set process.env.NODE_ENV to 'test'
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'test';
 
-    // Wait for loading to complete
-    await waitFor(() => {
-      expect(screen.getByTestId('loading')).toHaveTextContent('false');
-    });
+    try {
+      // Render the provider with a test component
+      await act(async () => {
+        render(
+          <PublicTenantSiteProvider>
+            <TestComponent />
+          </PublicTenantSiteProvider>
+        );
+      });
 
-    // Check that the context values are not set
-    expect(screen.getByTestId('current-tenant-id')).toHaveTextContent('none');
-    expect(screen.getByTestId('current-site-id')).toHaveTextContent('none');
-    expect(screen.getByTestId('tenant-count')).toHaveTextContent('0');
-    expect(screen.getByTestId('site-count')).toHaveTextContent('0');
+      // Wait for loading to complete
+      await waitFor(() => {
+        expect(screen.getByTestId('loading')).toHaveTextContent('false');
+      });
+
+      // Check that the context values are not set
+      expect(screen.getByTestId('current-tenant-id')).toHaveTextContent('none');
+      expect(screen.getByTestId('current-site-id')).toHaveTextContent('none');
+      expect(screen.getByTestId('tenant-count')).toHaveTextContent('0');
+      expect(screen.getByTestId('site-count')).toHaveTextContent('0');
+    } finally {
+      // Restore original NODE_ENV
+      process.env.NODE_ENV = originalNodeEnv;
+    }
   });
 });
