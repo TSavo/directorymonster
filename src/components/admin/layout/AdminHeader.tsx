@@ -6,26 +6,20 @@ import { MenuIcon, BellIcon, UserIcon } from './icons';
 import { TenantSelector } from '@/components/admin/tenant/TenantSelector';
 import { SiteSelector } from '@/components/admin/tenant/SiteSelector';
 import { useTenantSite } from '@/contexts/TenantSiteContext';
+import { UnifiedAuthComponent } from '@/components/auth';
 
 interface AdminHeaderProps {
   toggleSidebar: () => void;
 }
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   // Get tenant and site context
   const { hasMultipleTenants, hasMultipleSites } = useTenantSite();
 
-  const toggleUserMenu = () => {
-    if (notificationsOpen) setNotificationsOpen(false);
-    setUserMenuOpen(!userMenuOpen);
-  };
-
   const toggleNotifications = () => {
     setNotificationsOpen(!notificationsOpen);
-    if (userMenuOpen) setUserMenuOpen(false);
   };
 
   return (
@@ -86,63 +80,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
               )}
             </div>
 
-            {/* Profile dropdown */}
-            <div className="ml-3 relative">
-              <div>
-                <button
-                  type="button"
-                  className="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  id="user-menu-button"
-                  onClick={toggleUserMenu}
-                  aria-expanded={userMenuOpen}
-                  aria-haspopup="true"
-                >
-                  <span className="sr-only">Open user menu</span>
-                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                    <UserIcon className="h-6 w-6 text-gray-500" />
-                  </div>
-                </button>
-              </div>
-
-              {/* User dropdown panel */}
-              {userMenuOpen && (
-                <div
-                  className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="user-menu-button"
-                >
-                  <div className="block px-4 py-2 text-sm text-gray-700 border-b">
-                    <p className="font-medium">Admin User</p>
-                    <p className="text-gray-500">admin@example.com</p>
-                  </div>
-                  <Link
-                    href="/admin/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    Your Profile
-                  </Link>
-                  <Link
-                    href="/admin/settings"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    Settings
-                  </Link>
-                  <Link
-                    href="/api/auth/signout"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    Sign out
-                  </Link>
-                </div>
-              )}
-            </div>
+            {/* Unified Auth Component */}
+            <UnifiedAuthComponent />
           </div>
         </div>
       </div>
