@@ -17,6 +17,7 @@ const getSearchParams = () => {
 import { generateZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 import { getSalt, clearSaltCache } from '@/lib/auth/salt-cache';
 import { getAuthErrorMessage, AuthErrorType } from '@/lib/auth/error-handler';
+import { isValidReturnUrl } from '@/utils/url-validator';
 import CaptchaWidget from './CaptchaWidget';
 
 interface ZKPLoginProps {
@@ -183,9 +184,18 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
         // Check if there's a returnUrl in the search params
         const returnUrl = searchParams?.get('returnUrl');
 
-        // Redirect to returnUrl if available, otherwise use the default redirectPath
+        // Redirect to returnUrl if available and valid, otherwise use the default redirectPath
         if (returnUrl) {
-          router.push(decodeURIComponent(returnUrl));
+          const decodedUrl = decodeURIComponent(returnUrl);
+
+          // Validate the URL to prevent open redirect vulnerabilities
+          if (isValidReturnUrl(decodedUrl)) {
+            router.push(decodedUrl);
+          } else {
+            // Log the invalid URL attempt for security monitoring
+            console.warn('Invalid return URL detected:', decodedUrl);
+            router.push(redirectPath);
+          }
         } else {
           router.push(redirectPath);
         }

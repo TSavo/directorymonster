@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { decodeToken } from '@/utils/token-utils';
 
 // Define user type
 interface User {
@@ -69,23 +70,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setIsAuthenticated(true);
 
           // Also try to decode the token directly
-          try {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(
-              atob(base64)
-                .split('')
-                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                .join('')
-            );
-
-            const payload = JSON.parse(jsonPayload);
-            if (payload.user && !data.user) {
-              setUser(payload.user);
-              setIsAuthenticated(true);
-            }
-          } catch (decodeError) {
-            console.error('Error decoding token:', decodeError);
+          const payload = decodeToken(token);
+          if (payload?.user && !data.user) {
+            setUser(payload.user);
+            setIsAuthenticated(true);
+          } else if (!payload && !data.user) {
+            // If token decoding fails and no user data from API, set not authenticated
+            setIsAuthenticated(false);
+            setUser(null);
           }
         } else {
           // Clear invalid token
@@ -111,20 +103,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsAuthenticated(true);
 
     // Decode token to get user info (in a real app, you'd verify this on the server)
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-
-      const payload = JSON.parse(jsonPayload);
+    const payload = decodeToken(token);
+    if (payload?.user) {
       setUser(payload.user);
-    } catch (error) {
-      console.error('Error decoding token:', error);
+    } else {
+      console.error('Error decoding token: Invalid or missing user data');
+      // If token decoding fails, set not authenticated
+      setIsAuthenticated(false);
+      setUser(null);
     }
   };
 

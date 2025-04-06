@@ -5,7 +5,7 @@
 // Mock the security middleware
 jest.mock('@/app/api/middleware/secureTenantContext', () => ({
   withSecureTenantPermission: jest.fn((req, resourceType, permission, handler, resourceId) => {
-    return handler(req, { 
+    return handler(req, {
       tenantId: 'test-tenant-id',
       siteId: 'test-site-id',
       userId: 'test-user-id'
@@ -59,7 +59,7 @@ describe('Global Role Users API', () => {
       expect(RoleService.getGlobalRole).toHaveBeenCalledTimes(1);
       expect(RoleService.getGlobalRole).toHaveBeenCalledWith(roleId);
       expect(RoleService.getUsersWithGlobalRole).toHaveBeenCalledTimes(1);
-      expect(RoleService.getUsersWithGlobalRole).toHaveBeenCalledWith(roleId);
+      expect(RoleService.getUsersWithGlobalRole).toHaveBeenCalledWith(roleId, undefined, undefined);
     });
 
     it('should return 404 if role not found', async () => {
