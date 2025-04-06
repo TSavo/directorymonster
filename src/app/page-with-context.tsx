@@ -23,36 +23,26 @@ async function getHostname() {
 export default async function Home({ searchParams }: PageProps) {
   // Get host from headers (server component)
   const headerHost = await getHostname();
-
+  
   // For testing, hostname parameter takes precedence
   const debugHostname = searchParams?.hostname as string | undefined;
-
+  
   // Use debug param first, then header host, then localhost fallback
   const hostname = debugHostname || headerHost || 'localhost:3001';
-
-  // Log to debug hostnames
-  console.log(`DEBUG: Homepage - Headers host:`, headerHost);
-  console.log(`DEBUG: Homepage - Query param hostname:`, debugHostname);
-  console.log(`DEBUG: Homepage - Using final hostname:`, hostname);
-
-  // Get site config based on hostname or fallback to first site
-  let site: SiteConfig | null = null;
-
-  // Try to get site by hostname
-  // First try the hostname parameter, then fallback to localhost
-  console.log(`DEBUG: Looking up site by hostname: ${hostname}`);
-  site = await getSiteByHostname(hostname);
-  console.log(`DEBUG: Hostname lookup result:`, site?.name || 'null');
-
-  // Fallback to first site if no site found
-  if (!site) {
-    const siteKeys = await kv.keys('site:slug:*');
+  
+  // Get site by hostname
+  let site = await getSiteByHostname(hostname);
+  
+  // If no site found, try to get any site for local testing
+  if (!site && (hostname === 'localhost:3001' || hostname === 'localhost:3000' || hostname.includes('127.0.0.1'))) {
+    console.log('No site found for localhost, trying to get any site for testing');
+    const siteKeys = await kv.keys('site:*');
     const sites = await Promise.all(
       siteKeys.map(async (key) => await kv.get<SiteConfig>(key))
     );
     site = sites[0]; // For local testing, just use the first site
   }
-
+  
   // If site exists, this is platform
   if (site) {
     // Get categories for this site
@@ -88,13 +78,13 @@ export default async function Home({ searchParams }: PageProps) {
       description: site.metaDescription
     };
 
-    // Convert structured data to JSON strings
+    // Convert to JSON strings for script tags
     const websiteDataStr = JSON.stringify(websiteData);
     const organizationDataStr = JSON.stringify(organizationData);
 
     return (
-      <main className="min-h-screen bg-gray-50">
-        {/* Add structured data */}
+      <>
+        {/* Add structured data for SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: websiteDataStr }}
@@ -114,101 +104,97 @@ export default async function Home({ searchParams }: PageProps) {
         <meta property="og:url" content={baseUrl} />
         {site.logoUrl && <meta property="og:image" content={site.logoUrl} />}
 
-        {/* Hero section with site name and description */}
-        <div className="bg-white shadow-sm border-b" data-testid="hero-section">
-          <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
-                {site.name}
-              </h1>
-              <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500">
-                {site.metaDescription}
-              </p>
-            </div>
-
-            {/* SEO-friendly markup for primary keyword */}
-            <div className="hidden">
-              <h2>Best {site.primaryKeyword} Reviews and Guides</h2>
-              <p>Comprehensive {site.primaryKeyword} reviews, comparisons, and buyer guides.</p>
+        <MainLayout site={site} categories={categories}>
+          {/* Hero section with site name and description */}
+          <div className="bg-white shadow-sm border-b" data-testid="hero-section">
+            <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+              <div className="text-center">
+                <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+                  {site.name}
+                </h1>
+                <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500">
+                  {site.metaDescription}
+                </p>
+              </div>
+              
+              {/* SEO-friendly markup for primary keyword */}
+              <div className="hidden">
+                <h2>Best {site.primaryKeyword} Reviews and Guides</h2>
+                <p>Comprehensive {site.primaryKeyword} reviews, comparisons, and buyer guides.</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Categories section */}
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8" data-testid="category-section">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse Categories</h2>
+          {/* Categories section */}
+          <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8" data-testid="category-section">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse Categories</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" itemScope itemType="https://schema.org/ItemList">
-            {categories.filter(category => category !== null).map((category, index) => (
-              <div
-                key={category.id}
-                itemProp="itemListElement"
-                itemScope
-                itemType="https://schema.org/ListItem"
-              >
-                <CategoryLink
-                  category={category}
-                  className="group"
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" itemScope itemType="https://schema.org/ItemList">
+              {categories.filter(category => category !== null).map((category, index) => (
+                <div
+                  key={category.id}
+                  itemProp="itemListElement"
+                  itemScope
+                  itemType="https://schema.org/ListItem"
                 >
-                  <div className="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition duration-300 h-full flex flex-col">
-                    <div className="p-6 flex-grow">
-                      <meta itemProp="position" content={String(index + 1)} />
-                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition duration-300" itemProp="name">
-                        {category.name}
-                      </h3>
-                      <p className="mt-3 text-base text-gray-500" itemProp="description">
-                        {category.metaDescription}
-                      </p>
-                      <meta itemProp="url" content={`${baseUrl}/${category.slug}`} />
-                    </div>
-                    <div className="bg-gray-50 px-6 py-4">
-                      <div className="text-sm font-medium text-blue-600 group-hover:text-blue-800">
-                        View listings →
+                  <CategoryLink
+                    category={category}
+                    className="group"
+                  >
+                    <div className="bg-white overflow-hidden shadow-md rounded-lg hover:shadow-lg transition duration-300 h-full flex flex-col">
+                      <div className="p-6 flex-grow">
+                        <meta itemProp="position" content={String(index + 1)} />
+                        <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition duration-300" itemProp="name">
+                          {category.name}
+                        </h3>
+                        <p className="mt-3 text-base text-gray-500" itemProp="description">
+                          {category.metaDescription}
+                        </p>
+                        <meta itemProp="url" content={`${baseUrl}/${category.slug}`} />
+                      </div>
+                      <div className="bg-gray-50 px-6 py-4">
+                        <div className="text-sm font-medium text-blue-600 group-hover:text-blue-800">
+                          View listings →
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CategoryLink>
-              </div>
-            ))}
+                  </CategoryLink>
+                </div>
+              ))}
 
-            {categories.filter(category => category !== null).length === 0 && (
-              <div className="col-span-full bg-white p-6 rounded-lg shadow text-center">
-                <p className="text-gray-500">No categories found. Try seeding data first.</p>
-                <p className="mt-2 text-sm text-gray-400">Run: <code className="bg-gray-100 p-1 rounded">npm run seed</code></p>
-              </div>
-            )}
+              {categories.filter(category => category !== null).length === 0 && (
+                <div className="col-span-full bg-white p-6 rounded-lg shadow text-center">
+                  <p className="text-gray-500">No categories found. Try seeding data first.</p>
+                  <p className="mt-2 text-sm text-gray-400">Run: <code className="bg-gray-100 p-1 rounded">npm run seed</code></p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Admin section with lighter visual weight */}
-        <div className="bg-white border-t">
-          <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">Platform Administration</h2>
-                <p className="mt-1 text-sm text-gray-500">Access the admin dashboard to manage your directory.</p>
-              </div>
-              <div className="mt-4 sm:mt-0">
-                <Link
-                  href="/admin"
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Admin Dashboard
-                </Link>
+          {/* Admin section with lighter visual weight */}
+          <div className="bg-white border-t">
+            <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-medium text-gray-900">Platform Administration</h2>
+                  <p className="mt-1 text-sm text-gray-500">Access the admin dashboard to manage your directory.</p>
+                </div>
+                <div className="mt-4 sm:mt-0">
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Admin Dashboard
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <footer className="bg-gray-50 border-t" data-testid="site-footer">
-          <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <p className="text-sm text-gray-500" data-testid="copyright">Last updated: {new Date(site.updatedAt).toLocaleDateString()}</p>
-          </div>
-        </footer>
-      </main>
+        </MainLayout>
+      </>
     );
   }
-
+  
   // If no site exists, this is a fresh installation
   return (
     <main className="min-h-screen bg-gray-50">
