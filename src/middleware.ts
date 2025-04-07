@@ -22,8 +22,14 @@ const getSiteSlugFromPath = (pathname: string): string | null => {
 
 // Simple hostname mapping without database dependencies
 const getBasicTenantInfo = (hostname: string) => {
+  // Normalize hostname: lowercase and remove port/protocol
+  const normalizedHostname = hostname
+    .toLowerCase()
+    .replace(/^https?:\/\//, '') // Remove protocol
+    .replace(/:\d+$/, '');       // Remove port
+
   // Special case for localhost
-  if (hostname.includes('localhost') || hostname === '127.0.0.1') {
+  if (normalizedHostname.includes('localhost') || normalizedHostname === '127.0.0.1') {
     return {
       id: 'default',
       slug: 'default',
@@ -31,23 +37,23 @@ const getBasicTenantInfo = (hostname: string) => {
     };
   }
 
-  // For subdomains like hiking-gear.mydirectory.com
-  const parts = hostname.split('.');
-  if (parts.length > 2 && !hostname.endsWith('.localhost')) {
-    const subdomain = parts[0];
+  // For subdomains, use the entire hostname as the slug
+  // This ensures each subdomain is treated as a separate site
+  if (normalizedHostname.split('.').length > 2) {
+    const slug = normalizedHostname.replace(/\./g, '-');
     return {
-      id: subdomain,
-      slug: subdomain,
-      name: subdomain.charAt(0).toUpperCase() + subdomain.slice(1).replace(/-/g, ' ')
+      id: normalizedHostname,
+      slug: slug,
+      name: normalizedHostname
     };
   }
 
   // For custom domains, just use the domain name as identifier
   // The actual resolution will happen in the API or server component
   return {
-    id: hostname,
-    slug: hostname.replace(/\./g, '-'),
-    name: hostname
+    id: normalizedHostname,
+    slug: normalizedHostname.replace(/\./g, '-'),
+    name: normalizedHostname
   };
 };
 

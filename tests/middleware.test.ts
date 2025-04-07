@@ -56,13 +56,13 @@ describe('Middleware', () => {
 
     // Verify the URL was rewritten to include the site slug
     expect(NextResponse.rewrite).toHaveBeenCalled();
-    expect(response.url).toContain('api/sites/hiking-gear/search');
+    expect(response.url).toContain('api/sites/hiking-gear-mydirectory-com/search');
 
     // Verify the original query parameters are preserved
     expect(response.url).toContain('q=test');
 
     // Verify the site slug was added to the headers
-    expect(response.headers.get('x-site-slug')).toBe('hiking-gear');
+    expect(response.headers.get('x-site-slug')).toBe('hiking-gear-mydirectory-com');
   });
 
   it('should not rewrite already site-specific API paths', async () => {
@@ -116,6 +116,55 @@ describe('Middleware', () => {
 
     // Verify the site slug was added to the headers
     expect(response.headers.get('x-site-slug')).toBe('custom-domain-com');
+  });
+
+  it('should handle case-insensitive domains', async () => {
+    // Create a request with mixed case in the domain
+    const request = new NextRequest(new Request('http://CuStOm-DoMaIn.com/api/search?q=test'));
+
+    // Call the middleware
+    const response = await middleware(request);
+
+    // Verify the URL was rewritten to include the site slug (lowercase)
+    expect(NextResponse.rewrite).toHaveBeenCalled();
+    expect(response.url).toContain('api/sites/custom-domain-com/search');
+
+    // Verify the site slug was added to the headers (lowercase)
+    expect(response.headers.get('x-site-slug')).toBe('custom-domain-com');
+  });
+
+  it('should handle subdomains correctly', async () => {
+    // Create a request with a subdomain
+    const request = new NextRequest(new Request('http://blog.custom-domain.com/api/search?q=test'));
+
+    // Call the middleware
+    const response = await middleware(request);
+
+    // Verify the URL was rewritten to include the site slug
+    expect(NextResponse.rewrite).toHaveBeenCalled();
+
+    // The slug should include the subdomain
+    expect(response.url).toContain('api/sites/blog-custom-domain-com/search');
+
+    // Verify the site slug was added to the headers
+    expect(response.headers.get('x-site-slug')).toBe('blog-custom-domain-com');
+  });
+
+  it('should handle different TLDs correctly', async () => {
+    // Create a request with a different TLD
+    const request = new NextRequest(new Request('http://custom-domain.co.uk/api/search?q=test'));
+
+    // Call the middleware
+    const response = await middleware(request);
+
+    // Verify the URL was rewritten to include the site slug
+    expect(NextResponse.rewrite).toHaveBeenCalled();
+
+    // The slug should include the full domain with TLD
+    expect(response.url).toContain('api/sites/custom-domain-co-uk/search');
+
+    // Verify the site slug was added to the headers
+    expect(response.headers.get('x-site-slug')).toBe('custom-domain-co-uk');
   });
 
   it('should handle debug site slug parameter', async () => {
