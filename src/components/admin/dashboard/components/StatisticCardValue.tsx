@@ -15,8 +15,8 @@ export function StatisticCardValue({
   value,
 }: StatisticCardValueProps) {
   return (
-    <div 
-      className="text-2xl sm:text-3xl font-bold text-gray-800"
+    <div
+      className="text-2xl sm:text-3xl font-bold text-gradient"
       data-testid="statistic-card-value"
       aria-label={`${title}: ${value}`}
     >

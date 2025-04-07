@@ -25,7 +25,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
   };
 
   return (
-    <header className="bg-white shadow-sm z-10" data-testid="admin-header">
+    <header className="sticky top-0 bg-white/95 backdrop-blur-md shadow-sm z-10 transition-all duration-300" data-testid="admin-header">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -33,7 +33,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
               {/* Mobile menu button */}
               <button
                 type="button"
-                className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-neutral-500 hover:text-primary-600 hover:bg-neutral-100 focus-visible transition-colors"
                 onClick={toggleSidebar}
                 aria-label="Open sidebar"
               >
@@ -41,7 +41,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
               </button>
 
               <div className="ml-4 md:ml-0">
-                <h1 className="text-xl font-semibold text-gray-900">Admin Portal</h1>
+                <h1 className="text-xl font-bold text-gradient">Admin Portal</h1>
               </div>
             </div>
           </div>
@@ -72,28 +72,33 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
             <div className="relative">
               <button
                 type="button"
-                className="p-1 rounded-full text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="p-2 rounded-full text-neutral-500 hover:text-primary-600 hover:bg-neutral-100 focus-visible transition-colors"
                 onClick={toggleNotifications}
                 aria-expanded={notificationsOpen}
                 aria-haspopup="true"
               >
                 <span className="sr-only">View notifications</span>
-                <BellIcon className="h-6 w-6" />
+                <BellIcon className="h-5 w-5" />
               </button>
 
               {/* Notification dropdown panel */}
               {notificationsOpen && (
                 <div
-                  className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  className="origin-top-right absolute right-0 mt-2 w-80 rounded-xl shadow-lg py-1 bg-white/95 backdrop-blur-sm border border-neutral-100 focus-visible animate-fade-in"
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="user-menu-button"
                 >
-                  <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                  <div className="px-4 py-3 text-sm text-neutral-900 border-b border-neutral-100">
                     <h3 className="font-semibold">Notifications</h3>
                   </div>
-                  <div className="px-4 py-3 text-sm text-gray-700">
-                    <p className="text-center text-gray-500">No new notifications</p>
+                  <div className="px-4 py-4 text-sm text-neutral-700">
+                    <p className="text-center text-neutral-500 flex items-center justify-center">
+                      <svg className="h-5 w-5 mr-2 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                      </svg>
+                      No new notifications
+                    </p>
                   </div>
                 </div>
               )}

@@ -19,25 +19,30 @@ export function StatisticCardHeader({
   onRefresh,
 }: StatisticCardHeaderProps) {
   return (
-    <div className="flex items-center justify-between mb-2">
+    <div className="flex items-center justify-between mb-3">
       <div>
-        <h3 
-          className="text-sm font-medium text-gray-500"
+        <h3
+          className="text-sm font-medium text-neutral-500"
           data-testid="statistic-card-title"
         >
           {title}
         </h3>
         {subtitle && (
-          <p className="text-xs text-gray-400 mt-0.5" data-testid="statistic-card-subtitle">
+          <p className="text-xs text-neutral-400 mt-0.5" data-testid="statistic-card-subtitle">
             {subtitle}
           </p>
         )}
       </div>
       <div className="flex items-center space-x-2">
+        {icon && (
+          <div className="text-primary-500">
+            {icon}
+          </div>
+        )}
         {onRefresh && (
-          <button 
-            onClick={onRefresh} 
-            className="text-gray-400 hover:text-gray-600 p-1"
+          <button
+            onClick={onRefresh}
+            className="text-neutral-400 hover:text-primary-600 p-1 transition-colors"
             aria-label={`Refresh ${title} statistics`}
             data-testid="statistic-card-refresh"
           >
@@ -46,11 +51,7 @@ export function StatisticCardHeader({
             </svg>
           </button>
         )}
-        {icon && (
-          <div className="text-gray-400 p-1 rounded-full bg-gray-50" data-testid="statistic-icon">
-            {icon}
-          </div>
-        )}
+
       </div>
     </div>
   );

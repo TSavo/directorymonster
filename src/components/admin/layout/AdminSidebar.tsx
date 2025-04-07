@@ -45,13 +45,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
 
   // Mobile sidebar backdrop
   const backdropClasses = isOpen
-    ? 'fixed inset-0 bg-gray-600 bg-opacity-75 z-20 transition-opacity ease-linear duration-300'
+    ? 'fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-20 transition-opacity ease-linear duration-300'
     : 'hidden';
 
   // Sidebar positioning
   const sidebarClasses = isOpen
-    ? 'fixed inset-y-0 left-0 flex flex-col w-64 bg-gray-800 z-30 transform transition ease-in-out duration-300'
-    : 'fixed inset-y-0 left-0 flex flex-col w-64 bg-gray-800 z-30 transform -translate-x-full md:translate-x-0 transition ease-in-out duration-300';
+    ? 'fixed inset-y-0 left-0 flex flex-col w-64 bg-gradient-to-b from-primary-900 to-primary-950 z-30 transform transition-all ease-in-out duration-300 shadow-xl'
+    : 'fixed inset-y-0 left-0 flex flex-col w-64 bg-gradient-to-b from-primary-900 to-primary-950 z-30 transform -translate-x-full md:translate-x-0 transition-all ease-in-out duration-300 shadow-xl';
 
   return (
     <>
@@ -64,12 +64,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
 
       {/* Sidebar */}
       <div className={sidebarClasses} data-testid="admin-sidebar">
-        <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 bg-gray-900">
-          <Link href="/admin" className="text-white font-bold text-xl">
+        <div className="flex items-center justify-between h-20 flex-shrink-0 px-6 border-b border-primary-800/30">
+          <Link href="/admin" className="text-white font-bold text-xl text-gradient hover:opacity-90 transition-opacity">
             DirectoryMonster
           </Link>
           <button
-            className="md:hidden text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+            className="md:hidden text-primary-200 hover:text-white focus-visible transition-colors rounded-full p-1 hover:bg-primary-800/30"
             onClick={closeSidebar}
             aria-label="Close sidebar"
           >
@@ -77,8 +77,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
           </button>
         </div>
 
-        <div className="flex-1 flex flex-col overflow-y-auto">
-          <nav className="mt-5 flex-1 px-2 space-y-1" data-testid="admin-navigation">
+        <div className="flex-1 flex flex-col overflow-y-auto py-4">
+          <nav className="flex-1 px-3 space-y-1.5" data-testid="admin-navigation">
             {navigation.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -87,10 +87,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
                   key={item.name}
                   href={item.href}
                   className={`
-                    group flex items-center px-2 py-2 text-sm font-medium rounded-md
+                    group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 hover:-translate-y-0.5
                     ${isActive
-                      ? 'bg-gray-900 text-white'
-                      : 'text-gray-300 hover:bg-gray-700 hover:text-white'}
+                      ? 'bg-primary-800/50 text-white shadow-md'
+                      : 'text-primary-100 hover:bg-primary-800/30 hover:text-white'}
                   `}
                   aria-current={isActive ? 'page' : undefined}
                   onClick={isOpen ? closeSidebar : undefined}
@@ -98,8 +98,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
                 >
                   <item.icon
                     className={`
-                      mr-3 flex-shrink-0 h-6 w-6
-                      ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-300'}
+                      mr-3 flex-shrink-0 h-5 w-5
+                      ${isActive ? 'text-white' : 'text-primary-300 group-hover:text-white'}
                     `}
                   />
                   {item.name}
@@ -109,12 +109,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
           </nav>
         </div>
 
-        <div className="flex-shrink-0 flex border-t border-gray-700 p-4">
+        <div className="flex-shrink-0 flex border-t border-primary-800/30 p-4">
           <Link
             href="/"
-            className="text-gray-300 hover:text-white text-sm"
+            className="text-primary-200 hover:text-white text-sm flex items-center transition-colors focus-visible"
           >
-            ← Return to Site
+            <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Return to Site
           </Link>
         </div>
       </div>

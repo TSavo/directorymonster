@@ -23,7 +23,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   return (
     <TenantSiteProvider>
       <BreadcrumbProvider>
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex h-screen bg-neutral-50">
           {/* Sidebar for larger screens and overlay for mobile when open */}
           <AdminSidebar isOpen={sidebarOpen} closeSidebar={() => setSidebarOpen(false)} />
 
@@ -33,12 +33,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <AdminHeader toggleSidebar={toggleSidebar} />
 
             {/* Main content with breadcrumbs */}
-            <main className="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6" data-testid="admin-main-content">
-              <div className="flex items-center justify-between mb-4">
+            <main className="flex-1 overflow-y-auto bg-neutral-50 p-4 md:p-6" data-testid="admin-main-content">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                 <ContextBreadcrumbs />
                 <QuickActionsMenu />
               </div>
-              <div className="mt-4">
+              <div className="animate-fade-in">
                 {children}
               </div>
             </main>
