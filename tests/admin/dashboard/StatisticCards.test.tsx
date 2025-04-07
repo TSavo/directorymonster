@@ -74,7 +74,7 @@ describe.skip('StatisticCards Component', () => {
       metrics: mockMetrics,
       isLoading: false,
       error: null,
-      refetch: jest.fn(),
+      fetchMetrics: jest.fn(),
     });
   });
 
@@ -101,7 +101,7 @@ describe.skip('StatisticCards Component', () => {
       metrics: null,
       isLoading: true,
       error: null,
-      refetch: jest.fn(),
+      fetchMetrics: jest.fn(),
     });
 
     render(<StatisticCards siteSlug="test-site" />);
@@ -116,7 +116,7 @@ describe.skip('StatisticCards Component', () => {
       metrics: null,
       isLoading: false,
       error: new Error('Test error'),
-      refetch: jest.fn(),
+      fetchMetrics: jest.fn(),
     });
 
     render(<StatisticCards siteSlug="test-site" />);

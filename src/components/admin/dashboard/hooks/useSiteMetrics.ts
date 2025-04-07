@@ -91,11 +91,11 @@ export const useSiteMetrics = ({
       // In a real implementation, this would be an API call
       // const response = await fetch(`/api/sites/${siteSlug}/metrics?period=${period}`);
       // const data = await response.json();
-      
+
       // Using mock data for now
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 800));
-      
+
       const data = getMockSiteMetricsData(siteSlug);
       setMetrics(data);
     } catch (err) {
@@ -109,15 +109,11 @@ export const useSiteMetrics = ({
     fetchMetrics();
   }, [siteSlug, period, startDate, endDate]);
 
-  const refetch = async () => {
-    await fetchMetrics();
-  };
-
   return {
     metrics,
     isLoading,
     error,
-    refetch,
+    fetchMetrics,
   };
 };
 

@@ -137,7 +137,7 @@ export interface UseSiteMetricsResult {
   metrics: SiteMetricsData | null;
   isLoading: boolean;
   error: Error | null;
-  refetch: () => Promise<void>;
+  fetchMetrics: () => Promise<void>;
 }
 
 export interface UseActivityFeedParams {
@@ -171,7 +171,7 @@ export interface UsePerformanceMetricsResult {
   data: PerformanceMetricsData | null;
   isLoading: boolean;
   error: Error | null;
-  refetch: () => Promise<void>;
+  fetchMetrics: () => Promise<void>;
   setPeriod: (period: UsePerformanceMetricsParams['period']) => void;
   setDateRange: (startDate: string, endDate: string) => void;
 }
