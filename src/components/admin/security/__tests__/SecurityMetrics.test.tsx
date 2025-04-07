@@ -23,13 +23,13 @@ describe('SecurityMetrics', () => {
       metrics: mockMetrics,
       isLoading: false,
       error: null,
-      refetch: jest.fn(),
+      fetchMetrics: jest.fn(),
     });
   });
 
   test('renders all security metric cards', () => {
     render(<SecurityMetrics startDate="2023-01-01" endDate="2023-01-31" />);
-    
+
     // Check for all metric cards
     expect(screen.getByText('Total Login Attempts')).toBeInTheDocument();
     expect(screen.getByText('Successful Logins')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('SecurityMetrics', () => {
 
   test('displays correct metric values', () => {
     render(<SecurityMetrics startDate="2023-01-01" endDate="2023-01-31" />);
-    
+
     // Check for metric values
     expect(screen.getByText('100')).toBeInTheDocument(); // Total attempts
     expect(screen.getByText('70')).toBeInTheDocument(); // Successful logins
@@ -56,11 +56,11 @@ describe('SecurityMetrics', () => {
       metrics: null,
       isLoading: true,
       error: null,
-      refetch: jest.fn(),
+      fetchMetrics: jest.fn(),
     });
-    
+
     render(<SecurityMetrics startDate="2023-01-01" endDate="2023-01-31" />);
-    
+
     // Check for loading skeletons
     expect(screen.getAllByTestId('metric-skeleton')).toHaveLength(6);
   });
@@ -70,39 +70,39 @@ describe('SecurityMetrics', () => {
       metrics: null,
       isLoading: false,
       error: new Error('Failed to load security metrics'),
-      refetch: jest.fn(),
+      fetchMetrics: jest.fn(),
     });
-    
+
     render(<SecurityMetrics startDate="2023-01-01" endDate="2023-01-31" />);
-    
+
     expect(screen.getByText('Failed to load security metrics')).toBeInTheDocument();
     expect(screen.getByText('Retry')).toBeInTheDocument();
   });
 
   test('refreshes data when refresh button is clicked', () => {
-    const mockRefetch = jest.fn();
+    const mockFetchMetrics = jest.fn();
     (useSecurityMetrics as jest.Mock).mockReturnValue({
       metrics: mockMetrics,
       isLoading: false,
       error: null,
-      refetch: mockRefetch,
+      fetchMetrics: mockFetchMetrics,
     });
-    
+
     render(<SecurityMetrics startDate="2023-01-01" endDate="2023-01-31" />);
-    
+
     // Find and click refresh button
     const refreshButtons = screen.getAllByLabelText('Refresh');
     fireEvent.click(refreshButtons[0]);
-    
-    expect(mockRefetch).toHaveBeenCalled();
+
+    expect(mockFetchMetrics).toHaveBeenCalled();
   });
 
   test('applies date range correctly', () => {
     const startDate = '2023-01-01';
     const endDate = '2023-01-31';
-    
+
     render(<SecurityMetrics startDate={startDate} endDate={endDate} />);
-    
+
     expect(useSecurityMetrics).toHaveBeenCalledWith(
       expect.objectContaining({
         startDate,
@@ -113,7 +113,7 @@ describe('SecurityMetrics', () => {
 
   test('displays success rate percentage correctly', () => {
     render(<SecurityMetrics startDate="2023-01-01" endDate="2023-01-31" />);
-    
+
     expect(screen.getByText('70%')).toBeInTheDocument(); // Success rate
   });
 });

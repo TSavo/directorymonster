@@ -1,17 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useLoginAttempts, LoginAttemptsFilter, LoginAttempt } from './hooks/useLoginAttempts';
+import { useLoginAttempts } from './hooks/useLoginAttempts';
+import { LoginAttempt, SecurityFilter } from '../../../types/security';
 import { formatDistanceToNow } from 'date-fns';
 
 interface LoginAttemptsTableProps {
-  filter: LoginAttemptsFilter;
+  filter: SecurityFilter;
 }
 
 export const LoginAttemptsTable: React.FC<LoginAttemptsTableProps> = ({ filter }) => {
   const { loginAttempts, isLoading, error, hasMore, loadMore, refresh } = useLoginAttempts({
-    limit: 10,
-    filter,
+    initialFilter: filter,
+    autoFetch: true
   });
 
   const [selectedAttempt, setSelectedAttempt] = useState<LoginAttempt | null>(null);
@@ -65,10 +66,34 @@ export const LoginAttemptsTable: React.FC<LoginAttemptsTableProps> = ({ filter }
     }
   };
 
-  const getStatusClass = (success: boolean) => {
-    return success
-      ? 'bg-green-100 text-green-800'
-      : 'bg-red-100 text-red-800';
+  const getStatusClass = (status: string) => {
+    switch (status) {
+      case 'success':
+        return 'bg-green-100 text-green-800';
+      case 'failure':
+        return 'bg-red-100 text-red-800';
+      case 'blocked':
+        return 'bg-gray-100 text-gray-800';
+      case 'captcha_required':
+        return 'bg-orange-100 text-orange-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'success':
+        return 'Success';
+      case 'failure':
+        return 'Failed';
+      case 'blocked':
+        return 'Blocked';
+      case 'captcha_required':
+        return 'CAPTCHA Required';
+      default:
+        return status;
+    }
   };
 
   if (isLoading && loginAttempts.length === 0) {
@@ -85,7 +110,7 @@ export const LoginAttemptsTable: React.FC<LoginAttemptsTableProps> = ({ filter }
   if (error) {
     return (
       <div className="text-center py-8">
-        <p className="text-red-500 mb-4">{error.message}</p>
+        <p className="text-red-500 mb-4">{error}</p>
         <button
           onClick={refresh}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -135,14 +160,14 @@ export const LoginAttemptsTable: React.FC<LoginAttemptsTableProps> = ({ filter }
                   {attempt.username}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {attempt.ip}
+                  {attempt.ipAddress}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {attempt.location.city}, {attempt.location.country}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(attempt.success)}`}>
-                    {attempt.success ? 'Success' : 'Failed'}
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(attempt.status)}`}>
+                    {getStatusText(attempt.status)}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -208,7 +233,7 @@ export const LoginAttemptsTable: React.FC<LoginAttemptsTableProps> = ({ filter }
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <h3 className="text-lg font-semibold mb-4">Block IP Address</h3>
             <p className="mb-4">
-              Are you sure you want to block the IP address <span className="font-semibold">{selectedAttempt.ip}</span>?
+              Are you sure you want to block the IP address <span className="font-semibold">{selectedAttempt.ipAddress}</span>?
               This will prevent all login attempts from this IP address.
             </p>
             <div className="flex justify-end space-x-2">
@@ -222,7 +247,7 @@ export const LoginAttemptsTable: React.FC<LoginAttemptsTableProps> = ({ filter }
                 Cancel
               </button>
               <button
-                onClick={() => handleBlockIP(selectedAttempt.ip)}
+                onClick={() => handleBlockIP(selectedAttempt.ipAddress)}
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Confirm

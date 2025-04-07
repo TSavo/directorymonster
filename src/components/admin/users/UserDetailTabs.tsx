@@ -23,7 +23,7 @@ export function UserDetailTabs({ userId, activeTab }: UserDetailTabsProps) {
     const fetchUser = async () => {
       try {
         const response = await fetch(`/api/admin/users/${userId}`);
-        
+
         if (response.ok) {
           const data = await response.json();
           setUser(data.user);
@@ -34,7 +34,7 @@ export function UserDetailTabs({ userId, activeTab }: UserDetailTabsProps) {
         setIsLoading(false);
       }
     };
-    
+
     fetchUser();
   }, [userId]);
 
@@ -61,9 +61,9 @@ export function UserDetailTabs({ userId, activeTab }: UserDetailTabsProps) {
             <ArrowLeft className="h-4 w-4" />
             Back to Users
           </Button>
-          
+
           {isLoading ? (
-            <Skeleton className="h-8 w-40" />
+            <Skeleton className="h-8 w-40" data-testid="skeleton" />
           ) : (
             <h1 className="text-2xl font-bold tracking-tight">
               {user?.name || 'User Details'}
@@ -71,7 +71,7 @@ export function UserDetailTabs({ userId, activeTab }: UserDetailTabsProps) {
           )}
         </div>
       </div>
-      
+
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="grid grid-cols-5 w-full max-w-3xl">
           <TabsTrigger value="details" className="flex items-center gap-1">

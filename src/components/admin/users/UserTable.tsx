@@ -4,53 +4,55 @@ import React, { useState } from 'react';
 import { useUsers, User } from './hooks/useUsers';
 import { UserFormModal } from './UserFormModal';
 import { useSites } from '../sites/hooks/useSites';
+import Link from 'next/link';
+import { Shield, Globe, Clock, Lock } from 'lucide-react';
 
 export function UserTable() {
-  const { 
-    users, 
-    isLoading, 
-    error, 
-    createUser, 
-    updateUser, 
-    deleteUser 
+  const {
+    users,
+    isLoading,
+    error,
+    createUser,
+    updateUser,
+    deleteUser
   } = useUsers();
-  
+
   const { sites } = useSites();
-  
+
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
   const [showModal, setShowModal] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const handleAddUser = () => {
     setSelectedUser(undefined);
     setFormError(null);
     setShowModal(true);
   };
-  
+
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
     setFormError(null);
     setShowModal(true);
   };
-  
+
   const handleDeleteUser = async (userId: string) => {
     if (confirm('Are you sure you want to delete this user?')) {
       await deleteUser(userId);
     }
   };
-  
+
   const handleFormSubmit = async (userData: any) => {
     try {
       setIsSubmitting(true);
       setFormError(null);
-      
+
       if (selectedUser) {
         await updateUser(userData);
       } else {
         await createUser(userData);
       }
-      
+
       setShowModal(false);
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'An error occurred');
@@ -58,22 +60,22 @@ export function UserTable() {
       setIsSubmitting(false);
     }
   };
-  
+
   // Map siteIds to site names for display
   const getSiteNames = (siteIds: string[]) => {
     return siteIds
       .map(id => sites.find(site => site.id === id)?.name || id)
       .join(', ');
   };
-  
+
   if (isLoading) {
     return <div className="p-4">Loading users...</div>;
   }
-  
+
   if (error) {
     return <div className="p-4 text-red-600">Error: {error}</div>;
   }
-  
+
   return (
     <div data-testid="user-table-container">
       <div className="flex justify-between items-center mb-4">
@@ -86,7 +88,7 @@ export function UserTable() {
           Add User
         </button>
       </div>
-      
+
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200" data-testid="user-table">
           <thead className="bg-gray-50">
@@ -133,20 +135,50 @@ export function UserTable() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                    <button
-                      onClick={() => handleEditUser(user)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                      data-testid={`edit-user-${user.id}`}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="text-red-600 hover:text-red-900"
-                      data-testid={`delete-user-${user.id}`}
-                    >
-                      Delete
-                    </button>
+                    <div className="flex items-center justify-end space-x-2">
+                      <Link
+                        href={`/admin/users/${user.id}/roles`}
+                        className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                        title="Manage Roles"
+                      >
+                        <Shield className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href={`/admin/users/${user.id}/sites`}
+                        className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                        title="Manage Sites"
+                      >
+                        <Globe className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href={`/admin/users/${user.id}/activities`}
+                        className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                        title="View Activities"
+                      >
+                        <Clock className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href={`/admin/users/${user.id}/permissions`}
+                        className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                        title="View Permissions"
+                      >
+                        <Lock className="h-4 w-4" />
+                      </Link>
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="text-indigo-600 hover:text-indigo-900 ml-2"
+                        data-testid={`edit-user-${user.id}`}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.id)}
+                        className="text-red-600 hover:text-red-900"
+                        data-testid={`delete-user-${user.id}`}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -154,7 +186,7 @@ export function UserTable() {
           </tbody>
         </table>
       </div>
-      
+
       <UserFormModal
         user={selectedUser}
         isOpen={showModal}
