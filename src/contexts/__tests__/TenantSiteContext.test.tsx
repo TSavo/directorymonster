@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, screen, act, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { TenantSiteProvider, useTenantSite } from '../TenantSiteContext';
+import { TenantSiteProvider } from '../TenantSiteContext';
+import { useTenantSite } from '../../hooks/useTenantSite';
 
 // Mock localStorage
 const localStorageMock = (() => {
