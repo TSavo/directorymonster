@@ -8,7 +8,6 @@ import { useAuth } from '@/components/admin/auth/hooks/useAuth';
 import { UnifiedAuthComponent } from '@/components/auth';
 import SearchBar from './SearchBar';
 import { Menu, X, ChevronDown, Search } from 'lucide-react';
-import { ThemeToggle } from '@/components/ui/theme';
 
 interface MainHeaderProps {
   site: {
@@ -129,9 +128,6 @@ export default function MainHeader({ site, categories = [] }: MainHeaderProps) {
           </nav>
 
           <div className="flex items-center space-x-4">
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
             {/* Search Bar - Desktop */}
             <div className="hidden md:block">
               <SearchBar siteId={site.id} />
@@ -278,6 +274,24 @@ export default function MainHeader({ site, categories = [] }: MainHeaderProps) {
           </nav>
         </div>
       </div>
+
+      {/* Keyboard shortcuts */}
+      <KeyboardShortcut
+        combination={{ key: 'm', altKey: true }}
+        onKeyDown={() => setMobileMenuOpen(!mobileMenuOpen)}
+      />
+      {hasMultipleTenants && (
+        <KeyboardShortcut
+          combination={{ key: 't', altKey: true }}
+          onKeyDown={() => setTenantMenuOpen(!tenantMenuOpen)}
+        />
+      )}
+      {hasMultipleSites && (
+        <KeyboardShortcut
+          combination={{ key: 's', altKey: true }}
+          onKeyDown={() => setSiteMenuOpen(!siteMenuOpen)}
+        />
+      )}
     </header>
   );
 }

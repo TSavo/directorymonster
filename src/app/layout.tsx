@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import './globals.css'
 import { resolveTenant } from '../lib/tenant-resolver'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { SkipLink } from '@/components/a11y'
 
 // Generate dynamic metadata based on tenant
 export async function generateMetadata(): Promise<Metadata> {
@@ -103,6 +104,7 @@ export default async function RootLayout({
       </head>
       <body>
         <ThemeProvider>
+          <SkipLink targetId="main-content" />
           {children}
         </ThemeProvider>
       </body>

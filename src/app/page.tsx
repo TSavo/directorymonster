@@ -93,7 +93,7 @@ export default async function Home({ searchParams }: PageProps) {
     const organizationDataStr = JSON.stringify(organizationData);
 
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main id="main-content" className="min-h-screen bg-gray-50" tabIndex={-1}>
         {/* Add structured data */}
         <script
           type="application/ld+json"
@@ -115,10 +115,10 @@ export default async function Home({ searchParams }: PageProps) {
         {site.logoUrl && <meta property="og:image" content={site.logoUrl} />}
 
         {/* Hero section with site name and description */}
-        <div className="bg-white shadow-sm border-b" data-testid="hero-section">
+        <section aria-labelledby="hero-heading" className="bg-white shadow-sm border-b" data-testid="hero-section">
           <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+              <h1 id="hero-heading" className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
                 {site.name}
               </h1>
               <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500">
@@ -132,11 +132,11 @@ export default async function Home({ searchParams }: PageProps) {
               <p>Comprehensive {site.primaryKeyword} reviews, comparisons, and buyer guides.</p>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Categories section */}
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8" data-testid="category-section">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse Categories</h2>
+        <section aria-labelledby="categories-heading" className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8" data-testid="category-section">
+          <h2 id="categories-heading" className="text-3xl font-bold text-gray-900 mb-8">Browse Categories</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" itemScope itemType="https://schema.org/ItemList">
             {categories.filter(category => category !== null).map((category, index) => (
@@ -178,14 +178,14 @@ export default async function Home({ searchParams }: PageProps) {
               </div>
             )}
           </div>
-        </div>
+        </section>
 
         {/* Admin section with lighter visual weight */}
-        <div className="bg-white border-t">
+        <section aria-labelledby="admin-heading" className="bg-white border-t">
           <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-lg font-medium text-gray-900">Platform Administration</h2>
+                <h2 id="admin-heading" className="text-lg font-medium text-gray-900">Platform Administration</h2>
                 <p className="mt-1 text-sm text-gray-500">Access the admin dashboard to manage your directory.</p>
               </div>
               <div className="mt-4 sm:mt-0">
@@ -198,9 +198,9 @@ export default async function Home({ searchParams }: PageProps) {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <footer className="bg-gray-50 border-t" data-testid="site-footer">
+        <footer className="bg-gray-50 border-t" data-testid="site-footer" role="contentinfo">
           <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <p className="text-sm text-gray-500" data-testid="copyright">Last updated: {new Date(site.updatedAt).toLocaleDateString()}</p>
           </div>
@@ -211,7 +211,7 @@ export default async function Home({ searchParams }: PageProps) {
 
   // If no site exists, this is a fresh installation
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main id="main-content" className="min-h-screen bg-gray-50" tabIndex={-1}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="min-h-screen flex flex-col items-center justify-center">
           <div className="text-center mb-12">
