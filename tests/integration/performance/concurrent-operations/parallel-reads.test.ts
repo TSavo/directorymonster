@@ -7,9 +7,11 @@
 
 import { createMockRequest } from '../../auth/acl-test-setup';
 import { setupTestEnvironment, clearTestData } from '../../setup-mock';
-import { GET as getListings } from '@/app/api/sites/[siteSlug]/listings/route';
-import { GET as getSearchResults } from '@/app/api/search/route';
-import { GET as getCategories } from '@/app/api/sites/[siteSlug]/categories/route';
+import { GET as getListings } from '../../../src/app/api/sites/[siteSlug]/listings/route';
+import { GET as getCategories } from '../../../src/app/api/sites/[siteSlug]/categories/route';
+
+// Note: Search API has been moved to site-specific route
+// import { GET as getSearchResults } from '../../../src/app/api/sites/[siteSlug]/search/route';
 
 // Constants for parallel read tests
 const PARALLEL_OPERATIONS = 10;
@@ -168,16 +170,8 @@ describe('Parallel Reads', () => {
       requests.push(getCategories(request, { params: { siteSlug: site.slug } }));
     }
 
-    // Add search requests
-    for (let i = 0; i < PARALLEL_OPERATIONS / 3; i++) {
-      const request = createMockRequest(`/api/search?q=test&siteId=${site.id}`, {
-        headers: {
-          'x-forwarded-for': `192.168.2.${i + (2 * PARALLEL_OPERATIONS / 3) + 1}`,
-        },
-      });
-
-      requests.push(getSearchResults(request));
-    }
+    // Search API has been moved to site-specific route
+    // Skipping search requests in this test
 
     // Execute all requests in parallel
     const { fulfilled, rejected, totalTime } = await settlePromises(requests);

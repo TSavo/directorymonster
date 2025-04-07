@@ -28,7 +28,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Pagination and filters state
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
@@ -37,54 +37,50 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     status: '',
     sortBy: 'relevance',
   });
-  
+
   // Fetch search results when query, siteId, or filters change
   useEffect(() => {
     const fetchResults = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Build search URL with all parameters
         const searchParams = new URLSearchParams();
-        
+
         if (query) {
           searchParams.set('q', query);
         }
-        
-        if (siteId) {
-          searchParams.set('siteId', siteId);
-        }
-        
+
         // Add filter parameters
         if (filters.categoryId) {
           searchParams.set('categoryId', filters.categoryId);
         }
-        
+
         if (filters.featured) {
           searchParams.set('featured', 'true');
         }
-        
+
         if (isAdmin && filters.status) {
           searchParams.set('status', filters.status);
         }
-        
+
         // Add sorting parameter
         searchParams.set('sortBy', filters.sortBy);
-        
+
         // Add pagination parameters
         searchParams.set('page', String(page));
         searchParams.set('perPage', '10');
-        
-        // Fetch search results
-        const response = await fetch(`/api/search?${searchParams.toString()}`);
-        
+
+        // Fetch search results from site-specific endpoint
+        const response = await fetch(`/api/sites/${site.slug}/search?${searchParams.toString()}`);
+
         if (!response.ok) {
           throw new Error('Failed to load search results');
         }
-        
+
         const data = await response.json();
-        
+
         setResults(data.results);
         setTotalResults(data.pagination.totalResults);
         setTotalPages(data.pagination.totalPages);
@@ -94,7 +90,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         setIsLoading(false);
       }
     };
-    
+
     fetchResults();
   }, [query, siteId, filters, page, isAdmin]);
 
@@ -104,7 +100,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     // Scroll to top of results
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  
+
   // Handle filter changes
   const handleFilterChange = (newFilters: {
     categoryId?: string;
@@ -138,7 +134,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           </p>
         )}
       </div>
-      
+
       {/* Search filters */}
       <div className="lg:grid lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1">
@@ -149,7 +145,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             showStatusFilter={isAdmin}
           />
         </div>
-        
+
         <div className="lg:col-span-3">
           {/* Loading state */}
           {isLoading && (
@@ -179,7 +175,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             <div className="space-y-6">
               <div className="grid gap-6 grid-cols-1">
                 {results.map((listing) => (
-                  <ListingCard 
+                  <ListingCard
                     key={listing.id}
                     listing={listing}
                     site={site}
@@ -203,7 +199,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                     >
                       Previous
                     </button>
-                    
+
                     {pageNumbers.map((number) => (
                       <button
                         key={number}
@@ -219,7 +215,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                         {number}
                       </button>
                     ))}
-                    
+
                     <button
                       onClick={() => handlePageChange(page + 1)}
                       disabled={page === totalPages}

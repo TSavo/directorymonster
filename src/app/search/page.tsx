@@ -9,7 +9,6 @@ import { currentUser } from '@/lib/auth';
 interface SearchPageProps {
   searchParams: {
     q?: string;
-    siteId?: string;
   };
 }
 
@@ -17,72 +16,64 @@ export async function generateMetadata(
   { searchParams }: SearchPageProps
 ): Promise<Metadata> {
   const { q } = searchParams;
-  
+
   return {
     title: q ? `Search Results for "${q}"` : 'Search',
-    description: q 
+    description: q
       ? `Search results for "${q}" in our directory`
       : 'Search our directory for products, services, and information',
   };
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const { q, siteId } = searchParams;
-  
+  const { q } = searchParams;
+
   // Get the current site from the request
   const site = await getSiteFromRequest();
-  
-  // If siteId is provided, use that instead
-  let activeSite = site;
-  if (siteId) {
-    const siteById = await kv.get<SiteConfig>(`site:id:${siteId}`);
-    if (siteById) {
-      activeSite = siteById;
-    }
-  }
-  
+  const activeSite = site;
+
   // Get all categories for this site
   const allCategoriesKeys = await kv.keys(categoryKeys.allForSite(activeSite.id));
   const categories: Category[] = [];
-  
+
   if (allCategoriesKeys.length > 0) {
     const categoryPromises = allCategoriesKeys.map(key => kv.get<Category>(key));
     const categoryResults = await Promise.all(categoryPromises);
-    
+
     categoryResults.forEach(category => {
       if (category) {
         categories.push(category);
       }
     });
-    
+
     // Sort categories by name
     categories.sort((a, b) => a.name.localeCompare(b.name));
   }
-  
+
   // Check if user is admin
   const user = await currentUser();
   const isAdmin = user && (
-    user.isAdmin || 
+    user.isAdmin ||
     (user.adminSites && user.adminSites.includes(activeSite.id))
   );
-  
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="space-y-8">
         {/* Search form */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Search</h1>
-          <SearchForm 
+          <SearchForm
             siteId={activeSite.id}
             placeholder="Search for products, services, or keywords..."
             className="max-w-2xl"
           />
         </div>
-        
+
         {/* Search results */}
         {q ? (
-          <SearchResults 
-            query={q} 
+          <SearchResults
+            query={q}
             siteId={activeSite.id}
             site={activeSite}
             categories={categories}
