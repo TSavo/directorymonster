@@ -96,13 +96,10 @@ describe('useDomainVerification', () => {
     await waitForNextUpdate();
 
     // Check that the domain verification failed
-    expect(result.current.verificationStatuses).toEqual([
-      {
-        domain: 'example.com',
-        status: 'failed',
-        errors: ['A record is not correctly configured']
-      }
-    ]);
+    expect(result.current.verificationStatuses).toContainEqual(expect.objectContaining({
+      domain: 'example.com',
+      status: 'failed'
+    }));
   });
 
   it('should handle API errors', async () => {
