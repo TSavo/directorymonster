@@ -3,6 +3,10 @@ import { kv } from '@/lib/redis-client';
 import { getSiteByHostname } from '@/lib/site-utils';
 import { SiteConfig } from '@/types';
 
+/**
+ * @deprecated This API is deprecated and will be removed in a future version.
+ * Please use the site-specific API instead: /api/sites/[siteSlug]/info
+ */
 export async function GET(request: NextRequest) {
     try {
         // Get the host from the request headers
@@ -61,6 +65,7 @@ export async function GET(request: NextRequest) {
         } : { match: false };
 
         return NextResponse.json({
+            deprecationNotice: 'This API is deprecated. Please use /api/sites/[siteSlug]/info instead.',
             requestedHostname: hostname,
             originalHost: host,
             hostnameParam,
@@ -85,6 +90,7 @@ export async function GET(request: NextRequest) {
 
         // Return a fallback response even if errors occur
         return NextResponse.json({
+            deprecationNotice: 'This API is deprecated. Please use /api/sites/[siteSlug]/info instead.',
             requestedHostname: request.headers.get('host') || 'unknown',
             error: 'Error processing request',
             site: null,
