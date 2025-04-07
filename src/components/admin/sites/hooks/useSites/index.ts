@@ -125,7 +125,7 @@ export const useSites = (options: UseSitesOptions = {}): UseSitesReturn => {
     }
   }, [apiEndpoint, filters]);
 
-  // Refresh sites list
+  // Refresh sites list (alias for fetchSites that doesn't return anything)
   const refreshSites = useCallback(async (): Promise<void> => {
     await fetchSites();
   }, [fetchSites]);

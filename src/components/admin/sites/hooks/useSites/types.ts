@@ -95,5 +95,9 @@ export interface UseSitesReturn {
   // Loading and fetching
   fetchSite: (id: string) => Promise<SiteData | null>;
   fetchSites: () => Promise<SiteData[]>;
+  /**
+   * Alias for fetchSites that doesn't return anything
+   * @deprecated Consider using fetchSites directly instead
+   */
   refreshSites: () => Promise<void>;
 }
