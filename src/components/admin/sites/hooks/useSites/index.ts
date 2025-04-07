@@ -125,10 +125,7 @@ export const useSites = (options: UseSitesOptions = {}): UseSitesReturn => {
     }
   }, [apiEndpoint, filters]);
 
-  // Refresh sites list (alias for fetchSites that doesn't return anything)
-  const refreshSites = useCallback(async (): Promise<void> => {
-    await fetchSites();
-  }, [fetchSites]);
+  // Note: refreshSites method has been removed - use fetchSites directly instead
 
   // Create a new site
   const createSite = useCallback(async () => {
@@ -263,7 +260,7 @@ export const useSites = (options: UseSitesOptions = {}): UseSitesReturn => {
 
       if (result.success) {
         setSuccess('Site deleted successfully');
-        refreshSites(); // Refresh sites list after deletion
+        fetchSites(); // Refresh sites list after deletion
 
         // Show success notification if notification system is enabled
         if (useNotificationsSystem) {
@@ -297,7 +294,7 @@ export const useSites = (options: UseSitesOptions = {}): UseSitesReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [apiEndpoint, refreshSites, useNotificationsSystem, notificationSystem]);
+  }, [apiEndpoint, fetchSites, useNotificationsSystem, notificationSystem]);
 
   return {
     // Single site state
@@ -329,8 +326,7 @@ export const useSites = (options: UseSitesOptions = {}): UseSitesReturn => {
 
     // Loading and fetching
     fetchSite,
-    fetchSites,
-    refreshSites
+    fetchSites
   };
 };
 

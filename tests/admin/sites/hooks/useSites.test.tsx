@@ -344,7 +344,7 @@ describe('useSites Hook - API Integration', () => {
     expect(result.current.isLoading).toBe(false);
   });
 
-  it('refreshes sites list using fetchSites', async () => {
+  it('fetches sites list', async () => {
     // Clear previous mock calls
     jest.clearAllMocks();
 
@@ -356,7 +356,7 @@ describe('useSites Hook - API Integration', () => {
 
     const { result } = renderHook(() => useSites());
 
-    // Refresh sites using fetchSites directly
+    // Fetch sites
     await act(async () => {
       await result.current.fetchSites();
     });
