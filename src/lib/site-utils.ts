@@ -18,7 +18,36 @@ export async function getHostname(): Promise<string | null> {
 }
 
 /**
+ * Get site slug from request headers in server component
+ * This is set by the middleware based on hostname or debug parameters
+ */
+export async function getSiteSlug(): Promise<string | null> {
+  try {
+    // This works on the server side to get the site slug from headers
+    const { headers } = await import('next/headers');
+    const headersList = headers();
+    const siteSlug = headersList.get('x-site-slug');
+    return siteSlug;
+  } catch (error) {
+    console.error('Error getting site slug from headers:', error);
+    return null;
+  }
+}
+
+/**
+ * Get site configuration based on site slug
+ * This is the preferred method for getting site configuration
+ */
+export async function getSiteBySiteSlug(siteSlug: string): Promise<SiteConfig | null> {
+  if (!siteSlug) return null;
+
+  // Query the database for the site configuration
+  return await kv.get<SiteConfig>(`site:slug:${siteSlug}`);
+}
+
+/**
  * Get site configuration based on hostname
+ * @deprecated Use getSiteBySiteSlug with the site slug from request headers instead
  */
 export async function getSiteByHostname(hostname: string): Promise<SiteConfig | null> {
   // Normalize hostname by removing port and protocol if present
@@ -133,6 +162,27 @@ export async function getSiteByHostname(hostname: string): Promise<SiteConfig | 
   if (site) return site;
 
   console.log(`DEBUG: No site found for hostname: "${normalizedHostname}"`);
+  return null;
+}
+
+/**
+ * Get site configuration from the request context
+ * This is the recommended way to get the current site in server components
+ */
+export async function getCurrentSite(): Promise<SiteConfig | null> {
+  // First, try to get the site slug from request headers
+  const siteSlug = await getSiteSlug();
+  if (siteSlug) {
+    // If we have a site slug, get the site configuration
+    return await getSiteBySiteSlug(siteSlug);
+  }
+
+  // Fallback to hostname-based resolution
+  const hostname = await getHostname();
+  if (hostname) {
+    return await getSiteByHostname(hostname);
+  }
+
   return null;
 }
 
