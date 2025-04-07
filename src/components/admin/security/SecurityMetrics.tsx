@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { useSecurityMetrics } from './hooks/useSecurityMetrics';
-import { 
-  ShieldCheckIcon, 
-  ShieldExclamationIcon, 
-  LockClosedIcon, 
+import {
+  ShieldCheckIcon,
+  ShieldExclamationIcon,
+  LockClosedIcon,
   XCircleIcon,
   PuzzlePieceIcon,
   ExclamationTriangleIcon,
@@ -18,14 +18,14 @@ interface SecurityMetricsProps {
 }
 
 export const SecurityMetrics: React.FC<SecurityMetricsProps> = ({ startDate, endDate }) => {
-  const { metrics, isLoading, error, refetch } = useSecurityMetrics({ startDate, endDate });
+  const { metrics, isLoading, error, fetchMetrics } = useSecurityMetrics({ startDate, endDate });
 
   if (error) {
     return (
       <div className="text-center py-8">
         <p className="text-red-500 mb-4">{error.message}</p>
         <button
-          onClick={refetch}
+          onClick={fetchMetrics}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Retry
@@ -54,8 +54,8 @@ export const SecurityMetrics: React.FC<SecurityMetricsProps> = ({ startDate, end
                 <LockClosedIcon className="h-5 w-5 text-blue-500 mr-2" />
                 <h3 className="text-sm font-medium text-gray-700">Total Login Attempts</h3>
               </div>
-              <button 
-                onClick={refetch}
+              <button
+                onClick={fetchMetrics}
                 className="text-gray-400 hover:text-gray-600"
                 aria-label="Refresh"
               >
@@ -84,8 +84,8 @@ export const SecurityMetrics: React.FC<SecurityMetricsProps> = ({ startDate, end
                 <ShieldCheckIcon className="h-5 w-5 text-green-500 mr-2" />
                 <h3 className="text-sm font-medium text-gray-700">Successful Logins</h3>
               </div>
-              <button 
-                onClick={refetch}
+              <button
+                onClick={fetchMetrics}
                 className="text-gray-400 hover:text-gray-600"
                 aria-label="Refresh"
               >
@@ -97,8 +97,8 @@ export const SecurityMetrics: React.FC<SecurityMetricsProps> = ({ startDate, end
               <p className="ml-2 text-sm font-medium text-green-600">{successRate}%</p>
             </div>
             <div className="mt-1 w-full bg-gray-200 rounded-full h-1.5">
-              <div 
-                className="bg-green-500 h-1.5 rounded-full" 
+              <div
+                className="bg-green-500 h-1.5 rounded-full"
                 style={{ width: `${successRate}%` }}
               ></div>
             </div>
@@ -120,8 +120,8 @@ export const SecurityMetrics: React.FC<SecurityMetricsProps> = ({ startDate, end
                 <XCircleIcon className="h-5 w-5 text-red-500 mr-2" />
                 <h3 className="text-sm font-medium text-gray-700">Failed Logins</h3>
               </div>
-              <button 
-                onClick={refetch}
+              <button
+                onClick={fetchMetrics}
                 className="text-gray-400 hover:text-gray-600"
                 aria-label="Refresh"
               >
@@ -133,8 +133,8 @@ export const SecurityMetrics: React.FC<SecurityMetricsProps> = ({ startDate, end
               <p className="ml-2 text-sm font-medium text-red-600">{failureRate}%</p>
             </div>
             <div className="mt-1 w-full bg-gray-200 rounded-full h-1.5">
-              <div 
-                className="bg-red-500 h-1.5 rounded-full" 
+              <div
+                className="bg-red-500 h-1.5 rounded-full"
                 style={{ width: `${failureRate}%` }}
               ></div>
             </div>
@@ -156,8 +156,8 @@ export const SecurityMetrics: React.FC<SecurityMetricsProps> = ({ startDate, end
                 <ShieldExclamationIcon className="h-5 w-5 text-orange-500 mr-2" />
                 <h3 className="text-sm font-medium text-gray-700">Blocked Attempts</h3>
               </div>
-              <button 
-                onClick={refetch}
+              <button
+                onClick={fetchMetrics}
                 className="text-gray-400 hover:text-gray-600"
                 aria-label="Refresh"
               >
@@ -186,8 +186,8 @@ export const SecurityMetrics: React.FC<SecurityMetricsProps> = ({ startDate, end
                 <PuzzlePieceIcon className="h-5 w-5 text-purple-500 mr-2" />
                 <h3 className="text-sm font-medium text-gray-700">CAPTCHA Challenges</h3>
               </div>
-              <button 
-                onClick={refetch}
+              <button
+                onClick={fetchMetrics}
                 className="text-gray-400 hover:text-gray-600"
                 aria-label="Refresh"
               >
@@ -216,8 +216,8 @@ export const SecurityMetrics: React.FC<SecurityMetricsProps> = ({ startDate, end
                 <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500 mr-2" />
                 <h3 className="text-sm font-medium text-gray-700">High Risk IPs</h3>
               </div>
-              <button 
-                onClick={refetch}
+              <button
+                onClick={fetchMetrics}
                 className="text-gray-400 hover:text-gray-600"
                 aria-label="Refresh"
               >

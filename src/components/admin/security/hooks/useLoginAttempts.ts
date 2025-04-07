@@ -1,163 +1,168 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-
-export interface LoginAttempt {
-  id: string;
-  timestamp: string;
-  username: string;
-  ip: string;
-  userAgent: string;
-  success: boolean;
-  ipRiskLevel: string;
-  location: {
-    country: string;
-    city: string;
-    latitude: number;
-    longitude: number;
-  };
-  details?: Record<string, any>;
-}
-
-export interface LoginAttemptsFilter {
-  status?: string[];
-  ipRiskLevel?: string[];
-  userId?: string;
-  startDate?: string;
-  endDate?: string;
-}
+import { useState, useCallback, useEffect } from 'react';
+import { LoginAttempt, SecurityFilter } from '../../../../types/security';
+import { fetchLoginAttempts as fetchLoginAttemptsApi, blockIpAddress } from '../../../../services/securityService';
 
 export interface UseLoginAttemptsProps {
-  limit?: number;
-  filter?: LoginAttemptsFilter;
+  initialFilter?: SecurityFilter;
+  autoFetch?: boolean;
+  fetchApi?: typeof fetchLoginAttemptsApi;
+  blockIpApi?: typeof blockIpAddress;
+  defaultPageSize?: number;
 }
 
-export function useLoginAttempts({ limit = 10, filter = {} }: UseLoginAttemptsProps) {
+/**
+ * Hook for managing login attempts data with pagination and filtering
+ */
+export function useLoginAttempts(props?: UseLoginAttemptsProps) {
+  const {
+    initialFilter = {},
+    autoFetch = true,
+    fetchApi = fetchLoginAttemptsApi,
+    blockIpApi = blockIpAddress,
+    defaultPageSize = 10
+  } = props || {};
+
+  const [filter, setFilter] = useState<SecurityFilter>(initialFilter);
   const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState<boolean>(false);
-  const [offset, setOffset] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize] = useState<number>(defaultPageSize);
 
-  // Use a ref to track if this is the first render
-  const isFirstRender = useRef(true);
-
-  // Use a ref to track the previous filter to avoid unnecessary fetches
-  const prevFilterRef = useRef<string>('');
-  const prevLimitRef = useRef<number>(limit);
-
-  const fetchLoginAttempts = useCallback(async (reset: boolean = true) => {
-    console.log('[useLoginAttempts] fetchLoginAttempts called, reset:', reset, 'filter:', JSON.stringify(filter), 'limit:', limit, 'offset:', offset);
+  /**
+   * Fetch login attempts with optional filtering
+   */
+  const fetchLoginAttempts = useCallback(async (newFilter?: SecurityFilter) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Build query string
-      const queryParams = new URLSearchParams();
-      queryParams.append('limit', limit.toString());
-
-      if (!reset) {
-        queryParams.append('offset', offset.toString());
+      // Update the filter state if a new filter is provided
+      if (newFilter) {
+        setFilter(newFilter);
       }
 
-      if (filter.startDate) queryParams.append('startDate', filter.startDate);
-      if (filter.endDate) queryParams.append('endDate', filter.endDate);
-
-      if (filter.status && filter.status.length > 0) {
-        filter.status.forEach(status => {
-          queryParams.append('status', status);
-        });
+      // Reset page if filter changes
+      if (newFilter && newFilter !== filter) {
+        setPage(1);
       }
 
-      if (filter.ipRiskLevel && filter.ipRiskLevel.length > 0) {
-        filter.ipRiskLevel.forEach(level => {
-          queryParams.append('ipRiskLevel', level);
-        });
-      }
+      // Combine filter with pagination
+      const queryFilter = {
+        ...newFilter || filter,
+        page: 1,
+        pageSize
+      };
 
-      if (filter.userId) queryParams.append('userId', filter.userId);
+      const data = await fetchApi(queryFilter);
 
-      const url = `/api/admin/security/login-attempts?${queryParams.toString()}`;
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Error fetching login attempts: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('[useLoginAttempts] Data fetched successfully:', data.loginAttempts.length, 'attempts, hasMore:', data.hasMore);
-
-      if (reset) {
-        setLoginAttempts(data.loginAttempts);
-        setOffset(data.loginAttempts.length);
-        console.log('[useLoginAttempts] Reset data and set offset to:', data.loginAttempts.length);
-      } else {
-        setLoginAttempts(prev => [...prev, ...data.loginAttempts]);
-        setOffset(prev => prev + data.loginAttempts.length);
-        console.log('[useLoginAttempts] Appended data and increased offset by:', data.loginAttempts.length);
-      }
-
-      setHasMore(data.hasMore);
+      setLoginAttempts(data);
+      setHasMore(data.length === pageSize);
+      return data;
     } catch (err) {
-      console.error('[useLoginAttempts] Error fetching data:', err);
-      setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+      console.error('Error fetching login attempts:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch login attempts';
+      setError(errorMessage);
+      return [];
     } finally {
-      console.log('[useLoginAttempts] Fetch operation completed, setting isLoading to false');
       setIsLoading(false);
     }
-  }, [limit, offset, filter]);
+  }, [filter, pageSize, fetchApi]);
 
+  /**
+   * Load more login attempts (pagination)
+   */
+  const loadMore = useCallback(async () => {
+    if (isLoading || !hasMore) return [];
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const nextPage = page + 1;
+
+      // Combine filter with pagination
+      const queryFilter = {
+        ...filter,
+        page: nextPage,
+        pageSize
+      };
+
+      const data = await fetchApi(queryFilter);
+
+      setLoginAttempts(prev => [...prev, ...data]);
+      setHasMore(data.length === pageSize);
+      setPage(nextPage);
+      return data;
+    } catch (err) {
+      console.error('Error loading more login attempts:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load more login attempts';
+      setError(errorMessage);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  }, [filter, hasMore, isLoading, page, pageSize, fetchApi]);
+
+  /**
+   * Refresh the data with current filters
+   */
+  const refresh = useCallback(() => {
+    return fetchLoginAttempts(filter);
+  }, [fetchLoginAttempts, filter]);
+
+  /**
+   * Block an IP address
+   */
+  const blockIp = useCallback(async (ip: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await blockIpApi(ip);
+
+      // Update the local state to reflect the blocked IP
+      setLoginAttempts(prev =>
+        prev.map(attempt =>
+          attempt.ipAddress === ip
+            ? { ...attempt, status: 'blocked' }
+            : attempt
+        )
+      );
+
+      return true;
+    } catch (err) {
+      console.error('Error blocking IP:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to block IP';
+      setError(errorMessage);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [blockIpApi]);
+
+  // Auto-fetch on mount or when filter changes
   useEffect(() => {
-    // Convert filter to string for comparison
-    const filterString = JSON.stringify(filter);
-
-    console.log('[useLoginAttempts] Effect triggered, filter:', filterString, 'limit:', limit);
-
-    // Only fetch if this is the first render or if the filter or limit has changed
-    if (isFirstRender.current ||
-        filterString !== prevFilterRef.current ||
-        limit !== prevLimitRef.current) {
-
-      // Update refs
-      isFirstRender.current = false;
-      prevFilterRef.current = filterString;
-      prevLimitRef.current = limit;
-
-      // Reset offset and fetch data
-      setOffset(0);
-      fetchLoginAttempts(true);
+    if (autoFetch) {
+      fetchLoginAttempts();
     }
-
-    // Cleanup function to help with debugging
-    return () => {
-      console.log('[useLoginAttempts] Effect cleanup, filter was:', filterString, 'limit was:', limit);
-    };
-  }, [fetchLoginAttempts, filter, limit]);
-
-  const loadMore = async () => {
-    if (!isLoading && hasMore) {
-      await fetchLoginAttempts(false);
-    }
-  };
-
-  const refresh = async () => {
-    setOffset(0);
-    await fetchLoginAttempts(true);
-  };
+  }, [autoFetch, fetchLoginAttempts]);
 
   return {
     loginAttempts,
     isLoading,
     error,
     hasMore,
+    fetchLoginAttempts,
     loadMore,
     refresh,
+    blockIp,
+    // Expose these for testing
+    filter,
+    page,
+    pageSize
   };
 }
