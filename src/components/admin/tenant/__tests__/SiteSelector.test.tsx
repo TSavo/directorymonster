@@ -5,13 +5,20 @@ import { SiteSelector } from '../SiteSelector';
 import { TenantSiteProvider } from '../../../../contexts/TenantSiteContext';
 
 // Mock the useTenantSite hook
-jest.mock('../../../../contexts/TenantSiteContext', () => ({
-  TenantSiteProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+jest.mock('../../../../hooks/useTenantSite', () => ({
   useTenantSite: jest.fn()
 }));
 
+// Mock the TenantSiteContext provider
+jest.mock('../../../../contexts/TenantSiteContext', () => ({
+  TenantSiteProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  TenantSiteContext: {
+    Provider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+  }
+}));
+
 // Import the mocked hook
-import { useTenantSite } from '../../../../contexts/TenantSiteContext';
+import { useTenantSite } from '../../../../hooks/useTenantSite';
 
 describe('SiteSelector', () => {
   // Reset mocks before each test
@@ -30,7 +37,7 @@ describe('SiteSelector', () => {
     });
 
     render(<SiteSelector />);
-    
+
     // The component should not render anything
     expect(screen.queryByTestId('site-selector')).not.toBeInTheDocument();
   });
@@ -49,7 +56,7 @@ describe('SiteSelector', () => {
     });
 
     render(<SiteSelector />);
-    
+
     // The component should render a dropdown
     expect(screen.getByTestId('site-selector')).toBeInTheDocument();
     expect(screen.getByTestId('site-selector-current')).toHaveTextContent('Site 1');
@@ -70,13 +77,13 @@ describe('SiteSelector', () => {
     });
 
     render(<SiteSelector />);
-    
+
     // Open the dropdown
     fireEvent.click(screen.getByTestId('site-selector-button'));
-    
+
     // Select the second site
     fireEvent.click(screen.getByTestId('site-option-site-2'));
-    
+
     // Check if setCurrentSiteId was called with the correct site ID
     expect(mockSetCurrentSiteId).toHaveBeenCalledWith('site-2');
   });
@@ -92,7 +99,7 @@ describe('SiteSelector', () => {
     });
 
     render(<SiteSelector />);
-    
+
     // Should show loading indicator
     expect(screen.getByTestId('site-selector-loading')).toBeInTheDocument();
   });

@@ -5,13 +5,20 @@ import { TenantSelector } from '../TenantSelector';
 import { TenantSiteProvider } from '../../../../contexts/TenantSiteContext';
 
 // Mock the useTenantSite hook
-jest.mock('../../../../contexts/TenantSiteContext', () => ({
-  TenantSiteProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+jest.mock('../../../../hooks/useTenantSite', () => ({
   useTenantSite: jest.fn()
 }));
 
+// Mock the TenantSiteContext provider
+jest.mock('../../../../contexts/TenantSiteContext', () => ({
+  TenantSiteProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  TenantSiteContext: {
+    Provider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+  }
+}));
+
 // Import the mocked hook
-import { useTenantSite } from '../../../../contexts/TenantSiteContext';
+import { useTenantSite } from '../../../../hooks/useTenantSite';
 
 describe('TenantSelector', () => {
   // Reset mocks before each test
