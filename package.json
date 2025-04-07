@@ -48,6 +48,7 @@
     "test:verify": "powershell -File scripts/verify-all.ps1",
     "test:unit": "jest \"tests/unit/**/*.test.ts\"",
     "test:integration": "jest \"tests/integration/**/*.test.ts\" \"tests/multitenancy-integration.test.ts\" \"tests/page-rendering.test.ts\"",
+    "test:critical-paths": "jest \"tests/integration/critical-paths/**/*.test.tsx\"",
     "test:api": "jest \"tests/api/**/*.test.ts\"",
     "test:components": "jest \"tests/admin/**/*.test.tsx\"",
     "test:components:categories": "jest \"tests/admin/categories/**/*.test.tsx\"",
