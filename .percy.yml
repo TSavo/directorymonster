@@ -1,0 +1,20 @@
+version: 2
+snapshot:
+  widths:
+    - 375  # Mobile
+    - 768  # Tablet
+    - 1280 # Desktop
+  minHeight: 1024
+  percyCSS: |
+    /* Hide elements that may cause flakiness in snapshots */
+    .date-time, .timestamp, [data-testid="timestamp"] {
+      visibility: hidden !important;
+    }
+discovery:
+  allowedHostnames: []
+  disallowedHostnames: []
+  networkIdleTimeout: 100
+upload:
+  files: "**/*.{png,jpg,jpeg}"
+  ignore: ""
+  stripExtensions: false
