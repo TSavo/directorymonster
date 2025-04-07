@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { GET as getSearch } from '@/app/api/search/route';
+import { GET as getSearch } from '@/app/api/sites/[siteSlug]/search/route';
 import { POST as createListing } from '@/app/api/sites/[siteSlug]/listings/route';
 import { searchIndexer } from '@/lib/search-indexer';
 import { setupTestEnvironment, clearTestData, createMockRequest, wait } from '../setup';
@@ -125,11 +125,11 @@ describe('Search Indexing and Retrieval', () => {
     // Define a unique search query
     const uniqueQuery = 'xylophone';
 
-    // Create a mock request for the search API
-    const request = createMockRequest(`/api/search?q=${uniqueQuery}&siteId=site1`);
+    // Create a mock request for the site-specific search API
+    const request = createMockRequest(`/api/sites/test-site/search?q=${uniqueQuery}`);
 
     // Call the search API endpoint
-    const response = await getSearch(request);
+    const response = await getSearch(request, { params: { siteSlug: 'test-site' } });
 
     // Verify response is successful
     expect(response.status).toBe(200);
@@ -180,9 +180,9 @@ describe('Search Indexing and Retrieval', () => {
     };
     await searchIndexer.indexListing(listing2 as any);
 
-    // Search with site filter for site 1
-    const request1 = createMockRequest(`/api/search?q=${commonKeyword}&siteId=${site1.id}`);
-    const response1 = await getSearch(request1);
+    // Search with site-specific endpoint for site 1
+    const request1 = createMockRequest(`/api/sites/${site1.slug}/search?q=${commonKeyword}`);
+    const response1 = await getSearch(request1, { params: { siteSlug: site1.slug } });
     const data1 = await response1.json();
 
     // Verify results are filtered to site 1
@@ -197,9 +197,9 @@ describe('Search Indexing and Retrieval', () => {
       expect(data1.pagination).toBeDefined();
     }
 
-    // Search with site filter for site 2
-    const request2 = createMockRequest(`/api/search?q=${commonKeyword}&siteId=${site2.id}`);
-    const response2 = await getSearch(request2);
+    // Search with site-specific endpoint for site 2
+    const request2 = createMockRequest(`/api/sites/${site2.slug}/search?q=${commonKeyword}`);
+    const response2 = await getSearch(request2, { params: { siteSlug: site2.slug } });
     const data2 = await response2.json();
 
     // Verify results are filtered to site 2

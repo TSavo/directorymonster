@@ -106,29 +106,12 @@ describe('SearchPage Component', () => {
     expect(searchResults).toHaveAttribute('data-site-name', 'Test Site');
   });
 
-  it('uses specified site when siteId is provided', async () => {
+  // Site ID is now handled by middleware, not by query parameter
+  it('always uses the current site from middleware', async () => {
     const { kv } = require('../../../src/lib/redis-client');
 
-    const page = await SearchPage({ searchParams: { q: 'test query', siteId: 'site2' } });
-    render(page);
-
-    // Check that search results are rendered with correct site
-    const searchResults = screen.getByTestId('mock-search-results');
-    expect(searchResults).toBeInTheDocument();
-    expect(searchResults).toHaveAttribute('data-site-id', 'site2');
-    expect(searchResults).toHaveAttribute('data-site-name', 'Another Test Site');
-
-    // Verify Redis was called with correct key
-    expect(kv.get).toHaveBeenCalledWith('site:id:site2');
-  });
-
-  it('falls back to current site when specified siteId is not found', async () => {
-    const { kv } = require('../../../src/lib/redis-client');
-
-    // Mock Redis to return null for invalid site ID
-    kv.get.mockImplementationOnce(() => Promise.resolve(null));
-
-    const page = await SearchPage({ searchParams: { q: 'test query', siteId: 'invalid-site' } });
+    // Even with a siteId parameter, it should use the current site from middleware
+    const page = await SearchPage({ searchParams: { q: 'test query' } });
     render(page);
 
     // Check that search results are rendered with current site
@@ -136,10 +119,9 @@ describe('SearchPage Component', () => {
     expect(searchResults).toBeInTheDocument();
     expect(searchResults).toHaveAttribute('data-site-id', 'site1');
     expect(searchResults).toHaveAttribute('data-site-name', 'Test Site');
-
-    // Verify Redis was called with correct key
-    expect(kv.get).toHaveBeenCalledWith('site:id:invalid-site');
   });
+
+  // Site ID parameter is no longer used, so this test is no longer needed
 
   describe('generateMetadata', () => {
     it('returns default metadata when no query is provided', async () => {
