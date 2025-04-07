@@ -12,7 +12,8 @@ import {
   SettingsIcon,
   ChartIcon,
   CloseIcon,
-  ShieldIcon
+  ShieldIcon,
+  InboxIcon
 } from './icons';
 
 interface AdminSidebarProps {
@@ -29,6 +30,7 @@ interface NavigationItem {
 const navigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
   { name: 'Listings', href: '/admin/listings', icon: ListIcon },
+  { name: 'Submissions', href: '/admin/submissions', icon: InboxIcon },
   { name: 'Categories', href: '/admin/categories', icon: FolderIcon },
   { name: 'Sites', href: '/admin/sites', icon: GlobeIcon },
   { name: 'Users', href: '/admin/users', icon: UsersIcon },
