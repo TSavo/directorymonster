@@ -59,6 +59,30 @@ describe('DomainSetupGuide', () => {
     expect(mockProps.onVerify).toHaveBeenCalledTimes(1);
   });
 
+  it('handles copy to clipboard functionality', () => {
+    // Mock clipboard API
+    const originalClipboard = navigator.clipboard;
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: jest.fn() },
+      writable: true
+    });
+
+    render(<DomainSetupGuide {...mockProps} />);
+
+    // Find and click the copy buttons
+    const copyButtons = screen.getAllByText('Copy');
+    fireEvent.click(copyButtons[0]); // Copy A record
+
+    // Verify clipboard was called
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('76.76.21.21');
+
+    // Restore original clipboard
+    Object.defineProperty(navigator, 'clipboard', {
+      value: originalClipboard,
+      writable: true
+    });
+  });
+
   it('disables the verify button when isVerifying is true', () => {
     render(<DomainSetupGuide {...mockProps} isVerifying={true} />);
 
