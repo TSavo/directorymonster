@@ -95,7 +95,8 @@ const mockUseSites = {
   setFilters: jest.fn(),
   fetchSite: jest.fn().mockResolvedValue({}),
   fetchSites: jest.fn().mockResolvedValue([]),
-  refreshSites: jest.fn().mockResolvedValue([]),
+  // Using fetchSites directly instead of refreshSites
+  // refreshSites: jest.fn().mockResolvedValue([]),
   updateSiteData: jest.fn(),
   validateSiteData: jest.fn(),
   setCurrentStep: jest.fn(),

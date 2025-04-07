@@ -74,7 +74,8 @@ const mockUseSites = {
   setFilters: jest.fn(),
   fetchSite: jest.fn(),
   fetchSites: jest.fn(),
-  refreshSites: jest.fn(),
+  // Using fetchSites directly instead of refreshSites
+  // refreshSites: jest.fn(),
   deleteSite: jest.fn()
 };
 
