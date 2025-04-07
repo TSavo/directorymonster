@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDomains } from './hooks/useDomains';
+import { useDomainVerification } from './hooks/useDomainVerification';
+import DomainSetupGuide from './components/DomainSetupGuide';
 
 /**
  * DomainManager - Domain management component for handling site domains
@@ -22,7 +24,8 @@ export interface DomainManagerProps {
    */
   initialData?: {
     id?: string;
-    domains?: string[];
+    slug?: string;
+    domains?: string[] | { name: string; verified?: boolean }[];
   };
   /**
    * Mode for the form (create or edit)
@@ -51,6 +54,9 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
 }) => {
   const router = useRouter();
 
+  // Extract site slug from initial data
+  const siteSlug = initialData.slug || '';
+
   // Initialize domains hook with initial data
   const {
     domains,
@@ -66,9 +72,24 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
     submitDomains,
     handleInputChange
   } = useDomains({
-    initialDomains: initialData.domains || [],
+    initialDomains: Array.isArray(initialData.domains)
+      ? initialData.domains.map(d => typeof d === 'string' ? d : d.name)
+      : [],
     apiEndpoint
   });
+
+  // Initialize domain verification hook
+  const {
+    verificationStatuses,
+    verifyDomain,
+    getDomainStatus,
+    isDomainVerifying
+  } = useDomainVerification({
+    siteSlug
+  });
+
+  // Track which domain is currently being configured
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -147,26 +168,55 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
               <p className="text-gray-500 italic">No domains added yet</p>
             ) : (
               <ul className="mb-4 border rounded divide-y">
-                {domains.map((domain, index) => (
-                  <li key={domain} className="flex justify-between items-center p-2 hover:bg-gray-50">
-                    <span data-testid={`domainManager-domain-${index}`}>
-                      {domain}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeDomain(domain)}
-                      className="text-red-500 hover:text-red-700 p-1"
-                      aria-label={`Remove domain ${domain}`}
-                      data-testid={`domainManager-remove-domain-${index}`}
-                      disabled={isLoading}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      <span className="sr-only">Remove</span>
-                    </button>
-                  </li>
-                ))}
+                {domains.map((domain, index) => {
+                  const status = getDomainStatus(domain);
+                  const verificationStatus = status?.status || 'pending';
+
+                  return (
+                    <li key={domain} className="flex justify-between items-center p-2 hover:bg-gray-50">
+                      <div className="flex items-center space-x-2">
+                        <span data-testid={`domainManager-domain-${index}`}>
+                          {domain}
+                        </span>
+                        {verificationStatus === 'verified' && (
+                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                            Verified
+                          </span>
+                        )}
+                        {verificationStatus === 'failed' && (
+                          <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+                            Failed
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDomain(domain)}
+                          className="text-blue-500 hover:text-blue-700 p-1"
+                          aria-label={`Configure domain ${domain}`}
+                          data-testid={`domainManager-configure-domain-${index}`}
+                          disabled={isLoading}
+                        >
+                          Configure
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeDomain(domain)}
+                          className="text-red-500 hover:text-red-700 p-1"
+                          aria-label={`Remove domain ${domain}`}
+                          data-testid={`domainManager-remove-domain-${index}`}
+                          disabled={isLoading}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          <span className="sr-only">Remove</span>
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             )}
 
@@ -262,6 +312,17 @@ export const DomainManager: React.FC<DomainManagerProps> = ({
           </button>
         </div>
       </form>
+
+      {/* Domain Setup Guide */}
+      {selectedDomain && siteSlug && (
+        <DomainSetupGuide
+          domain={selectedDomain}
+          siteSlug={siteSlug}
+          verificationStatus={getDomainStatus(selectedDomain)?.status || 'pending'}
+          onVerify={() => verifyDomain(selectedDomain)}
+          isVerifying={isDomainVerifying(selectedDomain)}
+        />
+      )}
     </div>
   );
 };
