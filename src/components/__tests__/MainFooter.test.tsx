@@ -20,7 +20,7 @@ describe('MainFooter Component', () => {
 
   it('renders the footer with site name', () => {
     render(<MainFooter site={mockSite} />);
-    
+
     expect(screen.getByTestId('main-footer')).toBeInTheDocument();
     expect(screen.getByText('Test Site')).toBeInTheDocument();
   });
@@ -28,15 +28,15 @@ describe('MainFooter Component', () => {
   it('displays the current year in the copyright notice', () => {
     const currentYear = new Date().getFullYear();
     render(<MainFooter site={mockSite} />);
-    
+
     expect(screen.getByText(`© ${currentYear} Test Site. All rights reserved.`)).toBeInTheDocument();
   });
 
   it('renders all quick links', () => {
     render(<MainFooter site={mockSite} />);
-    
+
     expect(screen.getByText('Quick Links')).toBeInTheDocument();
-    
+
     // Check that all links are present
     const links = ['Home', 'About Us', 'Contact', 'Privacy Policy', 'Terms of Service'];
     links.forEach(linkText => {
@@ -46,26 +46,26 @@ describe('MainFooter Component', () => {
 
   it('renders contact information', () => {
     render(<MainFooter site={mockSite} />);
-    
+
     expect(screen.getByText('Contact Us')).toBeInTheDocument();
-    expect(screen.getByText('Email: info@example.com')).toBeInTheDocument();
-    expect(screen.getByText('Phone: (123) 456-7890')).toBeInTheDocument();
-    expect(screen.getByText('Address: 123 Directory St, City, Country')).toBeInTheDocument();
+    expect(screen.getByText('info@example.com')).toBeInTheDocument();
+    expect(screen.getByText('(123) 456-7890')).toBeInTheDocument();
+    expect(screen.getByText('123 Directory St, City, Country')).toBeInTheDocument();
   });
 
   it('applies correct CSS classes for responsive layout', () => {
     render(<MainFooter site={mockSite} />);
-    
+
     // Check footer container
     const footer = screen.getByTestId('main-footer');
-    expect(footer).toHaveClass('bg-gray-800 text-white py-8');
-    
+    expect(footer).toHaveClass('bg-gradient-to-r from-primary-900 to-primary-950 text-white py-16');
+
     // Check grid layout
     const grid = footer.querySelector('.grid');
-    expect(grid).toHaveClass('grid grid-cols-1 md:grid-cols-3 gap-8');
-    
+    expect(grid).toHaveClass('grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12');
+
     // Check copyright section
     const copyright = footer.querySelector('.border-t');
-    expect(copyright).toHaveClass('border-t border-gray-700 mt-8 pt-6 text-center text-gray-400');
+    expect(copyright).toHaveClass('border-t border-primary-800/50 mt-12 pt-8 text-center text-neutral-400');
   });
 });
