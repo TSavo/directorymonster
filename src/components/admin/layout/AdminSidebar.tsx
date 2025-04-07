@@ -36,6 +36,7 @@ const navigation: NavigationItem[] = [
   { name: 'Users', href: '/admin/users', icon: UsersIcon },
   { name: 'Analytics', href: '/admin/analytics', icon: ChartIcon },
   { name: 'Security', href: '/admin/security', icon: ShieldIcon },
+  { name: 'Permissions', href: '/admin/permissions/compare', icon: ShieldIcon },
   { name: 'Settings', href: '/admin/settings', icon: SettingsIcon },
 ];
 
