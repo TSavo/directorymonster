@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useTenantSite, Site } from '../../../contexts/TenantSiteContext';
+import { Site } from '../../../contexts/TenantSiteContext';
+import { useTenantSite } from '../../../hooks/useTenantSite';
 
 interface SiteSelectorProps {
   className?: string;
@@ -13,32 +14,32 @@ export function SiteSelector({ className = '' }: SiteSelectorProps) {
     setCurrentSiteId,
     loading
   } = useTenantSite();
-  
+
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // Don't render if tenant only has one site
   if (!hasMultipleSites) {
     return null;
   }
-  
+
   // Find the current site
   const currentSite = sites.find(site => site.id === currentSiteId);
-  
+
   // Toggle dropdown
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-  
+
   // Handle site selection
   const handleSelectSite = (siteId: string) => {
     setCurrentSiteId(siteId);
     setIsOpen(false);
   };
-  
+
   // Show loading state
   if (loading) {
     return (
-      <div 
+      <div
         className={`site-selector ${className}`}
         data-testid="site-selector-loading"
       >
@@ -48,9 +49,9 @@ export function SiteSelector({ className = '' }: SiteSelectorProps) {
       </div>
     );
   }
-  
+
   return (
-    <div 
+    <div
       className={`site-selector relative ${className}`}
       data-testid="site-selector"
     >
@@ -67,7 +68,7 @@ export function SiteSelector({ className = '' }: SiteSelectorProps) {
           <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
         </svg>
       </button>
-      
+
       {isOpen && (
         <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" data-testid="site-selector-dropdown">
           <div className="py-1" role="menu" aria-orientation="vertical">

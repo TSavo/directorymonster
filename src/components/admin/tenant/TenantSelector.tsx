@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useTenantSite, Tenant } from '../../../contexts/TenantSiteContext';
+import { Tenant } from '../../../contexts/TenantSiteContext';
+import { useTenantSite } from '../../../hooks/useTenantSite';
 
 interface TenantSelectorProps {
   className?: string;

@@ -15,7 +15,7 @@ export interface Site {
 }
 
 // Define the context type
-interface TenantSiteContextType {
+export interface TenantSiteContextType {
   currentTenantId: string | null;
   currentSiteId: string | null;
   setCurrentTenantId: (id: string | null) => void;
@@ -28,7 +28,7 @@ interface TenantSiteContextType {
 }
 
 // Create the context with default values
-const TenantSiteContext = createContext<TenantSiteContextType>({
+export const TenantSiteContext = createContext<TenantSiteContextType>({
   currentTenantId: null,
   currentSiteId: null,
   setCurrentTenantId: () => {},
@@ -251,7 +251,4 @@ export function TenantSiteProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Hook to use the context
-export function useTenantSite() {
-  return useContext(TenantSiteContext);
-}
+// Note: The useTenantSite hook has been moved to src/hooks/useTenantSite.ts
