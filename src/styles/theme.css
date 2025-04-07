@@ -101,14 +101,14 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-  
+
   /* Transitions */
   --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-colors: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1), fill 0.3s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-opacity: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-shadow: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-transform: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Border Radius */
   --radius-none: 0;
   --radius-sm: 0.125rem;
@@ -118,16 +118,54 @@
   --radius-2xl: 1rem;
   --radius-3xl: 1.5rem;
   --radius-full: 9999px;
+
+  /* Theme variables - Light Mode */
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-900);
+  --card: white;
+  --card-foreground: var(--color-neutral-900);
+  --popover: white;
+  --popover-foreground: var(--color-neutral-900);
+  --primary: var(--color-primary-600);
+  --primary-foreground: white;
+  --secondary: var(--color-neutral-100);
+  --secondary-foreground: var(--color-neutral-900);
+  --accent: var(--color-accent-500);
+  --accent-foreground: white;
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-500);
+  --success: var(--color-success-600);
+  --success-foreground: white;
+  --destructive: #ef4444;
+  --destructive-foreground: white;
+  --border: var(--color-neutral-200);
+  --input: var(--color-neutral-200);
+  --ring: var(--color-primary-500);
+  --header-bg: white;
+  --sidebar-bg: linear-gradient(to bottom, var(--color-primary-900), var(--color-primary-950));
+  --sidebar-color: white;
+  --sidebar-muted: var(--color-primary-300);
+  --sidebar-active-bg: rgba(255, 255, 255, 0.1);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
+  --card-hover-bg: var(--color-neutral-50);
+  --card-hover-border: var(--color-neutral-200);
+  --dropdown-bg: white;
+  --dropdown-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --text-gradient: linear-gradient(to right, var(--color-primary-600), var(--color-primary-800));
+  --bg-gradient: linear-gradient(to right, var(--color-primary-600), var(--color-primary-800));
+  --hero-gradient: linear-gradient(to right, var(--color-primary-600), var(--color-primary-800));
+  --footer-gradient: linear-gradient(to right, var(--color-primary-900), var(--color-primary-950));
 }
 
 /* Base styles */
 body {
   font-family: var(--font-sans);
-  color: var(--color-neutral-900);
-  background-color: var(--color-neutral-50);
+  color: var(--foreground);
+  background-color: var(--background);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -135,6 +173,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
   margin-top: 0;
   margin-bottom: 0.5em;
+  color: var(--foreground);
 }
 
 h1 {
@@ -164,16 +203,17 @@ h6 {
 p {
   margin-top: 0;
   margin-bottom: 1rem;
+  color: var(--foreground);
 }
 
 a {
-  color: var(--color-primary-600);
+  color: var(--primary);
   text-decoration: none;
   transition: var(--transition-colors);
 }
 
 a:hover {
-  color: var(--color-primary-700);
+  opacity: 0.85;
 }
 
 /* Utility classes */
@@ -181,20 +221,24 @@ a:hover {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(to right, var(--color-primary-600), var(--color-primary-800));
+  background-image: var(--text-gradient);
 }
 
 .bg-gradient {
-  background-image: linear-gradient(to right, var(--color-primary-600), var(--color-primary-800));
+  background-image: var(--bg-gradient);
 }
 
 .card-hover {
   transition: var(--transition-all);
+  background-color: var(--card);
+  border-color: var(--border);
 }
 
 .card-hover:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
+  background-color: var(--card-hover-bg);
+  border-color: var(--card-hover-border);
 }
 
 .animate-fade-in {
@@ -232,14 +276,54 @@ a:hover {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-neutral-100);
+  background: var(--muted);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-neutral-300);
+  background: var(--muted-foreground);
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-neutral-400);
+  background: var(--muted-foreground);
+  opacity: 0.8;
+}
+
+/* Dark mode theme */
+:root.dark {
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-neutral-100);
+  --card: var(--color-neutral-900);
+  --card-foreground: var(--color-neutral-100);
+  --popover: var(--color-neutral-900);
+  --popover-foreground: var(--color-neutral-100);
+  --primary: var(--color-primary-500);
+  --primary-foreground: var(--color-neutral-950);
+  --secondary: var(--color-neutral-800);
+  --secondary-foreground: var(--color-neutral-100);
+  --muted: var(--color-neutral-800);
+  --muted-foreground: var(--color-neutral-400);
+  --accent: var(--color-accent-500);
+  --accent-foreground: var(--color-neutral-950);
+  --success: var(--color-success-500);
+  --success-foreground: var(--color-neutral-950);
+  --destructive: #f87171;
+  --destructive-foreground: var(--color-neutral-950);
+  --border: var(--color-neutral-800);
+  --input: var(--color-neutral-800);
+  --ring: var(--color-primary-600);
+  --header-bg: var(--color-neutral-900);
+  --sidebar-bg: linear-gradient(to bottom, var(--color-neutral-950), var(--color-neutral-900));
+  --sidebar-color: var(--color-neutral-100);
+  --sidebar-muted: var(--color-neutral-400);
+  --sidebar-active-bg: rgba(0, 0, 0, 0.3);
+  --sidebar-hover-bg: rgba(0, 0, 0, 0.2);
+  --card-hover-bg: var(--color-neutral-800);
+  --card-hover-border: var(--color-neutral-700);
+  --dropdown-bg: var(--color-neutral-900);
+  --dropdown-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --text-gradient: linear-gradient(to right, var(--color-primary-500), var(--color-primary-300));
+  --bg-gradient: linear-gradient(to right, var(--color-primary-700), var(--color-primary-900));
+  --hero-gradient: linear-gradient(to right, var(--color-primary-800), var(--color-primary-950));
+  --footer-gradient: linear-gradient(to right, var(--color-neutral-950), var(--color-neutral-900));
 }

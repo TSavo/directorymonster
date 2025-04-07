@@ -5,6 +5,7 @@ import { SiteConfig } from '@/types';
 import { CategoryLink } from './LinkUtilities';
 import { SearchBar } from './search';
 import { Menu, X } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme';
 
 interface SiteHeaderProps {
   site: SiteConfig;
@@ -87,9 +88,14 @@ export default function SiteHeader({ site, categories }: SiteHeaderProps) {
             </ul>
           </nav>
 
-          {/* Search Bar */}
-          <div className="hidden md:block">
-            <SearchBar siteId={site.id} />
+          <div className="flex items-center space-x-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Search Bar */}
+            <div className="hidden md:block">
+              <SearchBar siteId={site.id} />
+            </div>
           </div>
 
           {/* Mobile menu button */}

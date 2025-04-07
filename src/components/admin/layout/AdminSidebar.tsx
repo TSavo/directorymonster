@@ -50,8 +50,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
 
   // Sidebar positioning
   const sidebarClasses = isOpen
-    ? 'fixed inset-y-0 left-0 flex flex-col w-64 bg-gradient-to-b from-primary-900 to-primary-950 z-30 transform transition-all ease-in-out duration-300 shadow-xl'
-    : 'fixed inset-y-0 left-0 flex flex-col w-64 bg-gradient-to-b from-primary-900 to-primary-950 z-30 transform -translate-x-full md:translate-x-0 transition-all ease-in-out duration-300 shadow-xl';
+    ? 'fixed inset-y-0 left-0 flex flex-col w-64 bg-sidebar z-30 transform transition-all ease-in-out duration-300 shadow-xl'
+    : 'fixed inset-y-0 left-0 flex flex-col w-64 bg-sidebar z-30 transform -translate-x-full md:translate-x-0 transition-all ease-in-out duration-300 shadow-xl';
 
   return (
     <>
@@ -64,12 +64,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
 
       {/* Sidebar */}
       <div className={sidebarClasses} data-testid="admin-sidebar">
-        <div className="flex items-center justify-between h-20 flex-shrink-0 px-6 border-b border-primary-800/30">
-          <Link href="/admin" className="text-white font-bold text-xl text-gradient hover:opacity-90 transition-opacity">
+        <div className="flex items-center justify-between h-20 flex-shrink-0 px-6 border-b border-sidebar-muted/30">
+          <Link href="/admin" className="font-bold text-xl text-sidebar text-gradient hover:opacity-90 transition-opacity">
             DirectoryMonster
           </Link>
           <button
-            className="md:hidden text-primary-200 hover:text-white focus-visible transition-colors rounded-full p-1 hover:bg-primary-800/30"
+            className="md:hidden text-sidebar-muted hover:text-sidebar focus-visible transition-colors rounded-full p-1 hover:bg-white/5"
             onClick={closeSidebar}
             aria-label="Close sidebar"
           >
@@ -88,9 +88,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
                   href={item.href}
                   className={`
                     group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 hover:-translate-y-0.5
-                    ${isActive
-                      ? 'bg-primary-800/50 text-white shadow-md'
-                      : 'text-primary-100 hover:bg-primary-800/30 hover:text-white'}
+                    ${isActive ? 'bg-white/10 text-sidebar shadow-md' : 'text-sidebar-muted hover:text-sidebar hover:bg-white/5'}
                   `}
                   aria-current={isActive ? 'page' : undefined}
                   onClick={isOpen ? closeSidebar : undefined}
@@ -99,7 +97,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
                   <item.icon
                     className={`
                       mr-3 flex-shrink-0 h-5 w-5
-                      ${isActive ? 'text-white' : 'text-primary-300 group-hover:text-white'}
+                      ${isActive ? 'text-sidebar' : 'text-sidebar-muted group-hover:text-sidebar'}
                     `}
                   />
                   {item.name}
@@ -109,10 +107,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, closeSidebar
           </nav>
         </div>
 
-        <div className="flex-shrink-0 flex border-t border-primary-800/30 p-4">
+        <div className="flex-shrink-0 flex p-4 border-t border-sidebar-muted/30">
           <Link
             href="/"
-            className="text-primary-200 hover:text-white text-sm flex items-center transition-colors focus-visible"
+            className="text-sm flex items-center text-sidebar-muted hover:text-sidebar transition-colors focus-visible"
           >
             <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
