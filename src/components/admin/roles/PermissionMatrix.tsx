@@ -32,64 +32,64 @@ export function PermissionMatrix({
   const [expandedResources, setExpandedResources] = useState<Record<string, boolean>>(
     resources.reduce((acc, resource) => ({ ...acc, [resource]: true }), {})
   );
-  
+
   const toggleResourceExpansion = (resource: string) => {
     setExpandedResources(prev => ({
       ...prev,
       [resource]: !prev[resource]
     }));
   };
-  
+
   const togglePermission = (resource: string, action: string) => {
     const currentActions = selectedPermissions[resource] || [];
     const newActions = currentActions.includes(action)
       ? currentActions.filter(a => a !== action)
       : [...currentActions, action];
-    
+
     const newPermissions = {
       ...selectedPermissions,
       [resource]: newActions
     };
-    
+
     // Remove resource if no actions are selected
     if (newActions.length === 0) {
       delete newPermissions[resource];
     }
-    
+
     onChange(newPermissions);
   };
-  
+
   const toggleAllActionsForResource = (resource: string, selected: boolean) => {
     const newPermissions = { ...selectedPermissions };
-    
+
     if (selected) {
       newPermissions[resource] = [...actions];
     } else {
       delete newPermissions[resource];
     }
-    
+
     onChange(newPermissions);
   };
-  
+
   const isAllActionsSelected = (resource: string) => {
     const selectedActions = selectedPermissions[resource] || [];
     return selectedActions.length === actions.length;
   };
-  
+
   const isSomeActionsSelected = (resource: string) => {
     const selectedActions = selectedPermissions[resource] || [];
     return selectedActions.length > 0 && selectedActions.length < actions.length;
   };
-  
+
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="loading-skeleton">
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-60 w-full" />
       </div>
     );
   }
-  
+
   if (resources.length === 0 || actions.length === 0) {
     return (
       <div className="text-center py-10 border rounded-md bg-muted/20">
@@ -97,7 +97,7 @@ export function PermissionMatrix({
       </div>
     );
   }
-  
+
   return (
     <div className="border rounded-md">
       <ScrollArea className="h-[400px]">
@@ -112,10 +112,10 @@ export function PermissionMatrix({
               ))}
             </div>
           </div>
-          
+
           {resources.map(resource => {
             const isExpanded = expandedResources[resource];
-            
+
             return (
               <div key={resource} className="space-y-2">
                 <div className="grid grid-cols-[1fr_auto] gap-4 items-center">
@@ -132,23 +132,24 @@ export function PermissionMatrix({
                         <ChevronRight className="h-4 w-4" />
                       )}
                     </Button>
-                    
+
                     <Checkbox
                       id={`resource-${resource}`}
                       checked={isAllActionsSelected(resource)}
                       indeterminate={isSomeActionsSelected(resource)}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         toggleAllActionsForResource(resource, checked === true)
                       }
+                      data-testid={`toggle-all-${resource}`}
                     />
-                    
-                    <Label 
-                      htmlFor={`resource-${resource}`} 
+
+                    <Label
+                      htmlFor={`resource-${resource}`}
                       className="ml-2 font-medium capitalize cursor-pointer"
                     >
                       {resource}
                     </Label>
-                    
+
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -162,7 +163,7 @@ export function PermissionMatrix({
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  
+
                   <div className="grid grid-cols-5 gap-4">
                     {actions.map(action => (
                       <div key={action} className="flex justify-center">
@@ -170,12 +171,13 @@ export function PermissionMatrix({
                           id={`permission-${resource}-${action}`}
                           checked={(selectedPermissions[resource] || []).includes(action)}
                           onCheckedChange={() => togglePermission(resource, action)}
+                          data-testid={`permission-${resource}-${action}`}
                         />
                       </div>
                     ))}
                   </div>
                 </div>
-                
+
                 {isExpanded && (
                   <div className="pl-10 pr-4 py-2 bg-muted/10 rounded-md">
                     <p className="text-sm text-muted-foreground">
@@ -205,6 +207,6 @@ function getResourceDescription(resource: string): string {
     tenant: 'Manage tenant configuration and properties',
     audit: 'Access audit logs and activity history'
   };
-  
+
   return descriptions[resource] || `Manage ${resource} resources`;
 }

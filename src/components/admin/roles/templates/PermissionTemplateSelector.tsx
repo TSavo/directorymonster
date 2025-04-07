@@ -29,7 +29,7 @@ interface PermissionTemplateSelectorProps {
   siteId?: string;
 }
 
-export function PermissionTemplateSelector({ 
+export function PermissionTemplateSelector({
   onSelectTemplate,
   scope,
   siteId
@@ -42,26 +42,26 @@ export function PermissionTemplateSelector({
   const [searchQuery, setSearchQuery] = useState('');
   const [previewTemplate, setPreviewTemplate] = useState<PermissionTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  
+
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Build query parameters
         const params = new URLSearchParams();
         params.append('scope', scope);
         if (scope === 'site' && siteId) {
           params.append('siteId', siteId);
         }
-        
+
         const response = await fetch(`/api/admin/roles/wizard/templates?${params.toString()}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch templates');
         }
-        
+
         const data = await response.json();
         setTemplates(data.templates || []);
       } catch (error) {
@@ -71,35 +71,35 @@ export function PermissionTemplateSelector({
         setIsLoading(false);
       }
     };
-    
+
     fetchTemplates();
   }, [scope, siteId]);
-  
+
   const handleSelectTemplate = () => {
     const template = templates.find(t => t.id === selectedTemplateId);
     if (template) {
       onSelectTemplate(template);
     }
   };
-  
+
   const handlePreviewTemplate = (template: PermissionTemplate) => {
     setPreviewTemplate(template);
     setIsPreviewOpen(true);
   };
-  
+
   // Get unique categories from templates
   const categories = ['all', ...new Set(templates.map(t => t.category))];
-  
+
   // Filter templates by category and search query
   const filteredTemplates = templates.filter(template => {
     const matchesCategory = activeCategory === 'all' || template.category === activeCategory;
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       template.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     return matchesCategory && matchesSearch;
   });
-  
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -112,7 +112,7 @@ export function PermissionTemplateSelector({
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="rounded-md bg-destructive/10 p-4">
@@ -125,7 +125,7 @@ export function PermissionTemplateSelector({
       </div>
     );
   }
-  
+
   if (templates.length === 0) {
     return (
       <div className="text-center py-10 border rounded-md bg-muted/20">
@@ -137,7 +137,7 @@ export function PermissionTemplateSelector({
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4">
@@ -150,7 +150,7 @@ export function PermissionTemplateSelector({
             className="pl-8"
           />
         </div>
-        
+
         <div className="flex items-center space-x-2 overflow-x-auto pb-2">
           {categories.map(category => (
             <Button
@@ -165,12 +165,12 @@ export function PermissionTemplateSelector({
           ))}
         </div>
       </div>
-      
+
       <RadioGroup value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredTemplates.map(template => (
-            <Card 
-              key={template.id} 
+            <Card
+              key={template.id}
               className={`cursor-pointer transition-all ${
                 selectedTemplateId === template.id ? 'ring-2 ring-primary' : ''
               }`}
@@ -178,20 +178,21 @@ export function PermissionTemplateSelector({
             >
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
-                  <RadioGroupItem 
-                    value={template.id} 
+                  <RadioGroupItem
+                    value={template.id}
                     id={`template-${template.id}`}
                     className="mt-1"
                   />
                   <CardTitle className="text-lg ml-2 flex-1">{template.name}</CardTitle>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     className="ml-auto"
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePreviewTemplate(template);
                     }}
+                    data-testid="preview-button"
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
@@ -212,9 +213,9 @@ export function PermissionTemplateSelector({
                 </div>
               </CardContent>
               <CardFooter>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="w-full"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -229,7 +230,7 @@ export function PermissionTemplateSelector({
           ))}
         </div>
       </RadioGroup>
-      
+
       {selectedTemplateId && (
         <div className="flex justify-end">
           <Button onClick={handleSelectTemplate}>
@@ -237,7 +238,7 @@ export function PermissionTemplateSelector({
           </Button>
         </div>
       )}
-      
+
       {/* Template Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
         <DialogContent className="max-w-2xl">
@@ -245,7 +246,7 @@ export function PermissionTemplateSelector({
             <DialogTitle>{previewTemplate?.name}</DialogTitle>
             <DialogDescription>{previewTemplate?.description}</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 mt-4">
             <div className="flex items-center justify-between">
               <Badge variant="outline" className="capitalize">
@@ -255,7 +256,7 @@ export function PermissionTemplateSelector({
                 {previewTemplate?.scope === 'tenant' ? 'Tenant-wide' : 'Site-specific'}
               </Badge>
             </div>
-            
+
             <div className="space-y-2">
               <h4 className="text-sm font-medium">Included Permissions:</h4>
               <ScrollArea className="h-[300px]">
@@ -276,9 +277,9 @@ export function PermissionTemplateSelector({
               </ScrollArea>
             </div>
           </div>
-          
+
           <div className="flex justify-end mt-4">
-            <Button 
+            <Button
               onClick={() => {
                 if (previewTemplate) {
                   setSelectedTemplateId(previewTemplate.id);

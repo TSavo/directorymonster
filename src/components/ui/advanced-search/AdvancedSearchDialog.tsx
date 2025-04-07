@@ -31,39 +31,39 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
   const [filters, setFilters] = useState<SearchFilter[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const router = useRouter();
-  
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!query.trim()) return;
-    
+
     // Build search URL
     const searchParams = new URLSearchParams();
     searchParams.append('q', query);
     searchParams.append('scope', scope);
-    
+
     // Add filters
     filters.forEach(filter => {
       searchParams.append(filter.key, filter.value);
     });
-    
+
     // Navigate to search results
     router.push(`/admin/search?${searchParams.toString()}`);
     setOpen(false);
   };
-  
+
   const addFilter = (key: string, value: string, label: string) => {
     setFilters(prev => [...prev, { key, value, label }]);
   };
-  
+
   const removeFilter = (index: number) => {
     setFilters(prev => prev.filter((_, i) => i !== index));
   };
-  
+
   const clearFilters = () => {
     setFilters([]);
   };
-  
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -81,7 +81,7 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
             Search across the system with advanced filtering options.
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSearch} className="space-y-4 mt-4">
           <div className="flex gap-2">
             <div className="flex-1">
@@ -98,7 +98,7 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
               Search
             </Button>
           </div>
-          
+
           <div className="space-y-4">
             <div>
               <Label className="text-sm font-medium">Search Scope</Label>
@@ -133,7 +133,7 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                 </div>
               </RadioGroup>
             </div>
-            
+
             <div>
               <div className="flex items-center justify-between">
                 <Button
@@ -146,7 +146,7 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                   <Filter className="h-4 w-4" />
                   {showFilters ? 'Hide Filters' : 'Show Filters'}
                 </Button>
-                
+
                 {filters.length > 0 && (
                   <Button
                     type="button"
@@ -159,7 +159,7 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                   </Button>
                 )}
               </div>
-              
+
               {filters.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {filters.map((filter, index) => (
@@ -171,6 +171,7 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                         size="sm"
                         onClick={() => removeFilter(index)}
                         className="h-4 w-4 p-0 ml-1"
+                        data-testid="remove-filter"
                       >
                         <X className="h-3 w-3" />
                       </Button>
@@ -178,7 +179,7 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                   ))}
                 </div>
               )}
-              
+
               {showFilters && (
                 <div className="space-y-4 mt-4 p-4 border rounded-md bg-muted/20">
                   {scope === 'all' || scope === 'users' ? (
@@ -186,7 +187,7 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                       <Label className="text-sm font-medium">User Filters</Label>
                       <div className="grid grid-cols-2 gap-2">
                         <Select
-                          onValueChange={(value) => 
+                          onValueChange={(value) =>
                             addFilter('userStatus', value, `Status: ${value}`)
                           }
                         >
@@ -199,9 +200,9 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                             <SelectItem value="pending">Pending</SelectItem>
                           </SelectContent>
                         </Select>
-                        
+
                         <Select
-                          onValueChange={(value) => 
+                          onValueChange={(value) =>
                             addFilter('userRole', value, `Role: ${value}`)
                           }
                         >
@@ -217,13 +218,13 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                       </div>
                     </div>
                   ) : null}
-                  
+
                   {scope === 'all' || scope === 'roles' ? (
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">Role Filters</Label>
                       <div className="grid grid-cols-2 gap-2">
                         <Select
-                          onValueChange={(value) => 
+                          onValueChange={(value) =>
                             addFilter('roleType', value, `Type: ${value}`)
                           }
                         >
@@ -235,9 +236,9 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                             <SelectItem value="custom">Custom</SelectItem>
                           </SelectContent>
                         </Select>
-                        
+
                         <Select
-                          onValueChange={(value) => 
+                          onValueChange={(value) =>
                             addFilter('roleScope', value, `Scope: ${value}`)
                           }
                         >
@@ -252,13 +253,13 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                       </div>
                     </div>
                   ) : null}
-                  
+
                   {scope === 'all' || scope === 'listings' || scope === 'content' ? (
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">Content Filters</Label>
                       <div className="grid grid-cols-2 gap-2">
                         <Select
-                          onValueChange={(value) => 
+                          onValueChange={(value) =>
                             addFilter('contentStatus', value, `Status: ${value}`)
                           }
                         >
@@ -271,9 +272,9 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                             <SelectItem value="archived">Archived</SelectItem>
                           </SelectContent>
                         </Select>
-                        
+
                         <Select
-                          onValueChange={(value) => 
+                          onValueChange={(value) =>
                             addFilter('contentCategory', value, `Category: ${value}`)
                           }
                         >
@@ -287,10 +288,10 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div className="flex items-center space-x-2 mt-2">
-                        <Checkbox 
-                          id="featured" 
+                        <Checkbox
+                          id="featured"
                           onCheckedChange={(checked) => {
                             if (checked) {
                               addFilter('featured', 'true', 'Featured');
@@ -301,13 +302,13 @@ export function AdvancedSearchDialog({ children }: AdvancedSearchDialogProps) {
                       </div>
                     </div>
                   ) : null}
-                  
+
                   {scope === 'all' || scope === 'sites' ? (
                     <div className="space-y-2">
                       <Label className="text-sm font-medium">Site Filters</Label>
                       <div className="grid grid-cols-2 gap-2">
                         <Select
-                          onValueChange={(value) => 
+                          onValueChange={(value) =>
                             addFilter('siteStatus', value, `Status: ${value}`)
                           }
                         >
