@@ -1,10 +1,62 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { InfoIcon, CheckCircleIcon, AlertTriangleIcon, CopyIcon, ExternalLinkIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
+// Import UI components
+const Tabs = ({ defaultValue, children }: { defaultValue: string, children: React.ReactNode }) => (
+  <div className="tabs" data-default-value={defaultValue}>{children}</div>
+);
+
+const TabsList = ({ children }: { children: React.ReactNode }) => (
+  <div className="tabs-list">{children}</div>
+);
+
+const TabsTrigger = ({ value, children }: { value: string, children: React.ReactNode }) => (
+  <button className="tabs-trigger" data-value={value}>{children}</button>
+);
+
+const TabsContent = ({ value, children }: { value: string, children: React.ReactNode }) => (
+  <div className="tabs-content" data-value={value}>{children}</div>
+);
+
+// Mock Alert components
+const Alert = ({ children, className }: { children: React.ReactNode, className?: string }) => (
+  <div className={`alert ${className || ''}`}>{children}</div>
+);
+
+const AlertTitle = ({ children }: { children: React.ReactNode }) => (
+  <div className="alert-title">{children}</div>
+);
+
+const AlertDescription = ({ children }: { children: React.ReactNode }) => (
+  <div className="alert-description">{children}</div>
+);
+
+// Mock Button component
+const Button = ({
+  children,
+  onClick,
+  disabled,
+  className,
+  variant,
+  size
+}: {
+  children: React.ReactNode,
+  onClick?: () => void,
+  disabled?: boolean,
+  className?: string,
+  variant?: string,
+  size?: string
+}) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`button ${variant || ''} ${size || ''} ${className || ''}`}
+  >
+    {children}
+  </button>
+);
 
 export interface DomainSetupGuideProps {
   /**
@@ -31,7 +83,7 @@ export interface DomainSetupGuideProps {
 
 /**
  * DomainSetupGuide - Component that provides guidance for setting up a domain
- * 
+ *
  * Features:
  * - Step-by-step instructions for domain configuration
  * - DNS record information with copy functionality
@@ -46,7 +98,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
   isVerifying = false
 }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  
+
   // DNS records that need to be configured
   const dnsRecords = {
     a: {
@@ -62,14 +114,14 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
       ttl: '3600'
     }
   };
-  
+
   // Handle copy to clipboard
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
   };
-  
+
   // Render verification status badge
   const renderStatusBadge = () => {
     switch (verificationStatus) {
@@ -96,14 +148,14 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
         );
     }
   };
-  
+
   return (
     <div className="bg-white rounded-lg border p-6 mt-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Domain Setup Guide: {domain}</h3>
         {renderStatusBadge()}
       </div>
-      
+
       <Alert className="mb-6">
         <InfoIcon className="h-4 w-4" />
         <AlertTitle>Important</AlertTitle>
@@ -111,7 +163,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
           DNS changes can take up to 48 hours to propagate. However, they often take effect within a few hours.
         </AlertDescription>
       </Alert>
-      
+
       <Tabs defaultValue="general">
         <TabsList className="mb-4">
           <TabsTrigger value="general">General Instructions</TabsTrigger>
@@ -119,7 +171,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
           <TabsTrigger value="namecheap">Namecheap</TabsTrigger>
           <TabsTrigger value="cloudflare">Cloudflare</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="general">
           <div className="space-y-6">
             <div>
@@ -128,10 +180,10 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                 Log in to your domain registrar's website and navigate to the DNS management section for {domain}.
               </p>
             </div>
-            
+
             <div>
               <h4 className="font-medium text-lg mb-2">Step 2: Add the following DNS records</h4>
-              
+
               <div className="overflow-x-auto">
                 <table className="min-w-full border border-gray-200 rounded-lg">
                   <thead className="bg-gray-50">
@@ -150,8 +202,8 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                       <td className="px-4 py-3">{dnsRecords.a.value}</td>
                       <td className="px-4 py-3">{dnsRecords.a.ttl}</td>
                       <td className="px-4 py-3">
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="sm"
                           onClick={() => copyToClipboard(dnsRecords.a.value, 'a')}
                           className="flex items-center text-blue-600"
@@ -167,8 +219,8 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                       <td className="px-4 py-3">{dnsRecords.cname.value}</td>
                       <td className="px-4 py-3">{dnsRecords.cname.ttl}</td>
                       <td className="px-4 py-3">
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="sm"
                           onClick={() => copyToClipboard(dnsRecords.cname.value, 'cname')}
                           className="flex items-center text-blue-600"
@@ -182,14 +234,14 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                 </table>
               </div>
             </div>
-            
+
             <div>
               <h4 className="font-medium text-lg mb-2">Step 3: Verify your domain</h4>
               <p className="text-gray-600 mb-4">
-                After configuring your DNS records, click the button below to verify your domain. 
+                After configuring your DNS records, click the button below to verify your domain.
                 This process checks if your DNS records are correctly configured.
               </p>
-              
+
               <Button
                 onClick={onVerify}
                 disabled={isVerifying || verificationStatus === 'verified'}
@@ -201,7 +253,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="godaddy">
           <div className="space-y-6">
             <div>
@@ -213,7 +265,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                 <li>In the DNS Management page, add the records shown in the table below</li>
               </ol>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="min-w-full border border-gray-200 rounded-lg">
                 <thead className="bg-gray-50">
@@ -240,7 +292,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                 </tbody>
               </table>
             </div>
-            
+
             <div className="mt-4">
               <Button
                 variant="outline"
@@ -253,7 +305,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="namecheap">
           <div className="space-y-6">
             <div>
@@ -265,7 +317,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                 <li>Add the records shown in the table below</li>
               </ol>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="min-w-full border border-gray-200 rounded-lg">
                 <thead className="bg-gray-50">
@@ -292,7 +344,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                 </tbody>
               </table>
             </div>
-            
+
             <div className="mt-4">
               <Button
                 variant="outline"
@@ -305,7 +357,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="cloudflare">
           <div className="space-y-6">
             <div>
@@ -318,7 +370,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                 <li><strong>Important:</strong> Make sure the proxy status is set to <strong>DNS only</strong> (gray cloud icon)</li>
               </ol>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="min-w-full border border-gray-200 rounded-lg">
                 <thead className="bg-gray-50">
@@ -345,7 +397,7 @@ export const DomainSetupGuide: React.FC<DomainSetupGuideProps> = ({
                 </tbody>
               </table>
             </div>
-            
+
             <div className="mt-4">
               <Button
                 variant="outline"

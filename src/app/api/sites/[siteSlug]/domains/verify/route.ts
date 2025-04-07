@@ -10,10 +10,10 @@ const resolve4 = promisify(dns.resolve4);
 
 /**
  * Verify domain DNS configuration
- * 
+ *
  * This endpoint checks if a domain's DNS records are correctly configured
  * to point to our service.
- * 
+ *
  * @param request The incoming request
  * @param params The route parameters containing the site slug
  * @returns A NextResponse with the verification result
@@ -87,25 +87,28 @@ export async function POST(
 
       if (!hasCorrectARecord) {
         errors.push('A record is not correctly configured');
-      }
+        verified = false;
+      } else {
+        // Check CNAME record for www subdomain
+        try {
+          const cnameRecords = await resolveCname(`www.${domain}`);
+          const hasCorrectCname = cnameRecords.some(record =>
+            record === `${siteSlug}.mydirectory.com` ||
+            record.endsWith('.mydirectory.com')
+          );
 
-      // Check CNAME record for www subdomain
-      try {
-        const cnameRecords = await resolveCname(`www.${domain}`);
-        const hasCorrectCname = cnameRecords.some(record => 
-          record === `${siteSlug}.mydirectory.com` || 
-          record.endsWith('.mydirectory.com')
-        );
-
-        if (!hasCorrectCname) {
-          errors.push('CNAME record for www subdomain is not correctly configured');
+          if (!hasCorrectCname) {
+            errors.push('CNAME record for www subdomain is not correctly configured');
+            verified = false;
+          } else {
+            // Domain is verified only if both A and CNAME records are correct
+            verified = true;
+          }
+        } catch (error) {
+          errors.push('Could not verify CNAME record for www subdomain');
+          verified = false;
         }
-      } catch (error) {
-        errors.push('Could not verify CNAME record for www subdomain');
       }
-
-      // Domain is verified if there are no errors
-      verified = errors.length === 0;
 
       // Update domain verification status
       const updatedDomains = site.domains.map(d => {
@@ -125,22 +128,23 @@ export async function POST(
       console.error(`Error verifying domain ${domain}:`, error);
       errors.push('Could not verify domain DNS records');
       verified = false;
-    }
 
-    if (verified) {
-      return NextResponse.json({
-        success: true,
-        message: 'Domain verified successfully',
-        verified
-      });
-    } else {
+      // Return error response immediately
       return NextResponse.json({
         success: false,
         message: 'Domain verification failed',
         errors,
-        verified
+        verified: false
       });
     }
+
+    // Return the verification result
+    return NextResponse.json({
+      success: verified,
+      message: verified ? 'Domain verified successfully' : 'Domain verification failed',
+      errors: verified ? [] : errors,
+      verified
+    });
   } catch (error) {
     console.error('Error in domain verification API:', error);
     return NextResponse.json(
