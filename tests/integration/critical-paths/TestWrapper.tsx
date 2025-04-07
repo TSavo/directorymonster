@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
+import { render } from '@testing-library/react';
 import { mockRouter } from './setup';
-import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // Mock the router context
 const RouterContext = React.createContext({});
@@ -85,9 +85,7 @@ interface TestWrapperProps {
 export const TestWrapper = ({ children, router = mockRouter }: TestWrapperProps) => {
   return (
     <RouterContext.Provider value={router as any}>
-      <ThemeProvider>
-        {children}
-      </ThemeProvider>
+      {children}
     </RouterContext.Provider>
   );
 };
