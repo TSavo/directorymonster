@@ -7,6 +7,8 @@ import { TenantSelector } from '@/components/admin/tenant/TenantSelector';
 import { SiteSelector } from '@/components/admin/tenant/SiteSelector';
 import { useTenantSite } from '@/contexts/TenantSiteContext';
 import { UnifiedAuthComponent } from '@/components/auth';
+import { AdvancedSearchDialog } from '@/components/ui/advanced-search';
+import { Search } from 'lucide-react';
 
 interface AdminHeaderProps {
   toggleSidebar: () => void;
@@ -45,6 +47,23 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
           </div>
 
           <div className="flex items-center space-x-4">
+            {/* Search */}
+            <div className="hidden md:block">
+              <AdvancedSearchDialog>
+                <div className="relative rounded-md shadow-sm">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                  </div>
+                  <input
+                    type="text"
+                    className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6"
+                    placeholder="Search..."
+                    readOnly
+                  />
+                </div>
+              </AdvancedSearchDialog>
+            </div>
+
             {/* Tenant and site selectors */}
             {hasMultipleTenants && <TenantSelector className="mr-2" />}
             {hasMultipleSites && <SiteSelector className="mr-2" />}
