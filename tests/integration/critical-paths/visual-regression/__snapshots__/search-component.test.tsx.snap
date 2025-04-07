@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Search Component Visual Regression renders the loading state correctly: search-component-loading 1`] = `"<div class="search-container"><form class="search-form" data-testid="search-form"><input type="text" placeholder="Search..." aria-label="Search" class="search-input" data-testid="search-input" value="test query"><button type="submit" class="search-button" data-testid="search-button">Search</button></form><div class="search-results" data-testid="search-results"><div class="loading-indicator" data-testid="loading-indicator">Loading...</div></div></div>"`;
+
+exports[`Search Component Visual Regression renders the search form correctly: search-component-default 1`] = `"<div class="search-container"><form class="search-form" data-testid="search-form"><input type="text" placeholder="Search..." aria-label="Search" class="search-input" data-testid="search-input" value=""><button type="submit" class="search-button" data-testid="search-button">Search</button></form></div>"`;
+
+exports[`Search Component Visual Regression renders the search form with query correctly: search-component-with-query 1`] = `"<div class="search-container"><form class="search-form" data-testid="search-form"><input type="text" placeholder="Search..." aria-label="Search" class="search-input" data-testid="search-input" value="test query"><button type="submit" class="search-button" data-testid="search-button">Search</button></form></div>"`;

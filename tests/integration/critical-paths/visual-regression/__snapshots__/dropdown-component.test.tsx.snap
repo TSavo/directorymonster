@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Dropdown Component Visual Regression renders the dropdown button correctly: dropdown-component-default 1`] = `"<div class="dropdown-container"><button class="dropdown-button" aria-haspopup="listbox" aria-expanded="false" data-testid="dropdown-button">Select an option</button></div>"`;
+
+exports[`Dropdown Component Visual Regression renders the dropdown menu correctly when open: dropdown-component-open 1`] = `"<div class="dropdown-container"><button class="dropdown-button" aria-haspopup="listbox" aria-expanded="true" data-testid="dropdown-button">Select an option</button><ul class="dropdown-menu" role="listbox" aria-labelledby="dropdown-button" data-testid="dropdown-menu"><li class="dropdown-item" role="option" aria-selected="false" data-testid="dropdown-item-0">Option 1</li><li class="dropdown-item" role="option" aria-selected="false" data-testid="dropdown-item-1">Option 2</li><li class="dropdown-item" role="option" aria-selected="false" data-testid="dropdown-item-2">Option 3</li><li class="dropdown-item" role="option" aria-selected="false" data-testid="dropdown-item-3">Option 4</li><li class="dropdown-item" role="option" aria-selected="false" data-testid="dropdown-item-4">Option 5</li></ul></div>"`;
+
+exports[`Dropdown Component Visual Regression renders the selected option correctly: dropdown-component-selected 1`] = `"<div class="dropdown-container"><button class="dropdown-button" aria-haspopup="listbox" aria-expanded="false" data-testid="dropdown-button">Option 3</button></div>"`;
