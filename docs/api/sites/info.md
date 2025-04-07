@@ -61,48 +61,26 @@ GET /api/sites/example-site/info
 - `404 Not Found`: The site was not found
 - `500 Internal Server Error`: An error occurred on the server
 
-## Deprecated API
+## Site-Specific API Pattern
 
-The following API is deprecated and will be removed in a future version:
+This API follows the site-specific pattern used throughout the application. All content in the system is site-specific, and the API URLs reflect this by including the site slug in the path.
 
-```http
-GET /api/site-info
-```
-
-Please use the site-specific API instead:
-
-```http
-GET /api/sites/[siteSlug]/info
-```
-
-### Migration Guide
-
-To migrate from the old API to the new API:
-
-1. Determine the site slug from the current site context
-2. Use the site slug in the new API endpoint: `/api/sites/[siteSlug]/info`
-3. Update your code to handle the new response format
-
-#### Example
-
-Old API:
+### Usage Example
 
 ```javascript
-// Old API usage
-const response = await fetch('/api/site-info');
-const data = await response.json();
-const site = data.site;
-```
-
-New API:
-
-```javascript
-// New API usage
+// Get site information
 const siteSlug = 'example-site'; // Get this from your site context
 const response = await fetch(`/api/sites/${siteSlug}/info`);
 const data = await response.json();
 const site = data.site;
 ```
+
+### Benefits of Site-Specific APIs
+
+- **Security**: Explicit site context in the URL prevents cross-site data access
+- **Clarity**: The URL clearly indicates which site's data is being accessed
+- **Consistency**: All content APIs follow the same pattern
+- **Simplicity**: No need to pass site IDs as query parameters
 
 ## Notes
 
