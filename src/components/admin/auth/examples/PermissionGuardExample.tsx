@@ -3,6 +3,7 @@
 import React from 'react';
 import { PermissionGuard } from '../guards/PermissionGuard';
 import { usePermission } from '../hooks/usePermission';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Example component demonstrating various ways to use PermissionGuard
@@ -10,9 +11,9 @@ import { usePermission } from '../hooks/usePermission';
  */
 export function PermissionGuardExample() {
   // Example of using the permission hook for programmatic checks
-  const { 
+  const {
     hasPermission: canManageCategories,
-    isLoading: checkingPermission 
+    isLoading: checkingPermission
   } = usePermission({
     resourceType: 'category',
     permission: 'manage'
@@ -21,15 +22,15 @@ export function PermissionGuardExample() {
   return (
     <div className="p-4 space-y-8 bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-semibold">PermissionGuard Component Examples</h2>
-      
+
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Basic Permission Check</h3>
         <p className="text-gray-600">
           Shows content only if the user has read permission for categories
         </p>
         <div className="border border-gray-200 p-3 rounded-md bg-gray-50">
-          <PermissionGuard 
-            resourceType="category" 
+          <PermissionGuard
+            resourceType="category"
             permission="read"
           >
             <div className="p-2 bg-blue-50 text-blue-700 rounded">
@@ -38,15 +39,15 @@ export function PermissionGuardExample() {
           </PermissionGuard>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <h3 className="text-lg font-medium">With Custom Fallback</h3>
         <p className="text-gray-600">
           Shows alternative content when permission check fails
         </p>
         <div className="border border-gray-200 p-3 rounded-md bg-gray-50">
-          <PermissionGuard 
-            resourceType="listing" 
+          <PermissionGuard
+            resourceType="listing"
             permission="delete"
             fallback={
               <div className="p-2 bg-red-50 text-red-700 rounded">
@@ -54,21 +55,21 @@ export function PermissionGuardExample() {
               </div>
             }
           >
-            <button className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
+            <Button variant="danger" size="sm">
               Delete Listing
-            </button>
+            </Button>
           </PermissionGuard>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Resource-Specific Permission</h3>
         <p className="text-gray-600">
           Checks permission for a specific resource ID
         </p>
         <div className="border border-gray-200 p-3 rounded-md bg-gray-50">
-          <PermissionGuard 
-            resourceType="listing" 
+          <PermissionGuard
+            resourceType="listing"
             permission="update"
             resourceId="listing-123"
             fallback={
@@ -77,21 +78,21 @@ export function PermissionGuardExample() {
               </div>
             }
           >
-            <button className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+            <Button variant="primary" size="sm">
               Edit Listing #123
-            </button>
+            </Button>
           </PermissionGuard>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Multiple Permissions (Any)</h3>
         <p className="text-gray-600">
           Shows content if the user has ANY of the specified permissions
         </p>
         <div className="border border-gray-200 p-3 rounded-md bg-gray-50">
-          <PermissionGuard 
-            resourceType="category" 
+          <PermissionGuard
+            resourceType="category"
             permissions={['update', 'delete']}
             requireAll={false}
             fallback={
@@ -106,15 +107,15 @@ export function PermissionGuardExample() {
           </PermissionGuard>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Multiple Permissions (All)</h3>
         <p className="text-gray-600">
           Shows content only if the user has ALL specified permissions
         </p>
         <div className="border border-gray-200 p-3 rounded-md bg-gray-50">
-          <PermissionGuard 
-            resourceType="site" 
+          <PermissionGuard
+            resourceType="site"
             permissions={['read', 'update']}
             requireAll={true}
             fallback={
@@ -129,7 +130,7 @@ export function PermissionGuardExample() {
           </PermissionGuard>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Silent Mode</h3>
         <p className="text-gray-600">
@@ -138,19 +139,19 @@ export function PermissionGuardExample() {
         <div className="border border-gray-200 p-3 rounded-md bg-gray-50">
           <div className="flex items-center space-x-2">
             <span>Edit User:</span>
-            <PermissionGuard 
-              resourceType="user" 
+            <PermissionGuard
+              resourceType="user"
               permission="update"
               silent={true}
             >
-              <button className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
+              <Button variant="primary" size="sm" className="bg-green-600 hover:bg-green-700">
                 Edit Profile
-              </button>
+              </Button>
             </PermissionGuard>
           </div>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Using the usePermission Hook</h3>
         <p className="text-gray-600">
@@ -165,15 +166,15 @@ export function PermissionGuardExample() {
                 You have full management permission for categories
               </div>
               <div className="flex space-x-2">
-                <button className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <Button variant="primary" size="sm">
                   Create Category
-                </button>
-                <button className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
+                </Button>
+                <Button variant="primary" size="sm" className="bg-green-600 hover:bg-green-700">
                   Import Categories
-                </button>
-                <button className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
+                </Button>
+                <Button variant="danger" size="sm">
                   Delete All
-                </button>
+                </Button>
               </div>
             </div>
           ) : (

@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { Button } from '@/components/ui/Button';
 
 interface FilterActionsProps {
   onApply: () => void;
@@ -15,22 +16,25 @@ function FilterActions({
 }: FilterActionsProps) {
   return (
     <div className="flex justify-between pt-4 border-t border-gray-200 p-4">
-      <button
+      <Button
         type="button"
         onClick={onClear}
-        className="text-sm text-gray-700 hover:text-gray-900"
+        variant="link"
+        size="sm"
+        className="text-gray-700 hover:text-gray-900"
         data-testid="clear-filters"
       >
         Clear Filters
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
         onClick={onApply}
-        className={`px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+        variant="primary"
+        size="sm"
         data-testid="apply-filters"
       >
         Apply
-      </button>
+      </Button>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { InfoIcon, CheckCircleIcon, AlertTriangleIcon, CopyIcon, ExternalLinkIcon } from 'lucide-react';
+import { Button as UIButton } from '@/components/ui/Button';
 
 // Import UI components
 const Tabs = ({ defaultValue, children }: { defaultValue: string, children: React.ReactNode }) => (
@@ -13,7 +14,7 @@ const TabsList = ({ children }: { children: React.ReactNode }) => (
 );
 
 const TabsTrigger = ({ value, children }: { value: string, children: React.ReactNode }) => (
-  <button className="tabs-trigger" data-value={value}>{children}</button>
+  <UIButton variant="ghost" className="tabs-trigger" data-value={value}>{children}</UIButton>
 );
 
 const TabsContent = ({ value, children }: { value: string, children: React.ReactNode }) => (
@@ -33,7 +34,7 @@ const AlertDescription = ({ children }: { children: React.ReactNode }) => (
   <div className="alert-description">{children}</div>
 );
 
-// Mock Button component
+// Button component that uses our UI Button
 const Button = ({
   children,
   onClick,
@@ -48,15 +49,24 @@ const Button = ({
   className?: string,
   variant?: string,
   size?: string
-}) => (
-  <button
-    onClick={onClick}
-    disabled={disabled}
-    className={`button ${variant || ''} ${size || ''} ${className || ''}`}
-  >
-    {children}
-  </button>
-);
+}) => {
+  const getVariant = () => {
+    if (variant === 'primary') return 'primary';
+    if (variant === 'secondary') return 'secondary';
+    return 'ghost';
+  };
+
+  return (
+    <UIButton
+      onClick={onClick}
+      disabled={disabled}
+      variant={getVariant()}
+      className={`${size || ''} ${className || ''}`}
+    >
+      {children}
+    </UIButton>
+  );
+};
 
 export interface DomainSetupGuideProps {
   /**

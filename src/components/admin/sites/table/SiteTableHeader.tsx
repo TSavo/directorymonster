@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 
 export interface SiteTableHeaderProps {
   /**
@@ -20,7 +21,7 @@ export interface SiteTableHeaderProps {
 
 /**
  * SiteTableHeader - Header component for the site table
- * 
+ *
  * Provides search functionality and create button
  */
 export const SiteTableHeader: React.FC<SiteTableHeaderProps> = ({
@@ -31,7 +32,7 @@ export const SiteTableHeader: React.FC<SiteTableHeaderProps> = ({
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3" data-testid="site-table-header">
       <h2 className="text-xl font-semibold">Sites</h2>
-      
+
       <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
         {/* Search input */}
         <div className="relative w-full sm:w-64">
@@ -55,15 +56,17 @@ export const SiteTableHeader: React.FC<SiteTableHeaderProps> = ({
             />
           </svg>
         </div>
-        
+
         {/* Create button */}
-        <Link
-          href={createPath}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-center"
+        <Button
+          asChild
+          variant="primary"
           data-testid="create-site-button"
         >
-          Create Site
-        </Link>
+          <Link href={createPath}>
+            Create Site
+          </Link>
+        </Button>
       </div>
     </div>
   );

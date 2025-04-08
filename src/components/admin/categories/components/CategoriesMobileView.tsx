@@ -1,6 +1,7 @@
 'use client';
 
 import { CategoriesMobileViewProps } from '../types';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Mobile-friendly view of categories that replaces the table for smaller screens
@@ -68,27 +69,33 @@ export function CategoriesMobileView({
           </div>
 
           <div className="flex justify-end space-x-3 pt-2 border-t">
-            <button
+            <Button
+              variant="link"
+              size="sm"
               onClick={() => onViewClick(category.id)}
-              className="text-blue-600 hover:text-blue-900 text-sm font-medium"
+              className="text-blue-600 hover:text-blue-900 p-0 h-auto"
               data-testid={`view-button-${category.id}`}
             >
               View
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="link"
+              size="sm"
               onClick={() => onEditClick(category.id)}
-              className="text-amber-600 hover:text-amber-900 text-sm font-medium"
+              className="text-amber-600 hover:text-amber-900 p-0 h-auto"
               data-testid={`edit-button-${category.id}`}
             >
               Edit
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="link"
+              size="sm"
               onClick={() => onDeleteClick(category.id, category.name)}
-              className="text-red-600 hover:text-red-900 text-sm font-medium"
+              className="text-red-600 hover:text-red-900 p-0 h-auto"
               data-testid={`delete-button-${category.id}`}
             >
               Delete
-            </button>
+            </Button>
           </div>
         </article>
       ))}

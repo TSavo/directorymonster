@@ -5,21 +5,22 @@ import React, { useState } from 'react';
 import { ResourceType, Permission } from '@/components/admin/auth/utils/accessControl';
 import { TenantACE } from '@/components/admin/auth/utils/roles';
 import { GlobalRoleFormProps } from './types';
+import { Button } from '@/components/ui/Button';
 
-const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({ 
-  initialData, 
-  onSubmit, 
-  onCancel 
+const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({
+  initialData,
+  onSubmit,
+  onCancel
 }) => {
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [aclEntries, setAclEntries] = useState<TenantACE[]>(initialData?.aclEntries || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Available resource types and permissions
   const resourceTypes: ResourceType[] = ['tenant', 'user', 'site', 'category', 'listing', 'setting', 'audit', 'role'];
   const permissions: Permission[] = ['create', 'read', 'update', 'delete', 'manage'];
-  
+
   // Add a new ACL entry
   const addAclEntry = () => {
     setAclEntries([
@@ -33,7 +34,7 @@ const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({
       }
     ]);
   };
-  
+
   // Update an ACL entry
   const updateAclEntry = (index: number, field: string, value: string) => {
     const newEntries = [...aclEntries];
@@ -44,17 +45,17 @@ const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({
     }
     setAclEntries(newEntries);
   };
-  
+
   // Remove an ACL entry
   const removeAclEntry = (index: number) => {
     setAclEntries(aclEntries.filter((_, i) => i !== index));
   };
-  
+
   // Submit the form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       await onSubmit({
         name,
@@ -67,14 +68,14 @@ const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <form onSubmit={handleSubmit}>
         <h3 className="text-lg font-medium mb-4">
           {initialData ? 'Edit Global Role' : 'Create Global Role'}
         </h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Role Name
@@ -87,7 +88,7 @@ const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({
             required
           />
         </div>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Description
@@ -99,27 +100,29 @@ const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({
             rows={3}
           />
         </div>
-        
+
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
             <label className="block text-sm font-medium text-gray-700">
               Permissions
             </label>
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              size="sm"
               onClick={addAclEntry}
-              className="text-sm bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100"
+              className="text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-100"
             >
               Add Permission
-            </button>
+            </Button>
           </div>
-          
+
           {aclEntries.length === 0 && (
             <p className="text-sm text-gray-500 italic">
               No permissions added. Add at least one permission.
             </p>
           )}
-          
+
           {aclEntries.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 mb-2 p-2 bg-gray-50 rounded">
               <select
@@ -133,7 +136,7 @@ const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({
                   </option>
                 ))}
               </select>
-              
+
               <select
                 value={entry.permission}
                 onChange={(e) => updateAclEntry(index, 'permission', e.target.value)}
@@ -145,7 +148,7 @@ const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({
                   </option>
                 ))}
               </select>
-              
+
               <button
                 type="button"
                 onClick={() => removeAclEntry(index)}
@@ -159,23 +162,24 @@ const GlobalRoleForm: React.FC<GlobalRoleFormProps> = ({
             </div>
           ))}
         </div>
-        
+
         <div className="flex justify-end gap-2">
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50"
-            disabled={isSubmitting}
+            isLoading={isSubmitting}
+            className="mr-2"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-            disabled={isSubmitting}
+            variant="primary"
+            isLoading={isSubmitting}
           >
-            {isSubmitting ? 'Saving...' : initialData ? 'Update Role' : 'Create Role'}
-          </button>
+            {initialData ? 'Update Role' : 'Create Role'}
+          </Button>
         </div>
       </form>
     </div>

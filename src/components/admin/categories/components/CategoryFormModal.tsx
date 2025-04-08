@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Category } from '@/types';
 import { CategoryForm } from '../CategoryForm';
+import { Button } from '@/components/ui/Button';
 
 interface CategoryFormModalProps {
   isOpen: boolean;
@@ -28,24 +29,24 @@ export function CategoryFormModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isEditMode = !!categoryId;
-  
+
   // Default title based on mode
   const modalTitle = title || (isEditMode ? 'Edit Category' : 'Create New Category');
-  
+
   // Fetch category data if in edit mode
   useEffect(() => {
     if (isOpen && isEditMode && categoryId) {
       const fetchCategoryData = async () => {
         setIsLoading(true);
         setError(null);
-        
+
         try {
           const response = await fetch(`/api/sites/${siteSlug}/categories/${categoryId}`);
-          
+
           if (!response.ok) {
             throw new Error(`Failed to fetch category: ${response.statusText}`);
           }
-          
+
           const data = await response.json();
           setCategoryData(data);
         } catch (err) {
@@ -55,14 +56,14 @@ export function CategoryFormModal({
           setIsLoading(false);
         }
       };
-      
+
       fetchCategoryData();
     } else if (!isEditMode) {
       // Reset data in create mode
       setCategoryData(undefined);
     }
   }, [isOpen, isEditMode, categoryId, siteSlug]);
-  
+
   // Close modal when ESC key is pressed
   useEffect(() => {
     const handleEscapeKey = (e: KeyboardEvent) => {
@@ -70,19 +71,19 @@ export function CategoryFormModal({
         onClose();
       }
     };
-    
+
     document.addEventListener('keydown', handleEscapeKey);
-    
+
     return () => {
       document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isOpen, onClose]);
-  
+
   // Handle modal closing - reset state
   const handleClose = () => {
     onClose();
   };
-  
+
   // Handle successful save
   const handleSaved = (id: string) => {
     if (onSaved) {
@@ -90,11 +91,11 @@ export function CategoryFormModal({
     }
     onClose();
   };
-  
+
   if (!isOpen) {
     return null;
   }
-  
+
   return (
     <div
       className="fixed inset-0 z-50 overflow-y-auto"
@@ -104,16 +105,16 @@ export function CategoryFormModal({
       data-testid="category-form-modal"
     >
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
         aria-hidden="true"
         onClick={handleClose}
         data-testid="category-form-modal-backdrop"
       ></div>
-      
+
       {/* Modal content */}
       <div className="flex items-center justify-center min-h-screen p-4">
-        <div 
+        <div
           className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto z-10"
           onClick={(e) => e.stopPropagation()}
           data-testid="category-form-modal-content"
@@ -123,9 +124,11 @@ export function CategoryFormModal({
             <h2 className="text-xl font-semibold text-gray-800" data-testid="category-form-modal-title">
               {modalTitle}
             </h2>
-            <button
+            <Button
               type="button"
-              className="text-gray-400 hover:text-gray-500 focus:outline-none"
+              variant="ghost"
+              size="icon"
+              className="text-gray-400 hover:text-gray-500"
               onClick={handleClose}
               aria-label="Close"
               data-testid="category-form-modal-close"
@@ -135,7 +138,7 @@ export function CategoryFormModal({
               </svg>
             </button>
           </div>
-          
+
           {/* Body */}
           <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
             {isLoading ? (
