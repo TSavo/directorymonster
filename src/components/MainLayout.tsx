@@ -1,37 +1,11 @@
 'use client';
 
-import React, { ReactNode } from 'react';
-import MainHeader from './MainHeader';
-import MainFooter from './MainFooter';
-import { PublicTenantSiteProvider } from '@/contexts/PublicTenantSiteContext';
-import { AuthProvider } from '@/components/admin/auth/AuthProvider';
+import React from 'react';
+import { UseMainLayoutProps } from './hooks/useMainLayout';
+import { MainLayoutContainer } from './MainLayoutContainer';
 
-interface MainLayoutProps {
-  children: ReactNode;
-  site: {
-    id: string;
-    name: string;
-    logoUrl?: string;
-  };
-  categories?: Array<{
-    id: string;
-    name: string;
-    slug: string;
-  }>;
-}
+export interface MainLayoutProps extends UseMainLayoutProps {}
 
-export default function MainLayout({ children, site, categories = [] }: MainLayoutProps) {
-  return (
-    <AuthProvider>
-      <PublicTenantSiteProvider>
-        <div className="flex flex-col min-h-screen">
-          <MainHeader site={site} categories={categories} />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <MainFooter site={site} />
-        </div>
-      </PublicTenantSiteProvider>
-    </AuthProvider>
-  );
+export default function MainLayout(props: MainLayoutProps) {
+  return <MainLayoutContainer {...props} />;
 }
