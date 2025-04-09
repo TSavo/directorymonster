@@ -1,6 +1,67 @@
-# Checkpoint: API E2E Testing Specifications - April 2, 2025
+# Checkpoint: Running DirectoryMonster Tests - April 9, 2025
 
-## Current Progress
+## Results of Test Execution
+
+I have run the directorymonster tests with different test commands. Here's a summary of the results:
+
+1. **Fixed Tests** (`npm run test:fixed`):
+   - All 18 test suites passed
+   - 148 tests total (3 skipped, 145 passed)
+   - These tests appear to be a subset of stable tests that consistently pass
+
+2. **Component Tests** (`npx jest --testMatch="**/src/components/**/*.test.{ts,tsx}"`):
+   - Mixed results with several failing tests
+   - Many hook-related tests failed due to state management issues
+   - Common failures included:
+     - Expected vs. actual state in hooks
+     - Missing waitForNextUpdate functionality
+     - Component test failures due to missing dependencies
+   - Several authentication and security-related tests passed successfully
+
+3. **API and Unit Test Selection Projects**:
+   - The commands `npm run test:api` and `npm run test:unit` failed because the project selection configuration was not properly set up
+   - Error: "You provided values for --selectProjects but a project does not have a name."
+
+## Analysis of Test Failures
+
+The test failures observed seem to fall into several categories:
+
+1. **State Management Issues**:
+   - Many hook tests expect state changes that aren't happening
+   - Expected state values don't match actual values
+   - Missing or incorrect initialization of state
+
+2. **Configuration Problems**:
+   - The Jest project configuration seems to be incomplete
+   - Project names aren't specified for selectProjects to work
+   - Some test paths may not be correctly mapped
+
+3. **Missing Functionality**:
+   - waitForNextUpdate is not properly defined or mocked
+   - Some components or hooks appear to be broken or incompletely implemented
+
+## Next Steps
+
+To address these test failures, the following steps should be taken:
+
+1. **Fix Hook Tests**:
+   - Ensure proper initialization of state values
+   - Add proper mock implementations for waitForNextUpdate
+   - Update expectations to match actual component behavior
+
+2. **Update Jest Configuration**:
+   - Add displayName property to Jest projects to fix selectProjects errors
+   - Review and correct test paths and patterns
+
+3. **Complete Implementation**:
+   - Fix missing components and functionality
+   - Ensure dependencies are correctly imported
+
+4. **Refine Test Commands**:
+   - Document which test commands are reliable
+   - Update the test command documentation
+
+## Previous Progress (April 2, 2025)
 
 We have made significant progress in developing comprehensive API testing specifications for the DirectoryMonster project. So far, we have created the following:
 
@@ -76,24 +137,12 @@ We've also set up the foundational components for E2E API testing:
    - Create a comprehensive guide for running and maintaining API tests
    - Document test coverage and results interpretation
 
-## Next Steps
+### Lessons Learned & Conclusions
 
-1. Complete specifications for remaining API endpoints
-2. Implement actual test files for highest-priority endpoints:
-   - Start with auth endpoints (crucial for all other tests)
-   - Then implement site and category tests
-   - Finally implement listing and search tests
-3. Create test utility functions for common operations
-4. Set up continuous integration for API tests
+After analyzing the current test status, it's clear that:
 
-## Lessons Learned
-
-1. The multi-tenant nature of DirectoryMonster requires special attention to isolation testing
-2. Many endpoints need to be tested with both authenticated and unauthenticated access
-3. Redis transactions require careful testing for atomicity
-4. Search indexing errors should not fail API operations but should be logged
-5. URL generation logic needs comprehensive testing for various domain configurations
-
-## Conclusion
-
-The API testing specification work is approximately 70% complete. The remaining specifications should follow the same pattern established in the existing ones. Once specifications are complete, implementation of actual tests can begin, focusing first on auth endpoints which are prerequisites for testing most other endpoints.
+1. The DirectoryMonster project has a mix of stable and unstable tests
+2. The most reliable tests are in the 'fixed' subset
+3. Hook-related tests need more work to stabilize
+4. Jest configuration needs updating to support project selection
+5. The test documentation should be updated to reflect the current state
