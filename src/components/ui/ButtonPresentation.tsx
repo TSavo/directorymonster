@@ -52,7 +52,7 @@ export const ButtonPresentation = React.forwardRef<HTMLButtonElement, ButtonPres
           <span className="mr-2" data-testid="left-icon">{leftIcon}</span>
         ) : null}
         {buttonText}
-        {showRightIcon && <span className="ml-2" data-testid="right-icon">{rightIcon}</span>}
+        {showRightIcon && !showSpinner && <span className="ml-2" data-testid="right-icon">{rightIcon}</span>}
       </button>
     );
   }
