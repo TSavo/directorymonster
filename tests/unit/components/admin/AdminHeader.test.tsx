@@ -35,15 +35,27 @@ jest.mock('@/components/admin/tenant/SiteSelector', () => ({
   SiteSelector: () => <div data-testid="mock-site-selector">SiteSelector</div>
 }));
 
-// Mock the TenantSiteContext
-jest.mock('@/contexts/TenantSiteContext', () => ({
+// Mock lucide-react icons
+jest.mock('lucide-react', () => ({
+  Search: () => <div data-testid="mock-search-icon">Search Icon</div>,
+  Bell: () => <div data-testid="mock-bell-icon">Bell Icon</div>,
+  Menu: () => <div data-testid="mock-menu-icon">Menu Icon</div>,
+  X: () => <div data-testid="mock-x-icon">X Icon</div>,
+  ChevronDown: () => <div data-testid="mock-chevron-down-icon">ChevronDown Icon</div>
+}));
+
+// Mock the useTenantSite hook directly
+jest.mock('@/hooks/useTenantSite', () => ({
   useTenantSite: jest.fn().mockReturnValue({
     tenants: [],
     sites: [],
     currentTenantId: 'test-tenant',
     currentSiteId: 'test-site',
     setCurrentTenantId: jest.fn(),
-    setCurrentSiteId: jest.fn()
+    setCurrentSiteId: jest.fn(),
+    hasMultipleTenants: false,
+    hasMultipleSites: false,
+    loading: false
   })
 }));
 
