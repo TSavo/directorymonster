@@ -79,20 +79,22 @@ export interface DialogPresentationProps {
 /**
  * Presentation component for Dialog
  */
-export const DialogPresentation: React.FC<DialogPresentationProps> = ({
-  isOpen,
-  handleOpenChange,
-  trigger,
-  asChild = false,
-  children,
-  title,
-  description,
-  footer,
-  contentClassName,
-  headerClassName,
-  footerClassName,
-  showCloseButton = true
-}: DialogPresentationProps) {
+export function DialogPresentation(props: DialogPresentationProps) {
+  const {
+    isOpen,
+    handleOpenChange,
+    trigger,
+    asChild = false,
+    children,
+    title,
+    description,
+    footer,
+    contentClassName,
+    headerClassName,
+    footerClassName,
+    showCloseButton = true
+  } = props;
+
   return (
     <RadixDialog open={isOpen} onOpenChange={handleOpenChange}>
       {trigger && (
