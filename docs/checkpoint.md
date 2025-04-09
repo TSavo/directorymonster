@@ -1,46 +1,70 @@
 # Checkpoint: Fixing Jest Configuration Issues - April 9, 2025
 
-## Changes Made to Fix Jest Project Configuration
+## Progress Update
 
-I've identified and fixed the configuration issues with the Jest tests. The main problems were:
+I've made significant improvements to the Jest configuration and test setup. While we've fixed the initial configuration issues that prevented running project-specific tests, there are still several failing tests that need attention.
 
-1. **Missing displayName Property**: 
-   - The Jest projects configuration was missing displayName properties
-   - This caused the --selectProjects option to fail
-   - Added displayName to each project configuration
+### Fixed Issues:
 
-2. **Projects Configuration Structure**:
-   - Created a new dedicated file `jest.projects.config.js` for project-based testing
-   - Added proper project definitions with clear displayNames
-   - Updated the package.json scripts to use the new config file
+1. **Jest Projects Configuration**:
+   - Created a dedicated `jest.projects.config.js` file with proper project definitions
+   - Added `displayName` property to each project configuration
+   - Updated package.json scripts to use the new config file
 
-3. **waitForNextUpdate Functionality**:
-   - Fixed the missing waitForNextUpdate functionality in react-hooks mock
-   - Enhanced the implementation to properly track state updates
-   - Made the functionality more robust
+2. **CommonJS/ESM Compatibility**:
+   - Fixed the `next/link.js` mock to use proper CommonJS syntax
+   - Updated `tests/utils/render.js` to use CommonJS exports instead of ESM
 
-4. **Project Selection Commands**:
-   - Updated npm scripts in package.json:
-     - `test:unit` now uses `--config jest.projects.config.js --selectProjects=UNIT`
-     - `test:component` now uses `--config jest.projects.config.js --selectProjects=COMPONENT`
-     - `test:integration` now uses `--config jest.projects.config.js --selectProjects=INTEGRATION`
-     - `test:hook` now uses `--config jest.projects.config.js --selectProjects=HOOK`
-     - `test:api` now uses `--config jest.projects.config.js --selectProjects=API`
+3. **Mock Implementation**:
+   - Fixed issues with React references in mock factory functions
+   - Implemented proper error handling in module mocks
+
+### Successful Tests:
+
+We've confirmed that the Button component tests are passing successfully using our new configuration. This is a good indicator that our approach works for properly structured tests.
+
+### Remaining Issues:
+
+1. **Module Path Mapping**:
+   - Many tests fail with the error: `Could not locate module @/tests/utils/render mapped as: C:\Users\T\directorymonster\src\$1`
+   - The path mapping for `@/tests/...` is not working correctly
+
+2. **Hook State Management Issues**:
+   - Several hook tests fail due to state not updating as expected
+   - Tests expect state changes that aren't occurring
+   - Need to improve our waitForNextUpdate implementation
+
+3. **Component Import Errors**:
+   - Some tests fail due to missing or improperly exported components
+   - Particularly in the admin components section
 
 ## Next Steps
 
-1. **Test the New Configuration**:
-   - Run the individual project tests to verify they work
-   - Check for any remaining issues with waitForNextUpdate
-   - Run the fixed tests to ensure they still pass
+1. **Fix Module Path Mapping**:
+   - Update the moduleNameMapper configuration to properly map `@/tests/...` to the correct path
+   - Consider adding an additional mapping specifically for test utilities
 
-2. **Update Documentation**:
-   - Update documentation to reflect the new project structure
-   - Create guidelines for adding new test projects
+2. **Improve Hook Tests**:
+   - Update the waitForNextUpdate implementation to better handle state changes
+   - Review failing hook tests and fix state management issues
 
-3. **Fix Remaining Test Issues**:
-   - Address state management issues in failing tests
-   - Fix components with missing imports or dependencies
+3. **Fix Component Imports**:
+   - Identify and fix missing component exports
+   - Ensure proper imports in test files
+
+4. **Expand Test Coverage**:
+   - Once the basic configuration is working properly, expand test coverage
+   - Focus on critical components and functionality first
+
+## Tests Summary
+
+We ran several test suites with our updated configuration:
+
+1. **Button Component Tests**: All 15 tests are passing
+2. **Unit Tests**: 15 passing, 23 failing out of 38 tests
+   - Many failures due to module path mapping issues
+   - Some failures due to state management in hooks
+3. **API Tests**: Currently not functioning due to missing test files
 
 ## Previous Work (April 9, 2025 - Earlier Today)
 
@@ -112,58 +136,3 @@ We have made significant progress in developing comprehensive API testing specif
 
 5. **Search API**:
    - GET /api/search - Searching for listings with filtering and pagination
-
-### E2E Testing Framework Setup
-
-We've also set up the foundational components for E2E API testing:
-
-1. Created `api-test-base.js` with common testing utilities
-2. Implemented `auth-helper.js` for authentication in tests
-3. Set up Jest configuration for API E2E tests
-4. Added npm scripts for running API tests
-
-## Remaining Work
-
-### API Specifications to Complete
-
-1. **Listings API**:
-   - DELETE /api/sites/[siteSlug]/listings/[listingId] - Deleting a listing
-
-2. **Admin API**:
-   - Various admin panel API endpoints
-
-3. **Auth API**:
-   - POST /api/auth/login - User authentication/login
-   - Other auth-related endpoints (password reset, verification, etc.)
-
-4. **User Management API**:
-   - User CRUD operations
-   - Role and permission management
-
-5. **Tenant API**:
-   - Tenant management endpoints
-
-### Implementation Tasks
-
-1. **Test Implementation**:
-   - Create actual test files based on specifications
-   - Implement test cases using SuperTest and Jest
-   - Create test fixtures and mocks
-
-2. **CI/CD Integration**:
-   - Add API tests to CI/CD pipeline
-   - Configure test reporting
-
-3. **Documentation**:
-   - Create a comprehensive guide for running and maintaining API tests
-   - Document test coverage and results interpretation
-
-### Lessons Learned & Conclusions
-
-After analyzing the current test status, it's clear that:
-
-1. The DirectoryMonster project has a mix of stable and unstable tests
-2. The most reliable tests are in the 'fixed' subset
-3. Hook-related tests need more work to stabilize
-4. Jest configuration needs updating to support project selection
-5. The test documentation should be updated to reflect the current state
