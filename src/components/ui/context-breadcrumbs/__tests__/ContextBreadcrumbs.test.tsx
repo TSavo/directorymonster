@@ -12,6 +12,18 @@ jest.mock('../BreadcrumbProvider', () => ({
   useBreadcrumbs: jest.fn(),
 }));
 
+// Mock lucide-react icons
+jest.mock('lucide-react', () => ({
+  ChevronRight: () => <div data-testid="mock-chevron-right">ChevronRight</div>,
+  Home: () => <div data-testid="mock-home-icon">Home</div>,
+  Users: () => <div data-testid="mock-users-icon">Users</div>,
+  Shield: () => <div data-testid="mock-shield-icon">Shield</div>,
+  Globe: () => <div data-testid="mock-globe-icon">Globe</div>,
+  FileText: () => <div data-testid="mock-file-text-icon">FileText</div>,
+  FolderTree: () => <div data-testid="mock-folder-tree-icon">FolderTree</div>,
+  Settings: () => <div data-testid="mock-settings-icon">Settings</div>
+}));
+
 describe('ContextBreadcrumbs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -31,12 +43,14 @@ describe('ContextBreadcrumbs', () => {
 
     // Check that all breadcrumb items are rendered
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Users')).toBeInTheDocument();
+    // Use getAllByText for 'Users' since it appears multiple times (icon and text)
+    expect(screen.getAllByText('Users').length).toBeGreaterThan(0);
     expect(screen.getByText('User Details')).toBeInTheDocument();
 
     // Last item should not be a link
     const dashboardLink = screen.getByText('Dashboard').closest('a');
-    const usersLink = screen.getByText('Users').closest('a');
+    // Find the Users link by href attribute
+    const usersLink = screen.getByRole('link', { name: 'Users' });
     const detailsText = screen.getByText('User Details');
 
     expect(dashboardLink).toHaveAttribute('href', '/admin');
@@ -76,7 +90,8 @@ describe('ContextBreadcrumbs', () => {
 
     // Check that all items are rendered
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Users')).toBeInTheDocument();
+    // Use getAllByText for 'Users' since it appears multiple times (icon and text)
+    expect(screen.getAllByText('Users').length).toBeGreaterThan(0);
     expect(screen.getByText('User Details')).toBeInTheDocument();
   });
 
