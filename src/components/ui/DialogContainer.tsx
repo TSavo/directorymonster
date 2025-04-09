@@ -2,15 +2,15 @@
 
 import React from 'react';
 import { useDialog, UseDialogProps } from './hooks/useDialog';
-import DialogPresentation, { DialogPresentationProps } from './DialogPresentation';
+import { DialogPresentation, DialogPresentationProps } from './DialogPresentation';
 
-export interface DialogContainerProps extends UseDialogProps, 
+export interface DialogContainerProps extends UseDialogProps,
   Omit<DialogPresentationProps, 'isOpen' | 'handleOpenChange'> {
 }
 
 /**
  * Container component for Dialog
- * 
+ *
  * This component connects the useDialog hook with the DialogPresentation component.
  */
 export function DialogContainer({
@@ -37,7 +37,7 @@ export function DialogContainer({
     open,
     onOpenChange
   });
-  
+
   // Render the presentation component with the hook values
   return (
     <DialogPresentation

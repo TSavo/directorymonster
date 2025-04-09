@@ -19,57 +19,57 @@ export interface DialogPresentationProps {
    * Current open state of the dialog
    */
   isOpen: boolean;
-  
+
   /**
    * Function to handle open state changes
    */
   handleOpenChange: (open: boolean) => void;
-  
+
   /**
    * Dialog trigger element
    */
   trigger?: React.ReactNode;
-  
+
   /**
    * Whether the trigger should be rendered as a child
    */
   asChild?: boolean;
-  
+
   /**
    * Dialog content
    */
   children: React.ReactNode;
-  
+
   /**
    * Dialog title
    */
   title?: React.ReactNode;
-  
+
   /**
    * Dialog description
    */
   description?: React.ReactNode;
-  
+
   /**
    * Dialog footer content
    */
   footer?: React.ReactNode;
-  
+
   /**
    * Additional class name for the content
    */
   contentClassName?: string;
-  
+
   /**
    * Additional class name for the header
    */
   headerClassName?: string;
-  
+
   /**
    * Additional class name for the footer
    */
   footerClassName?: string;
-  
+
   /**
    * Whether to show the close button
    */
@@ -79,7 +79,7 @@ export interface DialogPresentationProps {
 /**
  * Presentation component for Dialog
  */
-export function DialogPresentation({
+export const DialogPresentation: React.FC<DialogPresentationProps> = ({
   isOpen,
   handleOpenChange,
   trigger,
@@ -100,7 +100,7 @@ export function DialogPresentation({
           {trigger}
         </DialogTrigger>
       )}
-      
+
       <DialogContent className={contentClassName} data-testid="dialog-content">
         {(title || description) && (
           <DialogHeader className={headerClassName} data-testid="dialog-header">
@@ -108,17 +108,17 @@ export function DialogPresentation({
             {description && <DialogDescription data-testid="dialog-description">{description}</DialogDescription>}
           </DialogHeader>
         )}
-        
+
         <div data-testid="dialog-body">
           {children}
         </div>
-        
+
         {footer && (
           <DialogFooter className={footerClassName} data-testid="dialog-footer">
             {footer}
           </DialogFooter>
         )}
-        
+
         {!showCloseButton && (
           <DialogClose className="hidden" />
         )}
