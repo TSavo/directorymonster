@@ -1,0 +1,164 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button Visual Regression renders all button sizes 1`] = `
+<div>
+  <div>
+    <button
+      data-size="default"
+      data-testid="default-size"
+      data-variant="default"
+    >
+      Default
+    </button>
+    <button
+      data-size="sm"
+      data-testid="sm-size"
+      data-variant="default"
+    >
+      Small
+    </button>
+    <button
+      data-size="lg"
+      data-testid="lg-size"
+      data-variant="default"
+    >
+      Large
+    </button>
+    <button
+      data-size="icon"
+      data-testid="icon-size"
+      data-variant="default"
+    >
+      Icon
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Button Visual Regression renders all button variants 1`] = `
+<div>
+  <div>
+    <button
+      data-size="default"
+      data-testid="default-button"
+      data-variant="default"
+    >
+      Default
+    </button>
+    <button
+      data-size="default"
+      data-testid="destructive-button"
+      data-variant="destructive"
+    >
+      Destructive
+    </button>
+    <button
+      data-size="default"
+      data-testid="outline-button"
+      data-variant="outline"
+    >
+      Outline
+    </button>
+    <button
+      data-size="default"
+      data-testid="secondary-button"
+      data-variant="secondary"
+    >
+      Secondary
+    </button>
+    <button
+      data-size="default"
+      data-testid="ghost-button"
+      data-variant="ghost"
+    >
+      Ghost
+    </button>
+    <button
+      data-size="default"
+      data-testid="link-button"
+      data-variant="link"
+    >
+      Link
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Button Visual Regression renders loading state 1`] = `
+<div>
+  <div>
+    <button
+      data-loading="true"
+      data-size="default"
+      data-testid="loading-button"
+      data-variant="default"
+    >
+      Loading
+    </button>
+    <button
+      data-loading="true"
+      data-size="default"
+      data-testid="loading-text-button"
+      data-variant="default"
+    >
+      Please wait...
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Button Visual Regression renders with icons 1`] = `
+<div>
+  <div>
+    <button
+      data-size="default"
+      data-testid="left-icon-button"
+      data-variant="default"
+    >
+      <span
+        data-testid="left-icon"
+      >
+        <span>
+          🔍
+        </span>
+      </span>
+      Search
+    </button>
+    <button
+      data-size="default"
+      data-testid="right-icon-button"
+      data-variant="default"
+    >
+      Next
+      <span
+        data-testid="right-icon"
+      >
+        <span>
+          →
+        </span>
+      </span>
+    </button>
+    <button
+      data-size="default"
+      data-testid="both-icons-button"
+      data-variant="default"
+    >
+      <span
+        data-testid="left-icon"
+      >
+        <span>
+          🔍
+        </span>
+      </span>
+      Search and Next
+      <span
+        data-testid="right-icon"
+      >
+        <span>
+          →
+        </span>
+      </span>
+    </button>
+  </div>
+</div>
+`;
