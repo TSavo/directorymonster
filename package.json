@@ -88,7 +88,7 @@
     "circomlib": "^2.0.5",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "ffjavascript": "^0.2.63",
+    "ffjavascript": "^0.3.1",
     "glob": "^11.0.1",
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
