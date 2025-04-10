@@ -59,6 +59,12 @@
     "test:zkp": "cross-env ZKP_USE_MOCKS=true jest --config jest.config.zkp.js",
     "test:zkp:real": "cross-env ZKP_USE_MOCKS=false jest --config jest.config.zkp.js",
     "test:zkp:all": "node scripts/run-zkp-tests.js",
+    "zkp:setup": "ts-node scripts/zkp-setup-simple.ts",
+    "win:zkp:setup": "npx ts-node scripts/zkp-setup-simple.ts",
+    "zkp:check": "node scripts/check-zkp-setup.js",
+    "win:zkp:check": "node scripts/check-zkp-setup.js",
+    "deploy:with-zkp": "node scripts/deploy-with-zkp.js",
+    "win:deploy:with-zkp": "node scripts/deploy-with-zkp.js",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:critical-paths": "jest --config tests/integration/critical-paths/jest.config.js \"tests/integration/critical-paths/**/*.test.tsx\"",
@@ -90,7 +96,10 @@
     "win:test:security": "powershell -File scripts/test-all-security.ps1",
     "win:verify": "powershell -File scripts/verify-all.ps1",
     "win:docker": "powershell -File scripts/docker-do-it-all.ps1",
-    "win:setup": "powershell -File scripts/do-it-all.ps1"
+    "win:setup": "powershell -File scripts/do-it-all.ps1",
+    "win:test:zkp": "powershell -Command \"$env:ZKP_USE_MOCKS='true'; npm run test:zkp:win\"",
+    "win:test:zkp:real": "powershell -Command \"$env:ZKP_USE_MOCKS='false'; npm run test:zkp:win\"",
+    "test:zkp:win": "jest --config jest.config.zkp.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
