@@ -1,10 +1,42 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { useLoginAttemptsMap } from '../useLoginAttemptsMap';
 
+// Utility functions for async hook testing
+const waitForCondition = async (
+  condition: () => boolean,
+  timeout = 5000,
+  interval = 50
+): Promise<void> => {
+  const start = Date.now();
+  while (!condition() && Date.now() - start < timeout) {
+    await new Promise((resolve) => setTimeout(resolve, interval));
+  }
+  if (!condition()) {
+    throw new Error(`Timeout waiting for condition after ${timeout}ms`);
+  }
+};
+
+const waitForLoadingToComplete = async <T extends { isLoading: boolean }>(
+  result: { current: T },
+  timeout = 5000
+): Promise<void> => {
+  return waitForCondition(() => !result.current.isLoading, timeout);
+};
+
+const waitForHookToUpdate = async <T>(
+  result: { current: T },
+  predicate: (result: T) => boolean,
+  timeout = 5000
+): Promise<void> => {
+  return waitForCondition(() => predicate(result.current), timeout);
+};
+
 // Mock fetch
 global.fetch = jest.fn();
 
 describe('useLoginAttemptsMap', () => {
+  // Increase timeout for all tests in this suite
+  jest.setTimeout(30000);
   const mockMapData = [
     {
       id: '1',
@@ -52,7 +84,8 @@ describe('useLoginAttemptsMap', () => {
     expect(result.current.mapData).toEqual([]);
     expect(result.current.error).toBeNull();
 
-    await waitForNextUpdate({ timeout: 1000 });
+    // Wait for the hook to update
+    await waitForNextUpdate();
 
     // After data is loaded
     expect(result.current.isLoading).toBe(false);
@@ -84,7 +117,11 @@ describe('useLoginAttemptsMap', () => {
       useLoginAttemptsMap({})
     );
 
-    await waitForNextUpdate({ timeout: 1000 });
+    // Initial state
+    expect(result.current.isLoading).toBe(true);
+
+    // Wait for the hook to update
+    await waitForNextUpdate();
 
     // After error
     expect(result.current.isLoading).toBe(false);
@@ -121,7 +158,11 @@ describe('useLoginAttemptsMap', () => {
       useLoginAttemptsMap({})
     );
 
-    await waitForNextUpdate({ timeout: 1000 });
+    // Initial state
+    expect(result.current.isLoading).toBe(true);
+
+    // Wait for the hook to update
+    await waitForNextUpdate();
 
     // Initial data loaded
     expect(result.current.mapData).toEqual(mockMapData);
@@ -134,7 +175,8 @@ describe('useLoginAttemptsMap', () => {
     // Should be loading again
     expect(result.current.isLoading).toBe(true);
 
-    await waitForNextUpdate({ timeout: 1000 });
+    // Wait for the hook to update again
+    await waitForNextUpdate();
 
     // Updated data
     expect(result.current.mapData).toEqual(updatedMapData);
@@ -155,11 +197,15 @@ describe('useLoginAttemptsMap', () => {
       endDate: '2023-01-31'
     };
 
-    const { waitForNextUpdate } = renderHook(() =>
+    const { result, waitForNextUpdate } = renderHook(() =>
       useLoginAttemptsMap({ filter })
     );
 
-    await waitForNextUpdate({ timeout: 1000 });
+    // Initial state
+    expect(result.current.isLoading).toBe(true);
+
+    // Wait for the hook to update
+    await waitForNextUpdate();
 
     // Verify API call with filters
     expect(global.fetch).toHaveBeenCalledWith(
@@ -175,8 +221,7 @@ describe('useLoginAttemptsMap', () => {
     expect(url).toContain('endDate=2023-01-31');
   });
 
-  // This test can cause the test suite to hang
-  test('updates when filter changes - with debug', async () => {
+  test('updates when filter changes', async () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
@@ -189,12 +234,8 @@ describe('useLoginAttemptsMap', () => {
         })
       });
 
-    console.log('[TEST] Before renderHook');
     const { result, waitForNextUpdate, rerender } = renderHook(
-      (props) => {
-        console.log('[TEST] Inside renderHook function, props:', JSON.stringify(props));
-        return useLoginAttemptsMap(props);
-      },
+      (props) => useLoginAttemptsMap(props),
       {
         initialProps: {
           filter: {
@@ -204,40 +245,19 @@ describe('useLoginAttemptsMap', () => {
         }
       }
     );
-    console.log('[TEST] After renderHook, initial state:',
-      'isLoading:', result.current.isLoading,
-      'mapData.length:', result.current.mapData.length,
-      'error:', result.current.error
-    );
 
-    // Wait for initial data load with timeout
-    console.log('[TEST] Before waitForNextUpdate');
-    try {
-      await waitForNextUpdate({ timeout: 3000 });
-      console.log('[TEST] waitForNextUpdate completed successfully');
-    } catch (error) {
-      console.error('[TEST] Timeout waiting for initial data load:', error);
-      // Continue with the test even if we time out
-    }
-    console.log('[TEST] After waitForNextUpdate, state:',
-      'isLoading:', result.current.isLoading,
-      'mapData.length:', result.current.mapData.length,
-      'error:', result.current.error
-    );
+    // Initial state
+    expect(result.current.isLoading).toBe(true);
 
-    // Initial data should be loaded or still loading
-    if (!result.current.isLoading) {
-      console.log('[TEST] Checking initial data');
-      // Check that we got at least one map data point
-      expect(result.current.mapData.length).toBeGreaterThan(0);
-      // And check that the first item matches what we expect
-      expect(result.current.mapData[0]).toEqual(mockMapData[0]);
-    } else {
-      console.log('[TEST] Still loading, skipping initial data check');
-    }
+    // Wait for the hook to update
+    await waitForNextUpdate();
+
+    // Initial data loaded
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.mapData.length).toBeGreaterThan(0);
+    expect(result.current.mapData[0]).toEqual(mockMapData[0]);
 
     // Change filter
-    console.log('[TEST] Before rerender with new filter');
     rerender({
       filter: {
         status: ['success'],
@@ -245,26 +265,12 @@ describe('useLoginAttemptsMap', () => {
         endDate: '2023-01-31'
       }
     });
-    console.log('[TEST] After rerender, state:',
-      'isLoading:', result.current.isLoading,
-      'mapData.length:', result.current.mapData.length,
-      'error:', result.current.error
-    );
 
-    // Wait for filter update with timeout
-    console.log('[TEST] Before second waitForNextUpdate');
-    try {
-      await waitForNextUpdate({ timeout: 3000 });
-      console.log('[TEST] Second waitForNextUpdate completed successfully');
-    } catch (error) {
-      console.error('[TEST] Timeout waiting for filter update:', error);
-      // Continue with the test even if we time out
-    }
-    console.log('[TEST] After second waitForNextUpdate, state:',
-      'isLoading:', result.current.isLoading,
-      'mapData.length:', result.current.mapData.length,
-      'error:', result.current.error
-    );
+    // Should be loading again
+    expect(result.current.isLoading).toBe(true);
+
+    // Wait for the hook to update again
+    await waitForNextUpdate();
 
     // Verify API call was made
     expect(global.fetch).toHaveBeenCalled();
@@ -291,7 +297,11 @@ describe('useLoginAttemptsMap', () => {
       useLoginAttemptsMap({})
     );
 
-    await waitForNextUpdate({ timeout: 1000 });
+    // Initial state
+    expect(result.current.isLoading).toBe(true);
+
+    // Wait for the hook to update
+    await waitForNextUpdate();
 
     // After error
     expect(result.current.isLoading).toBe(false);

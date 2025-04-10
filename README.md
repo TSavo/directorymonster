@@ -490,8 +490,11 @@ await setIpRiskLevel(ipAddress, 'medium');
 # Set up the ZKP authentication system
 npm run zkp:setup
 
-# Run tests to verify the setup
-npm run test:crypto
+# Run tests to verify the setup (with mocks)
+npm run test:zkp
+
+# Run tests with real ZKP operations (requires circuit files)
+npm run test:zkp:real
 
 # Run security measures tests
 npx jest tests/crypto/zkp-security-measures.test.ts
@@ -531,7 +534,7 @@ npm run dev
   - Recommended to increase as hardware improves
   - Example: `BCRYPT_WORK_FACTOR=12`
 
-For more information, see the [ZKP Authentication Specification](docs/zkp-authentication.md) and the [Production Deployment Guide](docs/production-deployment.md).
+For more information, see the [ZKP Authentication Specification](docs/zkp-authentication.md), the [ZKP Testing Guide](docs/zkp-testing.md), and the [Production Deployment Guide](docs/production-deployment.md).
 
 ## Troubleshooting
 
@@ -539,6 +542,8 @@ For more information, see the [ZKP Authentication Specification](docs/zkp-authen
    - Always seed data first: `npm run seed`
    - Use convenience scripts: `npm run test:with-seed`
    - Add domain entries to hosts file or use `?hostname=` parameter
+   - For failing tests, use `npm run test:failures` to focus on fixing specific issues
+   - ZKP tests are excluded from `test:failures` to avoid triggering actual ZKP operations
 
 2. **CSS Issues**:
    - Use `@import` instead of `@tailwind` directives
@@ -554,3 +559,10 @@ For more information, see the [ZKP Authentication Specification](docs/zkp-authen
    - For local development, use in-memory fallback
    - For Docker, verify Redis container is running
    - Check connection string in environment variables
+
+5. **ZKP Testing Issues**:
+   - Use `npm run test:zkp` to run ZKP tests with mocks (faster, no circuit files needed)
+   - Use `npm run test:zkp:real` to run ZKP tests with real implementations (requires circuit files)
+   - Set `ZKP_USE_MOCKS=true` environment variable to force using mocks
+   - Circuit files must be present in the `circuits/` directory for real ZKP tests
+   - ZKP tests are excluded from regular test runs to avoid performance issues

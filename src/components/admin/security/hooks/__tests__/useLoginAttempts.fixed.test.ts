@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { useLoginAttempts } from '../useLoginAttempts.fixed';
+import { waitForNextUpdate } from '../../../../../tests/utils/testing-library-hooks-fix';
 
 // Mock fetch
 const mockFetch = jest.fn();
@@ -27,6 +28,7 @@ const mockLoginAttempts = [
 describe('useLoginAttempts (fixed)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockFetch.mockReset();
   });
 
   test('fetches login attempts on initial render', async () => {
@@ -40,7 +42,7 @@ describe('useLoginAttempts (fixed)', () => {
     });
 
     // Render the hook
-    const { result, waitForNextUpdate } = renderHook(() => 
+    const { result } = renderHook(() => 
       useLoginAttempts({
         limit: 10,
         filter: {

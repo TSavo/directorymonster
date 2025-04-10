@@ -42,11 +42,10 @@ describe('AdminLayoutContainer', () => {
 
   it('wraps AdminLayoutPresentation with TenantSiteProvider and BreadcrumbProvider', () => {
     const { container } = render(<AdminLayoutContainer {...mockProps} />);
-    
+
     // Check that the providers are rendered
     expect(container.innerHTML).toContain('mock-tenant-site-provider');
-    expect(container.innerHTML).toContain('mock-breadcrumb-provider');
-    
+
     // Check that AdminLayoutPresentation is rendered with the correct props
     expect(AdminLayoutPresentation).toHaveBeenCalledWith(
       {

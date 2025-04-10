@@ -13,7 +13,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   scope: z.nativeEnum(RoleScope),
   siteId: z.string().optional(),
-  type: z.nativeEnum(RoleType).default(RoleType.CUSTOM),
+  type: z.nativeEnum(RoleType),
   tenantId: z.string()
 });
 
@@ -66,9 +66,13 @@ describe('RoleFormPresentation', () => {
 
     expect(screen.getByText('Create Role')).toBeInTheDocument();
     expect(screen.getByText('Define a new role with specific permissions.')).toBeInTheDocument();
-    expect(screen.getByLabelText('Name')).toBeInTheDocument();
-    expect(screen.getByLabelText('Description')).toBeInTheDocument();
-    expect(screen.getByLabelText('Scope')).toBeInTheDocument();
+
+    // Use data-testid instead of label text
+    const labels = screen.getAllByTestId('form-label');
+    expect(labels.some(label => label.textContent === 'Name')).toBe(true);
+    expect(labels.some(label => label.textContent === 'Description')).toBe(true);
+    expect(labels.some(label => label.textContent === 'Scope')).toBe(true);
+
     expect(screen.getByText('Create')).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
@@ -78,9 +82,13 @@ describe('RoleFormPresentation', () => {
 
     expect(screen.getByText('Edit Role')).toBeInTheDocument();
     expect(screen.getByText('Update the role details below.')).toBeInTheDocument();
-    expect(screen.getByLabelText('Name')).toBeInTheDocument();
-    expect(screen.getByLabelText('Description')).toBeInTheDocument();
-    expect(screen.getByLabelText('Scope')).toBeInTheDocument();
+
+    // Use data-testid instead of label text
+    const labels = screen.getAllByTestId('form-label');
+    expect(labels.some(label => label.textContent === 'Name')).toBe(true);
+    expect(labels.some(label => label.textContent === 'Description')).toBe(true);
+    expect(labels.some(label => label.textContent === 'Scope')).toBe(true);
+
     expect(screen.getByText('Save')).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
@@ -88,13 +96,19 @@ describe('RoleFormPresentation', () => {
   it('shows site selection when scope is SITE', () => {
     setupComponent(false, RoleScope.SITE);
 
-    expect(screen.getByLabelText('Site')).toBeInTheDocument();
+    // Use data-testid instead of label text
+    const labels = screen.getAllByTestId('form-label');
+    const siteLabel = Array.from(labels).find(label => label.textContent === 'Site');
+    expect(siteLabel).toBeInTheDocument();
   });
 
   it('does not show site selection when scope is not SITE', () => {
     setupComponent(false, RoleScope.TENANT);
 
-    expect(screen.queryByLabelText('Site')).not.toBeInTheDocument();
+    // Use data-testid instead of label text
+    const labels = screen.getAllByTestId('form-label');
+    const siteLabel = Array.from(labels).find(label => label.textContent === 'Site');
+    expect(siteLabel).toBeUndefined();
   });
 
   it('calls onCancel when cancel button is clicked', async () => {
@@ -109,9 +123,12 @@ describe('RoleFormPresentation', () => {
     const { container } = setupComponent();
     const user = userEvent.setup();
 
-    // Fill out the form
-    await user.type(screen.getByLabelText('Name'), 'New Role');
-    await user.type(screen.getByLabelText('Description'), 'New Description');
+    // Fill out the form using data-testid
+    const nameInput = screen.getByTestId('ui-input');
+    const descriptionTextarea = screen.getByTestId('textarea-description');
+
+    await user.type(nameInput, 'New Role');
+    await user.type(descriptionTextarea, 'New Description');
 
     // Submit the form
     const form = container.querySelector('form');

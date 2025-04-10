@@ -14,6 +14,19 @@ jest.mock('next/link', () => {
   );
 });
 
+// Mock lucide-react icons
+jest.mock('lucide-react', () => ({
+  Eye: ({ size, className }: { size: number, className: string }) => (
+    <svg data-testid="eye-icon" className={className} width={size} height={size}></svg>
+  ),
+  Edit: ({ size, className }: { size: number, className: string }) => (
+    <svg data-testid="edit-icon" className={className} width={size} height={size}></svg>
+  ),
+  Trash2: ({ size, className }: { size: number, className: string }) => (
+    <svg data-testid="trash2-icon" className={className} width={size} height={size}></svg>
+  ),
+}));
+
 describe('ListingTableRow Component', () => {
   const mockListing = {
     id: 'listing_1',
@@ -34,7 +47,7 @@ describe('ListingTableRow Component', () => {
     categoryName: 'Test Category',
     siteName: 'Test Site'
   };
-  
+
   // Helper function to render the component inside a table context
   const renderWithTableContext = (ui: React.ReactElement) => {
     return render(
@@ -45,124 +58,124 @@ describe('ListingTableRow Component', () => {
       </table>
     );
   };
-  
+
   it('renders the listing title correctly', () => {
     renderWithTableContext(
-      <ListingTableRow 
-        listing={mockListing} 
-        showSiteColumn={false} 
-        onDeleteClick={jest.fn()} 
+      <ListingTableRow
+        listing={mockListing}
+        showSiteColumn={false}
+        onDeleteClick={jest.fn()}
       />
     );
-    
+
     expect(screen.getByText('Test Listing 1')).toBeInTheDocument();
   });
-  
+
   it('renders the category name correctly', () => {
     renderWithTableContext(
-      <ListingTableRow 
-        listing={mockListing} 
-        showSiteColumn={false} 
-        onDeleteClick={jest.fn()} 
+      <ListingTableRow
+        listing={mockListing}
+        showSiteColumn={false}
+        onDeleteClick={jest.fn()}
       />
     );
-    
+
     expect(screen.getByText('Test Category')).toBeInTheDocument();
   });
-  
+
   it('shows site column when showSiteColumn is true', () => {
     renderWithTableContext(
-      <ListingTableRow 
-        listing={mockListing} 
-        showSiteColumn={true} 
-        onDeleteClick={jest.fn()} 
+      <ListingTableRow
+        listing={mockListing}
+        showSiteColumn={true}
+        onDeleteClick={jest.fn()}
       />
     );
-    
+
     expect(screen.getByText('Test Site')).toBeInTheDocument();
   });
-  
+
   it('hides site column when showSiteColumn is false', () => {
     renderWithTableContext(
-      <ListingTableRow 
-        listing={mockListing} 
-        showSiteColumn={false} 
-        onDeleteClick={jest.fn()} 
+      <ListingTableRow
+        listing={mockListing}
+        showSiteColumn={false}
+        onDeleteClick={jest.fn()}
       />
     );
-    
+
     expect(screen.queryByText('Test Site')).not.toBeInTheDocument();
   });
-  
+
   it('displays verified status badge when backlinkVerifiedAt is set', () => {
     renderWithTableContext(
-      <ListingTableRow 
-        listing={mockListing} 
-        showSiteColumn={false} 
-        onDeleteClick={jest.fn()} 
+      <ListingTableRow
+        listing={mockListing}
+        showSiteColumn={false}
+        onDeleteClick={jest.fn()}
       />
     );
-    
+
     const verifiedBadge = screen.getByText(/Verified/);
     expect(verifiedBadge).toBeInTheDocument();
     expect(verifiedBadge).toHaveClass('bg-green-100 text-green-800');
   });
-  
+
   it('displays unverified status badge when backlinkVerifiedAt is not set', () => {
-    const unverifiedListing = { 
-      ...mockListing, 
-      backlinkVerifiedAt: undefined 
+    const unverifiedListing = {
+      ...mockListing,
+      backlinkVerifiedAt: undefined
     };
-    
+
     renderWithTableContext(
-      <ListingTableRow 
-        listing={unverifiedListing} 
-        showSiteColumn={false} 
-        onDeleteClick={jest.fn()} 
+      <ListingTableRow
+        listing={unverifiedListing}
+        showSiteColumn={false}
+        onDeleteClick={jest.fn()}
       />
     );
-    
+
     const unverifiedBadge = screen.getByText('Unverified');
     expect(unverifiedBadge).toBeInTheDocument();
     expect(unverifiedBadge).toHaveClass('bg-yellow-100 text-yellow-800');
   });
-  
+
   it('renders action buttons with correct URLs', () => {
     renderWithTableContext(
-      <ListingTableRow 
-        listing={mockListing} 
-        showSiteColumn={false} 
-        onDeleteClick={jest.fn()} 
+      <ListingTableRow
+        listing={mockListing}
+        showSiteColumn={false}
+        onDeleteClick={jest.fn()}
       />
     );
-    
+
     // Check that View and Edit links exist
     const viewLink = screen.getByRole('link', { name: /View/i });
     const editLink = screen.getByRole('link', { name: /Edit/i });
-    
+
     expect(viewLink).toBeInTheDocument();
     expect(editLink).toBeInTheDocument();
-    
+
     // Check URLs without siteSlug
     expect(viewLink).toHaveAttribute('href', `/admin/listings/${mockListing.id}`);
-    
+
     // Check Delete button exists
     const deleteButton = screen.getByRole('button', { name: /Delete/i });
     expect(deleteButton).toBeInTheDocument();
   });
-  
+
   it('uses site-specific URLs when siteSlug is provided', () => {
     renderWithTableContext(
-      <ListingTableRow 
-        listing={mockListing} 
-        showSiteColumn={false} 
+      <ListingTableRow
+        listing={mockListing}
+        showSiteColumn={false}
         siteSlug="test-site"
-        onDeleteClick={jest.fn()} 
+        onDeleteClick={jest.fn()}
       />
     );
-    
+
     const viewLink = screen.getByRole('link', { name: /View/i });
-    
+
     // Check URL with siteSlug
     expect(viewLink).toHaveAttribute('href', `/admin/test-site/listings/${mockListing.slug}`);
   });

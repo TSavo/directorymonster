@@ -4,7 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { middleware } from '../src/middleware';
 
-// Mock NextResponse
+// Mock NextResponse and URL
 jest.mock('next/server', () => {
   const originalModule = jest.requireActual('next/server');
   return {
@@ -21,7 +21,7 @@ jest.mock('next/server', () => {
         return {
           headers: new Map(),
           status: 200,
-          url: url.toString()
+          url: typeof url === 'string' ? url : url.toString()
         };
       }),
       json: jest.fn().mockImplementation((body, options) => {
@@ -35,13 +35,16 @@ jest.mock('next/server', () => {
   };
 });
 
+// Instead of mocking the URL constructor, we'll use a simpler approach
+// by directly mocking the NextRequest and NextResponse objects
+
 describe('Middleware', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should skip static assets', async () => {
-    const request = new NextRequest(new Request('http://example.com/_next/static/file.js'));
+    const request = new NextRequest('http://example.com/_next/static/file.js');
     await middleware(request);
     expect(NextResponse.next).toHaveBeenCalled();
     expect(NextResponse.rewrite).not.toHaveBeenCalled();
@@ -49,7 +52,7 @@ describe('Middleware', () => {
 
   it('should rewrite API paths to include site slug', async () => {
     // Create a request to a non-site-specific API endpoint
-    const request = new NextRequest(new Request('http://hiking-gear.mydirectory.com/api/search?q=test'));
+    const request = new NextRequest('http://hiking-gear.mydirectory.com/api/search?q=test');
 
     // Call the middleware
     const response = await middleware(request);
@@ -67,7 +70,7 @@ describe('Middleware', () => {
 
   it('should not rewrite already site-specific API paths', async () => {
     // Create a request to an already site-specific API endpoint
-    const request = new NextRequest(new Request('http://example.com/api/sites/hiking-gear/search?q=test'));
+    const request = new NextRequest('http://example.com/api/sites/hiking-gear/search?q=test');
 
     // Call the middleware
     await middleware(request);
@@ -79,7 +82,7 @@ describe('Middleware', () => {
 
   it('should not rewrite admin API paths', async () => {
     // Create a request to an admin API endpoint
-    const request = new NextRequest(new Request('http://example.com/api/admin/users'));
+    const request = new NextRequest('http://example.com/api/admin/users');
 
     // Call the middleware
     await middleware(request);
@@ -91,7 +94,7 @@ describe('Middleware', () => {
 
   it('should not rewrite non-site-specific API paths', async () => {
     // Create a request to a non-site-specific API endpoint
-    const request = new NextRequest(new Request('http://example.com/api/auth/login'));
+    const request = new NextRequest('http://example.com/api/auth/login');
 
     // Call the middleware
     await middleware(request);
@@ -103,7 +106,7 @@ describe('Middleware', () => {
 
   it('should handle custom domains', async () => {
     // Create a request to a custom domain
-    const request = new NextRequest(new Request('http://custom-domain.com/api/search?q=test'));
+    const request = new NextRequest('http://custom-domain.com/api/search?q=test');
 
     // Call the middleware
     const response = await middleware(request);
@@ -120,7 +123,7 @@ describe('Middleware', () => {
 
   it('should handle case-insensitive domains', async () => {
     // Create a request with mixed case in the domain
-    const request = new NextRequest(new Request('http://CuStOm-DoMaIn.com/api/search?q=test'));
+    const request = new NextRequest('http://CuStOm-DoMaIn.com/api/search?q=test');
 
     // Call the middleware
     const response = await middleware(request);
@@ -135,7 +138,7 @@ describe('Middleware', () => {
 
   it('should handle subdomains correctly', async () => {
     // Create a request with a subdomain
-    const request = new NextRequest(new Request('http://blog.custom-domain.com/api/search?q=test'));
+    const request = new NextRequest('http://blog.custom-domain.com/api/search?q=test');
 
     // Call the middleware
     const response = await middleware(request);
@@ -152,7 +155,7 @@ describe('Middleware', () => {
 
   it('should handle different TLDs correctly', async () => {
     // Create a request with a different TLD
-    const request = new NextRequest(new Request('http://custom-domain.co.uk/api/search?q=test'));
+    const request = new NextRequest('http://custom-domain.co.uk/api/search?q=test');
 
     // Call the middleware
     const response = await middleware(request);
@@ -169,7 +172,7 @@ describe('Middleware', () => {
 
   it('should handle debug site slug parameter', async () => {
     // Create a request with a debug site slug parameter
-    const request = new NextRequest(new Request('http://example.com/api/search?q=test&siteSlug=debug-site'));
+    const request = new NextRequest('http://example.com/api/search?q=test&siteSlug=debug-site');
 
     // Call the middleware
     const response = await middleware(request);

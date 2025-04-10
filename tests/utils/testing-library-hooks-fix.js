@@ -5,6 +5,41 @@
  * which was removed in newer versions of @testing-library/react-hooks.
  */
 
+// Import React to ensure it's available
+const React = require('react');
+const { act } = require('@testing-library/react');
+
+// Global state tracking
+let stateUpdateCallbacks = [];
+let pendingStateUpdates = 0;
+
+/**
+ * Notifies waiting tests that a state update has occurred
+ */
+function notifyStateUpdate() {
+  pendingStateUpdates++;
+  // Call all registered callbacks and clear the list
+  const callbacks = [...stateUpdateCallbacks];
+  stateUpdateCallbacks = [];
+  callbacks.forEach(cb => cb());
+}
+
+// Patch React.useState to track state updates
+const originalUseState = React.useState;
+React.useState = function patchedUseState(initialState) {
+  const [state, setState] = originalUseState(initialState);
+  
+  // Create a wrapped setState that notifies of updates
+  const wrappedSetState = (newState) => {
+    // Call the original setState
+    setState(newState);
+    // Notify of state update
+    notifyStateUpdate();
+  };
+  
+  return [state, wrappedSetState];
+};
+
 /**
  * Waits for a condition to be true
  * 
@@ -35,52 +70,43 @@ const waitForCondition = async (
  * @returns {Promise<void>}
  */
 const waitForNextUpdate = async (timeout = 5000) => {
-  // In the actual implementation, this would wait for a real state update
-  // However, for testing we'll simulate that update happened immediately
-  // and just need to wait for the next event loop tick
-  await new Promise((resolve) => setTimeout(resolve, 10));
-  return;
+  // If there are already pending updates, consume one and resolve immediately
+  if (pendingStateUpdates > 0) {
+    pendingStateUpdates--;
+    return Promise.resolve();
+  }
+  
+  // Create a promise that will resolve when the next state update happens
+  return new Promise((resolve, reject) => {
+    // Add resolver to the queue
+    stateUpdateCallbacks.push(resolve);
+    
+    // Set timeout to reject if no update happens within timeout
+    setTimeout(() => {
+      // Remove this resolver from the queue
+      stateUpdateCallbacks = stateUpdateCallbacks.filter(r => r !== resolve);
+      
+      // Reject if no updates happened within timeout
+      reject(new Error(`Timed out waiting for update after ${timeout}ms`));
+    }, timeout);
+  });
 };
 
-// Track whether this is being called in a test
-let isInitialized = false;
-
-// Set up a mock for act
-const setupAct = () => {
-  if (isInitialized) return;
-  
-  // Make sure we have access to React
-  const React = require('react');
-  
-  // Store the original act function if it exists
-  const originalAct = React.act;
-  
-  // Create a new act function that works with async operations
-  React.act = async (callback) => {
-    if (originalAct) {
-      // Call original act if it exists
-      return originalAct(async () => {
-        const result = await callback();
-        // Wait for any state updates to propagate
-        await new Promise(resolve => setTimeout(resolve, 0));
-        return result;
-      });
-    } else {
-      // If no original act, just call the callback
-      const result = await callback();
-      // Wait for any state updates to propagate
-      await new Promise(resolve => setTimeout(resolve, 0));
-      return result;
-    }
-  };
-  
-  isInitialized = true;
+// Immediately perform a flush after any act calls
+const originalAct = act;
+const patchedAct = async (callback) => {
+  let result;
+  await originalAct(async () => {
+    result = await callback();
+    // Allow state updates to propagate
+    await new Promise(resolve => setTimeout(resolve, 0));
+  });
+  return result;
 };
-
-// Initialize when this module is loaded
-setupAct();
 
 module.exports = {
   waitForCondition,
-  waitForNextUpdate
+  waitForNextUpdate,
+  act: patchedAct,
+  notifyStateUpdate
 };

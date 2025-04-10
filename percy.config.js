@@ -1,11 +1,12 @@
 // @ts-check
 const { defineConfig } = require('@playwright/test');
+const { devices } = require('@playwright/test');
 
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
 module.exports = defineConfig({
-  testDir: './tests/visual-regression',
+  testDir: './tests/visual',
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
   expect: {

@@ -3,6 +3,7 @@
 import { Search, X, Layers, RefreshCcw, PlusCircle, Grid, List } from 'lucide-react';
 import Link from 'next/link';
 import { CategoryTableHeaderProps } from '../types';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Header component with search and filtering controls for the category table
@@ -47,35 +48,45 @@ export function CategoryTableHeader({
           Categories ({totalCategories})
         </h2>
         <div className="flex gap-2" data-testid="header-actions">
-          <button
+          <Button
             onClick={onToggleHierarchy}
-            className={`px-3 py-2 ${showHierarchy ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'} rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-1`}
+            variant={showHierarchy ? "primary" : "secondary"}
+            size="sm"
             aria-label={showHierarchy ? "Hide Hierarchy" : "View Hierarchy"}
             data-testid="toggle-hierarchy-button"
             aria-pressed={showHierarchy}
+            className="flex items-center gap-1"
           >
             <Layers size={16} />
             <span>{showHierarchy ? "Hide Hierarchy" : "View Hierarchy"}</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={toggleViewMode}
-            className={`px-3 py-2 ${viewMode === 'card' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'} rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-1`}
+            variant={viewMode === 'card' ? "primary" : "secondary"}
+            size="sm"
             aria-label={viewMode === 'card' ? "Table View" : "Card View"}
             data-testid="toggle-view-button"
             aria-pressed={viewMode === 'card'}
+            className="flex items-center gap-1"
           >
             {viewMode === 'card' ? <List size={16} /> : <Grid size={16} />}
             <span>{viewMode === 'card' ? "Table View" : "Card View"}</span>
-          </button>
-          <Link
-            href={siteSlug ? `/admin/sites/${siteSlug}/categories/new` : '/admin/categories/new'}
-            onClick={onCreateClick}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-1"
+          </Button>
+          <Button
+            asChild
+            variant="primary"
+            size="sm"
             data-testid="add-category-button"
+            className="flex items-center gap-1"
           >
-            <PlusCircle size={16} />
-            <span>Add Category</span>
-          </Link>
+            <Link
+              href={siteSlug ? `/admin/sites/${siteSlug}/categories/new` : '/admin/categories/new'}
+              onClick={onCreateClick}
+            >
+              <PlusCircle size={16} />
+              <span>Add Category</span>
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -149,15 +160,17 @@ export function CategoryTableHeader({
 
           {/* Reset filters button - only show when filters are actually applied */}
           {hasFilters && (
-            <button
+            <Button
               onClick={handleResetFilters}
-              className="px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-1"
+              variant="secondary"
+              size="sm"
               aria-label="Reset Filters"
               data-testid="reset-filters-button"
+              className="flex items-center gap-1"
             >
               <RefreshCcw size={16} />
               <span>Reset Filters</span>
-            </button>
+            </Button>
           )}
         </div>
       </div>

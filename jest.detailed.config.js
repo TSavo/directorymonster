@@ -1,5 +1,6 @@
-// Import the Next.js Jest configuration
+// Import the Next.js Jest configuration and base config
 const nextJest = require('next/jest');
+const baseConfig = require('./jest.config.base');
 
 // Create a Next.js Jest configuration
 const createJestConfig = nextJest({
@@ -9,18 +10,11 @@ const createJestConfig = nextJest({
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
-  // Use the same setup files as the main Jest configuration
-  setupFilesAfterEnv: [
-    '<rootDir>/jest.setup.js',
-    '<rootDir>/tests/mocks/ui-setup.js',
-    '<rootDir>/tests/__setup__/global-test-data.js'
-  ],
-  testEnvironment: 'jest-environment-jsdom',
+  ...baseConfig,
 
   // Exclude e2e tests to focus on component and unit tests
   testPathIgnorePatterns: [
-    '/node_modules/',
-    '/.next/',
+    ...baseConfig.testPathIgnorePatterns,
     '/tests/e2e/',
     '/tests/integration/',
     '/tests/admin/integration/'
@@ -32,30 +26,6 @@ const customJestConfig = {
   // Don't show any other output
   verbose: false,
   silent: true,
-
-  // Use the same module name mapper as the main Jest configuration
-  moduleNameMapper: {
-    // Main app path aliases
-    '^@/(.*)$': '<rootDir>/src/$1',
-    '^@/app/(.*)$': '<rootDir>/src/app/$1',
-    '^@/components/(.*)$': '<rootDir>/src/components/$1',
-    '^@/hooks/(.*)$': '<rootDir>/src/hooks/$1',
-    '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
-    '^@/services/(.*)$': '<rootDir>/src/services/$1',
-    '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
-    '^@/types/(.*)$': '<rootDir>/src/types/$1',
-
-    // UI component mocks at various relative path depths
-    '^../../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
-    '^../../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
-    '^../../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
-    '^../ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
-    '^./ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
-    '^@/ui/(.*)$': '<rootDir>/tests/mocks/ui/$1',
-
-    // Mock snarkjs
-    '^snarkjs$': '<rootDir>/tests/__mocks__/snarkjs.js',
-  },
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

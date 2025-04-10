@@ -1,100 +1,77 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';
 import SearchBar from '../SearchBar';
+import { SearchBarContainer } from '../SearchBarContainer';
 
-// Mock the useRouter hook
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-  }),
+// Mock the SearchBarContainer component
+jest.mock('../SearchBarContainer', () => ({
+  SearchBarContainer: jest.fn(() => <div data-testid="mock-container" />)
 }));
 
-describe('SearchBar Component', () => {
-  it('renders the search form with input and button', () => {
-    render(<SearchBar siteId="site-1" />);
-    
-    expect(screen.getByTestId('search-form')).toBeInTheDocument();
-    expect(screen.getByTestId('search-input')).toBeInTheDocument();
-    expect(screen.getByTestId('search-button')).toBeInTheDocument();
+describe('SearchBar', () => {
+  // Reset mocks before each test
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('updates search term when user types', () => {
+  it('renders the container component', () => {
+    // Render the search bar
     render(<SearchBar siteId="site-1" />);
-    
-    const input = screen.getByTestId('search-input');
-    
-    // Simulate user typing
-    fireEvent.change(input, { target: { value: 'test query' } });
-    
-    // Verify input value is updated
-    expect(input).toHaveValue('test query');
+
+    // Check that the container component was rendered
+    expect(SearchBarContainer).toHaveBeenCalled();
   });
 
-  it('calls router.push with correct URL when search is submitted', () => {
-    const mockPush = jest.fn();
-    jest.spyOn(require('next/navigation'), 'useRouter').mockImplementation(() => ({
-      push: mockPush,
-    }));
-    
+  it('passes siteId to the container component', () => {
+    // Render the search bar with siteId
     render(<SearchBar siteId="site-1" />);
-    
-    const input = screen.getByTestId('search-input');
-    const form = screen.getByTestId('search-form');
-    
-    // Enter valid query and submit
-    fireEvent.change(input, { target: { value: 'test query' } });
-    fireEvent.submit(form);
-    
-    // Verify router.push is called with correct URL
-    expect(mockPush).toHaveBeenCalledWith('/search?q=test%20query&site=site-1');
+
+    // Check that the container component was rendered with correct props
+    expect(SearchBarContainer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        siteId: 'site-1'
+      }),
+      expect.anything()
+    );
   });
 
-  it('does not submit search if query is empty', () => {
-    const mockPush = jest.fn();
-    jest.spyOn(require('next/navigation'), 'useRouter').mockImplementation(() => ({
-      push: mockPush,
-    }));
-    
-    render(<SearchBar siteId="site-1" />);
-    
-    const form = screen.getByTestId('search-form');
-    
-    // Submit with empty query
-    fireEvent.submit(form);
-    
-    // Verify router.push is not called
-    expect(mockPush).not.toHaveBeenCalled();
+  it('passes placeholder to the container component', () => {
+    // Render the search bar with placeholder
+    render(<SearchBar siteId="site-1" placeholder="Custom placeholder" />);
+
+    // Check that the container component was rendered with correct props
+    expect(SearchBarContainer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        placeholder: 'Custom placeholder'
+      }),
+      expect.anything()
+    );
   });
 
-  it('does not submit search if query contains only whitespace', () => {
-    const mockPush = jest.fn();
-    jest.spyOn(require('next/navigation'), 'useRouter').mockImplementation(() => ({
-      push: mockPush,
-    }));
-    
-    render(<SearchBar siteId="site-1" />);
-    
-    const input = screen.getByTestId('search-input');
-    const form = screen.getByTestId('search-form');
-    
-    // Enter query with only whitespace
-    fireEvent.change(input, { target: { value: '   ' } });
-    fireEvent.submit(form);
-    
-    // Verify router.push is not called
-    expect(mockPush).not.toHaveBeenCalled();
+  it('passes className to the container component', () => {
+    // Render the search bar with className
+    render(<SearchBar siteId="site-1" className="custom-class" />);
+
+    // Check that the container component was rendered with correct props
+    expect(SearchBarContainer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        className: 'custom-class'
+      }),
+      expect.anything()
+    );
   });
 
-  it('has proper accessibility attributes', () => {
-    render(<SearchBar siteId="site-1" />);
-    
-    // Input should have placeholder
-    const input = screen.getByTestId('search-input');
-    expect(input).toHaveAttribute('placeholder', 'Search...');
-    
-    // Button should have an SVG icon
-    const button = screen.getByTestId('search-button');
-    expect(button.querySelector('svg')).toBeInTheDocument();
+  it('passes buttonLabel to the container component', () => {
+    // Render the search bar with buttonLabel
+    const buttonLabel = <span>Search</span>;
+    render(<SearchBar siteId="site-1" buttonLabel={buttonLabel} />);
+
+    // Check that the container component was rendered with correct props
+    expect(SearchBarContainer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        buttonLabel
+      }),
+      expect.anything()
+    );
   });
 });

@@ -172,3 +172,4 @@ scripts/compare-*.js
 *.wasm
 
 .early.coverage
+.qodo

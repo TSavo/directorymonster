@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogFooter,
   DialogDescription
 } from '@/components/ui/dialog';
@@ -23,18 +23,18 @@ import {
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
 } from '@/components/ui/tabs';
-import { 
-  UserPlus, 
-  UserMinus, 
-  Search, 
-  AlertCircle, 
-  Shield, 
+import {
+  UserPlus,
+  UserMinus,
+  Search,
+  AlertCircle,
+  Shield,
   User,
   Check,
   X
@@ -76,14 +76,14 @@ export function UserRoleManager({
   const [activeTab, setActiveTab] = useState('assigned');
 
   // Filter available roles by search query
-  const filteredAvailableRoles = availableRoles.filter(role => 
+  const filteredAvailableRoles = availableRoles ? availableRoles.filter(role =>
     role.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     role.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) : [];
 
   // Handle role selection
   const toggleRoleSelection = (roleId: string) => {
-    setSelectedRoleIds(prev => 
+    setSelectedRoleIds(prev =>
       prev.includes(roleId)
         ? prev.filter(id => id !== roleId)
         : [...prev, roleId]
@@ -115,25 +115,27 @@ export function UserRoleManager({
   // Calculate effective permissions from all roles
   const getEffectivePermissions = (): Record<ResourceType, PermissionAction[]> => {
     const effectivePermissions: Record<ResourceType, PermissionAction[]> = {} as Record<ResourceType, PermissionAction[]>;
-    
+
     // Collect all permissions from all roles
-    roles.forEach(role => {
-      role.permissions.forEach(permission => {
-        const { resource, actions } = permission;
-        
-        if (!effectivePermissions[resource]) {
-          effectivePermissions[resource] = [];
-        }
-        
-        // Add actions that don't already exist
-        actions.forEach(action => {
-          if (!effectivePermissions[resource].includes(action)) {
-            effectivePermissions[resource].push(action);
+    if (roles) {
+      roles.forEach(role => {
+        role.permissions.forEach(permission => {
+          const { resource, actions } = permission;
+
+          if (!effectivePermissions[resource]) {
+            effectivePermissions[resource] = [];
           }
+
+          // Add actions that don't already exist
+          actions.forEach(action => {
+            if (!effectivePermissions[resource].includes(action)) {
+              effectivePermissions[resource].push(action);
+            }
+          });
         });
       });
-    });
-    
+    }
+
     return effectivePermissions;
   };
 
@@ -150,7 +152,7 @@ export function UserRoleManager({
       tenant: 'Tenant Management',
       audit: 'Audit Logs'
     };
-    
+
     return resourceMap[resource] || resource;
   };
 
@@ -163,11 +165,11 @@ export function UserRoleManager({
       delete: 'Delete',
       manage: 'Manage'
     };
-    
-    const resourceSingular = resource.endsWith('s') 
-      ? resource.slice(0, -1) 
+
+    const resourceSingular = resource.endsWith('s')
+      ? resource.slice(0, -1)
       : resource;
-    
+
     return `${actionMap[action]} ${resourceSingular.charAt(0).toUpperCase() + resourceSingular.slice(1)}s`;
   };
 
@@ -208,7 +210,7 @@ export function UserRoleManager({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-medium">Roles for {user.name}</h2>
+          <h2 className="text-lg font-medium">Roles for {user?.name || 'User'}</h2>
           <p className="text-sm text-gray-500 mt-1">
             Manage roles assigned to this user
           </p>
@@ -227,10 +229,10 @@ export function UserRoleManager({
           <TabsTrigger value="assigned">Assigned Roles</TabsTrigger>
           <TabsTrigger value="effective">Effective Permissions</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="assigned">
           {/* Empty state */}
-          {roles.length === 0 ? (
+          {roles && roles.length === 0 ? (
             <div className="text-center py-10 border rounded-md bg-gray-50" data-testid="user-roles-empty">
               <Shield className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-semibold text-gray-900">No roles assigned</h3>
@@ -247,7 +249,7 @@ export function UserRoleManager({
             </div>
           ) : (
             <div className="border rounded-md divide-y">
-              {roles.map(role => (
+              {roles && roles.map(role => (
                 <div key={role.id} className="flex items-center justify-between p-4 hover:bg-gray-50">
                   <div>
                     <div className="flex items-center">
@@ -274,21 +276,21 @@ export function UserRoleManager({
             </div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="effective">
           <div className="border rounded-md">
-            {Object.entries(getEffectivePermissions()).length === 0 ? (
+            {getEffectivePermissions() && Object.entries(getEffectivePermissions()).length === 0 ? (
               <div className="text-center py-10">
                 <h3 className="text-sm font-semibold text-gray-900">No permissions</h3>
                 <p className="mt-1 text-sm text-gray-500">This user doesn't have any permissions.</p>
               </div>
             ) : (
               <div className="divide-y">
-                {Object.entries(getEffectivePermissions()).map(([resource, actions]) => (
+                {getEffectivePermissions() && Object.entries(getEffectivePermissions()).map(([resource, actions]) => (
                   <div key={resource} className="p-4">
                     <h3 className="font-medium mb-2">{getResourceDisplayName(resource as ResourceType)}</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                      {actions.map(action => (
+                      {actions && actions.map(action => (
                         <div key={`${resource}-${action}`} className="flex items-center">
                           <Check className="h-4 w-4 text-green-500 mr-2" />
                           <span className="text-sm">
@@ -309,12 +311,12 @@ export function UserRoleManager({
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Add Roles to {user.name}</DialogTitle>
+            <DialogTitle>Add Roles to {user?.name || 'User'}</DialogTitle>
             <DialogDescription>
               Select roles to assign to this user.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="py-4">
             <div className="relative mb-4">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
@@ -326,14 +328,14 @@ export function UserRoleManager({
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             <div className="border rounded-md divide-y max-h-[300px] overflow-y-auto">
-              {filteredAvailableRoles.length === 0 ? (
+              {filteredAvailableRoles && filteredAvailableRoles.length === 0 ? (
                 <div className="p-4 text-center text-sm text-gray-500">
                   No roles found matching your search.
                 </div>
               ) : (
-                filteredAvailableRoles.map(role => (
+                filteredAvailableRoles && filteredAvailableRoles.map(role => (
                   <div key={role.id} className="flex items-center p-3 hover:bg-gray-50">
                     <Checkbox
                       id={`select-role-${role.id}`}
@@ -358,7 +360,7 @@ export function UserRoleManager({
               )}
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button
               variant="outline"
@@ -382,7 +384,7 @@ export function UserRoleManager({
           <AlertDialogHeader>
             <AlertDialogTitle>Remove Role from User</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove the {roleToRemove?.name} role from {user.name}?
+              Are you sure you want to remove the {roleToRemove?.name} role from {user?.name || 'this user'}?
               This will revoke all permissions associated with this role from the user.
             </AlertDialogDescription>
           </AlertDialogHeader>

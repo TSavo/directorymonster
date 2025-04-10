@@ -27,6 +27,7 @@ This document provides a comprehensive overview of all documentation and specifi
 | [TESTING_GUIDE.md](/docs/TESTING_GUIDE.md) | Guide | Implementation guide for writing tests |
 | [TESTING_SPEC.md](/specs/TESTING_SPEC.md) | Spec | Testing standards and requirements |
 | [MOCKING_GUIDE.md](/docs/MOCKING_GUIDE.md) | Guide | Guide for mocking dependencies in tests |
+| [zkp-testing.md](/docs/zkp-testing.md) | Guide | Guide for testing Zero-Knowledge Proof functionality |
 | [COMPONENT_TESTING.md](/specs/COMPONENT_TESTING.md) | Spec | Standards for component testing |
 | [API_TESTING.md](/specs/API_TESTING.md) | Spec | Standards for API testing |
 | [INTEGRATION_TESTING.md](/specs/INTEGRATION_TESTING.md) | Spec | Standards for integration testing |

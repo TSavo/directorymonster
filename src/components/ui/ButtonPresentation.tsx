@@ -19,9 +19,21 @@ export interface ButtonPresentationProps {
 
 export const ButtonPresentation = React.forwardRef<HTMLButtonElement, ButtonPresentationProps>(
   ({ buttonProps, showSpinner, showLeftIcon, showRightIcon, buttonText, leftIcon, rightIcon }, ref) => {
+    // Extract special props that shouldn't be passed to the DOM element
+    const {
+      isLoading,
+      loadingText,
+      leftIcon: _leftIcon,
+      rightIcon: _rightIcon,
+      variant,
+      size,
+      asChild,
+      ...domProps
+    } = buttonProps;
+
     return (
       <button
-        {...buttonProps}
+        {...domProps}
         ref={ref}
       >
         {showSpinner ? (

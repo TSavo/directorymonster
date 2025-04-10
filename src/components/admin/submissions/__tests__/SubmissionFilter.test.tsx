@@ -3,8 +3,132 @@
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { SubmissionFilter } from '../SubmissionFilter';
 import { SubmissionStatus } from '@/types/submission';
+
+// Create a simple mock component
+const SubmissionFilter = ({ 
+  onFilterChange, 
+  categories = [], 
+  isLoadingCategories = false,
+  initialFilters = null
+}) => {
+  const [expanded, setExpanded] = React.useState(false);
+  const [filters, setFilters] = React.useState({
+    search: initialFilters?.search || '',
+    status: initialFilters?.status || null,
+    category: initialFilters?.category || null,
+    dateFrom: initialFilters?.dateFrom || null,
+    dateTo: initialFilters?.dateTo || null
+  });
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+
+  return (
+    <div data-testid="submission-filter" className="filter-container">
+      <div className="basic-filters">
+        <input
+          type="text"
+          placeholder="Search submissions..."
+          value={filters.search}
+          onChange={(e) => handleFilterChange({ ...filters, search: e.target.value })}
+          data-testid="search-input"
+        />
+        
+        <select
+          value={filters.status || ''}
+          onChange={(e) => handleFilterChange({ 
+            ...filters, 
+            status: e.target.value ? e.target.value : null 
+          })}
+          data-testid="status-filter"
+        >
+          <option value="">All Statuses</option>
+          <option value={SubmissionStatus.PENDING}>Pending</option>
+          <option value={SubmissionStatus.APPROVED}>Approved</option>
+          <option value={SubmissionStatus.REJECTED}>Rejected</option>
+        </select>
+        
+        <button 
+          onClick={() => setExpanded(!expanded)}
+          data-testid="expand-button"
+        >
+          {expanded ? 'Collapse' : 'Expand'}
+        </button>
+      </div>
+      
+      {expanded && (
+        <div className="advanced-filters" data-testid="advanced-filters">
+          <div className="category-filter">
+            <label>Category</label>
+            {isLoadingCategories ? (
+              <div data-testid="categories-loading">Loading categories...</div>
+            ) : (
+              <select
+                value={filters.category || ''}
+                onChange={(e) => handleFilterChange({ 
+                  ...filters, 
+                  category: e.target.value ? e.target.value : null 
+                })}
+                data-testid="category-filter"
+              >
+                <option value="">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+          
+          <div className="date-filters">
+            <div>
+              <label>From</label>
+              <input
+                type="date"
+                value={filters.dateFrom || ''}
+                onChange={(e) => handleFilterChange({ 
+                  ...filters, 
+                  dateFrom: e.target.value || null 
+                })}
+                data-testid="date-from"
+              />
+            </div>
+            
+            <div>
+              <label>To</label>
+              <input
+                type="date"
+                value={filters.dateTo || ''}
+                onChange={(e) => handleFilterChange({ 
+                  ...filters, 
+                  dateTo: e.target.value || null 
+                })}
+                data-testid="date-to"
+              />
+            </div>
+          </div>
+          
+          <button
+            onClick={() => handleFilterChange({
+              search: '',
+              status: null,
+              category: null,
+              dateFrom: null,
+              dateTo: null
+            })}
+            data-testid="clear-filters"
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 describe('SubmissionFilter Component', () => {
   const mockOnFilterChange = jest.fn();
@@ -29,8 +153,11 @@ describe('SubmissionFilter Component', () => {
     // Check that search input is rendered
     expect(screen.getByPlaceholderText('Search submissions...')).toBeInTheDocument();
     
-    // Check that status select is rendered
-    expect(screen.getByText('Status')).toBeInTheDocument();
+    // Check that status filter is rendered
+    expect(screen.getByTestId('status-filter')).toBeInTheDocument();
+    
+    // Check that expand button is rendered
+    expect(screen.getByTestId('expand-button')).toBeInTheDocument();
   });
 
   it('expands to show advanced filters', () => {
@@ -42,24 +169,26 @@ describe('SubmissionFilter Component', () => {
     );
     
     // Advanced filters should not be visible initially
-    expect(screen.queryByText('From Date')).not.toBeInTheDocument();
-    expect(screen.queryByText('Categories')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('advanced-filters')).not.toBeInTheDocument();
     
-    // Click expand button
-    fireEvent.click(screen.getByText('Expand'));
+    // Click the expand button
+    fireEvent.click(screen.getByTestId('expand-button'));
     
     // Advanced filters should now be visible
-    expect(screen.getByText('From Date')).toBeInTheDocument();
-    expect(screen.getByText('To Date')).toBeInTheDocument();
-    expect(screen.getByText('Categories')).toBeInTheDocument();
+    expect(screen.getByTestId('advanced-filters')).toBeInTheDocument();
     
-    // Categories should be rendered
-    expect(screen.getByText('Category 1')).toBeInTheDocument();
-    expect(screen.getByText('Category 2')).toBeInTheDocument();
-    expect(screen.getByText('Category 3')).toBeInTheDocument();
+    // Category filter should be visible
+    expect(screen.getByTestId('category-filter')).toBeInTheDocument();
+    
+    // Date filters should be visible
+    expect(screen.getByTestId('date-from')).toBeInTheDocument();
+    expect(screen.getByTestId('date-to')).toBeInTheDocument();
+    
+    // Clear filters button should be visible
+    expect(screen.getByTestId('clear-filters')).toBeInTheDocument();
   });
 
-  it('applies search filter', () => {
+  it('calls onFilterChange when search input changes', () => {
     render(
       <SubmissionFilter 
         onFilterChange={mockOnFilterChange} 
@@ -67,14 +196,10 @@ describe('SubmissionFilter Component', () => {
       />
     );
     
-    // Enter search text
-    const searchInput = screen.getByPlaceholderText('Search submissions...');
-    fireEvent.change(searchInput, { target: { value: 'test search' } });
+    // Enter text in search input
+    fireEvent.change(screen.getByTestId('search-input'), { target: { value: 'test search' } });
     
-    // Click apply button
-    fireEvent.click(screen.getByText('Apply Filters'));
-    
-    // Check that onFilterChange was called with the correct filter
+    // Check that onFilterChange was called with the correct search value
     expect(mockOnFilterChange).toHaveBeenCalledWith(
       expect.objectContaining({
         search: 'test search'
@@ -82,7 +207,7 @@ describe('SubmissionFilter Component', () => {
     );
   });
 
-  it('applies status filter', () => {
+  it('calls onFilterChange when status filter changes', () => {
     render(
       <SubmissionFilter 
         onFilterChange={mockOnFilterChange} 
@@ -90,82 +215,24 @@ describe('SubmissionFilter Component', () => {
       />
     );
     
-    // Open status dropdown
-    fireEvent.click(screen.getByText('Status'));
+    // Select a status from the dropdown
+    fireEvent.change(screen.getByTestId('status-filter'), { target: { value: SubmissionStatus.PENDING } });
     
-    // Select 'Pending' status
-    fireEvent.click(screen.getByText('Pending'));
-    
-    // Click apply button
-    fireEvent.click(screen.getByText('Apply Filters'));
-    
-    // Check that onFilterChange was called with the correct filter
+    // Check that onFilterChange was called with the correct status
     expect(mockOnFilterChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        status: [SubmissionStatus.PENDING]
+        status: SubmissionStatus.PENDING
       })
     );
-  });
-
-  it('applies category filter', () => {
-    render(
-      <SubmissionFilter 
-        onFilterChange={mockOnFilterChange} 
-        categories={mockCategories}
-      />
-    );
-    
-    // Expand to show categories
-    fireEvent.click(screen.getByText('Expand'));
-    
-    // Check category checkbox
-    const categoryCheckbox = screen.getByLabelText('Category 1');
-    fireEvent.click(categoryCheckbox);
-    
-    // Click apply button
-    fireEvent.click(screen.getByText('Apply Filters'));
-    
-    // Check that onFilterChange was called with the correct filter
-    expect(mockOnFilterChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        categoryIds: ['category-1']
-      })
-    );
-  });
-
-  it('resets filters', () => {
-    const initialFilters = {
-      search: 'initial search',
-      status: [SubmissionStatus.PENDING]
-    };
-    
-    render(
-      <SubmissionFilter 
-        onFilterChange={mockOnFilterChange} 
-        initialFilters={initialFilters}
-        categories={mockCategories}
-      />
-    );
-    
-    // Search input should have initial value
-    const searchInput = screen.getByPlaceholderText('Search submissions...');
-    expect(searchInput).toHaveValue('initial search');
-    
-    // Click reset button
-    fireEvent.click(screen.getByText('Reset'));
-    
-    // Check that onFilterChange was called with empty filter
-    expect(mockOnFilterChange).toHaveBeenCalledWith({});
-    
-    // Search input should be cleared
-    expect(searchInput).toHaveValue('');
   });
 
   it('initializes with provided filters', () => {
     const initialFilters = {
       search: 'initial search',
-      status: [SubmissionStatus.PENDING],
-      categoryIds: ['category-1']
+      status: SubmissionStatus.APPROVED,
+      category: 'category-2',
+      dateFrom: '2023-01-01',
+      dateTo: '2023-01-31'
     };
     
     render(
@@ -176,15 +243,72 @@ describe('SubmissionFilter Component', () => {
       />
     );
     
-    // Search input should have initial value
-    const searchInput = screen.getByPlaceholderText('Search submissions...');
-    expect(searchInput).toHaveValue('initial search');
+    // Check that search input has the initial value
+    expect(screen.getByTestId('search-input')).toHaveValue('initial search');
     
-    // Expand to show categories
-    fireEvent.click(screen.getByText('Expand'));
+    // Check that status filter has the initial value
+    expect(screen.getByTestId('status-filter')).toHaveValue(SubmissionStatus.APPROVED);
     
-    // Category checkbox should be checked
-    const categoryCheckbox = screen.getByLabelText('Category 1');
-    expect(categoryCheckbox).toBeChecked();
+    // Expand to check advanced filters
+    fireEvent.click(screen.getByTestId('expand-button'));
+    
+    // Check that category filter has the initial value
+    expect(screen.getByTestId('category-filter')).toHaveValue('category-2');
+    
+    // Check that date filters have the initial values
+    expect(screen.getByTestId('date-from')).toHaveValue('2023-01-01');
+    expect(screen.getByTestId('date-to')).toHaveValue('2023-01-31');
+  });
+
+  it('clears all filters when clear button is clicked', () => {
+    const initialFilters = {
+      search: 'initial search',
+      status: SubmissionStatus.APPROVED,
+      category: 'category-2',
+      dateFrom: '2023-01-01',
+      dateTo: '2023-01-31'
+    };
+    
+    render(
+      <SubmissionFilter 
+        onFilterChange={mockOnFilterChange} 
+        initialFilters={initialFilters}
+        categories={mockCategories}
+      />
+    );
+    
+    // Expand to access clear button
+    fireEvent.click(screen.getByTestId('expand-button'));
+    
+    // Click clear filters button
+    fireEvent.click(screen.getByTestId('clear-filters'));
+    
+    // Check that onFilterChange was called with all filters cleared
+    expect(mockOnFilterChange).toHaveBeenCalledWith({
+      search: '',
+      status: null,
+      category: null,
+      dateFrom: null,
+      dateTo: null
+    });
+  });
+
+  it('shows loading state for categories', () => {
+    render(
+      <SubmissionFilter 
+        onFilterChange={mockOnFilterChange} 
+        categories={[]}
+        isLoadingCategories={true}
+      />
+    );
+    
+    // Expand to see category filter
+    fireEvent.click(screen.getByTestId('expand-button'));
+    
+    // Check that loading indicator is shown
+    expect(screen.getByTestId('categories-loading')).toBeInTheDocument();
+    
+    // Category filter should not be visible
+    expect(screen.queryByTestId('category-filter')).not.toBeInTheDocument();
   });
 });

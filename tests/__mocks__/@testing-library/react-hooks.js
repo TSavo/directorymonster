@@ -5,7 +5,7 @@
  * which was removed in newer versions of the library.
  */
 
-const { waitForNextUpdate: waitForUpdate, waitForCondition } = require('../../utils/testing-library-hooks-fix');
+const { waitForNextUpdate: waitForUpdate, act, notifyStateUpdate } = require('../../utils/testing-library-hooks-fix');
 const React = require('react');
 
 // Store for hook state
@@ -22,18 +22,8 @@ function resetHookState() {
   effectDependencies = [];
 }
 
-// Track state updates to implement waitForNextUpdate
-let pendingStateUpdates = 0;
-let stateUpdateResolvers = [];
-
-// Function to notify waiters when state updates
-function notifyStateUpdate() {
-  pendingStateUpdates++;
-  stateUpdateResolvers.forEach(resolve => resolve());
-  stateUpdateResolvers = [];
-}
-
 // Mock React.useState
+const originalUseState = React.useState;
 React.useState = jest.fn((initialValue) => {
   const index = hookIndex++;
   if (hookStates[index] === undefined) {
@@ -46,7 +36,7 @@ React.useState = jest.fn((initialValue) => {
     } else {
       hookStates[index] = newValue;
     }
-    // Notify waiters about state update
+    // Notify about state updates for waitForNextUpdate
     notifyStateUpdate();
     return hookStates[index];
   });
@@ -94,88 +84,62 @@ React.useContext = jest.fn((context) => ({
   ...context._currentValue
 }));
 
-// Proper implementation of waitForNextUpdate
-const waitForNextUpdate = async (timeout = 5000) => {
-  // Check if there are already pending updates
-  if (pendingStateUpdates > 0) {
-    pendingStateUpdates--;
-    return;
-  }
+/**
+ * Renders a hook and returns a result object with helpful methods
+ * 
+ * @param {Function} callback - The hook to render
+ * @param {Object} options - Additional options
+ * @returns {Object} The render result
+ */
+const renderHookImpl = (callback, options = {}) => {
+  // Reset hook state for each test
+  resetHookState();
 
-  // Wait for the next update
-  return new Promise((resolve, reject) => {
-    // Add resolver to the queue
-    stateUpdateResolvers.push(resolve);
+  // Initial render
+  let current = callback(options.initialProps || {});
 
-    // Set timeout
-    setTimeout(() => {
-      // Remove this resolver from the queue
-      stateUpdateResolvers = stateUpdateResolvers.filter(r => r !== resolve);
+  // Create a result object with the current value and helpful methods
+  const result = {
+    current,
+    // Wait for next update
+    waitForNextUpdate: async (timeout = 5000) => {
+      await waitForUpdate(timeout);
       
-      // Reject if no updates happened within timeout
-      reject(new Error(`Timed out waiting for update after ${timeout}ms`));
-    }, timeout);
-  });
+      // Reset hook index and re-render
+      hookIndex = 0;
+      current = callback(options.initialProps || {});
+      result.current = current;
+      
+      return;
+    },
+    // Re-render with new props
+    rerender: jest.fn((newProps) => {
+      // Reset hook index for rerender
+      hookIndex = 0;
+
+      // Call the callback with new props
+      current = callback(newProps || options.initialProps || {});
+      result.current = current;
+      return result;
+    }),
+    // Unmount the hook
+    unmount: jest.fn(() => {
+      // Run cleanup functions
+      effectCleanups.forEach(cleanup => {
+        if (typeof cleanup === 'function') {
+          cleanup();
+        }
+      });
+      resetHookState();
+    })
+  };
+
+  return result;
 };
 
 // Export the mock module
 module.exports = {
-  renderHook: jest.fn((callback, options = {}) => {
-    // Reset hook state for each test
-    resetHookState();
-
-    // Initial render
-    let current = callback(options.initialProps || {});
-
-    // Create a mock result object
-    const result = {
-      current: current,
-      waitForNextUpdate: async (timeout = 5000) => {
-        // Use our implementation of waitForNextUpdate
-        await waitForNextUpdate(timeout);
-        
-        // Reset hook index for next render
-        hookIndex = 0;
-        
-        // Update current value
-        current = callback(options.initialProps || {});
-        result.current = current;
-        
-        return;
-      },
-      rerender: jest.fn((newProps) => {
-        // Reset hook index for rerender
-        hookIndex = 0;
-
-        // Call the callback with new props
-        current = callback(newProps || options.initialProps || {});
-        result.current = current;
-        return current;
-      }),
-      unmount: jest.fn(() => {
-        // Run cleanup functions
-        effectCleanups.forEach(cleanup => {
-          if (typeof cleanup === 'function') {
-            cleanup();
-          }
-        });
-        resetHookState();
-      })
-    };
-
-    return {
-      result,
-      waitForNextUpdate: result.waitForNextUpdate,
-      rerender: result.rerender,
-      unmount: result.unmount
-    };
-  }),
-  act: jest.fn(async (callback) => {
-    // Execute the callback
-    await callback();
-
-    // Reset hook index for next render
-    hookIndex = 0;
-  }),
-  waitForNextUpdate
+  renderHook: jest.fn(renderHookImpl),
+  act,
+  waitForNextUpdate: waitForUpdate
 };

@@ -125,7 +125,7 @@ describe('UserForm Component', () => {
     // Check that form fields have the correct values
     expect(screen.getByTestId('name-input')).toHaveValue('John Doe');
     expect(screen.getByTestId('email-input')).toHaveValue('john@example.com');
-    
+
     // Check that site checkbox is checked
     expect(screen.getByTestId('site-checkbox-site-1')).toBeChecked();
   });
@@ -150,7 +150,7 @@ describe('UserForm Component', () => {
     // Check that form fields are empty
     expect(screen.getByTestId('name-input')).toHaveValue('');
     expect(screen.getByTestId('email-input')).toHaveValue('');
-    
+
     // Check that site checkboxes are not checked
     expect(screen.getByTestId('site-checkbox-site-1')).not.toBeChecked();
     expect(screen.getByTestId('site-checkbox-site-2')).not.toBeChecked();
@@ -167,7 +167,7 @@ describe('UserForm Component', () => {
     );
 
     // Submit the form without filling in required fields
-    const submitButton = screen.getByRole('button', { name: /save/i });
+    const submitButton = screen.getByTestId('submit-button');
     fireEvent.click(submitButton);
 
     // Check that validation errors are displayed
@@ -194,15 +194,15 @@ describe('UserForm Component', () => {
     fireEvent.change(screen.getByTestId('name-input'), { target: { value: 'New User' } });
     fireEvent.change(screen.getByTestId('email-input'), { target: { value: 'new@example.com' } });
     fireEvent.change(screen.getByTestId('password-input'), { target: { value: 'password123' } });
-    
+
     // Select a site
     fireEvent.click(screen.getByTestId('site-checkbox-site-1'));
-    
+
     // Add a permission
     fireEvent.click(screen.getByTestId('add-permission-button'));
 
     // Submit the form
-    const submitButton = screen.getByRole('button', { name: /save/i });
+    const submitButton = screen.getByTestId('submit-button');
     fireEvent.click(submitButton);
 
     // Check that onSubmit was called with the correct data

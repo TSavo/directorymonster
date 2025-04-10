@@ -1,11 +1,33 @@
-import { renderHook, RenderHookResult } from '@testing-library/react';
-import { ReactNode } from 'react';
+import { renderHook as rtlRenderHook, RenderHookResult, RenderHookOptions } from '@testing-library/react';
+import React, { ReactNode } from 'react';
+import { act } from 'react-dom/test-utils';
+
+// Simple implementation of waitForNextUpdate that uses setTimeout
+export const waitForNextUpdate = async (timeout = 50): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+};
 
 /**
- * Custom wrapper for renderHook that allows providing a context provider
- * @param Provider The context provider component
- * @param providerProps Props to pass to the provider
- * @returns A function that can be used as the wrapper for renderHook
+ * Renders a hook with the given options and adds waitForNextUpdate functionality
+ */
+export function renderHook<TProps, TResult>(
+  callback: (props: TProps) => TResult,
+  options?: RenderHookOptions<TProps>
+): RenderHookResult<TProps, TResult> & { waitForNextUpdate: () => Promise<void> } {
+  const result = rtlRenderHook(callback, options);
+  
+  // Add waitForNextUpdate function to the result
+  return {
+    ...result,
+    waitForNextUpdate: async () => {
+      await waitForNextUpdate();
+      return;
+    }
+  };
+}
+
+/**
+ * Creates a wrapper around a context provider
  */
 export function withProvider<T>(
   Provider: React.ComponentType<T & { children?: ReactNode }>
@@ -18,9 +40,7 @@ export function withProvider<T>(
 }
 
 /**
- * Custom wrapper for renderHook that allows providing multiple context providers
- * @param providers Array of provider components and their props
- * @returns A function that can be used as the wrapper for renderHook
+ * Creates a wrapper around multiple context providers
  */
 export function withProviders(
   providers: Array<{
@@ -37,36 +57,41 @@ export function withProviders(
 }
 
 /**
- * Custom renderHook that allows providing a context provider
- * @param callback The hook to render
- * @param Provider The context provider component
- * @param providerProps Props to pass to the provider
- * @returns The result of renderHook
+ * Renders a hook with a context provider
  */
 export function renderHookWithProvider<TProps, TResult, TProviderProps>(
   callback: (props: TProps) => TResult,
   Provider: React.ComponentType<TProviderProps & { children?: ReactNode }>,
   providerProps: TProviderProps
-): RenderHookResult<TResult, TProps> {
+): RenderHookResult<TProps, TResult> & { waitForNextUpdate: () => Promise<void> } {
   return renderHook(callback, {
     wrapper: withProvider(Provider)(providerProps),
   });
 }
 
 /**
- * Custom renderHook that allows providing multiple context providers
- * @param callback The hook to render
- * @param providers Array of provider components and their props
- * @returns The result of renderHook
+ * Updates a hook with the given props and wraps it in an act
  */
-export function renderHookWithProviders<TProps, TResult>(
-  callback: (props: TProps) => TResult,
-  providers: Array<{
-    Provider: React.ComponentType<any>;
-    props: Record<string, any>;
-  }>
-): RenderHookResult<TResult, TProps> {
-  return renderHook(callback, {
-    wrapper: withProviders(providers),
+export async function updateHookWithAct<TProps, TResult>(
+  result: RenderHookResult<TProps, TResult>,
+  props: TProps
+): Promise<void> {
+  await act(async () => {
+    result.rerender(props);
+    await waitForNextUpdate();
   });
 }
+
+/**
+ * Executes a callback within an act
+ */
+export async function actHook<T>(callback: () => T | Promise<T>): Promise<T> {
+  let result: T;
+  await act(async () => {
+    result = await callback();
+    await waitForNextUpdate();
+  });
+  return result!;
+}
+
+export { act };

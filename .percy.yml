@@ -10,11 +10,18 @@ snapshot:
     .date-time, .timestamp, [data-testid="timestamp"] {
       visibility: hidden !important;
     }
+
+    /* Hide animations and transitions */
+    * {
+      animation-duration: 0s !important;
+      transition-duration: 0s !important;
+    }
 discovery:
-  allowedHostnames: []
+  allowedHostnames:
+    - localhost
   disallowedHostnames: []
   networkIdleTimeout: 100
 upload:
-  files: "**/*.{png,jpg,jpeg}"
+  files: "./tests/visual/**/*.spec.ts"
   ignore: ""
   stripExtensions: false
