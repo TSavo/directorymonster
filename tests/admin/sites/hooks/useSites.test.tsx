@@ -344,7 +344,7 @@ describe('useSites Hook - API Integration', () => {
     expect(result.current.isLoading).toBe(false);
   });
 
-  it('refreshes sites list', async () => {
+  it('fetches sites list', async () => {
     // Clear previous mock calls
     jest.clearAllMocks();
 
@@ -356,9 +356,9 @@ describe('useSites Hook - API Integration', () => {
 
     const { result } = renderHook(() => useSites());
 
-    // Refresh sites
+    // Fetch sites
     await act(async () => {
-      await result.current.refreshSites();
+      await result.current.fetchSites();
     });
 
     // Verify fetch was called with the correct URL pattern
@@ -478,7 +478,7 @@ describe('useSites Hook - API Integration', () => {
       json: async () => ({})
     });
 
-    // For refreshSites called after deletion
+    // For fetchSites called after deletion
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ sites: [mockSites[1]], total: 1 })

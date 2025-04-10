@@ -14,7 +14,7 @@ interface BacklinkStepProps {
   isSubmitting: boolean;
 }
 
-export function BacklinkStep({
+export default function BacklinkStep({
   formData,
   errors,
   updateNestedField,
@@ -22,10 +22,10 @@ export function BacklinkStep({
 }: BacklinkStepProps) {
   // Initialize backlink info if not present
   const backlinkInfo = formData.backlinkInfo || { url: '' };
-  
+
   // Get backlink errors
   const backlinkErrors = errors.backlinkInfo || {};
-  
+
   return (
     <div className="space-y-4" data-testid="listing-form-backlink">
       <div>
@@ -34,7 +34,7 @@ export function BacklinkStep({
           Provide a backlink to your website to improve your listing visibility
         </p>
       </div>
-      
+
       <TextInput
         id="backlink-url"
         label="Backlink URL"
@@ -46,7 +46,7 @@ export function BacklinkStep({
         placeholder="https://example.com"
         data-testid="backlink-url-input"
       />
-      
+
       <TextInput
         id="backlink-anchor-text"
         label="Anchor Text"
@@ -61,4 +61,4 @@ export function BacklinkStep({
   );
 }
 
-export default BacklinkStep;
+

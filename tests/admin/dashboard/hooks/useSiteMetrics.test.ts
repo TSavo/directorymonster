@@ -30,9 +30,9 @@ describe('useSiteMetrics Hook', () => {
     expect(true).toBe(true);
   });
 
-  it('refetches data when refetch is called', () => {
+  it('refetches data when fetchMetrics is called', () => {
     // This test verifies that the hook correctly refetches
-    // the metrics data when the refetch function is called
+    // the metrics data when the fetchMetrics function is called
     mockSiteMetricsHook();
     expect(true).toBe(true);
   });

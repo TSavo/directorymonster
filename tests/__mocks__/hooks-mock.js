@@ -1,4 +1,5 @@
-// Mock for useSiteMetrics hook
+// Hook mocks export
+// This file just exports the mock hooks for easier access in tests
 const useSiteMetrics = jest.fn().mockReturnValue({
   metrics: {
     totalSites: 10,
@@ -15,7 +16,7 @@ const useSiteMetrics = jest.fn().mockReturnValue({
   refetch: jest.fn()
 });
 
-// Mock for other hooks
+// Auth hook mock
 const useAuth = jest.fn().mockReturnValue({
   user: { id: 'test-user', name: 'Test User', email: 'test@example.com', role: 'admin' },
   isAuthenticated: true,
@@ -24,19 +25,6 @@ const useAuth = jest.fn().mockReturnValue({
   logout: jest.fn(),
   register: jest.fn()
 });
-
-// Mock the hooks
-jest.mock('@/hooks/useSiteMetrics', () => ({
-  __esModule: true,
-  useSiteMetrics,
-  default: useSiteMetrics
-}));
-
-jest.mock('@/hooks/useAuth', () => ({
-  __esModule: true,
-  useAuth,
-  default: useAuth
-}));
 
 // Export the mocked hooks for direct access in tests
 module.exports = {

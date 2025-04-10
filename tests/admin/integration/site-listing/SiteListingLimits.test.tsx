@@ -1,8 +1,56 @@
 import React from 'react';
+
+// Mock the BasicInfoStep component
+jest.mock('@/components/admin/listings/components/form/BasicInfoStep', () => ({
+  __esModule: true,
+  BasicInfoStep: function MockBasicInfoStep({ formData, errors, updateField, isSubmitting }) {
+    return (
+      <div data-testid="basic-info-step">
+        <input
+          data-testid="title-input"
+          value={formData.title || ''}
+          onChange={(e) => updateField('title', e.target.value)}
+        />
+        <textarea
+          data-testid="description-input"
+          value={formData.description || ''}
+          onChange={(e) => updateField('description', e.target.value)}
+        />
+      </div>
+    );
+  }
+}));
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+// Mock the ListingForm component
+jest.mock('@/components/admin/listings/ListingForm', () => ({
+  __esModule: true,
+  default: function MockListingForm({ initialData, onSubmit, onCancel, listingId, siteSlug }) {
+    return (
+      <div data-testid="listing-form">
+        <div data-testid="site-id">{initialData?.siteId || 'site1'}</div>
+        <select data-testid="site-select">
+          <option value="site1">Test Site 1</option>
+          <option value="site2">Test Site 2</option>
+        </select>
+        <button data-testid="next-step-button" onClick={() => {}}>
+          Next
+        </button>
+        <button data-testid="submit-button" onClick={() => onSubmit(initialData || {})}>
+          Submit
+        </button>
+        {onCancel && (
+          <button data-testid="cancel-button" onClick={onCancel}>
+            Cancel
+          </button>
+        )}
+      </div>
+    );
+  }
+}));
+
 import ListingForm from '@/components/admin/listings/ListingForm';
 import { SiteContext } from '@/contexts/SiteContext';
 

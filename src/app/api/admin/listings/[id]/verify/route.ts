@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withTenantAccess } from '@/middleware/tenant-validation';
-import { withResourcePermission } from '@/middleware/withPermission';
-import { ResourceType, Permission } from '@/types/permissions';
+import { withSecureTenantPermission } from '@/app/api/middleware/secureTenantContext';
+import { ResourceType, Permission } from '@/lib/role/types';
 import { kv } from '@/lib/redis-client';
 
 /**
@@ -22,13 +21,11 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
-  return withTenantAccess(
+  return withSecureTenantPermission(
     req,
-    withResourcePermission(
-      req,
-      'listing' as ResourceType,
-      'manage' as Permission,
-      async (validatedReq) => {
+    'listing' as ResourceType,
+    'verify' as Permission,
+    async (validatedReq, context) => {
         try {
           // Get tenant context and listing ID
           const tenantId = validatedReq.headers.get('x-tenant-id') as string;
@@ -81,7 +78,7 @@ export async function POST(
             { status: 500 }
           );
         }
-      }
-    )
+    },
+    params.id // Pass the resource ID for specific permission check
   );
 }

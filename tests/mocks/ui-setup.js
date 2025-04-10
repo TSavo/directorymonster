@@ -13,7 +13,18 @@ module.exports = {
   Checkbox: require('./ui/checkbox').Checkbox,
   DropdownMenu: require('./ui/dropdown-menu').DropdownMenu,
   DropdownMenuItem: require('./ui/dropdown-menu').DropdownMenuItem,
-  
+
+  // Alert components
+  Alert: require('./ui/alert').Alert,
+  AlertTitle: require('./ui/alert').AlertTitle,
+  AlertDescription: require('./ui/alert').AlertDescription,
+
+  // Tabs components
+  Tabs: require('./ui/tabs').Tabs,
+  TabsList: require('./ui/tabs').TabsList,
+  TabsTrigger: require('./ui/tabs').TabsTrigger,
+  TabsContent: require('./ui/tabs').TabsContent,
+
   // Card components
   Card: require('./ui/card').Card,
   CardHeader: require('./ui/card').CardHeader,
@@ -21,7 +32,7 @@ module.exports = {
   CardDescription: require('./ui/card').CardDescription,
   CardContent: require('./ui/card').CardContent,
   CardFooter: require('./ui/card').CardFooter,
-  
+
   // Sheet components
   Sheet: require('./ui/sheet').Sheet,
   SheetTrigger: require('./ui/sheet').SheetTrigger,
@@ -31,13 +42,13 @@ module.exports = {
   SheetDescription: require('./ui/sheet').SheetDescription,
   SheetFooter: require('./ui/sheet').SheetFooter,
   SheetClose: require('./ui/sheet').SheetClose,
-  
+
   // Accordion components
   Accordion: require('./ui/accordion').Accordion,
   AccordionItem: require('./ui/accordion').AccordionItem,
   AccordionTrigger: require('./ui/accordion').AccordionTrigger,
   AccordionContent: require('./ui/accordion').AccordionContent,
-  
+
   // Form components
   Label: require('./ui/label').Label
 };

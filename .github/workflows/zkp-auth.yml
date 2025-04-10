@@ -60,6 +60,12 @@ jobs:
     - name: Set up ZKP authentication system
       run: npm run zkp:setup
 
+    - name: Run ZKP tests with mocks
+      run: npm run test:zkp
+
+    - name: Run ZKP tests with real implementations
+      run: npm run test:zkp:real
+
     - name: Run secure ZKP tests
       run: npm run test:crypto:secure
 

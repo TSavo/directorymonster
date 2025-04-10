@@ -3,6 +3,7 @@ import { kv } from '@/lib/redis-client';
 import { SiteConfig, Category } from '@/types';
 import { getSiteByHostname, generateSiteBaseUrl, generateCategoryHref } from '@/lib/site-utils';
 import { CategoryLink } from '@/components/LinkUtilities';
+import MainLayout from '@/components/MainLayout';
 
 // Types for Next.js App Router page props
 type PageProps = {
@@ -22,27 +23,27 @@ async function getHostname() {
 export default async function Home({ searchParams }: PageProps) {
   // Get host from headers (server component)
   const headerHost = await getHostname();
-  
+
   // For testing, hostname parameter takes precedence
   const debugHostname = searchParams?.hostname as string | undefined;
-  
+
   // Use debug param first, then header host, then localhost fallback
   const hostname = debugHostname || headerHost || 'localhost:3001';
-  
+
   // Log to debug hostnames
   console.log(`DEBUG: Homepage - Headers host:`, headerHost);
   console.log(`DEBUG: Homepage - Query param hostname:`, debugHostname);
   console.log(`DEBUG: Homepage - Using final hostname:`, hostname);
-  
+
   // Get site config based on hostname or fallback to first site
   let site: SiteConfig | null = null;
-  
+
   // Try to get site by hostname
   // First try the hostname parameter, then fallback to localhost
   console.log(`DEBUG: Looking up site by hostname: ${hostname}`);
   site = await getSiteByHostname(hostname);
   console.log(`DEBUG: Hostname lookup result:`, site?.name || 'null');
-  
+
   // Fallback to first site if no site found
   if (!site) {
     const siteKeys = await kv.keys('site:slug:*');
@@ -59,10 +60,10 @@ export default async function Home({ searchParams }: PageProps) {
     const categories = await Promise.all(
       categoryKeys.map(async (key) => await kv.get<Category>(key))
     );
-    
+
     // Build base URL for site
     const baseUrl = generateSiteBaseUrl(site);
-    
+
     // Create structured data for WebSite
     const websiteData = {
       '@context': 'https://schema.org',
@@ -76,7 +77,7 @@ export default async function Home({ searchParams }: PageProps) {
         'query-input': 'required name=search_term_string'
       }
     };
-    
+
     // Create structured data for Organization
     const organizationData = {
       '@context': 'https://schema.org',
@@ -86,66 +87,66 @@ export default async function Home({ searchParams }: PageProps) {
       logo: site.logoUrl || `${baseUrl}/logo.png`,
       description: site.metaDescription
     };
-    
+
     // Convert structured data to JSON strings
     const websiteDataStr = JSON.stringify(websiteData);
     const organizationDataStr = JSON.stringify(organizationData);
-    
+
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main id="main-content" className="min-h-screen bg-gray-50" tabIndex={-1}>
         {/* Add structured data */}
-        <script 
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: websiteDataStr }}
         />
-        <script 
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: organizationDataStr }}
         />
-        
+
         {/* Add canonical URL for SEO */}
         <link rel="canonical" href={baseUrl} />
-        
+
         {/* Add meta tags for social sharing */}
         <meta property="og:title" content={site.name} />
         <meta property="og:description" content={site.metaDescription} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={baseUrl} />
         {site.logoUrl && <meta property="og:image" content={site.logoUrl} />}
-        
+
         {/* Hero section with site name and description */}
-        <div className="bg-white shadow-sm border-b" data-testid="hero-section">
+        <section aria-labelledby="hero-heading" className="bg-white shadow-sm border-b" data-testid="hero-section">
           <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+              <h1 id="hero-heading" className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
                 {site.name}
               </h1>
               <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500">
                 {site.metaDescription}
               </p>
             </div>
-            
+
             {/* SEO-friendly markup for primary keyword */}
             <div className="hidden">
               <h2>Best {site.primaryKeyword} Reviews and Guides</h2>
               <p>Comprehensive {site.primaryKeyword} reviews, comparisons, and buyer guides.</p>
             </div>
           </div>
-        </div>
-        
+        </section>
+
         {/* Categories section */}
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8" data-testid="category-section">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse Categories</h2>
-          
+        <section aria-labelledby="categories-heading" className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8" data-testid="category-section">
+          <h2 id="categories-heading" className="text-3xl font-bold text-gray-900 mb-8">Browse Categories</h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" itemScope itemType="https://schema.org/ItemList">
             {categories.filter(category => category !== null).map((category, index) => (
-              <div 
+              <div
                 key={category.id}
                 itemProp="itemListElement"
                 itemScope
                 itemType="https://schema.org/ListItem"
               >
-                <CategoryLink 
+                <CategoryLink
                   category={category}
                   className="group"
                 >
@@ -169,7 +170,7 @@ export default async function Home({ searchParams }: PageProps) {
                 </CategoryLink>
               </div>
             ))}
-            
+
             {categories.filter(category => category !== null).length === 0 && (
               <div className="col-span-full bg-white p-6 rounded-lg shadow text-center">
                 <p className="text-gray-500">No categories found. Try seeding data first.</p>
@@ -177,19 +178,19 @@ export default async function Home({ searchParams }: PageProps) {
               </div>
             )}
           </div>
-        </div>
-          
+        </section>
+
         {/* Admin section with lighter visual weight */}
-        <div className="bg-white border-t">
+        <section aria-labelledby="admin-heading" className="bg-white border-t">
           <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-lg font-medium text-gray-900">Platform Administration</h2>
+                <h2 id="admin-heading" className="text-lg font-medium text-gray-900">Platform Administration</h2>
                 <p className="mt-1 text-sm text-gray-500">Access the admin dashboard to manage your directory.</p>
               </div>
               <div className="mt-4 sm:mt-0">
-                <Link 
-                  href="/admin" 
+                <Link
+                  href="/admin"
                   className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Admin Dashboard
@@ -197,9 +198,9 @@ export default async function Home({ searchParams }: PageProps) {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <footer className="bg-gray-50 border-t" data-testid="site-footer">
+        <footer className="bg-gray-50 border-t" data-testid="site-footer" role="contentinfo">
           <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <p className="text-sm text-gray-500" data-testid="copyright">Last updated: {new Date(site.updatedAt).toLocaleDateString()}</p>
           </div>
@@ -207,10 +208,10 @@ export default async function Home({ searchParams }: PageProps) {
       </main>
     );
   }
-  
+
   // If no site exists, this is a fresh installation
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main id="main-content" className="min-h-screen bg-gray-50" tabIndex={-1}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="min-h-screen flex flex-col items-center justify-center">
           <div className="text-center mb-12">
@@ -221,7 +222,7 @@ export default async function Home({ searchParams }: PageProps) {
               SEO-Focused Multitenancy Directory Platform
             </p>
           </div>
-          
+
           <div className="bg-white shadow-md overflow-hidden rounded-lg max-w-lg w-full mb-12">
             <div className="bg-blue-600 px-6 py-4">
               <h2 className="text-lg font-semibold text-white">Getting Started</h2>
@@ -233,10 +234,10 @@ export default async function Home({ searchParams }: PageProps) {
               <div className="bg-gray-50 rounded-md p-4 border border-gray-200">
                 <code className="text-sm text-gray-800">npm run seed</code>
               </div>
-              
+
               <div className="mt-8">
-                <Link 
-                  href="/admin" 
+                <Link
+                  href="/admin"
                   className="w-full flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Admin Dashboard
@@ -244,7 +245,7 @@ export default async function Home({ searchParams }: PageProps) {
               </div>
             </div>
           </div>
-          
+
           <div className="text-center text-sm text-gray-500">
             <p>A modern directory platform for creating SEO-optimized listing sites</p>
           </div>

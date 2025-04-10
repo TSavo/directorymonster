@@ -13,6 +13,7 @@ export interface Resource {
   type: ResourceType;
   id?: string;        // Specific resource ID (if null, applies to all resources of this type)
   tenantId: string;   // The tenant this resource belongs to
+  siteId?: string;    // The site this resource belongs to (if null, applies to all sites in the tenant)
 }
 
 // Access control entry

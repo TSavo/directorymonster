@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { useSiteMetrics } from './hooks';
 import { StatisticCardsProps } from './types';
 import StatisticCard from './components/StatisticCard';
-import { 
-  ListingIcon, 
-  CategoryIcon, 
-  VisitorIcon, 
-  SearchIcon, 
-  InteractionIcon 
+import {
+  ListingIcon,
+  CategoryIcon,
+  VisitorIcon,
+  SearchIcon,
+  InteractionIcon
 } from './components/StatisticIcons';
 import { PeriodSelector, TimePeriod } from './components/PeriodSelector';
 import MetricsError from './components/MetricsError';
@@ -35,13 +35,13 @@ export const StatisticCards: React.FC<StatisticCardsProps> = ({
 }) => {
   // State for selected time period
   const [period, setPeriod] = useState<TimePeriod>('month');
-  
+
   // Use the hook to fetch metrics if they're not provided as props
   const {
     metrics: hookMetrics,
     isLoading: hookIsLoading,
     error,
-    refetch,
+    fetchMetrics,
   } = useSiteMetrics({
     siteSlug: siteSlug || '',
     period,
@@ -67,9 +67,9 @@ export const StatisticCards: React.FC<StatisticCardsProps> = ({
     <div data-testid="statistics-section">
       {/* Period selector */}
       <div className="flex justify-end mb-4">
-        <PeriodSelector 
-          period={period} 
-          onChange={handlePeriodChange} 
+        <PeriodSelector
+          period={period}
+          onChange={handlePeriodChange}
         />
       </div>
 
@@ -77,9 +77,9 @@ export const StatisticCards: React.FC<StatisticCardsProps> = ({
       <StatisticsContainer className={className} isLoading={isLoading}>
         {/* Display error if there is one */}
         {error && (
-          <MetricsError 
-            message={error.message} 
-            onRetry={refetch} 
+          <MetricsError
+            message={error.message}
+            onRetry={fetchMetrics}
           />
         )}
 
@@ -98,7 +98,7 @@ export const StatisticCards: React.FC<StatisticCardsProps> = ({
           icon={<ListingIcon />}
           isLoading={isLoading}
           subtitle={`Period: ${period}`}
-          onRefresh={refetch}
+          onRefresh={fetchMetrics}
         />
 
         {/* Categories Card */}
@@ -116,7 +116,7 @@ export const StatisticCards: React.FC<StatisticCardsProps> = ({
           icon={<CategoryIcon />}
           isLoading={isLoading}
           subtitle={`Period: ${period}`}
-          onRefresh={refetch}
+          onRefresh={fetchMetrics}
         />
 
         {/* Visitors Card */}
@@ -134,7 +134,7 @@ export const StatisticCards: React.FC<StatisticCardsProps> = ({
           icon={<VisitorIcon />}
           isLoading={isLoading}
           subtitle={`Period: ${period}`}
-          onRefresh={refetch}
+          onRefresh={fetchMetrics}
         />
 
         {/* Page Views Card */}
@@ -152,7 +152,7 @@ export const StatisticCards: React.FC<StatisticCardsProps> = ({
           icon={<VisitorIcon />}
           isLoading={isLoading}
           subtitle={`Period: ${period}`}
-          onRefresh={refetch}
+          onRefresh={fetchMetrics}
         />
 
         {/* Conditional Search Metrics */}
@@ -171,7 +171,7 @@ export const StatisticCards: React.FC<StatisticCardsProps> = ({
             icon={<SearchIcon />}
             isLoading={isLoading}
             subtitle={`Period: ${period}`}
-            onRefresh={refetch}
+            onRefresh={fetchMetrics}
           />
         )}
 
@@ -191,7 +191,7 @@ export const StatisticCards: React.FC<StatisticCardsProps> = ({
             icon={<InteractionIcon />}
             isLoading={isLoading}
             subtitle={`Period: ${period}`}
-            onRefresh={refetch}
+            onRefresh={fetchMetrics}
           />
         )}
       </StatisticsContainer>

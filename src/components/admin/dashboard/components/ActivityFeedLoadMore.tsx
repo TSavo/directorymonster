@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { Button } from '@/components/ui/Button';
 
 interface ActivityFeedLoadMoreProps {
   onClick: () => void;
@@ -15,14 +16,16 @@ export function ActivityFeedLoadMore({
 }: ActivityFeedLoadMoreProps) {
   return (
     <div className="pt-2 pb-3 px-4 text-center">
-      <button
+      <Button
         onClick={onClick}
-        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-        disabled={isLoading || disabled}
+        variant="link"
+        size="sm"
+        isLoading={isLoading}
+        disabled={disabled}
         data-testid="load-more-button"
       >
-        {isLoading ? 'Loading...' : 'Load more'}
-      </button>
+        Load more
+      </Button>
     </div>
   );
 }

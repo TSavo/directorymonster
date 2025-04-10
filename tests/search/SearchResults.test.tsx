@@ -24,19 +24,19 @@ jest.mock('../../src/components/search/filters/SearchFilters', () => {
   return function MockSearchFilters({ onFilterChange, initialFilters }: any) {
     return (
       <div data-testid="mock-search-filters">
-        <button 
+        <button
           onClick={() => onFilterChange({ categoryId: 'cat2' })}
           data-testid="filter-category-button"
         >
           Filter by Category
         </button>
-        <button 
+        <button
           onClick={() => onFilterChange({ featured: true })}
           data-testid="filter-featured-button"
         >
           Filter Featured
         </button>
-        <button 
+        <button
           onClick={() => onFilterChange({ sortBy: 'newest' })}
           data-testid="filter-sort-button"
         >
@@ -117,14 +117,14 @@ describe('SearchResults Component', () => {
 
   it('shows loading state initially', async () => {
     (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
-    
+
     render(
-      <SearchResults 
-        query="test query" 
+      <SearchResults
+        query="test query"
         site={mockSite}
       />
     );
-    
+
     expect(screen.getByText('Searching...')).toBeInTheDocument();
     const spinner = document.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();
@@ -145,7 +145,7 @@ describe('SearchResults Component', () => {
         query: 'test query'
       })
     });
-    
+
     // Second request after filtering returns filtered results
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
@@ -163,34 +163,34 @@ describe('SearchResults Component', () => {
         }
       })
     });
-    
+
     render(
-      <SearchResults 
-        query="test query" 
+      <SearchResults
+        query="test query"
         site={mockSite}
         categories={mockCategories}
       />
     );
-    
+
     // Wait for initial results to load
     await waitFor(() => {
       expect(screen.getByText('Search Results for "test query"')).toBeInTheDocument();
     });
-    
+
     // Check that the filter component is rendered
     expect(screen.getByTestId('mock-search-filters')).toBeInTheDocument();
-    
+
     // Apply category filter
     fireEvent.click(screen.getByTestId('filter-category-button'));
-    
+
     // Wait for filtered results to load
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
-    
-    // Verify correct API call with filters - accept either format depending on implementation
+
+    // Verify correct API call with filters using site-specific endpoint
     expect(global.fetch).toHaveBeenLastCalledWith(
-      expect.stringMatching(/\/api\/search\?q=test\+query(&siteId=site1)?(&categoryId=cat2)/)
+      expect.stringMatching(/\/api\/sites\/[\w-]+\/search\?q=test\+query(&categoryId=cat2)?/)
     );
   });
 
@@ -209,7 +209,7 @@ describe('SearchResults Component', () => {
         query: 'test query'
       })
     });
-    
+
     // Second page response
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
@@ -224,28 +224,28 @@ describe('SearchResults Component', () => {
         query: 'test query'
       })
     });
-    
+
     render(
-      <SearchResults 
-        query="test query" 
+      <SearchResults
+        query="test query"
         site={mockSite}
       />
     );
-    
+
     // Wait for results to load
     await waitFor(() => {
       expect(screen.getByText('Search Results for "test query"')).toBeInTheDocument();
     });
-    
+
     // Go to page 2
     const page2Button = screen.getByText('2');
     fireEvent.click(page2Button);
-    
+
     // Verify API call with page parameter
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
-    
+
     expect(global.fetch).toHaveBeenLastCalledWith(
       expect.stringContaining('page=2')
     );
@@ -253,18 +253,18 @@ describe('SearchResults Component', () => {
 
   it('handles API errors gracefully', async () => {
     (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('API error'));
-    
+
     render(
-      <SearchResults 
-        query="test query" 
+      <SearchResults
+        query="test query"
         site={mockSite}
       />
     );
-    
+
     await waitFor(() => {
       expect(screen.getByText('Error')).toBeInTheDocument();
     });
-    
+
     expect(screen.getByText('API error')).toBeInTheDocument();
   });
 });

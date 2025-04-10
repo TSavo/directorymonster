@@ -2,7 +2,9 @@
  * @jest-environment node
  */
 import { NextRequest } from 'next/server';
-import { GET } from '@/app/api/search/route';
+// This test is for the old search API which has been moved to a site-specific route
+// See tests/api/sites/search.test.ts for the new tests
+import { GET } from '@/app/api/sites/[siteSlug]/search/route';
 
 // Mock the searchIndexer
 jest.mock('../../src/lib/search', () => ({
@@ -17,27 +19,46 @@ jest.mock('../../src/middleware/withRedis', () => ({
   withRedis: (handler: Function) => handler,
 }));
 
-describe('Search API', () => {
+// Mock Redis client
+jest.mock('../../src/lib/redis-client', () => ({
+  kv: {
+    get: jest.fn().mockImplementation((key) => {
+      if (key.includes('site:slug:test-site')) {
+        return {
+          id: 'site1',
+          slug: 'test-site',
+          name: 'Test Site'
+        };
+      }
+      return null;
+    }),
+    set: jest.fn(),
+    del: jest.fn(),
+    keys: jest.fn()
+  }
+}));
+
+describe('Search API (Legacy Tests)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('returns error when siteId is missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/search?q=test');
-    const response = await GET(request);
+  it('returns 404 when site is not found', async () => {
+    const request = new NextRequest('http://localhost:3000/api/sites/nonexistent-site/search?q=test');
+    const response = await GET(request, { params: { siteSlug: 'nonexistent-site' } });
     const data = await response.json();
-    
-    expect(response.status).toBe(400);
+
+    expect(response.status).toBe(404);
     expect(data).toEqual({
-      error: 'Missing site ID',
+      error: 'Site not found',
     });
   });
 
   it('returns error when no search criteria provided', async () => {
-    const request = new NextRequest('http://localhost:3000/api/search?siteId=site1');
-    const response = await GET(request);
+    const request = new NextRequest('http://localhost:3000/api/sites/test-site/search');
+    const response = await GET(request, { params: { siteSlug: 'test-site' } });
     const data = await response.json();
-    
+
     expect(response.status).toBe(400);
     expect(data).toEqual({
       error: 'Missing search query or filters',
@@ -45,10 +66,10 @@ describe('Search API', () => {
   });
 
   it('returns error when query is too short', async () => {
-    const request = new NextRequest('http://localhost:3000/api/search?q=ab&siteId=site1');
-    const response = await GET(request);
+    const request = new NextRequest('http://localhost:3000/api/sites/test-site/search?q=ab');
+    const response = await GET(request, { params: { siteSlug: 'test-site' } });
     const data = await response.json();
-    
+
     expect(response.status).toBe(400);
     expect(data).toEqual({
       error: 'Search query too short',
@@ -57,24 +78,24 @@ describe('Search API', () => {
 
   it('handles query with category filter correctly', async () => {
     const { searchIndexer } = require('../../src/lib/search');
-    
+
     // Mock implementation of searchListings and countSearchResults
     searchIndexer.searchListings.mockResolvedValue([
       { id: 'listing1', title: 'Test Listing 1' },
       { id: 'listing2', title: 'Test Listing 2' }
     ]);
-    
+
     searchIndexer.countSearchResults.mockResolvedValue(2);
-    
+
     const request = new NextRequest(
-      'http://localhost:3000/api/search?q=test&siteId=site1&categoryId=cat1'
+      'http://localhost:3000/api/sites/test-site/search?q=test&categoryId=cat1'
     );
-    
-    const response = await GET(request);
+
+    const response = await GET(request, { params: { siteSlug: 'test-site' } });
     const data = await response.json();
-    
+
     expect(response.status).toBe(200);
-    
+
     // Verify search indexer was called with correct parameters
     expect(searchIndexer.searchListings).toHaveBeenCalledWith(
       'site1',
@@ -85,7 +106,7 @@ describe('Search API', () => {
         offset: 0
       })
     );
-    
+
     // Verify count was called with correct parameters
     expect(searchIndexer.countSearchResults).toHaveBeenCalledWith(
       'site1',
@@ -94,7 +115,7 @@ describe('Search API', () => {
         categoryId: 'cat1'
       })
     );
-    
+
     // Verify response structure
     expect(data).toEqual({
       results: [
@@ -118,22 +139,22 @@ describe('Search API', () => {
 
   it('handles featured filter correctly', async () => {
     const { searchIndexer } = require('../../src/lib/search');
-    
+
     searchIndexer.searchListings.mockResolvedValue([
       { id: 'listing1', title: 'Featured Listing', featured: true }
     ]);
-    
+
     searchIndexer.countSearchResults.mockResolvedValue(1);
-    
+
     const request = new NextRequest(
-      'http://localhost:3000/api/search?siteId=site1&featured=true'
+      'http://localhost:3000/api/sites/test-site/search?featured=true'
     );
-    
-    const response = await GET(request);
+
+    const response = await GET(request, { params: { siteSlug: 'test-site' } });
     const data = await response.json();
-    
+
     expect(response.status).toBe(200);
-    
+
     expect(searchIndexer.searchListings).toHaveBeenCalledWith(
       'site1',
       '',
@@ -141,29 +162,29 @@ describe('Search API', () => {
         featuredOnly: true
       })
     );
-    
+
     expect(data.filters.featured).toBe(true);
   });
 
   it('handles pagination parameters correctly', async () => {
     const { searchIndexer } = require('../../src/lib/search');
-    
+
     searchIndexer.searchListings.mockResolvedValue([
       { id: 'listing21', title: 'Listing 21' },
       { id: 'listing22', title: 'Listing 22' }
     ]);
-    
+
     searchIndexer.countSearchResults.mockResolvedValue(30);
-    
+
     const request = new NextRequest(
-      'http://localhost:3000/api/search?q=test&siteId=site1&page=3&perPage=10'
+      'http://localhost:3000/api/sites/test-site/search?q=test&page=3&perPage=10'
     );
-    
-    const response = await GET(request);
+
+    const response = await GET(request, { params: { siteSlug: 'test-site' } });
     const data = await response.json();
-    
+
     expect(response.status).toBe(200);
-    
+
     // Verify pagination parameters
     expect(searchIndexer.searchListings).toHaveBeenCalledWith(
       'site1',
@@ -173,7 +194,7 @@ describe('Search API', () => {
         offset: 20 // (page-1) * perPage
       })
     );
-    
+
     // Verify pagination response
     expect(data.pagination).toEqual({
       page: 3,
@@ -185,16 +206,16 @@ describe('Search API', () => {
 
   it('handles search errors gracefully', async () => {
     const { searchIndexer } = require('../../src/lib/search');
-    
+
     searchIndexer.searchListings.mockRejectedValue(new Error('Search failed'));
-    
+
     const request = new NextRequest(
-      'http://localhost:3000/api/search?q=test&siteId=site1'
+      'http://localhost:3000/api/sites/test-site/search?q=test'
     );
-    
-    const response = await GET(request);
+
+    const response = await GET(request, { params: { siteSlug: 'test-site' } });
     const data = await response.json();
-    
+
     expect(response.status).toBe(500);
     expect(data).toEqual({
       error: 'Search failed',

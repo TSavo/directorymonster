@@ -25,27 +25,8 @@ export interface Category {
   updatedAt: number;
 }
 
-export interface Listing {
-  id: string;
-  siteId: string;
-  categoryId: string;
-  categorySlug?: string; // Added optional categorySlug for better URL construction
-  title: string;
-  slug: string;
-  metaDescription: string;
-  content: string;
-  imageUrl?: string;
-  backlinkUrl: string;
-  backlinkAnchorText: string;
-  backlinkPosition: 'prominent' | 'body' | 'footer';
-  backlinkType: 'dofollow' | 'nofollow';
-  backlinkVerifiedAt?: number;
-  featured?: boolean; // Flag to mark featured listings
-  status?: string; // Status of the listing (e.g., 'published', 'draft', 'archived')
-  customFields: Record<string, unknown>;
-  createdAt: number;
-  updatedAt: number;
-}
+// Re-export the Listing type from the unified listing type definition
+export { Listing, ListingStatus, ListingMedia, ListingPrice, BacklinkInfo, CustomField } from './listing';
 
 export interface ApiKey {
   id: string;

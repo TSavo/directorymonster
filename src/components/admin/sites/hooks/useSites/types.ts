@@ -95,5 +95,5 @@ export interface UseSitesReturn {
   // Loading and fetching
   fetchSite: (id: string) => Promise<SiteData | null>;
   fetchSites: () => Promise<SiteData[]>;
-  refreshSites: () => Promise<void>;
+  // Note: refreshSites method has been removed - use fetchSites directly instead
 }

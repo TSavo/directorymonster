@@ -2,9 +2,22 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+
+// Use a function to get search params that can be mocked in tests
+const getSearchParams = () => {
+  try {
+    // Dynamic import to avoid issues with Jest
+    const { useSearchParams } = require('next/navigation');
+    return useSearchParams();
+  } catch (error) {
+    // Return null in test environments where useSearchParams might not be available
+    return null;
+  }
+};
 import { generateZKPWithBcrypt } from '@/lib/zkp/zkp-bcrypt';
 import { getSalt, clearSaltCache } from '@/lib/auth/salt-cache';
 import { getAuthErrorMessage, AuthErrorType } from '@/lib/auth/error-handler';
+import { isValidReturnUrl } from '@/utils/url-validator';
 import CaptchaWidget from './CaptchaWidget';
 
 interface ZKPLoginProps {
@@ -13,6 +26,9 @@ interface ZKPLoginProps {
 }
 
 export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
+  const router = useRouter();
+  const searchParams = getSearchParams();
+
   // Form state
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -35,8 +51,7 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
     captcha?: string;
   }>({});
 
-  // Router for redirecting
-  const router = useRouter();
+  // Router for redirecting was moved to the top of the component
 
   /**
    * Validate the form inputs
@@ -166,8 +181,24 @@ export function ZKPLogin({ redirectPath = '/admin' }: ZKPLoginProps) {
           localStorage.removeItem('rememberMe');
         }
 
-        // Redirect to admin dashboard
-        router.push(redirectPath);
+        // Check if there's a returnUrl in the search params
+        const returnUrl = searchParams?.get('returnUrl');
+
+        // Redirect to returnUrl if available and valid, otherwise use the default redirectPath
+        if (returnUrl) {
+          const decodedUrl = decodeURIComponent(returnUrl);
+
+          // Validate the URL to prevent open redirect vulnerabilities
+          if (isValidReturnUrl(decodedUrl)) {
+            router.push(decodedUrl);
+          } else {
+            // Log the invalid URL attempt for security monitoring
+            console.warn('Invalid return URL detected:', decodedUrl);
+            router.push(redirectPath);
+          }
+        } else {
+          router.push(redirectPath);
+        }
       } else {
         // Handle different error types
         if (response.status === 429) {

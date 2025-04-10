@@ -305,7 +305,7 @@ export function useCategories(siteSlug?: string, initialCategories?: CategoryWit
     viewMode,
     toggleViewMode,
 
-    // Refetch
+    // Fetch data
     fetchCategories
   };
 }

@@ -6,7 +6,7 @@ This document provides a comprehensive overview of all documentation and specifi
 
 - `/docs` - Implementation guides and how-to documentation
 - `/specs` - Specifications and design documents
-- `/specs/archived` - Archived specifications 
+- `/specs/archived` - Archived specifications
 - `/specs/docs-archive` - Archived documentation
 
 ## Documentation By Category
@@ -16,6 +16,7 @@ This document provides a comprehensive overview of all documentation and specifi
 | Document | Type | Description |
 |----------|------|-------------|
 | [TENANT_SECURITY_GUIDE.md](/docs/TENANT_SECURITY_GUIDE.md) | Guide | Implementation guide for tenant security |
+| [UNIFIED_LISTING_TYPE.md](/docs/UNIFIED_LISTING_TYPE.md) | Guide | Documentation for the unified Listing type |
 | [CROSS_TENANT_SECURITY_SPEC.md](/specs/CROSS_TENANT_SECURITY_SPEC.md) | Spec | Specification for preventing cross-tenant attacks |
 | [MULTI_TENANT_ACL_SPEC.md](/specs/MULTI_TENANT_ACL_SPEC.md) | Spec | Specification for multi-tenant access control |
 
@@ -26,6 +27,7 @@ This document provides a comprehensive overview of all documentation and specifi
 | [TESTING_GUIDE.md](/docs/TESTING_GUIDE.md) | Guide | Implementation guide for writing tests |
 | [TESTING_SPEC.md](/specs/TESTING_SPEC.md) | Spec | Testing standards and requirements |
 | [MOCKING_GUIDE.md](/docs/MOCKING_GUIDE.md) | Guide | Guide for mocking dependencies in tests |
+| [zkp-testing.md](/docs/zkp-testing.md) | Guide | Guide for testing Zero-Knowledge Proof functionality |
 | [COMPONENT_TESTING.md](/specs/COMPONENT_TESTING.md) | Spec | Standards for component testing |
 | [API_TESTING.md](/specs/API_TESTING.md) | Spec | Standards for API testing |
 | [INTEGRATION_TESTING.md](/specs/INTEGRATION_TESTING.md) | Spec | Standards for integration testing |

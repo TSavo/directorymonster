@@ -9,7 +9,7 @@ import StatisticCardTrend from './StatisticCardTrend';
 
 /**
  * Individual statistic card component that displays a single metric
- * 
+ *
  * @param {string} title - The title of the metric
  * @param {string|number} value - The value of the metric
  * @param {object} change - Optional object containing change data
@@ -32,22 +32,22 @@ export function StatisticCard({
   return (
     <div
       data-testid="statistic-card"
-      className={`bg-white rounded-lg shadow p-4 sm:p-6 border border-gray-100 hover:shadow-md transition-shadow ${className}`}
+      className={`bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-neutral-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1 ${className}`}
       aria-busy={isLoading}
     >
-      <StatisticCardHeader 
-        title={title} 
-        subtitle={subtitle} 
-        icon={icon} 
-        onRefresh={onRefresh} 
+      <StatisticCardHeader
+        title={title}
+        subtitle={subtitle}
+        icon={icon}
+        onRefresh={onRefresh}
       />
-      
+
       {isLoading ? (
         <StatisticCardSkeleton />
       ) : (
         <>
           <StatisticCardValue title={title} value={value} />
-          
+
           {change && <StatisticCardTrend change={change} />}
         </>
       )}

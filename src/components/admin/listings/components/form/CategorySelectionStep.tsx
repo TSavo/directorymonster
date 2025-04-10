@@ -12,7 +12,7 @@ interface CategorySelectionStepProps {
   siteSlug?: string;
 }
 
-export function CategorySelectionStep({
+export default function CategorySelectionStep({
   formData,
   errors,
   updateField,
@@ -27,15 +27,15 @@ export function CategorySelectionStep({
   useEffect(() => {
     const fetchCategories = async () => {
       if (!siteSlug) return;
-      
+
       try {
         setLoading(true);
         const response = await fetch(`/api/sites/${siteSlug}/categories`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
-        
+
         const data = await response.json();
         setCategories(data.categories || []);
       } catch (err) {
@@ -54,7 +54,7 @@ export function CategorySelectionStep({
     const newCategories = isChecked
       ? [...formData.categoryIds, categoryId]
       : formData.categoryIds.filter((id) => id !== categoryId);
-    
+
     updateField('categoryIds', newCategories);
   };
 
@@ -69,13 +69,13 @@ export function CategorySelectionStep({
   return (
     <div className="space-y-4" data-testid="listing-form-category-selection">
       <h3 className="text-lg font-medium text-gray-900">Select Categories</h3>
-      
+
       {errors.categoryIds && (
         <p className="mt-1 text-sm text-red-600">
           {errors.categoryIds}
         </p>
       )}
-      
+
       <div className="mt-4 space-y-2">
         {categories.length === 0 ? (
           <p className="text-gray-500">No categories available.</p>
@@ -94,8 +94,8 @@ export function CategorySelectionStep({
                 />
               </div>
               <div className="ml-3 text-sm">
-                <label 
-                  htmlFor={`category-${category.id}`} 
+                <label
+                  htmlFor={`category-${category.id}`}
                   className="font-medium text-gray-700"
                 >
                   {category.name}
@@ -109,4 +109,4 @@ export function CategorySelectionStep({
   );
 }
 
-export default CategorySelectionStep;
+

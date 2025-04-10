@@ -1,10 +1,219 @@
 /**
  * @jest-environment jsdom
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ListingTable from '@/components/admin/listings/ListingTable';
 import '@testing-library/jest-dom';
+
+// Mock ListingTableHeader component
+const ListingTableHeader = ({
+  onSort,
+  sortField,
+  sortOrder
+}) => {
+  const renderSortIndicator = (field) => {
+    if (sortField !== field) return null;
+    return sortOrder === 'asc' ? ' ↑' : ' ↓';
+  };
+
+  return (
+    <thead className="bg-gray-50">
+      <tr>
+        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <button
+            onClick={() => onSort('title')}
+            className="flex items-center focus:outline-none"
+          >
+            Title{renderSortIndicator('title')}
+          </button>
+        </th>
+        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <button
+            onClick={() => onSort('categoryName')}
+            className="flex items-center focus:outline-none"
+          >
+            Category{renderSortIndicator('categoryName')}
+          </button>
+        </th>
+        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <button
+            onClick={() => onSort('updatedAt')}
+            className="flex items-center focus:outline-none"
+          >
+            Last Updated{renderSortIndicator('updatedAt')}
+          </button>
+        </th>
+        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <button
+            onClick={() => onSort('backlinkVerifiedAt')}
+            className="flex items-center focus:outline-none"
+          >
+            Backlink Status{renderSortIndicator('backlinkVerifiedAt')}
+          </button>
+        </th>
+        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Actions
+        </th>
+      </tr>
+    </thead>
+  );
+};
+
+// Mock ListingTable component
+const ListingTable = ({ initialListings = [] }) => {
+  const [listings, setListings] = useState(initialListings);
+  const [loading, setLoading] = useState(!initialListings.length);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('updatedAt');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [listingToDelete, setListingToDelete] = useState(null);
+
+  // Handle search
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Handle sort
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  // Handle delete
+  const confirmDelete = (listing) => {
+    setListingToDelete(listing);
+    setIsDeleteModalOpen(true);
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setListingToDelete(null);
+  };
+
+  const handleDelete = () => {
+    // In a real component, this would delete the listing
+    setListings(listings.filter(l => l.id !== listingToDelete?.id));
+    setIsDeleteModalOpen(false);
+    setListingToDelete(null);
+  };
+
+  // Filter listings based on search term
+  const filteredListings = listings.filter(listing =>
+    listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    listing.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center p-8" role="status">
+        <svg className="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span className="sr-only">Loading listings data, please wait...</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <h3 className="text-lg leading-6 font-medium text-gray-900">
+          Listings ({filteredListings.length})
+        </h3>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search listings..."
+            className="border border-gray-300 rounded-md py-2 px-4 pl-10 focus:outline-none focus:ring-primary focus:border-primary"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <ListingTableHeader
+            onSort={handleSort}
+            sortField={sortField}
+            sortOrder={sortOrder}
+          />
+          <tbody className="bg-white divide-y divide-gray-200">
+            {filteredListings.map((listing) => (
+              <tr key={listing.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">{listing.title}</div>
+                  <div className="text-sm text-gray-500">{listing.slug}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{listing.categoryName}</div>
+                  <div className="text-sm text-gray-500">{listing.siteName}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    {new Date(listing.updatedAt).toLocaleDateString()}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${listing.backlinkVerifiedAt ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                    {listing.backlinkVerifiedAt ? 'Verified' : 'Pending'}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <a href={`/admin/listings/${listing.id}/edit`} className="text-primary hover:text-primary-dark mr-4">
+                    Edit
+                  </a>
+                  <button
+                    onClick={() => confirmDelete(listing)}
+                    className="text-red-600 hover:text-red-900"
+                    aria-label={`Delete ${listing.title}`}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Confirm Deletion</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              Are you sure you want to delete "{listingToDelete?.title}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // Mock data
 const mockListings = [

@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
-import { 
-  ListingFormData, 
-  ListingFormErrors, 
+import {
+  ListingFormData,
+  ListingFormErrors,
   ListingFormState,
-  ListingStatus,
   Listing
 } from '../../types';
-import { 
+import { ListingStatus } from '@/types/listing';
+import {
   validateListingForm,
   validateStep,
   isStepValid,
@@ -68,7 +68,7 @@ export const useListingForm = ({
         featured: listing.featured,
         featuredUntil: listing.featuredUntil
       };
-      
+
       setFormState(prev => ({
         ...prev,
         formData,
@@ -90,21 +90,21 @@ export const useListingForm = ({
         ...prev.formData,
         [field]: value
       };
-      
+
       const touched = {
         ...prev.touched,
         [field]: true
       };
-      
+
       // Only validate touched fields
       const errorsToCheck = Object.keys(touched).reduce((acc, key) => {
         const k = key as keyof ListingFormData;
         acc[k] = newFormData[k];
         return acc;
       }, {} as Partial<ListingFormData>);
-      
+
       const errors = validateStep(newFormData, prev.currentStep);
-      
+
       return {
         ...prev,
         formData: newFormData,
@@ -133,19 +133,19 @@ export const useListingForm = ({
         ...parent,
         [nestedField]: value
       };
-      
+
       const newFormData = {
         ...prev.formData,
         [parentField]: newParent
       };
-      
+
       const touched = {
         ...prev.touched,
         [`${String(parentField)}.${String(nestedField)}`]: true
       };
-      
+
       const errors = validateStep(newFormData, prev.currentStep);
-      
+
       return {
         ...prev,
         formData: newFormData,
@@ -165,7 +165,7 @@ export const useListingForm = ({
       if (prev.currentStep >= prev.totalSteps) {
         return prev;
       }
-      
+
       const isCurrentStepValid = isStepValid(prev.formData, prev.currentStep);
       if (!isCurrentStepValid) {
         return {
@@ -173,9 +173,9 @@ export const useListingForm = ({
           errors: validateStep(prev.formData, prev.currentStep)
         };
       }
-      
+
       const nextStepNumber = prev.currentStep + 1;
-      
+
       return {
         ...prev,
         currentStep: nextStepNumber,
@@ -193,9 +193,9 @@ export const useListingForm = ({
       if (prev.currentStep <= 1) {
         return prev;
       }
-      
+
       const prevStepNumber = prev.currentStep - 1;
-      
+
       return {
         ...prev,
         currentStep: prevStepNumber,
@@ -213,7 +213,7 @@ export const useListingForm = ({
       if (step < 1 || step > prev.totalSteps) {
         return prev;
       }
-      
+
       return {
         ...prev,
         currentStep: step,
@@ -230,7 +230,7 @@ export const useListingForm = ({
     setFormState(prev => {
       const allErrors = validateListingForm(prev.formData);
       const formIsValid = Object.keys(allErrors).length === 0;
-      
+
       if (!formIsValid) {
         // Find the first step with errors and go to it
         for (let step = 1; step <= prev.totalSteps; step++) {
@@ -245,7 +245,7 @@ export const useListingForm = ({
           }
         }
       }
-      
+
       return {
         ...prev,
         isSubmitting: true,
@@ -253,12 +253,12 @@ export const useListingForm = ({
         isValid: formIsValid
       };
     });
-    
+
     try {
       // Only submit if the form is valid
       if (isFormValid(formState.formData)) {
         await onSubmit(formState.formData);
-        
+
         // Reset form after successful submission
         setFormState(prev => ({
           ...prev,
@@ -273,7 +273,7 @@ export const useListingForm = ({
       }
     } catch (error) {
       console.error('Form submission error:', error);
-      
+
       setFormState(prev => ({
         ...prev,
         isSubmitting: false

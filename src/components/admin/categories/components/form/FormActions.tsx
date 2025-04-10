@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { FormActionsProps } from './types';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Form action buttons component
@@ -9,28 +10,23 @@ import { FormActionsProps } from './types';
 export function FormActions({ isLoading, isEditMode, onCancel }: FormActionsProps) {
   return (
     <div className="flex justify-end space-x-3" data-testid="category-form-actions">
-      <button
+      <Button
         type="button"
         onClick={onCancel}
-        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        disabled={isLoading}
+        variant="secondary"
+        isLoading={isLoading}
         data-testid="category-form-cancel"
       >
         Cancel
-      </button>
-      <button
+      </Button>
+      <Button
         type="submit"
-        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        disabled={isLoading}
+        variant="primary"
+        isLoading={isLoading}
         data-testid="category-form-submit"
       >
-        {isLoading 
-          ? 'Saving...' 
-          : isEditMode 
-            ? 'Update Category' 
-            : 'Create Category'
-        }
-      </button>
+        {isEditMode ? 'Update Category' : 'Create Category'}
+      </Button>
     </div>
   );
 }

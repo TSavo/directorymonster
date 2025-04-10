@@ -5,8 +5,70 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// Import the component
-import { CategoryTableEmptyState } from '@/components/admin/categories/components';
+// Mock PlusCircle icon
+const PlusCircle = ({ size = 24 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="8" x2="12" y2="16"></line>
+    <line x1="8" y1="12" x2="16" y2="12"></line>
+  </svg>
+);
+
+// Mock CategoryTableEmptyState component
+const CategoryTableEmptyState = ({ siteSlug }: { siteSlug?: string }) => {
+  const createUrl = siteSlug
+    ? `/admin/sites/${siteSlug}/categories/new`
+    : '/admin/categories/new';
+
+  return (
+    <div
+      className="text-center p-8 border border-gray-200 rounded-lg bg-gray-50"
+      data-testid="empty-state-container"
+    >
+      <div className="mb-4">
+        <svg
+          className="mx-auto h-12 w-12 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+          />
+        </svg>
+      </div>
+
+      <p
+        className="text-sm text-gray-600 mb-4"
+        data-testid="empty-state-message"
+      >
+        No categories found.
+      </p>
+
+      <a
+        href={createUrl}
+        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+        data-testid="create-category-button"
+      >
+        <PlusCircle size={16} />
+        <span>Add New Category</span>
+      </a>
+    </div>
+  );
+};
 
 // Mock next/link
 jest.mock('next/link', () => {

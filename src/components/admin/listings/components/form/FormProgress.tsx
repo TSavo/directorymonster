@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { Button } from '@/components/ui/Button';
 
 interface FormProgressProps {
   currentStep: number;
@@ -22,19 +23,21 @@ export function FormProgress({
           const isActive = step === currentStep;
           const isCompleted = step < currentStep;
           const isClickable = onStepClick && isCompleted;
-          
+
           return (
             <li key={step} className={`relative ${step !== 1 ? 'pl-8' : ''} ${step === totalSteps ? '' : 'pr-8'}`}>
               {step !== 1 && (
                 <div className="absolute top-4 left-0 -ml-px mt-0.5 h-0.5 w-8 bg-gray-300" aria-hidden="true"></div>
               )}
-              
-              <button
+
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={isClickable ? () => onStepClick(step) : undefined}
-                className={`group relative flex items-center justify-center ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
+                className={`group relative flex items-center justify-center p-0 h-auto ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
                 aria-current={isActive ? 'step' : undefined}
                 data-testid={`step-${step}`}
+                disabled={!isClickable}
               >
                 <span className="flex items-center" aria-hidden="true">
                   <span
@@ -62,7 +65,7 @@ export function FormProgress({
                 }`}>
                   {stepLabels[step - 1]}
                 </span>
-              </button>
+              </Button>
             </li>
           );
         })}

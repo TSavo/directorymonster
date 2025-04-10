@@ -1,163 +1,416 @@
+import { LoginAttempt } from './types/LoginAttempt'; // Ensure the correct import path
+
+// Other imports and code...
+
+import { LoginAttempt } from './types'; // Ensure the correct import path
+
+// Other imports and code...
+
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-
-export interface LoginAttempt {
-  id: string;
-  timestamp: string;
-  username: string;
-  ip: string;
-  userAgent: string;
-  success: boolean;
-  ipRiskLevel: string;
-  location: {
-    country: string;
-    city: string;
-    latitude: number;
-    longitude: number;
-  };
-  details?: Record<string, any>;
-}
-
-export interface LoginAttemptsFilter {
-  status?: string[];
-  ipRiskLevel?: string[];
-  userId?: string;
-  startDate?: string;
-  endDate?: string;
-}
+import { useState, useCallback, useEffect } from 'react';
+import { LoginAttempt, SecurityFilter } from '../../../../types/security';
+import { fetchLoginAttempts as fetchLoginAttemptsApi, blockIpAddress } from '../../../../services/securityService';
 
 export interface UseLoginAttemptsProps {
-  limit?: number;
-  filter?: LoginAttemptsFilter;
+  initialFilter?: SecurityFilter;
+  autoFetch?: boolean;
+  fetchApi?: typeof fetchLoginAttemptsApi;
+  blockIpApi?: typeof blockIpAddress;
+  defaultPageSize?: number;
 }
 
-export function useLoginAttempts({ limit = 10, filter = {} }: UseLoginAttemptsProps) {
+/**
+ * Hook for managing login attempts data with pagination and filtering
+ */
+export function useLoginAttempts(props?: UseLoginAttemptsProps) {
+  const {
+    initialFilter = {},
+    autoFetch = true,
+    fetchApi = fetchLoginAttemptsApi,
+    blockIpApi = blockIpAddress,
+    defaultPageSize = 10
+  } = props || {};
+
+  const [filter, setFilter] = useState<SecurityFilter>(initialFilter);
   const [loginAttempts, setLoginAttempts] = useState<LoginAttempt[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState<boolean>(false);
-  const [offset, setOffset] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize] = useState<number>(defaultPageSize);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
 
-  // Use a ref to track if this is the first render
-  const isFirstRender = useRef(true);
+  /**
+   * Fetch login attempts with optional filtering
+   */
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+console.log('Fetching login attempts with filter:', newFilter ? newFilter : filter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+console.log('Fetching login attempts with filter:', newFilter || filter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+  const fetchLoginAttempts = useCallback(async (newFilter?: SecurityFilter) => {
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+    setIsLoading(true);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+    setError(null);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
 
-  // Use a ref to track the previous filter to avoid unnecessary fetches
-  const prevFilterRef = useRef<string>('');
-  const prevLimitRef = useRef<number>(limit);
+let data: LoginAttempt[] = []; // Initialize data
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Received login attempts data:', data);
+    try {
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+      // Update the filter state if a new filter is provided
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+      if (newFilter) {
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+        setFilter(newFilter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+      }
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
 
-  const fetchLoginAttempts = useCallback(async (reset: boolean = true) => {
-    console.log('[useLoginAttempts] fetchLoginAttempts called, reset:', reset, 'filter:', JSON.stringify(filter), 'limit:', limit, 'offset:', offset);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+      // Reset page if filter changes
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('IP blocked successfully');
+console.log('Received more login attempts data:', data);
+      if (newFilter && newFilter !== filter) {
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+        setPage(1);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+      }
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+      // Combine filter with pagination
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+      const queryFilter = {
+console.log('IP blocked successfully',);
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+        ...newFilter || filter,
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received login attempts data:', data);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+console.log('Received login attempts data:', data);
+        page: 1,
+let data: LoginAttempt[] = []; // Initialize data
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+console.log('Received login attempts data:', data);
+        pageSize
+let data: LoginAttempt[] = []; // Initialize data
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+console.log('Received login attempts data:', data);
+      };
+let data: LoginAttempt[] = []; // Initialize data
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+console.log('Received login attempts data:', data);
+
+console.log('Received login attempts data:', data);
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+      const data = await fetchApi(queryFilter);
+
+      setLoginAttempts(data);
+console.log('IP blocked successfully');
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+      setHasMore(data.length === pageSize);
+      return data;
+    } catch (err) {
+console.log('IP blocked successfully');
+      console.error('Error fetching login attempts:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch login attempts';
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+      setError(errorMessage);
+console.log('IP blocked successfully');
+      return [];
+    } finally {
+console.log('Blocking IP:', ip);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Loading more login attempts with filter:', queryFilter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('IP blocked successfully');
+console.log('Received more login attempts data:', data);
+      setIsLoading(false);
+console.log('Blocking IP:', ip);
+    }
+  }, [filter, pageSize, fetchApi]);
+
+  /**
+let data: LoginAttempt[] = []; // Initialize data
+console.log('IP blocked successfully');
+console.log('Received more login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Blocking IP:', ip);
+console.log('Loading more login attempts with filter:', queryFilter);
+   * Load more login attempts (pagination)
+   */
+  const loadMore = useCallback(async () => {
+let data: LoginAttempt[] = []; // Initialize data
+console.log('IP blocked successfully');
+console.log('Received more login attempts data:', data);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Blocking IP:', ip);
+console.log('Loading more login attempts with filter:', queryFilter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+    if (isLoading || !hasMore) return [];
+
+console.log('IP blocked successfully');
+    setIsLoading(true);
+let queryFilter = { ...filter, page: nextPage, pageSize }; // Initialize queryFilter
+console.log('Blocking IP:', ip);
+console.log('Loading more login attempts with filter:', queryFilter);
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+    setError(null);
+
+console.log('IP blocked successfully');
+console.log('Loading more login attempts with filter:', queryFilter);
+    try {
+      const nextPage = page + 1;
+let data: LoginAttempt[] = []; // Initialize data
+console.log('Received more login attempts data:', data);
+
+console.log('Blocking IP:', ip);
+      // Combine filter with pagination
+      const queryFilter = {
+        ...filter,
+        page: nextPage,
+let data: LoginAttempt[] = []; // Initialize data
+console.log('IP blocked successfully');
+console.log('Received more login attempts data:', data);
+        pageSize
+console.log('Blocking IP:', ip);
+      };
+
+console.log('Received more login attempts data:', data);
+      const data = await fetchApi(queryFilter);
+
+console.log('IP blocked successfully');
+      setLoginAttempts(prev => [...prev, ...data]);
+      setHasMore(data.length === pageSize);
+      setPage(nextPage);
+      return data;
+    } catch (err) {
+      console.error('Error loading more login attempts:', err);
+console.log('Blocking IP:', ip);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load more login attempts';
+      setError(errorMessage);
+      return [];
+    } finally {
+      setIsLoading(false);
+console.log('IP blocked successfully');
+    }
+  }, [filter, hasMore, isLoading, page, pageSize, fetchApi]);
+console.log('Blocking IP:', ip);
+
+  /**
+   * Refresh the data with current filters
+   */
+  const refresh = useCallback(() => {
+console.log('IP blocked successfully');
+    return fetchLoginAttempts(filter);
+  }, [fetchLoginAttempts, filter]);
+console.log('Blocking IP:', ip);
+
+  /**
+   * Block an IP address
+   */
+console.log('Blocking IP:', ip);
+console.log('IP blocked successfully');
+  const blockIp = useCallback(async (ip: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Build query string
-      const queryParams = new URLSearchParams();
-      queryParams.append('limit', limit.toString());
+console.log('IP blocked successfully');
+      await blockIpApi(ip);
 
-      if (!reset) {
-        queryParams.append('offset', offset.toString());
-      }
+      // Update the local state to reflect the blocked IP
+      setLoginAttempts(prev =>
+        prev.map(attempt =>
+          attempt.ipAddress === ip
+            ? { ...attempt, status: 'blocked' }
+            : attempt
+        )
+      );
 
-      if (filter.startDate) queryParams.append('startDate', filter.startDate);
-      if (filter.endDate) queryParams.append('endDate', filter.endDate);
-
-      if (filter.status && filter.status.length > 0) {
-        filter.status.forEach(status => {
-          queryParams.append('status', status);
-        });
-      }
-
-      if (filter.ipRiskLevel && filter.ipRiskLevel.length > 0) {
-        filter.ipRiskLevel.forEach(level => {
-          queryParams.append('ipRiskLevel', level);
-        });
-      }
-
-      if (filter.userId) queryParams.append('userId', filter.userId);
-
-      const url = `/api/admin/security/login-attempts?${queryParams.toString()}`;
-
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Error fetching login attempts: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('[useLoginAttempts] Data fetched successfully:', data.loginAttempts.length, 'attempts, hasMore:', data.hasMore);
-
-      if (reset) {
-        setLoginAttempts(data.loginAttempts);
-        setOffset(data.loginAttempts.length);
-        console.log('[useLoginAttempts] Reset data and set offset to:', data.loginAttempts.length);
-      } else {
-        setLoginAttempts(prev => [...prev, ...data.loginAttempts]);
-        setOffset(prev => prev + data.loginAttempts.length);
-        console.log('[useLoginAttempts] Appended data and increased offset by:', data.loginAttempts.length);
-      }
-
-      setHasMore(data.hasMore);
+      return true;
     } catch (err) {
-      console.error('[useLoginAttempts] Error fetching data:', err);
-      setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+      console.error('Error blocking IP:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to block IP';
+      setError(errorMessage);
+      return false;
     } finally {
-      console.log('[useLoginAttempts] Fetch operation completed, setting isLoading to false');
       setIsLoading(false);
     }
-  }, [limit, offset, filter]);
+  }, [blockIpApi]);
 
+  // Auto-fetch on mount or when filter changes
   useEffect(() => {
-    // Convert filter to string for comparison
-    const filterString = JSON.stringify(filter);
-
-    console.log('[useLoginAttempts] Effect triggered, filter:', filterString, 'limit:', limit);
-
-    // Only fetch if this is the first render or if the filter or limit has changed
-    if (isFirstRender.current ||
-        filterString !== prevFilterRef.current ||
-        limit !== prevLimitRef.current) {
-
-      // Update refs
-      isFirstRender.current = false;
-      prevFilterRef.current = filterString;
-      prevLimitRef.current = limit;
-
-      // Reset offset and fetch data
-      setOffset(0);
-      fetchLoginAttempts(true);
+    if (autoFetch) {
+      fetchLoginAttempts();
     }
-
-    // Cleanup function to help with debugging
-    return () => {
-      console.log('[useLoginAttempts] Effect cleanup, filter was:', filterString, 'limit was:', limit);
-    };
-  }, [fetchLoginAttempts, filter, limit]);
-
-  const loadMore = async () => {
-    if (!isLoading && hasMore) {
-      await fetchLoginAttempts(false);
-    }
-  };
-
-  const refresh = async () => {
-    setOffset(0);
-    await fetchLoginAttempts(true);
-  };
+  }, [autoFetch, fetchLoginAttempts]);
 
   return {
     loginAttempts,
     isLoading,
     error,
     hasMore,
+    fetchLoginAttempts,
     loadMore,
     refresh,
+    blockIp,
+    // Expose these for testing
+    filter,
+    page,
+    pageSize
   };
 }

@@ -7,7 +7,12 @@ interface ButtonProps {
   className?: string;
   onClick?: () => void;
   disabled?: boolean;
+  isLoading?: boolean;
+  loadingText?: string;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
+  'data-testid'?: string;
   [prop: string]: any;
 }
 
@@ -19,19 +24,34 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   onClick,
   disabled = false,
+  isLoading = false,
+  loadingText,
+  leftIcon,
+  rightIcon,
   type = 'button',
+  'data-testid': dataTestId = 'ui-button',
   ...props
 }) => {
+  // Filter out any props that aren't valid for DOM elements
+  const validProps = Object.entries(props).reduce((acc, [key, value]) => {
+    if (typeof value !== 'function' && typeof value !== 'object') {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as Record<string, any>);
+
   return (
     <button
       type={type}
       className={`ui-button ui-button-${variant} ui-button-${size} ${className}`}
       onClick={onClick}
-      disabled={disabled}
-      data-testid="ui-button"
-      {...props}
+      disabled={disabled || isLoading}
+      data-testid={dataTestId}
+      {...validProps}
     >
-      {children}
+      {leftIcon && <span className="mr-2">{leftIcon}</span>}
+      {isLoading ? (loadingText || 'Loading...') : children}
+      {rightIcon && <span className="ml-2">{rightIcon}</span>}
     </button>
   );
 };

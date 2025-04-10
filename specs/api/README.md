@@ -4,21 +4,26 @@ This document outlines the API architecture and endpoints available for programm
 
 ## API Architecture
 
-DirectoryMonster implements a three-tier API architecture:
+DirectoryMonster implements a two-tier API architecture with site-specific submission endpoints:
 
-1. **Public API** (`/api/*`): Read-only endpoints for public consumption of directory data
-2. **Submission API** (`/api/submit/*`): Authenticated endpoints for content contribution
-3. **Admin API** (`/api/admin/*`): Administrative endpoints for system management
+1. **Public API** (`/api/sites/*`):
+   - Read-only endpoints for public consumption of directory data
+   - Includes authenticated submission endpoints at `/api/sites/[siteSlug]/submissions`
+   - Requires authentication and ACL permissions for submission operations
 
-This separation provides clear boundaries between different types of operations and security models.
+2. **Admin API** (`/api/admin/*`):
+   - Administrative endpoints for system management
+   - Includes submission review and management at `/api/admin/submissions`
+
+This architecture provides clear boundaries between different types of operations and security models while maintaining a consistent approach to site-specific operations.
 
 ## Public API
 
-The Public API provides read-only access to published directory content. These endpoints do not require authentication and are designed for high-performance content delivery.
+The Public API primarily provides read-only access to published directory content. Most endpoints do not require authentication and are designed for high-performance content delivery.
 
 ### Authentication
 
-No authentication is required for Public API endpoints.
+Most Public API endpoints do not require authentication. However, the submission endpoints (`/api/sites/[siteSlug]/submissions/*`) require authentication and ACL permissions.
 
 ### Caching
 
@@ -90,15 +95,15 @@ X-Tenant-ID: YOUR_TENANT_ID
 
 - `GET /api/search`: Search across all sites and listings
 
-### Submission API
+### User Submission Endpoints (Public API with Authentication)
 
-#### Listings Submission
+#### Site-Specific Submissions
 
-- `POST /api/submit/listings`: Create a new listing submission
-- `GET /api/submit/listings`: Retrieve user's listing submissions
-- `GET /api/submit/listings/{submissionId}`: Get details of a specific submission
-- `PUT /api/submit/listings/{submissionId}`: Update a pending submission
-- `DELETE /api/submit/listings/{submissionId}`: Withdraw a submission
+- `POST /api/sites/{siteSlug}/submissions`: Create a new submission for a specific site
+- `GET /api/sites/{siteSlug}/submissions`: Retrieve user's own submissions for a specific site
+- `GET /api/sites/{siteSlug}/submissions/{submissionId}`: Get details of a specific submission
+- `PUT /api/sites/{siteSlug}/submissions/{submissionId}`: Update a pending submission
+- `DELETE /api/sites/{siteSlug}/submissions/{submissionId}`: Withdraw a submission
 
 ### Admin API
 
@@ -127,15 +132,16 @@ X-Tenant-ID: YOUR_TENANT_ID
 
 #### Submission Management
 
-- `GET /api/admin/submissions`: List all submissions
-- `PUT /api/admin/submissions/{id}/approve`: Approve a submission
-- `PUT /api/admin/submissions/{id}/reject`: Reject a submission
-- `PUT /api/admin/submissions/{id}/feedback`: Provide feedback on a submission
+- `GET /api/admin/submissions`: List all submissions (with filtering options)
+- `GET /api/admin/submissions/{id}`: Get details of a specific submission
+- `POST /api/admin/submissions/{id}/approve`: Approve a submission
+- `POST /api/admin/submissions/{id}/reject`: Reject a submission with feedback
+- `POST /api/admin/submissions/{id}/request-changes`: Request changes to a submission
 
 ## Detailed Documentation
 
 For detailed specifications of each endpoint, refer to the individual API documentation files in the respective directories:
 
 - [Public API Documentation](./README.md)
-- [Submission API Documentation](./submit/README.md)
+- [User Submission Documentation](./submit/README.md)
 - [Admin API Documentation](./admin/README.md)

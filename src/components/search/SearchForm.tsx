@@ -27,38 +27,34 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    
+
     // Validate query length
     if (!query.trim()) {
       setError('Please enter a search term');
       return;
     }
-    
+
     const terms = query.trim().split(/\s+/).filter(term => term.length > 2);
-    
+
     if (terms.length === 0) {
       setError(`Search terms must be at least ${minQueryLength} characters long`);
       return;
     }
-    
+
     // Clear any error
     setError(null);
-    
+
     // Build search URL
     const searchParams = new URLSearchParams();
     searchParams.set('q', query);
-    
-    if (siteId) {
-      searchParams.set('siteId', siteId);
-    }
-    
-    // Redirect to search results page
+
+    // Redirect to search results page - site context is handled by middleware
     router.push(`/search?${searchParams.toString()}`);
   };
 
   return (
-    <form 
-      onSubmit={handleSubmit} 
+    <form
+      onSubmit={handleSubmit}
       className={`flex flex-col sm:flex-row gap-2 ${className}`}
       role="search"
       aria-label="Site search"
@@ -76,8 +72,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
           aria-describedby={error ? "search-error" : undefined}
         />
         {error && (
-          <div 
-            id="search-error" 
+          <div
+            id="search-error"
             className="text-red-500 text-sm mt-1 absolute"
             role="alert"
           >

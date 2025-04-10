@@ -2,7 +2,9 @@
 
 import React, { useState, useCallback } from 'react';
 import Image from 'next/image';
-import { ListingFormData, ListingMedia, MediaType } from '../../types';
+import { ListingFormData, ListingMedia } from '../../types';
+import { MediaType } from '@/types/listing';
+import { Button } from '@/components/ui/Button';
 
 interface MediaUploadStepProps {
   formData: ListingFormData;
@@ -11,7 +13,7 @@ interface MediaUploadStepProps {
   isSubmitting: boolean;
 }
 
-export function MediaUploadStep({
+export default function MediaUploadStep({
   formData,
   errors,
   updateField,
@@ -25,11 +27,11 @@ export function MediaUploadStep({
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    
+
     setUploading(true);
     setUploadProgress(0);
     setUploadError(null);
-    
+
     try {
       // Mock file upload progress
       const mockUploadInterval = setInterval(() => {
@@ -38,13 +40,13 @@ export function MediaUploadStep({
           return Math.min(prev + 10, 90);
         });
       }, 300);
-      
+
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      
+
       clearInterval(mockUploadInterval);
       setUploadProgress(100);
-      
+
       // Create new media objects
       const newMedia: ListingMedia[] = Array.from(files).map((file, index) => ({
         id: `temp-${Date.now()}-${index}`,
@@ -56,10 +58,10 @@ export function MediaUploadStep({
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }));
-      
+
       // Update form data
       updateField('media', [...formData.media, ...newMedia]);
-      
+
       // Reset upload state
       setTimeout(() => {
         setUploading(false);
@@ -71,7 +73,7 @@ export function MediaUploadStep({
       setUploading(false);
       setUploadProgress(null);
     }
-    
+
     // Clear input
     e.target.value = '';
   }, [formData.media, updateField]);
@@ -79,12 +81,12 @@ export function MediaUploadStep({
   // Remove media item
   const handleRemoveMedia = (mediaId: string) => {
     const newMedia = formData.media.filter((item) => item.id !== mediaId);
-    
+
     // If removing primary image, set the first one as primary
     if (newMedia.length > 0 && formData.media.find((item) => item.id === mediaId)?.isPrimary) {
       newMedia[0].isPrimary = true;
     }
-    
+
     updateField('media', newMedia);
   };
 
@@ -94,18 +96,18 @@ export function MediaUploadStep({
       ...item,
       isPrimary: item.id === mediaId
     }));
-    
+
     updateField('media', newMedia);
   };
 
   return (
     <div className="space-y-4" data-testid="listing-form-media-upload">
       <h3 className="text-lg font-medium text-gray-900">Upload Media</h3>
-      
+
       {errors.media && (
         <p className="mt-1 text-sm text-red-600">{errors.media}</p>
       )}
-      
+
       <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
         <div className="space-y-1 text-center">
           <svg
@@ -145,24 +147,24 @@ export function MediaUploadStep({
           <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
         </div>
       </div>
-      
+
       {uploadProgress !== null && (
         <div className="w-full bg-gray-200 rounded-full h-2.5">
-          <div 
-            className="bg-blue-600 h-2.5 rounded-full" 
+          <div
+            className="bg-blue-600 h-2.5 rounded-full"
             style={{ width: `${uploadProgress}%` }}
           ></div>
         </div>
       )}
-      
+
       {uploadError && (
         <p className="mt-1 text-sm text-red-600">{uploadError}</p>
       )}
-      
+
       {formData.media.length > 0 && (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {formData.media.map((item) => (
-            <div 
+            <div
               key={item.id}
               className={`relative rounded-lg overflow-hidden border ${
                 item.isPrimary ? 'border-blue-500' : 'border-gray-300'
@@ -177,10 +179,12 @@ export function MediaUploadStep({
                   sizes="(max-width: 768px) 50vw, 25vw"
                 />
               </div>
-              
+
               <div className="absolute top-1 right-1 flex space-x-1">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => handleSetPrimary(item.id)}
                   disabled={item.isPrimary || isSubmitting}
                   className={`p-1 rounded-full ${
@@ -194,12 +198,14 @@ export function MediaUploadStep({
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
-                </button>
-                
-                <button
+                </Button>
+
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => handleRemoveMedia(item.id)}
-                  disabled={isSubmitting}
+                  isLoading={isSubmitting}
                   className="p-1 bg-white text-red-600 rounded-full hover:bg-gray-100"
                   title="Remove"
                   data-testid={`remove-media-${item.id}`}
@@ -207,7 +213,7 @@ export function MediaUploadStep({
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -217,4 +223,4 @@ export function MediaUploadStep({
   );
 }
 
-export default MediaUploadStep;
+

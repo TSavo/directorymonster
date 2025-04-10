@@ -12,7 +12,7 @@ import { NextRequest } from 'next/server';
 import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
 import { SiteConfig, Category, Listing } from '@/types';
 import { GET as getListings } from '@/app/api/sites/[siteSlug]/listings/route';
-import { GET as getSearchResults } from '@/app/api/search/route';
+import { GET as getSearchResults } from '@/app/api/sites/[siteSlug]/search/route';
 import { kv, redis } from '@/lib/redis-client';
 import { createLogger } from '@/lib/logger';
 
@@ -556,8 +556,8 @@ describe('Large Dataset Handling', () => {
       // Define search terms that will match multiple results
       const searchTerm = 'test';
 
-      // Create search request
-      const request = createMockRequest(`/api/search?q=${searchTerm}&siteId=${site.id}&limit=20`, {
+      // Create search request using site-specific endpoint
+      const request = createMockRequest(`/api/sites/${site.slug}/search?q=${searchTerm}&limit=20`, {
         headers: {
           'x-forwarded-for': '192.168.1.1',
         },
@@ -565,7 +565,7 @@ describe('Large Dataset Handling', () => {
 
       // Measure search performance
       const startTime = performance.now();
-      const response = await getSearchResults(request);
+      const response = await getSearchResults(request, { params: { siteSlug: site.slug } });
       const endTime = performance.now();
 
       const searchTime = endTime - startTime;

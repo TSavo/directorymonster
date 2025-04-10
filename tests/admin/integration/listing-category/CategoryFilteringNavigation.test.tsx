@@ -20,6 +20,12 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }));
 
+// Mock the ListingTable component
+jest.mock('@/components/admin/listings/ListingTable', () => ({
+  __esModule: true,
+  default: () => <div data-testid="mock-listing-table">Listing Table</div>
+}));
+
 // Mock hooks implementation
 import { useListings } from '@/components/admin/listings/hooks/useListings';
 import { useCategories } from '@/components/admin/categories/hooks/useCategories';

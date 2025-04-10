@@ -3,8 +3,8 @@
  */
 import { GET as getSiteListings } from '@/app/api/sites/[siteSlug]/listings/route';
 import { GET as getSiteCategories } from '@/app/api/sites/[siteSlug]/categories/route';
-import { GET as getSiteInfo } from '@/app/api/site-info/route';
-import { GET as getSearch } from '@/app/api/search/route';
+import { GET as getSiteInfo } from '@/app/api/sites/[siteSlug]/info/route';
+import { GET as getSearch } from '@/app/api/sites/[siteSlug]/search/route';
 import { setupTestEnvironment, clearTestData, createMockRequest } from '../setup';
 import { SiteConfig, Category, Listing } from '@/types';
 
@@ -200,9 +200,9 @@ describe('Cross-Site Data Isolation', () => {
     };
     await searchIndexer.indexListing(listing2 as any);
 
-    // Search with site filter for site 1
-    const request1 = createMockRequest(`/api/search?q=${commonKeyword}&siteId=${site1.id}`);
-    const response1 = await getSearch(request1);
+    // Search with site-specific endpoint for site 1
+    const request1 = createMockRequest(`/api/sites/${site1.slug}/search?q=${commonKeyword}`);
+    const response1 = await getSearch(request1, { params: { siteSlug: site1.slug } });
     const data1 = await response1.json();
 
     // Verify results are filtered to site 1
@@ -217,9 +217,9 @@ describe('Cross-Site Data Isolation', () => {
       expect(data1.pagination).toBeDefined();
     }
 
-    // Search with site filter for site 2
-    const request2 = createMockRequest(`/api/search?q=${commonKeyword}&siteId=${site2.id}`);
-    const response2 = await getSearch(request2);
+    // Search with site-specific endpoint for site 2
+    const request2 = createMockRequest(`/api/sites/${site2.slug}/search?q=${commonKeyword}`);
+    const response2 = await getSearch(request2, { params: { siteSlug: site2.slug } });
     const data2 = await response2.json();
 
     // Verify results are filtered to site 2
@@ -234,9 +234,9 @@ describe('Cross-Site Data Isolation', () => {
       expect(data2.pagination).toBeDefined();
     }
 
-    // Search with both sites
-    const request3 = createMockRequest(`/api/search?q=${commonKeyword}&siteId=${site1.id}`);
-    const response3 = await getSearch(request3);
+    // Search with site 1 again to verify consistent results
+    const request3 = createMockRequest(`/api/sites/${site1.slug}/search?q=${commonKeyword}`);
+    const response3 = await getSearch(request3, { params: { siteSlug: site1.slug } });
     const data3 = await response3.json();
 
     // Verify results for site1 are returned
@@ -259,13 +259,11 @@ describe('Cross-Site Data Isolation', () => {
     const site1 = sites[0];
     const site2 = sites[1];
 
-    // Test with site 1 domain
-    const request1 = createMockRequest('/api/site-info', {
-      hostname: site1.domain,
-    });
+    // Test with site 1 slug
+    const request1 = createMockRequest(`/api/sites/${site1.slug}/info`);
 
-    // Call the site-info API endpoint
-    const response1 = await getSiteInfo(request1);
+    // Call the site-specific info API endpoint
+    const response1 = await getSiteInfo(request1, { params: { siteSlug: site1.slug } });
 
     // Parse the response
     const data1 = await response1.json();
@@ -279,13 +277,11 @@ describe('Cross-Site Data Isolation', () => {
     expect(data1.site.id).toBeDefined();
     expect(data1.site.slug).toBeDefined();
 
-    // Test with site 2 domain
-    const request2 = createMockRequest('/api/site-info', {
-      hostname: site2.domain,
-    });
+    // Test with site 2 slug
+    const request2 = createMockRequest(`/api/sites/${site2.slug}/info`);
 
-    // Call the site-info API endpoint
-    const response2 = await getSiteInfo(request2);
+    // Call the site-specific info API endpoint
+    const response2 = await getSiteInfo(request2, { params: { siteSlug: site2.slug } });
 
     // Parse the response
     const data2 = await response2.json();

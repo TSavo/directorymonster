@@ -204,3 +204,42 @@ require('./tests/__mocks__/hooks-mock');
 
 // Import DomainStep mock
 require('./tests/__mocks__/domain-step-mock');
+
+// Set up React 18 compatibility for tests
+// We don't need to mock createRoot anymore as we're using the actual implementation
+// This ensures React 18 APIs are properly used in tests
+
+// Make sure the DOM environment is properly set up for React 18
+if (typeof window !== 'undefined') {
+  // Ensure we have the required DOM methods for React 18
+  if (!window.HTMLElement.prototype.attachShadow) {
+    window.HTMLElement.prototype.attachShadow = () => ({ mode: 'open' });
+  }
+}
+
+// Configure React Testing Library to use React 18 APIs
+require('./tests/utils/react18-setup');
+require('@testing-library/react');
+
+// Add compatibility for React Testing Library hooks tests
+const { waitForNextUpdate } = require('./tests/utils/testing-library-hooks-fix');
+
+// Make waitForNextUpdate available globally for tests
+global.waitForNextUpdate = waitForNextUpdate;
+
+// Instead of trying to patch the library directly, we'll make the function available globally
+// This way, tests can use it directly without modifying the library
+
+// Apply form polyfills for JSDOM
+require('./tests/utils/form-polyfills');
+
+// Import custom render utilities
+const { render, renderWithProviders, renderWithTheme, renderWithAllProviders } = require('./tests/utils/render');
+
+// Make custom render utilities available globally for tests
+global.renderWithProviders = renderWithProviders;
+global.renderWithTheme = renderWithTheme;
+global.renderWithAllProviders = renderWithAllProviders;
+
+// Override the default render method
+global.render = render;

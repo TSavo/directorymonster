@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 
 export interface SiteData {
   id: string;
@@ -27,7 +28,7 @@ export interface SiteTableRowProps {
 
 /**
  * SiteTableRow - Row component for the site table
- * 
+ *
  * Displays a single site with actions
  */
 export const SiteTableRow: React.FC<SiteTableRowProps> = ({
@@ -36,7 +37,7 @@ export const SiteTableRow: React.FC<SiteTableRowProps> = ({
 }) => {
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'N/A';
-    
+
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString();
@@ -44,7 +45,7 @@ export const SiteTableRow: React.FC<SiteTableRowProps> = ({
       return 'Invalid date';
     }
   };
-  
+
   return (
     <tr className="hover:bg-gray-50" data-testid={`site-row-${site.id}`}>
       <td className="py-3 px-4 border-b">
@@ -57,13 +58,13 @@ export const SiteTableRow: React.FC<SiteTableRowProps> = ({
           </div>
         )}
       </td>
-      
+
       <td className="py-3 px-4 border-b">
         <span className="text-gray-700" data-testid={`site-slug-${site.id}`}>
           {site.slug}
         </span>
       </td>
-      
+
       <td className="py-3 px-4 border-b">
         <div className="max-h-24 overflow-y-auto">
           {site.domains.length > 0 ? (
@@ -79,14 +80,14 @@ export const SiteTableRow: React.FC<SiteTableRowProps> = ({
           )}
         </div>
       </td>
-      
+
       <td className="py-3 px-4 border-b text-gray-700" data-testid={`site-created-${site.id}`}>
         {formatDate(site.createdAt)}
       </td>
-      
+
       <td className="py-3 px-4 border-b">
         <div className="flex justify-center space-x-2">
-          <Link 
+          <Link
             href={`/admin/sites/${site.id}`}
             className="p-1 text-blue-600 hover:text-blue-800"
             title="View Site"
@@ -98,8 +99,8 @@ export const SiteTableRow: React.FC<SiteTableRowProps> = ({
             </svg>
             <span className="sr-only">View Site</span>
           </Link>
-          
-          <Link 
+
+          <Link
             href={`/admin/sites/${site.id}/edit`}
             className="p-1 text-yellow-600 hover:text-yellow-800"
             title="Edit Site"
@@ -110,10 +111,12 @@ export const SiteTableRow: React.FC<SiteTableRowProps> = ({
             </svg>
             <span className="sr-only">Edit Site</span>
           </Link>
-          
-          <button
+
+          <Button
             onClick={() => onDelete(site.id)}
-            className="p-1 text-red-600 hover:text-red-800"
+            variant="ghost"
+            size="icon"
+            className="text-red-600 hover:text-red-800 p-1"
             title="Delete Site"
             data-testid={`delete-site-${site.id}`}
           >
@@ -121,7 +124,7 @@ export const SiteTableRow: React.FC<SiteTableRowProps> = ({
               <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
             <span className="sr-only">Delete Site</span>
-          </button>
+          </Button>
         </div>
       </td>
     </tr>

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Button } from '@/components/ui/Button';
 
 export interface FormActionsProps {
   /**
@@ -51,58 +52,48 @@ export const FormActions: React.FC<FormActionsProps> = ({
     <div className="flex justify-between mt-8" data-testid="form-actions">
       <div className="flex justify-start">
         {!isFirstStep && (
-          <button
+          <Button
             type="button"
             onClick={onPrevious}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded focus:outline-none focus:ring-2"
+            variant="ghost"
             data-testid="form-back-button"
-            disabled={isLoading}
+            isLoading={isLoading}
           >
             ← Back
-          </button>
+          </Button>
         )}
       </div>
 
       <div className="flex justify-end space-x-3">
-        <button
+        <Button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded focus:outline-none focus:ring-2"
+          variant="secondary"
           data-testid="cancel-button"
-          disabled={isLoading}
+          isLoading={isLoading}
         >
           Cancel
-        </button>
+        </Button>
 
         {isLastStep ? (
-          <button
+          <Button
             type="submit"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded focus:outline-none focus:ring-2 disabled:opacity-50"
+            variant="primary"
             data-testid="submit-site-button"
-            disabled={isLoading}
+            isLoading={isLoading}
           >
-            {isLoading ? (
-              <span data-testid="submit-loading">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Loading...
-              </span>
-            ) : (
-              mode === 'edit' ? `Update Site` : `Create Site`
-            )}
-          </button>
+            {mode === 'edit' ? 'Update Site' : 'Create Site'}
+          </Button>
         ) : (
-          <button
+          <Button
             type="button"
             onClick={onNext}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded focus:outline-none focus:ring-2 disabled:opacity-50"
+            variant="primary"
             data-testid="next-button"
-            disabled={isLoading}
+            isLoading={isLoading}
           >
             Next →
-          </button>
+          </Button>
         )}
       </div>
     </div>

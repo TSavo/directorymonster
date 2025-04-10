@@ -34,24 +34,24 @@ export async function deleteRole(
     if (!role) {
       return false;
     }
-    
+
     if (role.isGlobal) {
       // For global roles, we need to find all users in all tenants who have this role
       const pattern = `user:roles:*`;
       const userRoleKeys = await scanKeys(redis, pattern);
-      
+
       // Check each key for the role
       for (const key of userRoleKeys) {
         const hasRole = await redis.sismember(key, roleId);
         if (hasRole) {
           // Remove the role from this user
           await redis.srem(key, roleId);
-          
+
           // Format: user:roles:{userId}:{tenantId}
           const parts = key.split(':');
           const userId = parts[2];
           const userTenantId = parts[3];
-          
+
           // Audit the role removal
           await AuditService.logEvent({
             action: 'global_role_removed_from_user',
@@ -65,12 +65,12 @@ export async function deleteRole(
           });
         }
       }
-      
+
       // Delete the global role and remove from index
       const key = getGlobalRoleKey(roleId);
       await kv.del(key);
       await redis.srem(GLOBAL_ROLES_KEY, roleId);
-      
+
       // Audit the global role deletion
       await AuditService.logEvent({
         action: 'global_role_deleted',
@@ -85,16 +85,16 @@ export async function deleteRole(
       // For tenant roles, we only need to remove from users in this tenant
       const tenantUsersKey = getTenantUsersKey(tenantId);
       const userIds = await redis.smembers(tenantUsersKey);
-      
+
       // Remove role from all users in this tenant
       for (const userId of userIds) {
         await removeRoleFromUser(userId, tenantId, roleId);
       }
-      
+
       // Delete the role
       const key = getRoleKey(tenantId, roleId);
       await kv.del(key);
-      
+
       // Audit the role deletion
       await AuditService.logRoleEvent(
         'system', // This should be replaced with actual user ID in production
@@ -105,7 +105,7 @@ export async function deleteRole(
           roleName: role.name
         }
       );
-      
+
       // Also use logEvent directly for test coverage
       await AuditService.logEvent({
         action: 'role_deleted',
@@ -119,7 +119,7 @@ export async function deleteRole(
         success: true
       });
     }
-    
+
     return true;
   } catch (error) {
     console.error(`Error deleting role ${roleId}:`, error);
@@ -146,16 +146,16 @@ export async function getUsersWithRole(
   try {
     // Check if this is a global role
     const globalRole = await getGlobalRole(roleId);
-    
+
     if (globalRole && globalRole.isGlobal) {
       // For global roles, we need a different approach
       return getUsersWithGlobalRole(roleId);
     }
-    
+
     // For tenant roles, we can use the existing approach
     const tenantUsersKey = getTenantUsersKey(tenantId);
     const userIds = await redis.smembers(tenantUsersKey);
-    
+
     // Filter users with this role
     const usersWithRole: string[] = [];
     for (const userId of userIds) {
@@ -165,7 +165,7 @@ export async function getUsersWithRole(
         usersWithRole.push(userId);
       }
     }
-    
+
     return usersWithRole;
   } catch (error) {
     console.error(`Error getting users with role ${roleId} in tenant ${tenantId}:`, error);
@@ -182,26 +182,46 @@ export async function getUsersWithRole(
  * the function logs the error and returns an empty array.
  *
  * @param roleId - The identifier of the global role to look up.
- * @returns A promise that resolves to an array of user IDs who have the specified global role.
+ * @param page - Optional page number for pagination (default: 1).
+ * @param pageSize - Optional page size for pagination (default: all users).
+ * @returns A promise that resolves to an array of user IDs who have the specified global role,
+ *          or an object with users and total count if pagination is used.
  */
-export async function getUsersWithGlobalRole(roleId: string): Promise<string[]> {
+export async function getUsersWithGlobalRole(
+  roleId: string,
+  page?: number,
+  pageSize?: number
+): Promise<string[] | { users: string[], total: number }> {
   try {
+    // Validate pagination parameters if provided
+    if (page !== undefined || pageSize !== undefined) {
+      // If one pagination parameter is provided, both must be provided
+      if (page === undefined || pageSize === undefined) {
+        throw new Error('Both page and pageSize must be provided for pagination');
+      }
+
+      // Validate pagination parameters
+      if (page < 1 || pageSize < 1 || pageSize > 100) {
+        throw new Error('Invalid pagination parameters');
+      }
+    }
+
     // Verify this is a global role
     const globalRole = await getGlobalRole(roleId);
     if (!globalRole || !globalRole.isGlobal) {
       throw new Error(`Role ${roleId} is not a global role`);
     }
-    
+
     // Get all users who have global roles
     const allGlobalRoleUsers = await redis.smembers(GLOBAL_ROLE_USERS_KEY);
-    
+
     // Filter users who have this specific global role
     const usersWithRole: string[] = [];
     for (const userId of allGlobalRoleUsers) {
       // Check each tenant where the user has roles
       const pattern = `user:roles:${userId}:*`;
       const keys = await scanKeys(redis, pattern);
-      
+
       // Check if the user has this role in any tenant
       for (const key of keys) {
         const hasRole = await redis.sismember(key, roleId);
@@ -211,10 +231,29 @@ export async function getUsersWithGlobalRole(roleId: string): Promise<string[]> 
         }
       }
     }
-    
-    return usersWithRole;
+
+    // If pagination is not requested, return all users
+    if (page === undefined || pageSize === undefined) {
+      return usersWithRole;
+    }
+
+    // Apply pagination
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, usersWithRole.length);
+    const paginatedUsers = usersWithRole.slice(startIndex, endIndex);
+
+    // Return paginated results with total count
+    return {
+      users: paginatedUsers,
+      total: usersWithRole.length
+    };
   } catch (error) {
     console.error(`Error getting users with global role ${roleId}:`, error);
+
+    // Return appropriate empty result based on whether pagination was requested
+    if (page !== undefined && pageSize !== undefined) {
+      return { users: [], total: 0 };
+    }
     return [];
   }
 }

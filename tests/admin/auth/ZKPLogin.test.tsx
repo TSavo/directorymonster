@@ -274,7 +274,7 @@ describe('ZKPLogin Component', () => {
     // Check for the loading spinner immediately after form submission
     // The spinner is an SVG with an aria-hidden attribute, so we can't use screen.getByRole
     // Instead, look for the text "Authenticating..." which appears when loading
-    expect(screen.getByText(/authenticating/i)).toBeInTheDocument();
+    expect(screen.getByText('Authenticating...')).toBeInTheDocument();
 
     // Wait for the authentication to complete
     await waitFor(() => {

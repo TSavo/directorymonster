@@ -46,13 +46,13 @@ src/components/admin/listings/
 The ListingForm component is a multi-step form for creating and editing listings. It provides step navigation, validation, and preview functionality.
 
 ```jsx
-import { ListingForm } from '@/components/admin/listings';
+import ListingForm from '@/components/admin/listings/ListingForm';
 
 export default function CreateListingPage({ params }) {
   const { siteSlug } = params;
-  
+
   return (
-    <ListingForm 
+    <ListingForm
       siteSlug={siteSlug}
       mode="create"
       onSuccess={(data) => console.log('Listing created:', data)}
@@ -70,7 +70,7 @@ import { ListingTable } from '@/components/admin/listings';
 
 export default function ListingsPage({ params }) {
   const { siteSlug } = params;
-  
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Listing Management</h1>
@@ -168,29 +168,44 @@ Both components are designed to be responsive:
 
 Listings follow this data structure:
 
+The Listing type is defined in `src/types/listing.ts` and includes the following key properties:
+
 ```typescript
 interface Listing {
   id: string;
-  name: string;
+  siteId: string;
+  tenantId: string;
+  title: string;
   slug: string;
-  description?: string;
+  description: string;
+  content?: string;
+  status: ListingStatus | string;
   categoryIds: string[];
-  primaryCategoryId?: string;
-  price?: number;
-  salePrice?: number;
-  featuredImageUrl?: string;
-  images: string[];
-  status: 'draft' | 'published' | 'archived';
-  featured: boolean;
-  verified: boolean;
-  backlinkUrl?: string;
-  backlinkAnchor?: string;
-  backlinkVerified: boolean;
-  customFields: Record<string, any>;
+  categorySlug?: string;
+  categories?: { id: string; name: string; slug: string; }[];
+  media: ListingMedia[];
+  price?: ListingPrice;
+  contactInfo?: ContactInfo;
+  seoData?: SEOData;
+  backlinkInfo?: BacklinkInfo;
+  customFields?: CustomField[] | Record<string, unknown>;
+  featured?: boolean;
+  featuredUntil?: string;
+  viewCount?: number;
+  clickCount?: number;
+  submissionId?: string;
   createdAt: string;
   updatedAt: string;
+  publishedAt?: string;
+  expiresAt?: string;
+  userId: string;
+  userDisplayName?: string;
 }
 ```
+
+This is the single, unified definition used throughout the application. All components import this type from `@/types/listing` or via the re-export in `@/types`.
+
+See the full definition in `src/types/listing.ts` for all related types and enums.
 
 ## Error Handling
 

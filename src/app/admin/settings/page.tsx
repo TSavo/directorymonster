@@ -1,16 +1,17 @@
 import React from 'react';
+import { Button } from '@/components/ui/Button';
 
 export default function AdminSettingsPage() {
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6">System Settings</h1>
-      
+
       <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
           <h3 className="text-lg leading-6 font-medium text-gray-900">General Settings</h3>
           <p className="mt-1 max-w-2xl text-sm text-gray-500">Platform-wide configuration and options.</p>
         </div>
-        
+
         <div className="px-4 py-5 sm:p-6 space-y-6">
           <div>
             <label htmlFor="site-name" className="block text-sm font-medium text-gray-700">Platform Name</label>
@@ -25,7 +26,7 @@ export default function AdminSettingsPage() {
             </div>
             <p className="mt-1 text-sm text-gray-500">This will be displayed in system emails and admin pages.</p>
           </div>
-          
+
           <div>
             <label htmlFor="admin-email" className="block text-sm font-medium text-gray-700">Admin Email</label>
             <div className="mt-1">
@@ -39,7 +40,7 @@ export default function AdminSettingsPage() {
             </div>
             <p className="mt-1 text-sm text-gray-500">System notifications will be sent to this address.</p>
           </div>
-          
+
           <div>
             <fieldset>
               <legend className="text-sm font-medium text-gray-700">Default Settings for New Sites</legend>
@@ -58,7 +59,7 @@ export default function AdminSettingsPage() {
                     <p className="text-gray-500">When enabled, new listings will be automatically approved without review.</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <input
@@ -74,7 +75,7 @@ export default function AdminSettingsPage() {
                     <p className="text-gray-500">When enabled, users can search for listings and categories.</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <input
@@ -94,14 +95,14 @@ export default function AdminSettingsPage() {
             </fieldset>
           </div>
         </div>
-        
+
         <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-          <button
+          <Button
             type="submit"
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            variant="primary"
           >
             Save Settings
-          </button>
+          </Button>
         </div>
       </div>
     </div>
